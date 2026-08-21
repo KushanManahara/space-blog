@@ -1,0 +1,75 @@
+import { Suspense, ViewTransition } from "react";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+
+import { SectionHeader } from "@/components/layout/section-header";
+import { Reveal } from "@/components/motion/reveal";
+import { FilterChips } from "@/components/nav/filter-chips";
+import { PostCard } from "@/components/post/post-card";
+import { PostSkeletonGrid } from "@/components/post/post-skeleton";
+import { listPosts, routes, topicFilters, type TopicFilter } from "@/lib/content";
+import { buildHref } from "@/lib/url";
+
+/** Latest six posts, filtered by topic through the URL. */
+export function LatestWriting({ topic }: { topic: TopicFilter }) {
+  return (
+    <section className="mx-auto max-w-page px-gutter pb-[clamp(76px,9vw,132px)]">
+      <Reveal>
+        <SectionHeader
+          title="Latest writing"
+          subtitle="Filter by what you came for."
+          action={
+            <Link
+              href={routes.articles}
+              className="inline-flex items-center gap-2 rounded-full border border-line-2 bg-bg-2 px-5 py-[11px] text-[14px] font-semibold text-fg-1 transition-[transform,box-shadow] duration-[350ms] ease-bounce hover:-translate-y-0.5 hover:shadow-md active:scale-[0.96] active:duration-150 active:ease-out"
+            >
+              View all
+              <ArrowRight className="size-[15px]" strokeWidth={1.75} />
+            </Link>
+          }
+          className="mb-7"
+        />
+      </Reveal>
+
+      <Reveal className="mb-6.5">
+        <FilterChips
+          label="Filter latest writing by topic"
+          options={topicFilters.map((option) => ({
+            label: option,
+            href: buildHref(routes.home, {}, { topic: option === "All" ? undefined : option }),
+            active: option === topic,
+          }))}
+        />
+      </Reveal>
+
+      {/* Keyed so switching topics swaps in the skeleton while the grid streams. */}
+      <Suspense key={topic} fallback={<PostSkeletonGrid />}>
+        <LatestGrid topic={topic} />
+      </Suspense>
+    </section>
+  );
+}
+
+async function LatestGrid({ topic }: { topic: TopicFilter }) {
+  const visible = listPosts({ topic, limit: 6 });
+
+  if (visible.length === 0) {
+    return (
+      <p className="rounded-lg border border-line-1 bg-bg-2 p-8 text-[15px] text-fg-2">
+        Nothing published under this topic yet. Try another filter.
+      </p>
+    );
+  }
+
+  return (
+    <ViewTransition key={topic} enter="content-swap" exit="content-swap">
+      <div className="grid gap-5.5 sm:grid-cols-2 lg:grid-cols-3">
+        {visible.map((post, index) => (
+          <Reveal key={post.slug} index={index}>
+            <PostCard post={post} />
+          </Reveal>
+        ))}
+      </div>
+    </ViewTransition>
+  );
+}

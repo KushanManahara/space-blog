@@ -1,0 +1,644 @@
+@import "tailwindcss";
+
+/* ============================================================
+   GIMHARA DESIGN SYSTEM — token layer
+   Ported from the design project's colors_and_type.css.
+   Every colour, radius, shadow and easing used in the app comes
+   from here; components never hardcode hex values.
+   ============================================================ */
+@theme {
+  /* — Brand Blue Ramp (#007AFF) — */
+  --color-violet-100: #e5f2ff;
+  --color-violet-200: #c7e2fe;
+  --color-violet-300: #90c5fd;
+  --color-violet-400: #4ba0fc;
+  --color-violet-500: #007aff;
+  --color-violet-600: #0062d2;
+  --color-violet-700: #004da8;
+
+  /* — Sky / Cyan Ramp — */
+  --color-orchid-100: #e0f7fe;
+  --color-orchid-200: #b9eefd;
+  --color-orchid-300: #7cdcfb;
+  --color-orchid-400: #38c5f8;
+  --color-orchid-500: #0ea5e9;
+  --color-orchid-600: #0284c7;
+  --color-orchid-700: #0369a1;
+
+  /* — Deep Navy / Slate Ramp — */
+  --color-indigo-100: #e2e8f0;
+  --color-indigo-200: #cbd5e1;
+  --color-indigo-300: #94a3b8;
+  --color-indigo-400: #64748b;
+  --color-indigo-500: #1e3a8a;
+  --color-indigo-600: #172554;
+  --color-indigo-700: #0f172a;
+
+  /* — Cobalt / Electric Azure Ramp — */
+  --color-cornflower-100: #e8f0fe;
+  --color-cornflower-200: #c2d9fe;
+  --color-cornflower-300: #93befd;
+  --color-cornflower-400: #609ffa;
+  --color-cornflower-500: #007aff;
+  --color-cornflower-600: #0062d2;
+
+  /* Direct Blue Tokens */
+  --color-blue-100: #e5f2ff;
+  --color-blue-200: #c7e2fe;
+  --color-blue-300: #90c5fd;
+  --color-blue-400: #4ba0fc;
+  --color-blue-500: #007aff;
+  --color-blue-600: #0062d2;
+  --color-blue-700: #004da8;
+
+  /* — Pastel surface tints — */
+  --color-tint-orchid: #e0f2fe;
+  --color-tint-violet: #e5f2ff;
+  --color-tint-indigo: #eef2f6;
+  --color-tint-cornflower: #e8f2fe;
+
+  /* — Neutrals: clean cool whites → deep slate-black darks (No purple tint) — */
+  --color-n-0: #ffffff;
+  --color-n-50: #f8fafc;
+  --color-n-100: #f1f5f9;
+  --color-n-200: #e2e8f0;
+  --color-n-300: #cbd5e1;
+  --color-n-400: #94a3b8;
+  --color-n-500: #64748b;
+  --color-n-600: #475569;
+  --color-n-700: #334155;
+  --color-n-800: #1e293b;
+  --color-n-900: #0f172a;
+  --color-n-950: #080d1a;
+
+  /* — Semantic foregrounds — */
+  --color-fg-1: var(--color-n-900);
+  --color-fg-2: var(--color-n-600);
+  --color-fg-3: var(--color-n-500);
+  --color-fg-link: #007aff;
+
+  /* Long-form body copy runs one step darker than fg-2, and decorative glyphs
+     (list arrows, rank numerals) one step lighter than fg-3. Both need their
+     own token so dark mode can move them independently. */
+  --color-fg-prose: var(--color-n-700);
+  --color-fg-faint: var(--color-n-400);
+
+  /* — Semantic surfaces — */
+  --color-bg-1: var(--color-n-50);
+  --color-bg-2: var(--color-n-0);
+  --color-bg-3: var(--color-n-100);
+  --color-bg-inverse: var(--color-n-900);
+
+  /* — Lines & strokes — */
+  --color-line-1: var(--color-n-200);
+  --color-line-2: var(--color-n-300);
+
+  /* Veil: the translucent plate under floating chrome (nav bar, hover rows,
+     sticky toolbars). Always the *lifted* surface for the current theme, so
+     `bg-veil/80` reads as frosted white in light and frosted slate in dark.
+     Distinct from bg-2 because it is only ever used with an alpha. */
+  --color-veil: var(--color-n-0);
+
+  /* — Accents — */
+  --color-brand: #007aff;
+  --color-accent: #007aff;
+
+  /* The deeper brand step, used for hover ink on titles and links. Separate
+     from --color-brand so dark mode can lift it without shifting the accent. */
+  --color-brand-strong: #0056b3;
+  --color-accent-orchid: #0284c7;
+  --color-accent-indigo: #1d4ed8;
+
+  /* Hairline in brand colour, used on chips and toggles that carry a tint. */
+  --color-line-brand: #c7e2fe;
+
+  /* Ink: the maximum-contrast solid used by primary buttons, active chips and
+     pagination. It is the opposite end of the page, so it inverts with the
+     theme — near-black plate in light, near-white plate in dark. */
+  --color-ink: var(--color-n-900);
+  --color-on-ink: var(--color-n-0);
+
+  /* Plate: the offset card sitting behind the featured cover. A large flat
+     area, so unlike the topic chips it cannot stay a pastel in dark mode. */
+  --color-plate: #e5f2ff;
+
+  /* — Typography — */
+  --font-sans:
+    var(--font-louis-george-cafe), system-ui, -apple-system, "Segoe UI", Helvetica, Arial,
+    sans-serif;
+  --font-display: var(--font-louis-george-cafe), system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", "Menlo", monospace;
+
+  /* — Type scale — Each step carries its own leading, tracking and weight, so
+     a heading is one utility rather than four. Values are the ones already in
+     use; this names them, it does not retune them. */
+  --text-display: clamp(40px, 5.4vw, 68px);
+  --text-display--line-height: 1.04;
+  --text-display--letter-spacing: -0.03em;
+  --text-display--font-weight: 300;
+
+  --text-h1: clamp(36px, 4.6vw, 58px);
+  --text-h1--line-height: 1.05;
+  --text-h1--letter-spacing: -0.03em;
+  --text-h1--font-weight: 300;
+
+  --text-h2: clamp(28px, 3.4vw, 40px);
+  --text-h2--line-height: 1.12;
+  --text-h2--letter-spacing: -0.025em;
+  --text-h2--font-weight: 700;
+
+  --text-h3: clamp(26px, 3vw, 34px);
+  --text-h3--line-height: 1.15;
+  --text-h3--letter-spacing: -0.025em;
+  --text-h3--font-weight: 700;
+
+  --text-h4: clamp(30px, 3.6vw, 44px);
+  --text-h4--line-height: 1.14;
+  --text-h4--letter-spacing: -0.025em;
+  --text-h4--font-weight: 700;
+
+  /* — Page rhythm — the shell every section shares. */
+  --container-page: 1180px;
+  --spacing-gutter: clamp(20px, 5vw, 40px);
+  --spacing-band: clamp(76px, 9vw, 132px);
+  --spacing-tail: clamp(96px, 11vw, 176px);
+
+  /* — Radii — */
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-2xl: 44px;
+
+  /* — Elevation: crisp blue and graphite shadows — */
+  --shadow-xs: 0 1px 2px rgb(15 23 42 / 0.05);
+  --shadow-sm: 0 2px 8px rgb(0 122 255 / 0.06), 0 1px 2px rgb(15 23 42 / 0.04);
+  --shadow-md: 0 8px 24px rgb(0 122 255 / 0.08), 0 2px 6px rgb(15 23 42 / 0.05);
+  --shadow-lg: 0 20px 48px rgb(0 122 255 / 0.12), 0 6px 16px rgb(15 23 42 / 0.06);
+  --shadow-xl: 0 36px 80px rgb(0 122 255 / 0.16), 0 12px 28px rgb(15 23 42 / 0.08);
+  --shadow-glow-sm: 0 8px 32px rgb(0 122 255 / 0.22);
+  --shadow-glow-md: 0 16px 60px rgb(0 122 255 / 0.3);
+  --shadow-glow-accent: 0 12px 48px rgb(14 165 233 / 0.32);
+
+  /* Card hover: elevation shadows with soft ambient blue glow */
+  --shadow-card-hover-md: var(--shadow-md), 0 0 28px -8px rgb(0 122 255 / 0.18);
+  --shadow-card-hover-lg: var(--shadow-lg), 0 0 36px -6px rgb(0 122 255 / 0.2);
+  --shadow-card-hover-xl: var(--shadow-xl), 0 0 44px -4px rgb(0 122 255 / 0.22);
+
+  /* — Motion: ripples settling, never bouncy — */
+  --ease-expo: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.46, 0.64, 1);
+}
+
+:root {
+  /* Gradients and glows are painted, not utility-generated. */
+  --gradient-brand: linear-gradient(180deg, #38bdf8 0%, #007aff 50%, #0051b3 100%);
+  --gradient-brand-diag: linear-gradient(145deg, #38bdf8 0%, #007aff 48%, #0051b3 100%);
+  --gradient-accent: linear-gradient(180deg, #007aff 0%, #0284c7 100%);
+  --glow-violet: radial-gradient(closest-side, rgb(0 122 255 / 0.45), rgb(0 122 255 / 0));
+  --glow-blue: radial-gradient(closest-side, rgb(0 122 255 / 0.45), rgb(0 122 255 / 0));
+
+  /* Bridge for shadcn primitives so they inherit the design system. */
+  --background: var(--color-bg-1);
+  --foreground: var(--color-fg-1);
+  --border: var(--color-line-1);
+  --input: var(--color-line-1);
+  --ring: #007aff;
+  --muted-foreground: var(--color-fg-3);
+
+  /* Frosted-plate ingredients, consumed by .glass / .glass-panel. */
+  --glass-bg: rgb(255 255 255 / 0.72);
+  --glass-border: rgb(255 255 255 / 0.72);
+  --glass-panel-bg: rgb(255 255 255 / 0.86);
+  --glass-panel-border: rgb(255 255 255 / 0.75);
+  --glass-highlight: rgb(255 255 255 / 0.8);
+  --glass-brightness: 1.04;
+
+  color-scheme: light;
+}
+
+/* ============================================================
+   DARK MODE
+   Redefines the semantic layer for an obsidian/slate dark theme.
+   ============================================================ */
+:root.dark {
+  --color-fg-1: var(--color-n-50);
+  --color-fg-2: var(--color-n-300);
+  --color-fg-3: var(--color-n-400);
+  --color-fg-link: #60a5fa;
+  --color-fg-prose: var(--color-n-200);
+  --color-fg-faint: var(--color-n-600);
+
+  --color-bg-1: var(--color-n-950);
+  --color-bg-2: var(--color-n-900);
+  --color-bg-3: var(--color-n-800);
+  --color-bg-inverse: var(--color-n-800);
+
+  --color-line-1: #1e293b;
+  --color-line-2: #334155;
+
+  --color-veil: var(--color-n-800);
+
+  --color-brand: #4ba0fc;
+  --color-accent: #38bdf8;
+  --color-brand-strong: #60a5fa;
+  --color-accent-orchid: #38bdf8;
+  --color-accent-indigo: #93c5fd;
+  --color-line-brand: #1e3a8a;
+
+  --color-tint-orchid: #0c263d;
+  --color-tint-violet: #0d2847;
+  --color-tint-indigo: #0f1d33;
+  --color-tint-cornflower: #0a2342;
+
+  --color-ink: var(--color-n-50);
+  --color-on-ink: var(--color-n-900);
+  --color-plate: #1e3a8a;
+
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-sm: 0 2px 8px rgb(0 0 0 / 0.44), 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-md: 0 8px 24px rgb(0 0 0 / 0.5), 0 2px 6px rgb(0 0 0 / 0.34);
+  --shadow-lg: 0 20px 48px rgb(0 0 0 / 0.56), 0 6px 16px rgb(0 0 0 / 0.38);
+  --shadow-xl: 0 36px 80px rgb(0 0 0 / 0.62), 0 12px 28px rgb(0 0 0 / 0.42);
+  --shadow-glow-sm: 0 8px 32px rgb(0 122 255 / 0.26);
+  --shadow-glow-md: 0 16px 60px rgb(0 122 255 / 0.34);
+  --shadow-glow-accent: 0 12px 48px rgb(56 189 248 / 0.36);
+  --shadow-card-hover-md: var(--shadow-md), 0 0 28px -8px rgb(0 122 255 / 0.3);
+  --shadow-card-hover-lg: var(--shadow-lg), 0 0 36px -6px rgb(0 122 255 / 0.32);
+  --shadow-card-hover-xl: var(--shadow-xl), 0 0 44px -4px rgb(0 122 255 / 0.34);
+
+  --ring: #38bdf8;
+  --glow-violet: radial-gradient(closest-side, rgb(0 122 255 / 0.35), rgb(0 122 255 / 0));
+  --glow-blue: radial-gradient(closest-side, rgb(0 122 255 / 0.35), rgb(0 122 255 / 0));
+
+  --glass-bg: rgb(15 23 42 / 0.72);
+  --glass-border: rgb(255 255 255 / 0.09);
+  --glass-panel-bg: rgb(15 23 42 / 0.88);
+  --glass-panel-border: rgb(255 255 255 / 0.11);
+  --glass-highlight: rgb(255 255 255 / 0.07);
+  --glass-brightness: 1;
+
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --color-fg-1: var(--color-n-50);
+    --color-fg-2: var(--color-n-300);
+    --color-fg-3: var(--color-n-400);
+    --color-fg-link: #60a5fa;
+    --color-fg-prose: var(--color-n-200);
+    --color-fg-faint: var(--color-n-600);
+
+    --color-bg-1: var(--color-n-950);
+    --color-bg-2: var(--color-n-900);
+    --color-bg-3: var(--color-n-800);
+    --color-bg-inverse: var(--color-n-800);
+
+    --color-line-1: #1e293b;
+    --color-line-2: #334155;
+
+    --color-veil: var(--color-n-800);
+
+    --color-brand: #4ba0fc;
+    --color-accent: #38bdf8;
+    --color-brand-strong: #60a5fa;
+    --color-accent-orchid: #38bdf8;
+    --color-accent-indigo: #93c5fd;
+    --color-line-brand: #1e3a8a;
+
+    --color-tint-orchid: #0c263d;
+    --color-tint-violet: #0d2847;
+    --color-tint-indigo: #0f1d33;
+    --color-tint-cornflower: #0a2342;
+
+    --color-ink: var(--color-n-50);
+    --color-on-ink: var(--color-n-900);
+    --color-plate: #1e3a8a;
+
+    --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.4);
+    --shadow-sm: 0 2px 8px rgb(0 0 0 / 0.44), 0 1px 2px rgb(0 0 0 / 0.3);
+    --shadow-md: 0 8px 24px rgb(0 0 0 / 0.5), 0 2px 6px rgb(0 0 0 / 0.34);
+    --shadow-lg: 0 20px 48px rgb(0 0 0 / 0.56), 0 6px 16px rgb(0 0 0 / 0.38);
+    --shadow-xl: 0 36px 80px rgb(0 0 0 / 0.62), 0 12px 28px rgb(0 0 0 / 0.42);
+    --shadow-glow-sm: 0 8px 32px rgb(0 122 255 / 0.26);
+    --shadow-glow-md: 0 16px 60px rgb(0 122 255 / 0.34);
+    --shadow-glow-accent: 0 12px 48px rgb(56 189 248 / 0.36);
+    --shadow-card-hover-md: var(--shadow-md), 0 0 28px -8px rgb(0 122 255 / 0.3);
+    --shadow-card-hover-lg: var(--shadow-lg), 0 0 36px -6px rgb(0 122 255 / 0.32);
+    --shadow-card-hover-xl: var(--shadow-xl), 0 0 44px -4px rgb(0 122 255 / 0.34);
+
+    --ring: #38bdf8;
+    --glow-violet: radial-gradient(closest-side, rgb(0 122 255 / 0.35), rgb(0 122 255 / 0));
+    --glow-blue: radial-gradient(closest-side, rgb(0 122 255 / 0.35), rgb(0 122 255 / 0));
+
+    --glass-bg: rgb(15 23 42 / 0.72);
+    --glass-border: rgb(255 255 255 / 0.09);
+    --glass-panel-bg: rgb(15 23 42 / 0.88);
+    --glass-panel-border: rgb(255 255 255 / 0.11);
+    --glass-highlight: rgb(255 255 255 / 0.07);
+    --glass-brightness: 1;
+
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-muted-foreground: var(--muted-foreground);
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--color-bg-1);
+    color: var(--color-fg-1);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: #c7e2fe;
+    color: #0f172a;
+  }
+
+  :root.dark ::selection {
+    background: #0056b3;
+    color: #f8fafc;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not(.light) ::selection {
+      background: #0056b3;
+      color: #f8fafc;
+    }
+  }
+
+  :focus-visible {
+    outline: 2px solid #007aff;
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  /* Frosted surfaces recur across the nav, badges, modals and hero chips.
+     `.glass` and `.glass-panel` follow the theme; `.glass-on-cover` does not,
+     because it only ever sits on dark cover artwork. */
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px) saturate(170%) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(20px) saturate(170%) brightness(var(--glass-brightness));
+    border: 1px solid var(--glass-border);
+    color: var(--color-fg-1);
+    box-shadow:
+      var(--shadow-sm),
+      inset 0 1px 0 var(--glass-highlight);
+  }
+
+  .glass-panel {
+    background: var(--glass-panel-bg);
+    backdrop-filter: blur(30px) saturate(180%) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(30px) saturate(180%) brightness(var(--glass-brightness));
+    border: 1px solid var(--glass-panel-border);
+    color: var(--color-fg-1);
+    box-shadow:
+      var(--shadow-xl),
+      inset 0 1.4px 1px var(--glass-highlight);
+  }
+
+  /* Pills and badges that float on cover art. The artwork underneath is a
+     dark brand gradient in both themes, so this plate stays light and its
+     ink stays near-black regardless of the page theme. */
+  .glass-on-cover {
+    background: rgb(255 255 255 / 0.82);
+    backdrop-filter: blur(20px) saturate(170%) brightness(1.04);
+    -webkit-backdrop-filter: blur(20px) saturate(170%) brightness(1.04);
+    border: 1px solid rgb(255 255 255 / 0.72);
+    color: var(--color-n-900);
+    box-shadow:
+      var(--shadow-sm),
+      inset 0 1px 0 rgb(255 255 255 / 0.8);
+  }
+
+  .text-gradient {
+    background: var(--gradient-brand-diag);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  /* Cover art sheen — the radial highlight every gradient cover carries. */
+  .cover-sheen {
+    background: radial-gradient(
+      118% 110% at 20% 14%,
+      rgb(255 255 255 / 0.28),
+      rgb(255 255 255 / 0) 60%
+    );
+  }
+}
+
+/* Scroll reveal: hidden only once the observer has taken over, so the
+   markup stays visible when JavaScript never runs. */
+[data-reveal] {
+  opacity: 1;
+}
+
+html[data-reveal-ready="true"] [data-reveal] {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.7s var(--ease-expo) var(--reveal-delay, 0ms),
+    transform 0.7s var(--ease-bounce) var(--reveal-delay, 0ms);
+}
+
+html[data-reveal-ready="true"] [data-reveal="in"] {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -420px 0;
+  }
+  100% {
+    background-position: 420px 0;
+  }
+}
+
+/*
+ * Dialog panels centre themselves with the standalone `translate` property
+ * (via --dialog-tx/--dialog-ty, set per alignment variant) rather than the
+ * `transform` shorthand, so this keyframe's own motion doesn't clobber that
+ * centering — `translate` and `scale` are independent CSS properties and
+ * compose instead of overwriting one another.
+ */
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    scale: 0.985;
+    translate: var(--dialog-tx, -50%) calc(var(--dialog-ty, -50%) + 14px);
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+    translate: var(--dialog-tx, -50%) var(--dialog-ty, -50%);
+  }
+}
+
+/* Exits are softer and quicker than enters: a small translate, not the full
+   distance travelled in, and ease-in so the motion builds before it leaves. */
+@keyframes pop-out {
+  from {
+    opacity: 1;
+    scale: 1;
+    translate: var(--dialog-tx, -50%) var(--dialog-ty, -50%);
+  }
+  to {
+    opacity: 0;
+    scale: 0.98;
+    translate: var(--dialog-tx, -50%) calc(var(--dialog-ty, -50%) + 8px);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes bar-up {
+  from {
+    opacity: 0;
+    transform: translateY(120%);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    box-shadow: 0 0 0 4px rgb(82 113 255 / 0.16);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgb(82 113 255 / 0.05);
+  }
+}
+
+/* ============================================================
+   VIEW TRANSITIONS
+   Page-to-page navigation crossfades via `(site)/template.tsx`;
+   same-route filter/sort/tab swaps crossfade via `key`-driven
+   <ViewTransition> boundaries in the pages that use them. Timing
+   is asymmetric on purpose — old content should leave quickly so
+   it stops competing for attention; new content arrives a beat
+   slower so the reader has time to register it landed.
+   ============================================================ */
+:root {
+  --vt-duration-exit: 150ms;
+  --vt-duration-enter: 220ms;
+}
+
+::view-transition-old(.page-exit) {
+  animation: var(--vt-duration-exit) ease-in both vt-fade-out;
+}
+::view-transition-new(.page-enter) {
+  animation: var(--vt-duration-enter) ease-out var(--vt-duration-exit) both vt-fade-in;
+}
+
+/* Same-route content swap (filter chips, tabs, sort) — a plain, quick
+   crossfade; the surrounding page doesn't move, only this region does. */
+::view-transition-old(.content-swap) {
+  animation: 120ms ease-in both vt-fade-out;
+}
+::view-transition-new(.content-swap) {
+  animation: 180ms ease-out 80ms both vt-fade-in;
+}
+
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* The transition overlay would otherwise eat clicks for its duration. */
+::view-transition {
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  html[data-reveal-ready="true"] [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ============================================================
+   ANIMATED THEME TOGGLER TRANSITIONS
+   ============================================================ */
+html[data-magicui-theme-vt="active"]::view-transition-old(root),
+html[data-magicui-theme-vt="active"]::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Scoped to AnimatedThemeToggler — the toggler sets the data-attribute and the variable only during a theme toggle. */
+html[data-magicui-theme-vt="active"]::view-transition-group(root) {
+  animation-duration: var(--magicui-theme-toggle-vt-duration);
+}
+
+/* Pin the collapsed clip-path via CSS so Firefox does not paint the new
+   theme unclipped between snapshot and the ready.then() JS animation. */
+html[data-magicui-theme-vt="active"]::view-transition-new(root) {
+  clip-path: var(--magicui-theme-vt-clip-from);
+}
