@@ -62,6 +62,7 @@ function FeaturedCard({ post }: { post: Post }) {
           alt={post.title}
           priority
           pattern={false}
+          notch
           className="aspect-[16/10]"
         >
           {!post.coverImage ? <CoverRings sizes={[520, 340, 180]} /> : null}

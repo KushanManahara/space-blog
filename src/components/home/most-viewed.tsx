@@ -89,12 +89,13 @@ function MostViewedHero({ post }: { post: PostSummary }) {
         image={post.coverImage}
         alt={post.title}
         pattern={false}
+        notch
         className="aspect-[16/11] rounded-lg shadow-md transition-[transform,box-shadow] duration-[550ms] ease-bounce group-hover:-translate-y-1.5 group-hover:shadow-card-hover-lg"
       >
         {!post.coverImage ? (
           <CoverRings sizes={[560, 340]} className="[&>div]:top-[74%] [&>div]:left-[58%]" />
         ) : null}
-        <TopicBadge topic={post.topic} tone="frosted" className="absolute top-4 left-4" />
+        <TopicBadge topic={post.topic} tone="frosted" className="absolute top-4 right-4" />
         <span className="glass-on-cover absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-[12px] font-semibold">
           <Eye className="size-[13px] text-brand" strokeWidth={1.75} />
           {formatCount(post.views)} views

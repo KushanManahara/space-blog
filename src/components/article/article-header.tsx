@@ -74,7 +74,8 @@ export function ArticleHeader({
           priority
           pattern={false}
           zoom={false}
-          className="aspect-[21/9] rounded-xl shadow-md"
+          notch
+          className="aspect-[21/9] rounded-xl shadow-md [--notch-surface:var(--color-bg-1)]"
         >
           {!post.coverImage ? (
             <CoverRings sizes={[900, 620, 340]} className="[&>div]:top-[72%]" />

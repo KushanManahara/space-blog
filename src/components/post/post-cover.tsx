@@ -8,6 +8,10 @@ import { getTopicVisual } from "./topic-visuals";
 /**
  * Gradient cover artwork or custom thumbnail image. `zoom` opts the image into the group hover scale used
  * by cards and rows; `pattern` adds the topic's texture overlay when no image is supplied.
+ *
+ * `notch` cuts the top-left corner out of the artwork and drops the topic's
+ * glyph into the gap. It is opt-in because the small thumbnails (rows, command
+ * menu, studio table) are barely wider than the notch itself.
  */
 export function PostCover({
   topic,
@@ -17,6 +21,7 @@ export function PostCover({
   className,
   pattern = true,
   zoom = true,
+  notch = false,
   children,
 }: {
   topic: TopicName;
@@ -26,9 +31,11 @@ export function PostCover({
   className?: string;
   pattern?: boolean;
   zoom?: boolean;
+  notch?: boolean;
   children?: React.ReactNode;
 }) {
   const visual = getTopicVisual(topic);
+  const TopicIcon = visual.icon;
 
   return (
     <div className={cn("relative overflow-hidden bg-bg-3", className)}>
@@ -57,6 +64,21 @@ export function PostCover({
           />
         ) : null}
       </div>
+      {notch ? (
+        /*
+         * Not a badge sitting on the artwork: this is the card's own surface
+         * carried into the corner, so the artwork reads as cut away around it.
+         * It sits flush at 0,0 and takes the card's radius on the outer corner
+         * so it nests into the card rather than floating on it. Surfaces that
+         * are not bg-2 (the page itself, tinted cards) set --notch-surface.
+         */
+        <span
+          aria-hidden
+          className="absolute top-0 left-0 z-3 inline-flex size-11 items-center justify-center rounded-tl-lg rounded-br-md bg-[var(--notch-surface,var(--color-bg-2))]"
+        >
+          <TopicIcon className={cn("size-[17px]", visual.label)} strokeWidth={1.75} />
+        </span>
+      ) : null}
       <div className="relative z-2 h-full w-full">{children}</div>
     </div>
   );

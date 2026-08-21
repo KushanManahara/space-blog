@@ -47,10 +47,12 @@ export function PostCard({
         topic={post.topic}
         image={post.coverImage}
         alt={post.title}
+        notch={variant !== "compact"}
         className={coverRatio[variant]}
       >
+        {/* Moved off the top-left: that corner is the notch now. */}
         {variant !== "compact" ? (
-          <TopicBadge topic={post.topic} tone="onImage" className="absolute top-3.5 left-3.5" />
+          <TopicBadge topic={post.topic} tone="onImage" className="absolute top-3.5 right-3.5" />
         ) : null}
       </PostCover>
 

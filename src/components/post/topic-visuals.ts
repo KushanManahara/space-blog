@@ -1,3 +1,14 @@
+import {
+  ClipboardCheck,
+  Cpu,
+  FlaskConical,
+  Gauge,
+  Lightbulb,
+  Microscope,
+  Wrench,
+  type LucideIcon,
+} from "lucide-react";
+
 import type { TopicName } from "@/lib/content";
 
 export type TopicVisual = {
@@ -14,6 +25,8 @@ export type TopicVisual = {
   label: string;
   /** Solid dot used in the topic directory. */
   dot: string;
+  /** Glyph for the cover's corner cutout. One per topic, never a default. */
+  icon: LucideIcon;
 };
 
 export const topicVisuals: Record<TopicName, TopicVisual> = {
@@ -26,6 +39,7 @@ export const topicVisuals: Record<TopicName, TopicVisual> = {
     ink: "text-violet-600",
     label: "text-brand-strong",
     dot: "bg-violet-600",
+    icon: Gauge,
   },
   Systems: {
     cover: "linear-gradient(150deg, #93C5FD 0%, #2563EB 55%, #0F172A 100%)",
@@ -36,6 +50,7 @@ export const topicVisuals: Record<TopicName, TopicVisual> = {
     ink: "text-indigo-600",
     label: "text-accent-indigo",
     dot: "bg-indigo-600",
+    icon: Cpu,
   },
   Evaluation: {
     cover: "linear-gradient(155deg, #7DD3FC 0%, #0284C7 55%, #0369A1 100%)",
@@ -45,6 +60,7 @@ export const topicVisuals: Record<TopicName, TopicVisual> = {
     ink: "text-cornflower-600",
     label: "text-fg-link",
     dot: "bg-cornflower-600",
+    icon: ClipboardCheck,
   },
   Engineering: {
     cover: "linear-gradient(150deg, #BAE6FD 0%, #0EA5E9 50%, #0062D2 100%)",
@@ -55,6 +71,7 @@ export const topicVisuals: Record<TopicName, TopicVisual> = {
     ink: "text-orchid-600",
     label: "text-accent-orchid",
     dot: "bg-orchid-600",
+    icon: Wrench,
   },
   Experiments: {
     cover: "linear-gradient(150deg, #93C5FD 0%, #007AFF 50%, #1E3A8A 100%)",
@@ -65,6 +82,7 @@ export const topicVisuals: Record<TopicName, TopicVisual> = {
     ink: "text-violet-700",
     label: "text-brand-strong",
     dot: "bg-violet-700",
+    icon: FlaskConical,
   },
   Research: {
     cover: "linear-gradient(155deg, #38BDF8 0%, #1D4ED8 55%, #0B192C 100%)",
@@ -75,6 +93,7 @@ export const topicVisuals: Record<TopicName, TopicVisual> = {
     ink: "text-indigo-500",
     label: "text-accent-indigo",
     dot: "bg-indigo-500",
+    icon: Microscope,
   },
   Findings: {
     cover: "linear-gradient(150deg, #BFDBFE 0%, #3B82F6 50%, #1E40AF 100%)",
@@ -84,6 +103,7 @@ export const topicVisuals: Record<TopicName, TopicVisual> = {
     ink: "text-cornflower-600",
     label: "text-fg-link",
     dot: "bg-cornflower-600",
+    icon: Lightbulb,
   },
 };
 
