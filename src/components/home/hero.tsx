@@ -13,12 +13,6 @@ export function Hero({ featured }: { featured: Post }) {
     <section className="relative mx-auto max-w-page px-gutter pt-[clamp(40px,6vw,84px)] pb-[clamp(56px,7vw,104px)]">
       <div className="relative z-1 grid items-center gap-[clamp(32px,5vw,64px)] lg:grid-cols-[1.02fr_0.98fr]">
         <Reveal>
-          <div className="glass inline-flex items-center rounded-full px-4 py-2">
-            <span className="text-[11.5px] font-semibold tracking-[0.14em] text-fg-2 uppercase">
-              {site.tagline} · issue {site.issue}
-            </span>
-          </div>
-
           <h1 className="mt-6 max-w-[15ch] text-[clamp(40px,5.4vw,68px)] leading-[1.04] font-light tracking-[-0.03em] text-balance text-fg-1">
             Notes from building machine learning{" "}
             <span className="text-gradient font-bold">that has to work.</span>

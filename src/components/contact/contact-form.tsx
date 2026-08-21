@@ -130,7 +130,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="inline-flex cursor-pointer items-center gap-2.5 self-start rounded-full bg-brand px-7 py-3.5 text-[15px] font-semibold text-white shadow-glow-sm transition-[transform,box-shadow] duration-[350ms] ease-bounce hover:-translate-y-0.5 hover:shadow-glow-md active:scale-[0.96] active:duration-150 active:ease-out disabled:pointer-events-none disabled:opacity-60"
+      className="inline-flex cursor-pointer items-center gap-2.5 self-start rounded-full bg-brand px-7 py-3.5 text-[15px] font-semibold text-on-brand shadow-glow-sm transition-[transform,box-shadow] duration-[350ms] ease-bounce hover:-translate-y-0.5 hover:shadow-glow-md active:scale-[0.96] active:duration-150 active:ease-out disabled:pointer-events-none disabled:opacity-60"
     >
       {pending ? "Sending…" : "Send message"}
       {pending ? (

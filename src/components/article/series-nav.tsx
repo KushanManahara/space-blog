@@ -17,7 +17,7 @@ export function SeriesNav({ series, currentPart }: { series: Series; currentPart
               <span
                 className={cn(
                   "inline-flex size-5.5 shrink-0 items-center justify-center rounded-full text-[11.5px] font-bold",
-                  isCurrent ? "bg-brand text-white" : "bg-bg-3 text-fg-2",
+                  isCurrent ? "bg-brand text-on-brand" : "bg-bg-3 text-fg-2",
                 )}
               >
                 {index + 1}

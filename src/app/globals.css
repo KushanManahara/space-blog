@@ -22,7 +22,7 @@
   --color-orchid-300: #7cdcfb;
   --color-orchid-400: #38c5f8;
   --color-orchid-500: #0ea5e9;
-  --color-orchid-600: #0284c7;
+  --color-orchid-600: #0369a1;
   --color-orchid-700: #0369a1;
 
   /* — Deep Navy / Slate Ramp — */
@@ -42,15 +42,6 @@
   --color-cornflower-500: #007aff;
   --color-cornflower-600: #0062d2;
 
-  /* Direct Blue Tokens */
-  --color-blue-100: #e5f2ff;
-  --color-blue-200: #c7e2fe;
-  --color-blue-300: #90c5fd;
-  --color-blue-400: #4ba0fc;
-  --color-blue-500: #007aff;
-  --color-blue-600: #0062d2;
-  --color-blue-700: #004da8;
-
   /* — Pastel surface tints — */
   --color-tint-orchid: #e0f2fe;
   --color-tint-violet: #e5f2ff;
@@ -64,7 +55,10 @@
   --color-n-200: #e2e8f0;
   --color-n-300: #cbd5e1;
   --color-n-400: #94a3b8;
-  --color-n-500: #64748b;
+  /* n-450 exists so light mode's faint step can clear 3:1 without
+     dragging down dark mode's fg-3, which also rides on n-400. */
+  --color-n-450: #7f8da0;
+  --color-n-500: #5f6c80;
   --color-n-600: #475569;
   --color-n-700: #334155;
   --color-n-800: #1e293b;
@@ -75,13 +69,13 @@
   --color-fg-1: var(--color-n-900);
   --color-fg-2: var(--color-n-600);
   --color-fg-3: var(--color-n-500);
-  --color-fg-link: #007aff;
+  --color-fg-link: var(--color-cornflower-600);
 
   /* Long-form body copy runs one step darker than fg-2, and decorative glyphs
      (list arrows, rank numerals) one step lighter than fg-3. Both need their
      own token so dark mode can move them independently. */
   --color-fg-prose: var(--color-n-700);
-  --color-fg-faint: var(--color-n-400);
+  --color-fg-faint: var(--color-n-450);
 
   /* — Semantic surfaces — */
   --color-bg-1: var(--color-n-50);
@@ -100,13 +94,17 @@
   --color-veil: var(--color-n-0);
 
   /* — Accents — */
-  --color-brand: #007aff;
-  --color-accent: #007aff;
+  --color-brand: var(--color-violet-600);
+  /* Ink for text sitting ON a brand-filled plate. The brand is a dark plate in
+     light mode and a light one in dark, so this has to invert with it: without
+     it a `bg-brand` button keeps white text on pale blue. */
+  --color-on-brand: var(--color-n-0);
+  --color-accent: var(--color-orchid-600);
 
   /* The deeper brand step, used for hover ink on titles and links. Separate
      from --color-brand so dark mode can lift it without shifting the accent. */
   --color-brand-strong: #0056b3;
-  --color-accent-orchid: #0284c7;
+  --color-accent-orchid: var(--color-orchid-600);
   --color-accent-indigo: #1d4ed8;
 
   /* Hairline in brand colour, used on chips and toggles that carry a tint. */
@@ -228,7 +226,7 @@
   --color-fg-3: var(--color-n-400);
   --color-fg-link: #60a5fa;
   --color-fg-prose: var(--color-n-200);
-  --color-fg-faint: var(--color-n-600);
+  --color-fg-faint: #748196;
 
   --color-bg-1: var(--color-n-950);
   --color-bg-2: var(--color-n-900);
@@ -241,6 +239,7 @@
   --color-veil: var(--color-n-800);
 
   --color-brand: #4ba0fc;
+  --color-on-brand: var(--color-n-900);
   --color-accent: #38bdf8;
   --color-brand-strong: #60a5fa;
   --color-accent-orchid: #38bdf8;
@@ -289,7 +288,7 @@
     --color-fg-3: var(--color-n-400);
     --color-fg-link: #60a5fa;
     --color-fg-prose: var(--color-n-200);
-    --color-fg-faint: var(--color-n-600);
+    --color-fg-faint: #748196;
 
     --color-bg-1: var(--color-n-950);
     --color-bg-2: var(--color-n-900);
@@ -302,6 +301,7 @@
     --color-veil: var(--color-n-800);
 
     --color-brand: #4ba0fc;
+    --color-on-brand: var(--color-n-900);
     --color-accent: #38bdf8;
     --color-brand-strong: #60a5fa;
     --color-accent-orchid: #38bdf8;

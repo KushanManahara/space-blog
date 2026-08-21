@@ -77,7 +77,7 @@ function SeriesRow({ series, tone, index }: { series: Series; tone: string; inde
                   aria-hidden
                   className={cn(
                     "inline-flex size-[19px] shrink-0 items-center justify-center rounded-full text-[10.5px] font-bold",
-                    done ? "bg-brand text-on-ink" : "border border-line-2 text-fg-faint",
+                    done ? "bg-brand text-on-brand" : "border border-line-2 text-fg-faint",
                   )}
                 >
                   {done ? <Check className="size-3" strokeWidth={3} /> : index + 1}
