@@ -5,7 +5,14 @@ import { author, footerColumns, routes, site } from "@/lib/content";
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-line-1 bg-bg-1">
+    <footer className="relative isolate overflow-hidden border-t border-line-1 bg-bg-1">
+      {/* Closes the page on colour instead of fading out. Weighted to the
+          bottom corners so the link columns keep a near-plain surface. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10"
+        style={{ backgroundImage: "var(--footer-wash)" }}
+      />
       <div className="mx-auto max-w-page px-gutter pt-14 pb-10">
         <div className="flex flex-wrap justify-between gap-10">
           <div className="flex max-w-[300px] flex-col gap-3">
@@ -27,7 +34,7 @@ export function SiteFooter() {
                     <Link
                       key={link.label}
                       href={link.href}
-                      className="text-[14px] text-fg-3 transition-colors duration-300 ease-expo hover:text-fg-1"
+                      className="text-[14px] text-fg-2 transition-colors duration-300 ease-expo hover:text-fg-1"
                     >
                       {link.label}
                     </Link>
@@ -38,7 +45,7 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-11 flex flex-wrap justify-between gap-3.5 border-t border-line-1 pt-5 text-[13px] text-fg-3">
+        <div className="mt-11 flex flex-wrap justify-between gap-3.5 border-t border-line-1 pt-5 text-[13px] text-fg-2">
           <span>
             © {new Date().getUTCFullYear()} {author.name}
           </span>

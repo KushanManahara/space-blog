@@ -212,6 +212,13 @@
      `--ambient-edges` is viewport-fixed and hugs the outer margins, keeping
      colour away from the column where the text and cards live.
 
+     `--footer-wash` is the one deliberate exception to "no section
+     backgrounds": the footer is the end of the page and reads better closing
+     on colour than fading out. SiteFooter paints it on its own layer.
+
+     Nothing is anchored at the top centre any more. A stop there sat directly
+     behind the sticky nav and read as a glow around it.
+
      Two details keep these from reading as patches. Each ellipse fades over
      six stops on a smoothstep ramp rather than one linear run: a single run
      holds a constant alpha slope and then stops dead, and that discontinuity
@@ -230,99 +237,171 @@
      light through paper, not as a gradient. No blur() filters, no shapes, no
      repeating pattern.
      ============================================================ */
+  /* Ambient intensity dial. Every alpha in the two layers below is
+     calc()'d against this, so the narrow-viewport override is one line
+     instead of a second copy of the gradients. */
+  --amb-k: 1;
+
   --ambient-flow:
     radial-gradient(
-      130% 26% at 50% 2%,
-      rgb(96 165 250 / 0.075) 0%,
-      rgb(96 165 250 / 0.0585) 30%,
-      rgb(96 165 250 / 0.036) 52%,
-      rgb(96 165 250 / 0.018) 70%,
-      rgb(96 165 250 / 0.0053) 86%,
-      rgb(96 165 250 / 0) 100%
+      130% 26% at 50% 8%,
+      rgb(148 163 184 / calc(var(--amb-k) * 0.05)) 0%,
+      rgb(148 163 184 / calc(var(--amb-k) * 0.039)) 30%,
+      rgb(148 163 184 / calc(var(--amb-k) * 0.024)) 52%,
+      rgb(148 163 184 / calc(var(--amb-k) * 0.012)) 70%,
+      rgb(148 163 184 / calc(var(--amb-k) * 0.0035)) 86%,
+      rgb(148 163 184 / 0) 100%
     ),
     radial-gradient(
-      58% 24% at 6% 16%,
-      rgb(0 122 255 / 0.095) 0%,
-      rgb(0 122 255 / 0.0741) 30%,
-      rgb(0 122 255 / 0.0456) 52%,
-      rgb(0 122 255 / 0.0228) 70%,
-      rgb(0 122 255 / 0.0067) 86%,
+      40% 30% at -2% 18%,
+      rgb(0 122 255 / calc(var(--amb-k) * 0.26)) 0%,
+      rgb(0 122 255 / calc(var(--amb-k) * 0.2028)) 30%,
+      rgb(0 122 255 / calc(var(--amb-k) * 0.1248)) 52%,
+      rgb(0 122 255 / calc(var(--amb-k) * 0.0624)) 70%,
+      rgb(0 122 255 / calc(var(--amb-k) * 0.0182)) 86%,
       rgb(0 122 255 / 0) 100%
     ),
     radial-gradient(
-      54% 22% at 95% 27%,
+      38% 28% at 102% 30%,
+      rgb(139 92 246 / calc(var(--amb-k) * 0.208)) 0%,
+      rgb(139 92 246 / calc(var(--amb-k) * 0.1622)) 30%,
+      rgb(139 92 246 / calc(var(--amb-k) * 0.0998)) 52%,
+      rgb(139 92 246 / calc(var(--amb-k) * 0.0499)) 70%,
+      rgb(139 92 246 / calc(var(--amb-k) * 0.0146)) 86%,
+      rgb(139 92 246 / 0) 100%
+    ),
+    radial-gradient(
+      42% 32% at -3% 46%,
+      rgb(0 122 255 / calc(var(--amb-k) * 0.26)) 0%,
+      rgb(0 122 255 / calc(var(--amb-k) * 0.2028)) 30%,
+      rgb(0 122 255 / calc(var(--amb-k) * 0.1248)) 52%,
+      rgb(0 122 255 / calc(var(--amb-k) * 0.0624)) 70%,
+      rgb(0 122 255 / calc(var(--amb-k) * 0.0182)) 86%,
+      rgb(0 122 255 / 0) 100%
+    ),
+    radial-gradient(
+      40% 30% at 103% 62%,
+      rgb(56 189 248 / calc(var(--amb-k) * 0.247)) 0%,
+      rgb(56 189 248 / calc(var(--amb-k) * 0.1927)) 30%,
+      rgb(56 189 248 / calc(var(--amb-k) * 0.1186)) 52%,
+      rgb(56 189 248 / calc(var(--amb-k) * 0.0593)) 70%,
+      rgb(56 189 248 / calc(var(--amb-k) * 0.0173)) 86%,
+      rgb(56 189 248 / 0) 100%
+    ),
+    radial-gradient(
+      40% 30% at -1% 79%,
+      rgb(0 122 255 / calc(var(--amb-k) * 0.208)) 0%,
+      rgb(0 122 255 / calc(var(--amb-k) * 0.1622)) 30%,
+      rgb(0 122 255 / calc(var(--amb-k) * 0.0998)) 52%,
+      rgb(0 122 255 / calc(var(--amb-k) * 0.0499)) 70%,
+      rgb(0 122 255 / calc(var(--amb-k) * 0.0146)) 86%,
+      rgb(0 122 255 / 0) 100%
+    );
+
+  --ambient-edges:
+    radial-gradient(
+      34% 60% at -10% 26%,
+      rgb(0 122 255 / calc(var(--amb-k) * 0.273)) 0%,
+      rgb(0 122 255 / calc(var(--amb-k) * 0.2129)) 30%,
+      rgb(0 122 255 / calc(var(--amb-k) * 0.131)) 52%,
+      rgb(0 122 255 / calc(var(--amb-k) * 0.0655)) 70%,
+      rgb(0 122 255 / calc(var(--amb-k) * 0.0191)) 86%,
+      rgb(0 122 255 / 0) 100%
+    ),
+    radial-gradient(
+      32% 56% at 110% 62%,
+      rgb(56 189 248 / calc(var(--amb-k) * 0.26)) 0%,
+      rgb(56 189 248 / calc(var(--amb-k) * 0.2028)) 30%,
+      rgb(56 189 248 / calc(var(--amb-k) * 0.1248)) 52%,
+      rgb(56 189 248 / calc(var(--amb-k) * 0.0624)) 70%,
+      rgb(56 189 248 / calc(var(--amb-k) * 0.0182)) 86%,
+      rgb(56 189 248 / 0) 100%
+    );
+
+  --footer-wash:
+    linear-gradient(
+      180deg,
+      rgb(0 122 255 / 0) 0%,
+      rgb(0 122 255 / 0.1088) 45%,
+      rgb(0 122 255 / 0.32) 100%
+    ),
+    radial-gradient(
+      72% 125% at -6% 104%,
+      rgb(56 189 248 / 0.2144) 0%,
+      rgb(56 189 248 / 0.1672) 30%,
+      rgb(56 189 248 / 0.1029) 52%,
+      rgb(56 189 248 / 0.0515) 70%,
+      rgb(56 189 248 / 0.015) 86%,
+      rgb(56 189 248 / 0) 100%
+    ),
+    radial-gradient(
+      66% 115% at 106% 100%,
+      rgb(139 92 246 / 0.16) 0%,
+      rgb(139 92 246 / 0.1248) 30%,
+      rgb(139 92 246 / 0.0768) 52%,
+      rgb(139 92 246 / 0.0384) 70%,
+      rgb(139 92 246 / 0.0112) 86%,
+      rgb(139 92 246 / 0) 100%
+    );
+
+  --footer-wash:
+    linear-gradient(
+      180deg,
+      rgb(0 122 255 / 0) 0%,
+      rgb(0 122 255 / 0.084) 45%,
+      rgb(0 122 255 / 0.24) 100%
+    ),
+    radial-gradient(
+      70% 120% at -6% 104%,
+      rgb(56 189 248 / 0.16) 0%,
+      rgb(56 189 248 / 0.1248) 30%,
+      rgb(56 189 248 / 0.0768) 52%,
+      rgb(56 189 248 / 0.0384) 70%,
+      rgb(56 189 248 / 0.0112) 86%,
+      rgb(56 189 248 / 0) 100%
+    ),
+    radial-gradient(
+      64% 110% at 106% 100%,
+      rgb(139 92 246 / 0.13) 0%,
+      rgb(139 92 246 / 0.1014) 30%,
+      rgb(139 92 246 / 0.0624) 52%,
+      rgb(139 92 246 / 0.0312) 70%,
+      rgb(139 92 246 / 0.0091) 86%,
+      rgb(139 92 246 / 0) 100%
+    );
+
+  --footer-wash:
+    linear-gradient(
+      180deg,
+      rgb(0 122 255 / 0) 0%,
+      rgb(0 122 255 / 0.0525) 45%,
+      rgb(0 122 255 / 0.15) 100%
+    ),
+    radial-gradient(
+      70% 120% at -6% 104%,
+      rgb(56 189 248 / 0.1) 0%,
+      rgb(56 189 248 / 0.078) 30%,
+      rgb(56 189 248 / 0.048) 52%,
+      rgb(56 189 248 / 0.024) 70%,
+      rgb(56 189 248 / 0.007) 86%,
+      rgb(56 189 248 / 0) 100%
+    ),
+    radial-gradient(
+      64% 110% at 106% 100%,
       rgb(139 92 246 / 0.075) 0%,
       rgb(139 92 246 / 0.0585) 30%,
       rgb(139 92 246 / 0.036) 52%,
       rgb(139 92 246 / 0.018) 70%,
       rgb(139 92 246 / 0.0053) 86%,
       rgb(139 92 246 / 0) 100%
-    ),
-    radial-gradient(
-      60% 26% at 4% 44%,
-      rgb(0 122 255 / 0.09) 0%,
-      rgb(0 122 255 / 0.0702) 30%,
-      rgb(0 122 255 / 0.0432) 52%,
-      rgb(0 122 255 / 0.0216) 70%,
-      rgb(0 122 255 / 0.0063) 86%,
-      rgb(0 122 255 / 0) 100%
-    ),
-    radial-gradient(
-      56% 24% at 97% 61%,
-      rgb(56 189 248 / 0.08) 0%,
-      rgb(56 189 248 / 0.0624) 30%,
-      rgb(56 189 248 / 0.0384) 52%,
-      rgb(56 189 248 / 0.0192) 70%,
-      rgb(56 189 248 / 0.0056) 86%,
-      rgb(56 189 248 / 0) 100%
-    ),
-    radial-gradient(
-      58% 26% at 7% 78%,
-      rgb(0 122 255 / 0.065) 0%,
-      rgb(0 122 255 / 0.0507) 30%,
-      rgb(0 122 255 / 0.0312) 52%,
-      rgb(0 122 255 / 0.0156) 70%,
-      rgb(0 122 255 / 0.0046) 86%,
-      rgb(0 122 255 / 0) 100%
-    ),
-    radial-gradient(
-      140% 24% at 50% 99%,
-      rgb(148 163 184 / 0.05) 0%,
-      rgb(148 163 184 / 0.039) 30%,
-      rgb(148 163 184 / 0.024) 52%,
-      rgb(148 163 184 / 0.012) 70%,
-      rgb(148 163 184 / 0.0035) 86%,
-      rgb(148 163 184 / 0) 100%
     );
 
-  --ambient-edges:
-    radial-gradient(
-      42% 58% at -8% 26%,
-      rgb(0 122 255 / 0.105) 0%,
-      rgb(0 122 255 / 0.0819) 30%,
-      rgb(0 122 255 / 0.0504) 52%,
-      rgb(0 122 255 / 0.0252) 70%,
-      rgb(0 122 255 / 0.0074) 86%,
-      rgb(0 122 255 / 0) 100%
-    ),
-    radial-gradient(
-      40% 54% at 108% 62%,
-      rgb(56 189 248 / 0.09) 0%,
-      rgb(56 189 248 / 0.0702) 30%,
-      rgb(56 189 248 / 0.0432) 52%,
-      rgb(56 189 248 / 0.0216) 70%,
-      rgb(56 189 248 / 0.0063) 86%,
-      rgb(56 189 248 / 0) 100%
-    ),
-    radial-gradient(
-      78% 30% at 50% -6%,
-      rgb(0 122 255 / 0.095) 0%,
-      rgb(0 122 255 / 0.0741) 30%,
-      rgb(0 122 255 / 0.0456) 52%,
-      rgb(0 122 255 / 0.0228) 70%,
-      rgb(0 122 255 / 0.0067) 86%,
-      rgb(0 122 255 / 0) 100%
-    );
+  /* Below `md` the content column is effectively the whole viewport, so the
+     edge cores that sit harmlessly in desktop margins would land under text.
+     Pulling the intensity back keeps the same look without costing contrast. */
+  @media (width < 48rem) {
+    --amb-k: 0.6;
+  }
 
   /* Bridge for shadcn primitives so they inherit the design system. */
   --background: var(--color-bg-1);
