@@ -212,24 +212,117 @@
      `--ambient-edges` is viewport-fixed and hugs the outer margins, keeping
      colour away from the column where the text and cards live.
 
-     Every stop is an ellipse measured in percentages of the layer, so the
-     radii scale with the page and no edge is ever visible. Alphas stay in the
-     0.02 to 0.05 range on purpose: this should read as light through paper,
-     not as a gradient. No blur() filters, no shapes, no repeating pattern.
+     Two details keep these from reading as patches. Each ellipse fades over
+     six stops on a smoothstep ramp rather than one linear run: a single run
+     holds a constant alpha slope and then stops dead, and that discontinuity
+     is the faint rim the eye picks up as an edge. And every ramp ends on its
+     own hue at zero alpha, never on `transparent`, which is rgb(0 0 0 / 0)
+     and can drag a grey cast through the midpoint.
+
+     The hue stops are anchored at x <= 7% and x >= 95%. The content column is
+     `max-w-page` centred, so it occupies roughly 9% to 91% of a desktop
+     viewport: keeping the centres outside that band puts the colour in the
+     margins and leaves the surface behind text and cards near-white. The
+     vertical centres overlap by design (16, 27, 44, 61, 78) so no gap between
+     them can register as a band.
+
+     Alphas stay in the 0.03 to 0.05 range on purpose: this should read as
+     light through paper, not as a gradient. No blur() filters, no shapes, no
+     repeating pattern.
      ============================================================ */
   --ambient-flow:
-    radial-gradient(120% 22% at 50% 2%, rgb(255 247 232 / 0.55), transparent 70%),
-    radial-gradient(95% 16% at 18% 17%, rgb(0 122 255 / 0.04), transparent 72%),
-    radial-gradient(90% 15% at 86% 29%, rgb(139 92 246 / 0.032), transparent 72%),
-    radial-gradient(110% 18% at 22% 43%, rgb(0 122 255 / 0.04), transparent 74%),
-    radial-gradient(100% 14% at 78% 60%, rgb(56 189 248 / 0.042), transparent 72%),
-    radial-gradient(95% 16% at 30% 76%, rgb(0 122 255 / 0.03), transparent 74%),
-    radial-gradient(130% 20% at 50% 99%, rgb(255 246 230 / 0.5), transparent 72%);
+    radial-gradient(
+      130% 26% at 50% 2%,
+      rgb(96 165 250 / 0.075) 0%,
+      rgb(96 165 250 / 0.0585) 30%,
+      rgb(96 165 250 / 0.036) 52%,
+      rgb(96 165 250 / 0.018) 70%,
+      rgb(96 165 250 / 0.0053) 86%,
+      rgb(96 165 250 / 0) 100%
+    ),
+    radial-gradient(
+      58% 24% at 6% 16%,
+      rgb(0 122 255 / 0.095) 0%,
+      rgb(0 122 255 / 0.0741) 30%,
+      rgb(0 122 255 / 0.0456) 52%,
+      rgb(0 122 255 / 0.0228) 70%,
+      rgb(0 122 255 / 0.0067) 86%,
+      rgb(0 122 255 / 0) 100%
+    ),
+    radial-gradient(
+      54% 22% at 95% 27%,
+      rgb(139 92 246 / 0.075) 0%,
+      rgb(139 92 246 / 0.0585) 30%,
+      rgb(139 92 246 / 0.036) 52%,
+      rgb(139 92 246 / 0.018) 70%,
+      rgb(139 92 246 / 0.0053) 86%,
+      rgb(139 92 246 / 0) 100%
+    ),
+    radial-gradient(
+      60% 26% at 4% 44%,
+      rgb(0 122 255 / 0.09) 0%,
+      rgb(0 122 255 / 0.0702) 30%,
+      rgb(0 122 255 / 0.0432) 52%,
+      rgb(0 122 255 / 0.0216) 70%,
+      rgb(0 122 255 / 0.0063) 86%,
+      rgb(0 122 255 / 0) 100%
+    ),
+    radial-gradient(
+      56% 24% at 97% 61%,
+      rgb(56 189 248 / 0.08) 0%,
+      rgb(56 189 248 / 0.0624) 30%,
+      rgb(56 189 248 / 0.0384) 52%,
+      rgb(56 189 248 / 0.0192) 70%,
+      rgb(56 189 248 / 0.0056) 86%,
+      rgb(56 189 248 / 0) 100%
+    ),
+    radial-gradient(
+      58% 26% at 7% 78%,
+      rgb(0 122 255 / 0.065) 0%,
+      rgb(0 122 255 / 0.0507) 30%,
+      rgb(0 122 255 / 0.0312) 52%,
+      rgb(0 122 255 / 0.0156) 70%,
+      rgb(0 122 255 / 0.0046) 86%,
+      rgb(0 122 255 / 0) 100%
+    ),
+    radial-gradient(
+      140% 24% at 50% 99%,
+      rgb(148 163 184 / 0.05) 0%,
+      rgb(148 163 184 / 0.039) 30%,
+      rgb(148 163 184 / 0.024) 52%,
+      rgb(148 163 184 / 0.012) 70%,
+      rgb(148 163 184 / 0.0035) 86%,
+      rgb(148 163 184 / 0) 100%
+    );
 
   --ambient-edges:
-    radial-gradient(38% 52% at -6% 26%, rgb(0 122 255 / 0.04), transparent 70%),
-    radial-gradient(36% 48% at 106% 62%, rgb(56 189 248 / 0.045), transparent 70%),
-    radial-gradient(70% 26% at 50% -4%, rgb(0 122 255 / 0.04), transparent 72%);
+    radial-gradient(
+      42% 58% at -8% 26%,
+      rgb(0 122 255 / 0.105) 0%,
+      rgb(0 122 255 / 0.0819) 30%,
+      rgb(0 122 255 / 0.0504) 52%,
+      rgb(0 122 255 / 0.0252) 70%,
+      rgb(0 122 255 / 0.0074) 86%,
+      rgb(0 122 255 / 0) 100%
+    ),
+    radial-gradient(
+      40% 54% at 108% 62%,
+      rgb(56 189 248 / 0.09) 0%,
+      rgb(56 189 248 / 0.0702) 30%,
+      rgb(56 189 248 / 0.0432) 52%,
+      rgb(56 189 248 / 0.0216) 70%,
+      rgb(56 189 248 / 0.0063) 86%,
+      rgb(56 189 248 / 0) 100%
+    ),
+    radial-gradient(
+      78% 30% at 50% -6%,
+      rgb(0 122 255 / 0.095) 0%,
+      rgb(0 122 255 / 0.0741) 30%,
+      rgb(0 122 255 / 0.0456) 52%,
+      rgb(0 122 255 / 0.0228) 70%,
+      rgb(0 122 255 / 0.0067) 86%,
+      rgb(0 122 255 / 0) 100%
+    );
 
   /* Bridge for shadcn primitives so they inherit the design system. */
   --background: var(--color-bg-1);
