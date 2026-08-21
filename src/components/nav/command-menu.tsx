@@ -126,6 +126,8 @@ function CommandMenu({
               >
                 <PostCover
                   topic={post.topic}
+                  image={post.coverImage}
+                  alt={post.title}
                   zoom={false}
                   className="size-[38px] shrink-0 rounded-[10px]"
                 />

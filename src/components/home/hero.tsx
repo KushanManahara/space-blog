@@ -56,8 +56,15 @@ function FeaturedCard({ post }: { post: Post }) {
         {/* TODO: featured post cover photograph, 1600x1000 (16:10). Drop it in as a
             <next/image fill priority> layer above PostCover; the topic gradient
             below stays as the no-asset fallback. */}
-        <PostCover topic={post.topic} pattern={false} className="aspect-[16/10]">
-          <CoverRings sizes={[520, 340, 180]} />
+        <PostCover
+          topic={post.topic}
+          image={post.coverImage}
+          alt={post.title}
+          priority
+          pattern={false}
+          className="aspect-[16/10]"
+        >
+          {!post.coverImage ? <CoverRings sizes={[520, 340, 180]} /> : null}
           <span className="glass-on-cover absolute top-4 right-4 rounded-full px-3.5 py-[7px] text-[12px] font-semibold">
             Featured
           </span>

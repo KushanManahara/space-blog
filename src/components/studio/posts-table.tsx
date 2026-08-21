@@ -32,6 +32,8 @@ export function PostsTable({ rows }: { rows: Array<StudioPost & { post: Post }> 
             <div className="flex min-w-0 items-center gap-3.5">
               <PostCover
                 topic={post.topic}
+                image={post.coverImage}
+                alt={post.title}
                 zoom={false}
                 className="size-11 shrink-0 rounded-full"
               />

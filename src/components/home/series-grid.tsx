@@ -18,7 +18,7 @@ const seriesTone = [
  */
 export function SeriesGrid() {
   return (
-    <section className="border-y border-line-1 bg-bg-2">
+    <section className="border-y border-line-1">
       <div className="mx-auto max-w-page px-gutter py-band">
         <Reveal className="mb-7.5">
           <h2 className="text-h2 text-fg-1">Series</h2>

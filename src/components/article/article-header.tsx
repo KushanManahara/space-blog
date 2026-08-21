@@ -69,11 +69,16 @@ export function ArticleHeader({
             below stays as the no-asset fallback. */}
         <PostCover
           topic={post.topic}
+          image={post.coverImage}
+          alt={post.title}
+          priority
           pattern={false}
           zoom={false}
           className="aspect-[21/9] rounded-xl shadow-md"
         >
-          <CoverRings sizes={[900, 620, 340]} className="[&>div]:top-[72%]" />
+          {!post.coverImage ? (
+            <CoverRings sizes={[900, 620, 340]} className="[&>div]:top-[72%]" />
+          ) : null}
         </PostCover>
       </Reveal>
     </>

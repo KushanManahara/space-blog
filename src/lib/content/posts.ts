@@ -16,6 +16,7 @@ export const posts: Post[] = postSchema.array().parse([
     commentCount: 26,
     tags: ["#inference", "#benchmarks", "#cuda", "#serving"],
     series: { ...SERVING_SERIES, part: 2 },
+    coverImage: "/projects/Speculative decoding.png",
     body: demoArticleBody,
   },
   {
@@ -29,6 +30,7 @@ export const posts: Post[] = postSchema.array().parse([
     views: 16100,
     commentCount: 41,
     tags: ["#evaluation", "#rag", "#reproducibility"],
+    coverImage: "/projects/Why our RAG evaluation kept lying to us.png",
     body: demoArticleBody,
   },
   {
@@ -42,6 +44,7 @@ export const posts: Post[] = postSchema.array().parse([
     views: 22700,
     commentCount: 33,
     tags: ["#cuda", "#serving"],
+    coverImage: "/projects/Reading the FlashAttention-3 kernel line by line.png",
     body: demoArticleBody,
   },
   {
@@ -68,6 +71,7 @@ export const posts: Post[] = postSchema.array().parse([
     views: 14800,
     commentCount: 22,
     tags: ["#quantization", "#benchmarks", "#inference"],
+    coverImage: "/projects/Quantization at 4 bits- what breaks first.png",
     body: demoArticleBody,
   },
   {
@@ -81,6 +85,7 @@ export const posts: Post[] = postSchema.array().parse([
     views: 13500,
     commentCount: 28,
     tags: ["#postgres"],
+    coverImage: "/projects/Postgres index bloat, quantified.png",
     body: demoArticleBody,
   },
   {
@@ -94,6 +99,7 @@ export const posts: Post[] = postSchema.array().parse([
     views: 19600,
     commentCount: 37,
     tags: ["#benchmarks", "#distillation"],
+    coverImage: "/projects/Training a 340M model on one GPU for $40.png",
     body: demoArticleBody,
   },
   {
@@ -133,6 +139,7 @@ export const posts: Post[] = postSchema.array().parse([
     views: 12400,
     commentCount: 17,
     tags: ["#evaluation", "#reproducibility"],
+    coverImage: "/projects/CrossEntropyLoss.png",
     body: demoArticleBody,
   },
   {

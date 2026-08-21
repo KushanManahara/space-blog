@@ -56,8 +56,10 @@
   --color-n-300: #cbd5e1;
   --color-n-400: #94a3b8;
   /* n-450 exists so light mode's faint step can clear 3:1 without
-     dragging down dark mode's fg-3, which also rides on n-400. */
-  --color-n-450: #7f8da0;
+     dragging down dark mode's fg-3, which also rides on n-400. Tuned against
+     the *ambient-tinted* surface, not bare bg-1: the background wash sits
+     behind this text and costs roughly 0.3 of a contrast point. */
+  --color-n-450: #78869a;
   --color-n-500: #5f6c80;
   --color-n-600: #475569;
   --color-n-700: #334155;
@@ -197,6 +199,38 @@
   --glow-violet: radial-gradient(closest-side, rgb(0 122 255 / 0.45), rgb(0 122 255 / 0));
   --glow-blue: radial-gradient(closest-side, rgb(0 122 255 / 0.45), rgb(0 122 255 / 0));
 
+  /* ============================================================
+     AMBIENT BACKGROUND
+     One page-wide atmosphere, split into two layers that BackgroundDecor
+     paints behind everything.
+
+     `--ambient-flow` is document-height, so it scrolls with the page and is
+     what makes the tone evolve vertically: warm white at the hero, cooling
+     through pale blue and a hint of lavender across the middle, neutral again
+     at the series band, a breath of cyan lower down, warm white by the footer.
+
+     `--ambient-edges` is viewport-fixed and hugs the outer margins, keeping
+     colour away from the column where the text and cards live.
+
+     Every stop is an ellipse measured in percentages of the layer, so the
+     radii scale with the page and no edge is ever visible. Alphas stay in the
+     0.02 to 0.05 range on purpose: this should read as light through paper,
+     not as a gradient. No blur() filters, no shapes, no repeating pattern.
+     ============================================================ */
+  --ambient-flow:
+    radial-gradient(120% 22% at 50% 2%, rgb(255 247 232 / 0.55), transparent 70%),
+    radial-gradient(95% 16% at 18% 17%, rgb(0 122 255 / 0.04), transparent 72%),
+    radial-gradient(90% 15% at 86% 29%, rgb(139 92 246 / 0.032), transparent 72%),
+    radial-gradient(110% 18% at 22% 43%, rgb(0 122 255 / 0.04), transparent 74%),
+    radial-gradient(100% 14% at 78% 60%, rgb(56 189 248 / 0.042), transparent 72%),
+    radial-gradient(95% 16% at 30% 76%, rgb(0 122 255 / 0.03), transparent 74%),
+    radial-gradient(130% 20% at 50% 99%, rgb(255 246 230 / 0.5), transparent 72%);
+
+  --ambient-edges:
+    radial-gradient(38% 52% at -6% 26%, rgb(0 122 255 / 0.04), transparent 70%),
+    radial-gradient(36% 48% at 106% 62%, rgb(56 189 248 / 0.045), transparent 70%),
+    radial-gradient(70% 26% at 50% -4%, rgb(0 122 255 / 0.04), transparent 72%);
+
   /* Bridge for shadcn primitives so they inherit the design system. */
   --background: var(--color-bg-1);
   --foreground: var(--color-fg-1);
@@ -271,6 +305,24 @@
   --glow-violet: radial-gradient(closest-side, rgb(0 122 255 / 0.35), rgb(0 122 255 / 0));
   --glow-blue: radial-gradient(closest-side, rgb(0 122 255 / 0.35), rgb(0 122 255 / 0));
 
+  /* Dark carries the same structure at roughly double the alpha, because a
+       wash this faint disappears entirely against a near-black ground. The
+       warm stops become a dim slate lift rather than cream, which would read
+       as a stain here. */
+  --ambient-flow:
+    radial-gradient(120% 22% at 50% 2%, rgb(96 165 250 / 0.07), transparent 70%),
+    radial-gradient(95% 16% at 18% 17%, rgb(0 122 255 / 0.09), transparent 72%),
+    radial-gradient(90% 15% at 86% 29%, rgb(139 92 246 / 0.07), transparent 72%),
+    radial-gradient(110% 18% at 22% 43%, rgb(0 122 255 / 0.085), transparent 74%),
+    radial-gradient(100% 14% at 78% 60%, rgb(56 189 248 / 0.075), transparent 72%),
+    radial-gradient(95% 16% at 30% 76%, rgb(0 122 255 / 0.06), transparent 74%),
+    radial-gradient(130% 20% at 50% 99%, rgb(148 163 184 / 0.05), transparent 72%);
+
+  --ambient-edges:
+    radial-gradient(38% 52% at -6% 26%, rgb(0 122 255 / 0.1), transparent 70%),
+    radial-gradient(36% 48% at 106% 62%, rgb(56 189 248 / 0.085), transparent 70%),
+    radial-gradient(70% 26% at 50% -4%, rgb(0 122 255 / 0.09), transparent 72%);
+
   --glass-bg: rgb(15 23 42 / 0.72);
   --glass-border: rgb(255 255 255 / 0.09);
   --glass-panel-bg: rgb(15 23 42 / 0.88);
@@ -333,6 +385,24 @@
     --glow-violet: radial-gradient(closest-side, rgb(0 122 255 / 0.35), rgb(0 122 255 / 0));
     --glow-blue: radial-gradient(closest-side, rgb(0 122 255 / 0.35), rgb(0 122 255 / 0));
 
+    /* Dark carries the same structure at roughly double the alpha, because a
+       wash this faint disappears entirely against a near-black ground. The
+       warm stops become a dim slate lift rather than cream, which would read
+       as a stain here. */
+    --ambient-flow:
+      radial-gradient(120% 22% at 50% 2%, rgb(96 165 250 / 0.07), transparent 70%),
+      radial-gradient(95% 16% at 18% 17%, rgb(0 122 255 / 0.09), transparent 72%),
+      radial-gradient(90% 15% at 86% 29%, rgb(139 92 246 / 0.07), transparent 72%),
+      radial-gradient(110% 18% at 22% 43%, rgb(0 122 255 / 0.085), transparent 74%),
+      radial-gradient(100% 14% at 78% 60%, rgb(56 189 248 / 0.075), transparent 72%),
+      radial-gradient(95% 16% at 30% 76%, rgb(0 122 255 / 0.06), transparent 74%),
+      radial-gradient(130% 20% at 50% 99%, rgb(148 163 184 / 0.05), transparent 72%);
+
+    --ambient-edges:
+      radial-gradient(38% 52% at -6% 26%, rgb(0 122 255 / 0.1), transparent 70%),
+      radial-gradient(36% 48% at 106% 62%, rgb(56 189 248 / 0.085), transparent 70%),
+      radial-gradient(70% 26% at 50% -4%, rgb(0 122 255 / 0.09), transparent 72%);
+
     --glass-bg: rgb(15 23 42 / 0.72);
     --glass-border: rgb(255 255 255 / 0.09);
     --glass-panel-bg: rgb(15 23 42 / 0.88);
@@ -363,6 +433,7 @@
   }
 
   body {
+    position: relative;
     background: var(--color-bg-1);
     color: var(--color-fg-1);
     font-family: var(--font-sans);

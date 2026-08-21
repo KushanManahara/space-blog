@@ -43,7 +43,12 @@ export function PostCard({
         className,
       )}
     >
-      <PostCover topic={post.topic} className={coverRatio[variant]}>
+      <PostCover
+        topic={post.topic}
+        image={post.coverImage}
+        alt={post.title}
+        className={coverRatio[variant]}
+      >
         {variant !== "compact" ? (
           <TopicBadge topic={post.topic} tone="onImage" className="absolute top-3.5 left-3.5" />
         ) : null}

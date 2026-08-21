@@ -72,6 +72,7 @@ export const postSchema = z.object({
       part: z.number().int().positive(),
     })
     .optional(),
+  coverImage: z.string().optional(),
   body: z.array(articleBlockSchema).min(1),
 });
 
