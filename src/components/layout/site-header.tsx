@@ -34,10 +34,11 @@ export function SiteHeader() {
   return (
     <div
       className={cn(
+        // No backdrop of its own. Any band here (a blur, a fade, a fill) paints
+        // over the ambient background and meets it at an edge, which is the
+        // seam this keeps reintroducing. The pill below is already frosted and
+        // self-contained, so content simply scrolls past it.
         "sticky top-0 z-60 px-4 transition-[padding] duration-500 ease-expo",
-        "before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-36",
-        "before:-z-10 before:backdrop-blur-xl",
-        "before:mask-[linear-gradient(to_bottom,black_0%,black_25%,rgba(0,0,0,0.7)_45%,transparent_100%)]",
         "sm:px-[clamp(16px,4vw,40px)]",
         isScrolled ? "pt-2.5" : "pt-4.5",
       )}
