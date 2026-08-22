@@ -18,6 +18,22 @@ import { cn } from "@/lib/utils";
  * then collapses to the brand and primary actions while the reader scrolls down —
  * scrolling up (or returning to the top) expands it again.
  */
+/**
+ * Blur radius doubles per layer while each mask stops shorter than the last,
+ * so the top of the strip gets every layer compounded and the bottom gets only
+ * the 1px one on its way out. Effective blur at the top is about
+ * sqrt(1 + 4 + 16 + 64 + 256), roughly 18px, decaying to zero by 220px.
+ * `fade` runs well past `solid` on every layer: the wide feather is what stops
+ * any single layer registering as a band.
+ */
+const BLUR_LAYERS = [
+  { radius: "1px", solid: "52%", fade: "100%" },
+  { radius: "2px", solid: "38%", fade: "78%" },
+  { radius: "4px", solid: "26%", fade: "58%" },
+  { radius: "8px", solid: "15%", fade: "40%" },
+  { radius: "16px", solid: "5%", fade: "24%" },
+] as const;
+
 export function SiteHeader() {
   const pathname = usePathname();
   const commandMenu = useCommandMenu();
@@ -34,15 +50,32 @@ export function SiteHeader() {
   return (
     <div
       className={cn(
-        // No backdrop of its own. Any band here (a blur, a fade, a fill) paints
-        // over the ambient background and meets it at an edge, which is the
-        // seam this keeps reintroducing. The pill below is already frosted and
-        // self-contained, so content simply scrolls past it.
         "sticky top-0 z-60 px-4 transition-[padding] duration-500 ease-expo",
         "sm:px-[clamp(16px,4vw,40px)]",
         isScrolled ? "pt-2.5" : "pt-4.5",
       )}
     >
+      {/*
+        Progressive blur behind the bar. No colour of its own, so the ambient
+        background reads through unchanged; only its sharpness varies.
+      */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-55">
+        {BLUR_LAYERS.map((layer) => (
+          <span
+            key={layer.radius}
+            className="progressive-blur-layer"
+            style={
+              {
+                "--pb-height": "220px",
+                "--pb-radius": layer.radius,
+                "--pb-solid": layer.solid,
+                "--pb-fade": layer.fade,
+              } as React.CSSProperties
+            }
+          />
+        ))}
+      </div>
+
       <nav
         aria-label="Primary"
         onFocusCapture={() => setHasFocus(true)}

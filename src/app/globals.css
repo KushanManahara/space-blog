@@ -643,7 +643,6 @@
   .glass {
     background: var(--glass-bg);
     backdrop-filter: blur(20px) saturate(170%) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(20px) saturate(170%) brightness(var(--glass-brightness));
     border: 1px solid var(--glass-border);
     color: var(--color-fg-1);
     box-shadow:
@@ -654,12 +653,37 @@
   .glass-panel {
     background: var(--glass-panel-bg);
     backdrop-filter: blur(30px) saturate(180%) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(30px) saturate(180%) brightness(var(--glass-brightness));
     border: 1px solid var(--glass-panel-border);
     color: var(--color-fg-1);
     box-shadow:
       var(--shadow-xl),
       inset 0 1.4px 1px var(--glass-highlight);
+  }
+
+  /*
+   * One layer of a progressive blur. Masking a single backdrop-blur ramps the
+   * layer's *opacity*, so it still ends at a boundary between blurred and
+   * sharp. Stacking several layers instead, each blurrier than the last and
+   * each masked to a shorter run down the page, ramps the blur *radius*: near
+   * the top every layer applies and compounds, further down only the gentlest
+   * survives, and it reaches zero without an edge.
+   *
+   * Carries no colour. backdrop-filter only resamples what is already behind,
+   * so the ambient background passes through untinted.
+   */
+  .progressive-blur-layer {
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    height: var(--pb-height, 200px);
+    pointer-events: none;
+    backdrop-filter: blur(var(--pb-radius));
+    mask-image: linear-gradient(
+      to bottom,
+      #000 0%,
+      #000 var(--pb-solid),
+      transparent var(--pb-fade)
+    );
   }
 
   /* Pills and badges that float on cover art. The artwork underneath is a
@@ -668,7 +692,6 @@
   .glass-on-cover {
     background: rgb(255 255 255 / 0.82);
     backdrop-filter: blur(20px) saturate(170%) brightness(1.04);
-    -webkit-backdrop-filter: blur(20px) saturate(170%) brightness(1.04);
     border: 1px solid rgb(255 255 255 / 0.72);
     color: var(--color-n-900);
     box-shadow:
