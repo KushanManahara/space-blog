@@ -177,6 +177,12 @@
   --shadow-md: 0 8px 24px rgb(0 122 255 / 0.08), 0 2px 6px rgb(15 23 42 / 0.05);
   --shadow-lg: 0 20px 48px rgb(0 122 255 / 0.12), 0 6px 16px rgb(15 23 42 / 0.06);
   --shadow-xl: 0 36px 80px rgb(0 122 255 / 0.16), 0 12px 28px rgb(15 23 42 / 0.08);
+  /* Masthead: four falloffs rather than one, so the card reads as floating on
+     ambient light instead of stamped with a drop shadow. */
+  --shadow-masthead:
+    0 1px 2px rgb(15 23 42 / 0.04), 0 8px 20px rgb(15 23 42 / 0.05),
+    0 24px 48px rgb(0 122 255 / 0.1), 0 48px 96px rgb(0 122 255 / 0.08);
+
   --shadow-glow-sm: 0 8px 32px rgb(0 122 255 / 0.22);
   --shadow-glow-md: 0 16px 60px rgb(0 122 255 / 0.3);
   --shadow-glow-accent: 0 12px 48px rgb(14 165 233 / 0.32);
@@ -317,6 +323,20 @@
       rgb(56 189 248 / calc(var(--amb-k) * 0.0182)) 86%,
       rgb(56 189 248 / 0) 100%
     );
+
+  /* Masthead horizon: azure above, lilac below, meeting on a soft band behind
+     the title card. The change happens across 42-56% rather than on a hard
+     stop, so it reads as a horizon rather than as the section slabs this
+     replaced. Fades to nothing top and bottom so it never bounds a section. */
+  --masthead-horizon: linear-gradient(
+    180deg,
+    rgb(0 122 255 / 0.03) 0%,
+    rgb(0 122 255 / 0.1) 22%,
+    rgb(0 122 255 / 0.13) 40%,
+    rgb(124 106 247 / 0.17) 54%,
+    rgb(139 92 246 / 0.13) 72%,
+    rgb(139 92 246 / 0) 100%
+  );
 
   --footer-wash:
     linear-gradient(
@@ -495,6 +515,20 @@
     radial-gradient(36% 48% at 106% 62%, rgb(56 189 248 / 0.085), transparent 70%),
     radial-gradient(70% 26% at 50% -4%, rgb(0 122 255 / 0.09), transparent 72%);
 
+  --masthead-horizon: linear-gradient(
+    180deg,
+    rgb(0 122 255 / 0.05) 0%,
+    rgb(0 122 255 / 0.16) 22%,
+    rgb(0 122 255 / 0.2) 40%,
+    rgb(124 106 247 / 0.24) 54%,
+    rgb(139 92 246 / 0.17) 72%,
+    rgb(139 92 246 / 0) 100%
+  );
+
+  --shadow-masthead:
+    0 1px 2px rgb(0 0 0 / 0.5), 0 8px 20px rgb(0 0 0 / 0.45), 0 24px 48px rgb(0 0 0 / 0.5),
+    0 48px 96px rgb(0 122 255 / 0.14);
+
   --glass-bg: rgb(15 23 42 / 0.72);
   --glass-border: rgb(255 255 255 / 0.09);
   --glass-panel-bg: rgb(15 23 42 / 0.88);
@@ -574,6 +608,20 @@
       radial-gradient(38% 52% at -6% 26%, rgb(0 122 255 / 0.1), transparent 70%),
       radial-gradient(36% 48% at 106% 62%, rgb(56 189 248 / 0.085), transparent 70%),
       radial-gradient(70% 26% at 50% -4%, rgb(0 122 255 / 0.09), transparent 72%);
+
+    --masthead-horizon: linear-gradient(
+      180deg,
+      rgb(0 122 255 / 0.05) 0%,
+      rgb(0 122 255 / 0.16) 22%,
+      rgb(0 122 255 / 0.2) 40%,
+      rgb(124 106 247 / 0.24) 54%,
+      rgb(139 92 246 / 0.17) 72%,
+      rgb(139 92 246 / 0) 100%
+    );
+
+    --shadow-masthead:
+      0 1px 2px rgb(0 0 0 / 0.5), 0 8px 20px rgb(0 0 0 / 0.45), 0 24px 48px rgb(0 0 0 / 0.5),
+      0 48px 96px rgb(0 122 255 / 0.14);
 
     --glass-bg: rgb(15 23 42 / 0.72);
     --glass-border: rgb(255 255 255 / 0.09);
@@ -675,7 +723,7 @@
     position: absolute;
     inset-inline: 0;
     top: 0;
-    height: var(--pb-height, 200px);
+    height: var(--pb-height, 80px);
     pointer-events: none;
     backdrop-filter: blur(var(--pb-radius));
     mask-image: linear-gradient(

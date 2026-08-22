@@ -27,11 +27,11 @@ import { cn } from "@/lib/utils";
  * any single layer registering as a band.
  */
 const BLUR_LAYERS = [
-  { radius: "1px", solid: "52%", fade: "100%" },
-  { radius: "2px", solid: "38%", fade: "78%" },
-  { radius: "4px", solid: "26%", fade: "58%" },
-  { radius: "8px", solid: "15%", fade: "40%" },
-  { radius: "16px", solid: "5%", fade: "24%" },
+  { radius: "1px", solid: "40%", fade: "100%" },
+  { radius: "2px", solid: "28%", fade: "75%" },
+  { radius: "4px", solid: "16%", fade: "55%" },
+  { radius: "8px", solid: "8%", fade: "38%" },
+  { radius: "12px", solid: "0%", fade: "22%" },
 ] as const;
 
 export function SiteHeader() {
@@ -56,17 +56,17 @@ export function SiteHeader() {
       )}
     >
       {/*
-        Progressive blur behind the bar. No colour of its own, so the ambient
-        background reads through unchanged; only its sharpness varies.
+        Progressive blur behind the bar, tightly scoped to header height (80px)
+        so page headings, cards, and content below remain 100% sharp.
       */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-55">
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-20">
         {BLUR_LAYERS.map((layer) => (
           <span
             key={layer.radius}
             className="progressive-blur-layer"
             style={
               {
-                "--pb-height": "220px",
+                "--pb-height": "80px",
                 "--pb-radius": layer.radius,
                 "--pb-solid": layer.solid,
                 "--pb-fade": layer.fade,
