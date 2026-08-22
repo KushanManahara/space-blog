@@ -153,7 +153,7 @@ export default async function ArticlePage({ params }: PageProps<"/articles/[slug
         </div>
       </article>
 
-      <section className="border-t border-line-1">
+      <section>
         <div className="mx-auto max-w-page px-gutter py-band">
           <Reveal>
             <h2 className="mb-6.5 text-[clamp(26px,3vw,36px)] font-bold tracking-[-0.025em] text-fg-1">

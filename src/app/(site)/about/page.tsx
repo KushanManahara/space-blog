@@ -62,7 +62,7 @@ export default function AboutPage() {
         className="pb-[clamp(28px,4vw,44px)]"
       />
 
-      <section className="border-y border-line-1">
+      <section>
         <div className="mx-auto max-w-page px-gutter py-band">
           <div className="grid items-start gap-[clamp(28px,5vw,72px)] lg:grid-cols-[300px_1fr]">
             <Reveal>
