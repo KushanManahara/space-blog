@@ -19,11 +19,7 @@ export function TopicHeader({ topic }: { topic: Topic }) {
         </>
       }
       media={
-        <PostCover
-          topic={topic.name}
-          zoom={false}
-          className="size-33 shrink-0 rounded-lg shadow-md"
-        >
+        <PostCover topic={topic.name} zoom={false} className="shadow-md">
           <CoverRings sizes={[150]} className="[&>div]:top-[60%]" />
         </PostCover>
       }

@@ -1,24 +1,28 @@
 import { cn } from "@/lib/utils";
 
 /**
- * The page's ambient background. Two flat layers, both painted from tokens
- * defined in `globals.css` so the whole atmosphere lives in one place.
+ * The page's background, painted from tokens in `globals.css` so the whole
+ * atmosphere lives in one place. Three flat layers, bottom to top:
  *
- * `flow` is absolutely positioned inside `body`, so it is as tall as the
- * document and scrolls with it. That is what makes the tone evolve from hero
- * to footer instead of sitting still in the viewport.
+ * `horizon` is the ground: azure at the top of the document, blending through
+ * a faint lilac across the middle, settling into a warm off-white at the foot.
+ * It is document-height and sits behind everything, so any section can float on
+ * it without owning a copy of it or breaking out to viewport width.
  *
- * `edges` is fixed to the viewport and weighted to the outer margins, so
- * colour gathers in the whitespace beside the content column rather than
- * behind the text.
+ * `flow` is also document-height and carries the hue variation that evolves as
+ * you scroll, weighted to the margins.
+ *
+ * `edges` is fixed to the viewport, so colour keeps gathering in the whitespace
+ * beside the content column no matter how far down the page you are.
  *
  * Deliberately no `blur()`, no `border-radius`, no repeating pattern and no
- * discrete shapes: the softness comes from very wide radial stops at very low
- * alpha, which costs one paint instead of a filter pass over a large surface.
+ * discrete shapes: the softness comes from very wide stops at very low alpha,
+ * which costs one paint instead of a filter pass over a large surface.
  */
 export function BackgroundDecor({ className }: { className?: string }) {
   return (
     <div aria-hidden className={cn("pointer-events-none select-none", className)}>
+      <div className="absolute inset-0 -z-10" style={{ backgroundImage: "var(--page-horizon)" }} />
       <div className="absolute inset-0 -z-10" style={{ backgroundImage: "var(--ambient-flow)" }} />
       <div className="fixed inset-0 -z-10" style={{ backgroundImage: "var(--ambient-edges)" }} />
     </div>

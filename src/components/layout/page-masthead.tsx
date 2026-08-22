@@ -34,32 +34,16 @@ export function PageMasthead({
     <section
       className={cn("relative mx-auto max-w-page px-gutter pt-[clamp(28px,4.5vw,52px)]", className)}
     >
-      {/*
-        The horizon. Breaks the container to full viewport width so the split
-        reads across the page, not just behind the card.
-
-        Bounded by top/bottom insets rather than a fixed height, so it tracks
-        whatever the card's height turns out to be on each page. That matters
-        for contrast: it puts the strongest part of the ramp behind the card,
-        which is opaque, and leaves only the gradient's tail where body copy
-        resumes. A band strong enough to read sitting under text would push
-        fg-3 and the faint step under AA, since the ambient wash has already
-        spent most of their headroom.
-      */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-[calc(50%-50vw)] -top-[clamp(80px,10vw,140px)] -bottom-[clamp(40px,5vw,72px)] -z-10"
-        style={{ backgroundImage: "var(--masthead-horizon)" }}
-      />
-
       <Reveal
-        className="flex flex-wrap items-center gap-[clamp(20px,3vw,32px)] rounded-xl bg-bg-2 p-[clamp(24px,3vw,34px)]"
+        className="flex flex-wrap items-center gap-[clamp(20px,3vw,32px)] rounded-xl bg-bg-2 p-6 md:p-8 lg:p-10"
         /* Not the `shadow-masthead` utility: Tailwind inlines multi-layer
            shadow values rather than referencing the variable, which would pin
            the card to the light shadow in both themes. */
         style={{ boxShadow: "var(--shadow-masthead)" }}
       >
-        {media}
+        {media ? (
+          <div className="size-24 shrink-0 overflow-hidden rounded-lg [&>*]:size-full">{media}</div>
+        ) : null}
 
         <div className="min-w-65 flex-1">
           {eyebrow ? (

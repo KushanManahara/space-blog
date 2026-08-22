@@ -59,8 +59,8 @@
      dragging down dark mode's fg-3, which also rides on n-400. Tuned against
      the *ambient-tinted* surface, not bare bg-1: the background wash sits
      behind this text and costs roughly 0.3 of a contrast point. */
-  --color-n-450: #78869a;
-  --color-n-500: #5f6c80;
+  --color-n-450: #6f7d92;
+  --color-n-500: #526075;
   --color-n-600: #475569;
   --color-n-700: #334155;
   --color-n-800: #1e293b;
@@ -179,9 +179,9 @@
   --shadow-xl: 0 36px 80px rgb(0 122 255 / 0.16), 0 12px 28px rgb(15 23 42 / 0.08);
   /* Masthead: four falloffs rather than one, so the card reads as floating on
      ambient light instead of stamped with a drop shadow. */
-  --shadow-masthead:
-    0 1px 2px rgb(15 23 42 / 0.04), 0 8px 20px rgb(15 23 42 / 0.05),
-    0 24px 48px rgb(0 122 255 / 0.1), 0 48px 96px rgb(0 122 255 / 0.08);
+  /* Masthead: a wide, low-opacity ambient falloff plus a hairline, so the
+     card reads as floating rather than stamped with a drop shadow. */
+  --shadow-masthead: 0 20px 40px -15px rgb(0 0 0 / 0.05), 0 0 1px rgb(0 0 0 / 0.08);
 
   --shadow-glow-sm: 0 8px 32px rgb(0 122 255 / 0.22);
   --shadow-glow-md: 0 16px 60px rgb(0 122 255 / 0.3);
@@ -324,19 +324,12 @@
       rgb(56 189 248 / 0) 100%
     );
 
-  /* Masthead horizon: azure above, lilac below, meeting on a soft band behind
-     the title card. The change happens across 42-56% rather than on a hard
-     stop, so it reads as a horizon rather than as the section slabs this
-     replaced. Fades to nothing top and bottom so it never bounds a section. */
-  --masthead-horizon: linear-gradient(
-    180deg,
-    rgb(0 122 255 / 0.03) 0%,
-    rgb(0 122 255 / 0.1) 22%,
-    rgb(0 122 255 / 0.13) 40%,
-    rgb(124 106 247 / 0.17) 54%,
-    rgb(139 92 246 / 0.13) 72%,
-    rgb(139 92 246 / 0) 100%
-  );
+  /* Page horizon: the ground the whole document sits on. Azure at the top,
+     blending through a faint lilac across the middle third, settling into a
+     warm off-white at the foot. Painted document-height by BackgroundDecor,
+     below the ambient washes, so it needs no viewport breakout and bounds
+     nothing. */
+  --page-horizon: linear-gradient(180deg, #ebf3fe 0%, #ebf3fe 35%, #f3eeff 65%, #fbfaf7 100%);
 
   --footer-wash:
     linear-gradient(
@@ -515,19 +508,9 @@
     radial-gradient(36% 48% at 106% 62%, rgb(56 189 248 / 0.085), transparent 70%),
     radial-gradient(70% 26% at 50% -4%, rgb(0 122 255 / 0.09), transparent 72%);
 
-  --masthead-horizon: linear-gradient(
-    180deg,
-    rgb(0 122 255 / 0.05) 0%,
-    rgb(0 122 255 / 0.16) 22%,
-    rgb(0 122 255 / 0.2) 40%,
-    rgb(124 106 247 / 0.24) 54%,
-    rgb(139 92 246 / 0.17) 72%,
-    rgb(139 92 246 / 0) 100%
-  );
+  --page-horizon: linear-gradient(180deg, #0a1728 0%, #0a1728 35%, #171233 65%, #14110f 100%);
 
-  --shadow-masthead:
-    0 1px 2px rgb(0 0 0 / 0.5), 0 8px 20px rgb(0 0 0 / 0.45), 0 24px 48px rgb(0 0 0 / 0.5),
-    0 48px 96px rgb(0 122 255 / 0.14);
+  --shadow-masthead: 0 24px 48px -16px rgb(0 0 0 / 0.62), 0 0 0 1px rgb(255 255 255 / 0.06);
 
   --glass-bg: rgb(15 23 42 / 0.72);
   --glass-border: rgb(255 255 255 / 0.09);
@@ -609,19 +592,9 @@
       radial-gradient(36% 48% at 106% 62%, rgb(56 189 248 / 0.085), transparent 70%),
       radial-gradient(70% 26% at 50% -4%, rgb(0 122 255 / 0.09), transparent 72%);
 
-    --masthead-horizon: linear-gradient(
-      180deg,
-      rgb(0 122 255 / 0.05) 0%,
-      rgb(0 122 255 / 0.16) 22%,
-      rgb(0 122 255 / 0.2) 40%,
-      rgb(124 106 247 / 0.24) 54%,
-      rgb(139 92 246 / 0.17) 72%,
-      rgb(139 92 246 / 0) 100%
-    );
+    --page-horizon: linear-gradient(180deg, #0a1728 0%, #0a1728 35%, #171233 65%, #14110f 100%);
 
-    --shadow-masthead:
-      0 1px 2px rgb(0 0 0 / 0.5), 0 8px 20px rgb(0 0 0 / 0.45), 0 24px 48px rgb(0 0 0 / 0.5),
-      0 48px 96px rgb(0 122 255 / 0.14);
+    --shadow-masthead: 0 24px 48px -16px rgb(0 0 0 / 0.62), 0 0 0 1px rgb(255 255 255 / 0.06);
 
     --glass-bg: rgb(15 23 42 / 0.72);
     --glass-border: rgb(255 255 255 / 0.09);

@@ -33,7 +33,7 @@ export default function AboutPage() {
           /* TODO: author portrait, 1000x1250 (4:5). Drop it in as a
              <next/image fill> layer above this block; the monogram plate
              below stays as the no-asset fallback. */
-          <div className="relative size-33 shrink-0 overflow-hidden rounded-lg shadow-md">
+          <div className="relative shadow-md">
             <div className="absolute inset-0 bg-[linear-gradient(150deg,#93C5FD_0%,#007AFF_62%,#0F172A_100%)]">
               <div className="cover-sheen absolute inset-0" />
               <div className="absolute inset-0 bg-[linear-gradient(rgb(255_255_255/0.12)_1px,transparent_1px),linear-gradient(90deg,rgb(255_255_255/0.12)_1px,transparent_1px)] bg-[length:38px_38px]" />
