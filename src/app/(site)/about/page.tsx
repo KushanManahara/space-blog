@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
-import { PageMasthead } from "@/components/layout/page-masthead";
+import { MastheadBadge, PageMasthead } from "@/components/layout/page-masthead";
 import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
 import { aboutSetup, author, routes, site, tags, timeline } from "@/lib/content";
@@ -20,41 +20,20 @@ export default function AboutPage() {
         eyebrow="About"
         title={
           <>
-            I measure things <span className="text-gradient font-bold">before I believe them.</span>
+            I measure things <span className="text-brand">before I believe them.</span>
           </>
         }
-        description={
-          <>
-            I&rsquo;m {author.name}. I work on inference performance and evaluation, and I write
-            here because the notes are more useful in public than in a private file.
-          </>
-        }
-        media={
-          /* TODO: author portrait, 1000x1250 (4:5). Drop it in as a
-             <next/image fill> layer above this block; the monogram plate
-             below stays as the no-asset fallback. */
-          <div className="relative shadow-md">
-            <div className="absolute inset-0 bg-[linear-gradient(150deg,#93C5FD_0%,#007AFF_62%,#0F172A_100%)]">
-              <div className="cover-sheen absolute inset-0" />
-              <div className="absolute inset-0 bg-[linear-gradient(rgb(255_255_255/0.12)_1px,transparent_1px),linear-gradient(90deg,rgb(255_255_255/0.12)_1px,transparent_1px)] bg-[length:38px_38px]" />
-            </div>
-            <span
-              aria-hidden
-              className="absolute inset-0 flex items-center justify-center font-display text-[42px] leading-none font-bold tracking-[-0.04em] text-white/25"
-            >
-              {author.initials}
-            </span>
-          </div>
-        }
+        description={`I'm ${author.name}. I work on inference performance and evaluation, and I write here because the notes are more useful in public than in a private file.`}
+        media={<MastheadBadge>{author.initials}</MastheadBadge>}
         actions={
           <>
-            <Button asChild variant="primary" size="md" className="px-5.5 py-3">
+            <Button asChild variant="primary" size="md">
               <Link href={routes.articles}>
                 Read the archive
-                <ArrowRight className="size-4" strokeWidth={1.75} />
+                <ArrowRight className="size-4" strokeWidth={2} />
               </Link>
             </Button>
-            <Button asChild variant="secondary" size="md" className="px-5.5 py-3">
+            <Button asChild variant="subtle" size="md">
               <Link href={routes.contact}>Get in touch</Link>
             </Button>
           </>

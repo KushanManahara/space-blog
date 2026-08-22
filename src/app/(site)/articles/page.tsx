@@ -2,13 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ViewTransition } from "react";
 
-import { PageMasthead } from "@/components/layout/page-masthead";
+import { ArrowRight, BookOpen } from "lucide-react";
+
+import { MastheadBadge, PageMasthead } from "@/components/layout/page-masthead";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Reveal } from "@/components/motion/reveal";
 import { FilterChips } from "@/components/nav/filter-chips";
 import { Pagination } from "@/components/nav/pagination";
 import { SortToggle } from "@/components/nav/sort-toggle";
 import { PostRow } from "@/components/post/post-row";
+import { Button } from "@/components/ui/button";
 import {
   getSeriesBySlug,
   isSortOrder,
@@ -47,16 +50,34 @@ export default async function ArticlesPage({ searchParams }: PageProps<"/article
   return (
     <>
       <PageMasthead
-        eyebrow="Archive"
-        title={`All ${site.issue} posts, newest first.`}
+        eyebrow="Articles"
+        title={
+          <>
+            All {site.issue} posts, <span className="text-brand">newest first.</span>
+          </>
+        }
         description="Sorted by publish date. Corrections are appended, never silently edited."
+        media={<MastheadBadge icon={BookOpen} />}
+        actions={
+          <>
+            <Button asChild variant="primary" size="md">
+              <Link href={routes.topics}>
+                Explore topics
+                <ArrowRight className="size-4" strokeWidth={2} />
+              </Link>
+            </Button>
+            <Button asChild variant="subtle" size="md">
+              <Link href={routes.about}>About author</Link>
+            </Button>
+          </>
+        }
       >
         {activeSeries ? (
-          <p className="mt-4 inline-flex items-center gap-2.5 rounded-full bg-tint-violet px-4 py-2 text-[13.5px] font-semibold text-brand-strong">
+          <p className="mt-2 inline-flex items-center gap-2.5 rounded-full bg-tint-violet px-4 py-1.5 text-[13px] font-semibold text-brand-strong">
             Series · {activeSeries.title}
             <Link
               href={buildHref(routes.articles, current, { series: undefined })}
-              className="text-fg-3"
+              className="text-fg-3 hover:text-fg-1"
             >
               Clear
             </Link>

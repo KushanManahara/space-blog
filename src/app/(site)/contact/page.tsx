@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { ArrowRight, Mail } from "lucide-react";
+
 import { ContactForm } from "@/components/contact/contact-form";
 import { GitHubIcon, RssIcon, XIcon } from "@/components/icons/social-icons";
-import { PageMasthead } from "@/components/layout/page-masthead";
+import { MastheadBadge, PageMasthead } from "@/components/layout/page-masthead";
 import { Reveal } from "@/components/motion/reveal";
-import { author } from "@/lib/content";
+import { Button } from "@/components/ui/button";
+import { author, routes } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -22,8 +26,26 @@ export default function ContactPage() {
     <>
       <PageMasthead
         eyebrow="Contact"
-        title="Get in touch."
+        title={
+          <>
+            Get in touch <span className="text-brand">or send a note.</span>
+          </>
+        }
         description="Corrections and reproductions get answered first. Everything else, within a week."
+        media={<MastheadBadge icon={Mail} />}
+        actions={
+          <>
+            <Button asChild variant="primary" size="md">
+              <Link href={routes.articles}>
+                Read the archive
+                <ArrowRight className="size-4" strokeWidth={2} />
+              </Link>
+            </Button>
+            <Button asChild variant="subtle" size="md">
+              <Link href={routes.about}>About author</Link>
+            </Button>
+          </>
+        }
       />
 
       <section className="mx-auto max-w-page px-gutter pt-[clamp(28px,4vw,44px)] pb-[clamp(76px,9vw,132px)]">

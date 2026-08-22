@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { ArrowRight, Layers } from "lucide-react";
 
-import { Sparkles } from "lucide-react";
-
-import { PageMasthead } from "@/components/layout/page-masthead";
+import { MastheadBadge, PageMasthead } from "@/components/layout/page-masthead";
 import { Reveal } from "@/components/motion/reveal";
 import { TopicCard } from "@/components/topic/topic-tile";
-import { site, topics } from "@/lib/content";
+import { Button } from "@/components/ui/button";
+import { routes, site, topics } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Topics",
@@ -18,12 +19,24 @@ export default function TopicsPage() {
     <>
       <PageMasthead
         eyebrow="Topics"
-        title="Everything I keep coming back to."
-        description="Each topic collects the posts, corrections and traces that belong together."
-        meta={
+        title={
           <>
-            <Sparkles className="size-[15px]" strokeWidth={1.75} />
-            {topics.length} topics
+            Everything I keep <span className="text-brand">coming back to.</span>
+          </>
+        }
+        description="Each topic collects the posts, corrections and traces that belong together."
+        media={<MastheadBadge icon={Layers} />}
+        actions={
+          <>
+            <Button asChild variant="primary" size="md">
+              <Link href={routes.articles}>
+                Browse archive
+                <ArrowRight className="size-4" strokeWidth={2} />
+              </Link>
+            </Button>
+            <Button asChild variant="subtle" size="md">
+              <Link href={routes.about}>About author</Link>
+            </Button>
           </>
         }
       />

@@ -1,15 +1,47 @@
+import * as React from "react";
 import { Reveal } from "@/components/motion/reveal";
 import { cn } from "@/lib/utils";
 
 /**
- * The card masthead every page title sits in. Extracted from TopicHeader,
- * which was the only page using the treatment.
+ * Visual badge container for page masthead cards: Apple Blue gradient, grid pattern,
+ * sheen overlay, and high-contrast centered icon or monogram.
+ */
+export function MastheadBadge({
+  children,
+  icon: Icon,
+  className,
+}: {
+  children?: React.ReactNode;
+  icon?: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+  className?: string;
+}) {
+  return (
+    <div className={cn("relative size-full", className)}>
+      <div className="absolute inset-0 bg-[linear-gradient(145deg,#38BDF8_0%,#007AFF_60%,#0A2540_100%)]">
+        <div className="cover-sheen absolute inset-0" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgb(255_255_255/0.12)_1px,transparent_1px),linear-gradient(90deg,rgb(255_255_255/0.12)_1px,transparent_1px)] bg-[length:22px_22px]" />
+      </div>
+      <div className="relative z-10 flex size-full items-center justify-center">
+        {Icon ? (
+          <Icon className="size-8 text-white/90 sm:size-9" strokeWidth={1.75} />
+        ) : (
+          <span className="font-display text-[32px] font-bold tracking-tight text-white/90 sm:text-[36px]">
+            {children}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Standardized horizontal hero / masthead card across routes.
  *
- * Every slot is optional except the title, so a page takes only the parts it
- * has: the topic page gets artwork and follow controls, the archive gets an
- * eyebrow and a line of copy, search puts its form in `children`. The card
- * itself, its radius, padding, translucency and blur stay identical across
- * all of them, which is the point.
+ * Layout:
+ * - Container: Wide horizontal card with rounded-2xl / rounded-3xl, shadow, border, and backdrop-blur.
+ * - Left: Fixed-size square container (rounded-2xl) for avatar, initials, or icon graphic.
+ * - Center: Pill badge, bold headline, and 1-2 lines of descriptive text.
+ * - Right: Action button group (Primary solid pill CTA + Secondary outline pill CTA).
  */
 export function PageMasthead({
   eyebrow,
@@ -32,42 +64,44 @@ export function PageMasthead({
 }) {
   return (
     <section
-      className={cn("relative mx-auto max-w-page px-gutter pt-[clamp(28px,4.5vw,52px)]", className)}
+      className={cn("relative mx-auto max-w-page px-gutter pt-[clamp(28px,4.5vw,48px)]", className)}
     >
-      <Reveal
-        className="flex flex-wrap items-center gap-[clamp(20px,3vw,32px)] rounded-xl bg-bg-2 p-6 md:p-8 lg:p-10"
-        /* Not the `shadow-masthead` utility: Tailwind inlines multi-layer
-           shadow values rather than referencing the variable, which would pin
-           the card to the light shadow in both themes. */
-        style={{ boxShadow: "var(--shadow-masthead)" }}
-      >
-        {media ? (
-          <div className="size-24 shrink-0 overflow-hidden rounded-lg [&>*]:size-full">{media}</div>
-        ) : null}
-
-        <div className="min-w-65 flex-1">
-          {eyebrow ? (
-            <span className="inline-block rounded-full bg-tint-cornflower px-3 py-1.5 text-[11.5px] font-semibold text-fg-link">
-              {eyebrow}
-            </span>
+      <Reveal className="flex flex-col justify-between gap-6 rounded-2xl border border-line-1 bg-bg-2 p-6 shadow-lg backdrop-blur-md sm:p-7 md:p-8 lg:flex-row lg:items-center lg:gap-8 lg:p-9">
+        <div className="flex min-w-0 flex-1 flex-col gap-5 sm:flex-row sm:items-center md:gap-6">
+          {media ? (
+            <div className="size-20 shrink-0 overflow-hidden rounded-xl shadow-md sm:size-24 md:size-26 [&>*]:size-full">
+              {media}
+            </div>
           ) : null}
 
-          <h1 className={cn("text-h4 text-fg-1", eyebrow && "mt-3.5")}>{title}</h1>
+          <div className="flex min-w-0 flex-1 flex-col items-start gap-2.5">
+            {eyebrow ? (
+              <span className="inline-flex items-center rounded-full bg-tint-cornflower px-3 py-1 text-[12px] font-semibold text-fg-link">
+                {eyebrow}
+              </span>
+            ) : null}
 
-          {description ? (
-            <p className="mt-3 max-w-[620px] text-[15.5px] leading-[1.65] text-fg-2">
-              {description}
-            </p>
-          ) : null}
+            <h1 className="text-[20px] leading-snug font-bold tracking-[-0.02em] text-fg-1 sm:text-[22px] md:text-[24px] lg:text-[26px]">
+              {title}
+            </h1>
 
-          {meta ? (
-            <p className="mt-3.5 flex items-center gap-2 text-[13.5px] text-fg-3">{meta}</p>
-          ) : null}
+            {description ? (
+              <p className="max-w-[620px] text-[14.5px] leading-[1.65] text-fg-2 md:text-[15.5px]">
+                {description}
+              </p>
+            ) : null}
 
-          {children}
+            {meta ? (
+              <div className="mt-1 flex items-center gap-2 text-[13px] text-fg-3">{meta}</div>
+            ) : null}
+
+            {children}
+          </div>
         </div>
 
-        {actions ? <div className="flex items-center gap-2.5">{actions}</div> : null}
+        {actions ? (
+          <div className="flex shrink-0 flex-wrap items-center gap-3">{actions}</div>
+        ) : null}
       </Reveal>
     </section>
   );
