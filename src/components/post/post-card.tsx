@@ -37,7 +37,7 @@ export function PostCard({
     <Link
       href={`/articles/${post.slug}`}
       className={cn(
-        "group flex flex-col overflow-hidden rounded-lg border border-line-1 transition-[transform,box-shadow] duration-[550ms] ease-bounce hover:-translate-y-1.5 hover:shadow-card-hover-lg active:scale-[0.98] active:duration-150 active:ease-out",
+        "group flex flex-col overflow-hidden rounded-lg border border-line-1 transition-[transform,box-shadow] duration-550 ease-bounce hover:-translate-y-1.5 hover:shadow-card-hover-lg active:scale-[0.98] active:duration-150 active:ease-out",
         "bg-bg-2 shadow-sm",
         variant === "compact" && "bg-bg-1 shadow-none",
         className,
