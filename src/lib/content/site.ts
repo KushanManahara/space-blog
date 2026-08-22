@@ -293,6 +293,12 @@ export const componentInventory: ComponentInventoryItem[] = componentInventoryIt
       runtime: "Client",
     },
     {
+      name: "PageMasthead",
+      path: "components/layout/page-masthead.tsx",
+      props: "eyebrow, title, description, meta, media, actions",
+      runtime: "Server",
+    },
+    {
       name: "TopicHeader",
       path: "components/topic/topic-header.tsx",
       props: "topic",

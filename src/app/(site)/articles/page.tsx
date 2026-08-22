@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ViewTransition } from "react";
 
-import { Overline } from "@/components/layout/section-header";
+import { PageMasthead } from "@/components/layout/page-masthead";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Reveal } from "@/components/motion/reveal";
 import { FilterChips } from "@/components/nav/filter-chips";
@@ -45,17 +45,12 @@ export default async function ArticlesPage({ searchParams }: PageProps<"/article
   const activeSeries = series ? getSeriesBySlug(series) : undefined;
 
   return (
-    <section className="mx-auto max-w-page px-gutter pt-[clamp(44px,6vw,80px)] pb-[clamp(84px,10vw,150px)]">
-      <Reveal className="mb-8.5">
-        <Overline>Archive</Overline>
-        <h1 className="mt-4.5 text-h1 text-fg-1">
-          All {site.issue} posts,
-          <br />
-          newest first.
-        </h1>
-        <p className="mt-4.5 max-w-[520px] text-[17.5px] text-fg-2">
-          Sorted by publish date. Corrections are appended, never silently edited.
-        </p>
+    <>
+      <PageMasthead
+        eyebrow="Archive"
+        title={`All ${site.issue} posts, newest first.`}
+        description="Sorted by publish date. Corrections are appended, never silently edited."
+      >
         {activeSeries ? (
           <p className="mt-4 inline-flex items-center gap-2.5 rounded-full bg-tint-violet px-4 py-2 text-[13.5px] font-semibold text-brand-strong">
             Series · {activeSeries.title}
@@ -67,58 +62,64 @@ export default async function ArticlesPage({ searchParams }: PageProps<"/article
             </Link>
           </p>
         ) : null}
-      </Reveal>
+      </PageMasthead>
 
-      <div className="grid items-start gap-[clamp(28px,4vw,56px)] lg:grid-cols-[1fr_344px]">
-        <div>
-          <Reveal className="flex flex-wrap items-center justify-between gap-4 border-b border-line-1 pb-5">
-            <FilterChips
-              label="Filter posts by topic"
-              size="sm"
-              options={topicFilters.map((option) => ({
-                label: option,
-                href: buildHref(routes.articles, current, {
-                  topic: option === "All" ? undefined : option,
+      <section className="mx-auto max-w-page px-gutter pt-[clamp(28px,4vw,44px)] pb-[clamp(84px,10vw,150px)]">
+        <div className="grid items-start gap-[clamp(28px,4vw,56px)] lg:grid-cols-[1fr_344px]">
+          <div>
+            <Reveal className="flex flex-wrap items-center justify-between gap-4 border-b border-line-1 pb-5">
+              <FilterChips
+                label="Filter posts by topic"
+                size="sm"
+                options={topicFilters.map((option) => ({
+                  label: option,
+                  href: buildHref(routes.articles, current, {
+                    topic: option === "All" ? undefined : option,
+                    page: undefined,
+                  }),
+                  active: option === topic,
+                }))}
+              />
+              <SortToggle
+                value={sort}
+                href={buildHref(routes.articles, current, {
+                  sort: sort === "recent" ? "views" : "recent",
                   page: undefined,
-                }),
-                active: option === topic,
-              }))}
-            />
-            <SortToggle
-              value={sort}
-              href={buildHref(routes.articles, current, {
-                sort: sort === "recent" ? "views" : "recent",
-                page: undefined,
-              })}
-            />
-          </Reveal>
+                })}
+              />
+            </Reveal>
 
-          <ViewTransition key={`${topic}-${sort}-${page}`} enter="content-swap" exit="content-swap">
-            {visible.length === 0 ? (
-              <p className="mt-8 rounded-lg border border-line-1 bg-bg-2 p-8 text-[15px] text-fg-2">
-                No posts under this filter yet. Clear the topic filter to see the whole archive.
-              </p>
-            ) : (
-              <div>
-                {visible.map((post) => (
-                  <PostRow key={post.slug} post={post} />
-                ))}
-              </div>
-            )}
-          </ViewTransition>
+            <ViewTransition
+              key={`${topic}-${sort}-${page}`}
+              enter="content-swap"
+              exit="content-swap"
+            >
+              {visible.length === 0 ? (
+                <p className="mt-8 rounded-lg border border-line-1 bg-bg-2 p-8 text-[15px] text-fg-2">
+                  No posts under this filter yet. Clear the topic filter to see the whole archive.
+                </p>
+              ) : (
+                <div>
+                  {visible.map((post) => (
+                    <PostRow key={post.slug} post={post} />
+                  ))}
+                </div>
+              )}
+            </ViewTransition>
 
-          <Pagination
-            className="mt-9"
-            page={page}
-            total={site.archivePageCount}
-            hrefFor={(next) =>
-              buildHref(routes.articles, current, { page: next === 1 ? undefined : String(next) })
-            }
-          />
+            <Pagination
+              className="mt-9"
+              page={page}
+              total={site.archivePageCount}
+              hrefFor={(next) =>
+                buildHref(routes.articles, current, { page: next === 1 ? undefined : String(next) })
+              }
+            />
+          </div>
+
+          <Sidebar />
         </div>
-
-        <Sidebar />
-      </div>
-    </section>
+      </section>
+    </>
   );
 }

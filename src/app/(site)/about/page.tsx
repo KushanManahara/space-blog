@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
+import { PageMasthead } from "@/components/layout/page-masthead";
 import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
 import { aboutSetup, author, routes, site, tags, timeline } from "@/lib/content";
@@ -15,59 +16,51 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <>
-      <section className="relative mx-auto max-w-page px-gutter pt-[clamp(44px,6vw,84px)] pb-[clamp(56px,7vw,104px)]">
-        <div className="relative grid items-center gap-[clamp(32px,5vw,64px)] lg:grid-cols-[1.05fr_0.95fr]">
-          <Reveal>
-            <div className="glass inline-flex items-center gap-2.5 rounded-full py-2 pr-4 pl-3">
-              <span className="size-[7px] rounded-full bg-brand shadow-[0_0_0_4px_rgb(0_122_255/0.16)]" />
-              <span className="text-[11.5px] font-semibold tracking-[0.14em] text-fg-2 uppercase">
-                About
-              </span>
+      <PageMasthead
+        eyebrow="About"
+        title={
+          <>
+            I measure things <span className="text-gradient font-bold">before I believe them.</span>
+          </>
+        }
+        description={
+          <>
+            I&rsquo;m {author.name}. I work on inference performance and evaluation, and I write
+            here because the notes are more useful in public than in a private file.
+          </>
+        }
+        media={
+          /* TODO: author portrait, 1000x1250 (4:5). Drop it in as a
+             <next/image fill> layer above this block; the monogram plate
+             below stays as the no-asset fallback. */
+          <div className="relative size-33 shrink-0 overflow-hidden rounded-lg shadow-md">
+            <div className="absolute inset-0 bg-[linear-gradient(150deg,#93C5FD_0%,#007AFF_62%,#0F172A_100%)]">
+              <div className="cover-sheen absolute inset-0" />
+              <div className="absolute inset-0 bg-[linear-gradient(rgb(255_255_255/0.12)_1px,transparent_1px),linear-gradient(90deg,rgb(255_255_255/0.12)_1px,transparent_1px)] bg-[length:38px_38px]" />
             </div>
-
-            <h1 className="mt-6 max-w-[17ch] text-[clamp(38px,4.8vw,60px)] leading-[1.05] font-light tracking-[-0.03em] text-balance text-fg-1">
-              I measure things
-              <br />
-              <span className="text-gradient font-bold">before I believe them.</span>
-            </h1>
-
-            <p className="mt-5.5 max-w-[500px] text-[19px] leading-[1.6] text-fg-2">
-              I&rsquo;m {author.name}. I work on inference performance and evaluation, and I write
-              here because the notes are more useful in public than in a private file.
-            </p>
-
-            <div className="mt-7.5 flex flex-wrap gap-3">
-              <Button asChild variant="primary" size="lg">
-                <Link href={routes.articles}>
-                  Read the archive
-                  <ArrowRight className="size-4" strokeWidth={1.75} />
-                </Link>
-              </Button>
-              <Button asChild variant="secondary" size="lg">
-                <Link href={routes.contact}>Get in touch</Link>
-              </Button>
-            </div>
-          </Reveal>
-
-          <Reveal className="relative">
-            {/* TODO: author portrait, 1000x1250 (4:5). Drop it in as a
-                <next/image fill> layer above this block; the monogram plate
-                below stays as the no-asset fallback. */}
-            <div className="relative aspect-[4/5] overflow-hidden rounded-xl shadow-lg">
-              <div className="absolute inset-0 bg-[linear-gradient(150deg,#93C5FD_0%,#007AFF_62%,#0F172A_100%)]">
-                <div className="cover-sheen absolute inset-0" />
-                <div className="absolute inset-0 bg-[linear-gradient(rgb(255_255_255/0.12)_1px,transparent_1px),linear-gradient(90deg,rgb(255_255_255/0.12)_1px,transparent_1px)] bg-[length:38px_38px]" />
-              </div>
-              <span
-                aria-hidden
-                className="absolute inset-0 flex items-center justify-center font-display text-[clamp(72px,11vw,132px)] leading-none font-bold tracking-[-0.04em] text-white/22"
-              >
-                {author.initials}
-              </span>
-            </div>
-          </Reveal>
-        </div>
-      </section>
+            <span
+              aria-hidden
+              className="absolute inset-0 flex items-center justify-center font-display text-[42px] leading-none font-bold tracking-[-0.04em] text-white/25"
+            >
+              {author.initials}
+            </span>
+          </div>
+        }
+        actions={
+          <>
+            <Button asChild variant="primary" size="md" className="px-5.5 py-3">
+              <Link href={routes.articles}>
+                Read the archive
+                <ArrowRight className="size-4" strokeWidth={1.75} />
+              </Link>
+            </Button>
+            <Button asChild variant="secondary" size="md" className="px-5.5 py-3">
+              <Link href={routes.contact}>Get in touch</Link>
+            </Button>
+          </>
+        }
+        className="pb-[clamp(28px,4vw,44px)]"
+      />
 
       <section className="border-y border-line-1">
         <div className="mx-auto max-w-page px-gutter py-band">
