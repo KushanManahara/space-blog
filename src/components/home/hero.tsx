@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { ArrowRight, Bookmark, Heart, ListOrdered, MessageSquare } from "lucide-react";
+import { ArrowRight, ListOrdered } from "lucide-react";
 
 import { Reveal } from "@/components/motion/reveal";
+import { MetricRow } from "@/components/post/metric-row";
 import { CoverRings, PostCover } from "@/components/post/post-cover";
 import { TopicBadge } from "@/components/post/topic-badge";
 import { Button } from "@/components/ui/button";
@@ -50,9 +51,9 @@ function FeaturedCard({ post }: { post: Post }) {
   return (
     <Link
       href={`/articles/${post.slug}`}
-      className="group relative block rounded-lg border border-line-1 bg-bg-2 shadow-lg transition-[transform,box-shadow] duration-550 ease-bounce before:absolute before:inset-y-4.5 before:-right-4.5 before:left-4.5 before:-z-1 before:translate-y-4.5 before:rounded-lg before:content-[''] hover:-translate-y-1.5 active:scale-[0.98] active:duration-150 active:ease-out"
+      className="group block transition-transform duration-550 ease-bounce active:scale-[0.98] active:duration-150 active:ease-out"
     >
-      <div className="overflow-hidden rounded-lg">
+      <div className="transition-transform duration-550 ease-bounce group-hover:-translate-y-1.5">
         {/* TODO: featured post cover photograph, 1600x1000 (16:10). Drop it in as a
             <next/image fill priority> layer above PostCover; the topic gradient
             below stays as the no-asset fallback. */}
@@ -63,52 +64,37 @@ function FeaturedCard({ post }: { post: Post }) {
           priority
           pattern={false}
           notch
-          className="aspect-[16/10]"
+          className="aspect-[16/10] rounded-xl"
         >
           {!post.coverImage ? <CoverRings sizes={[520, 340, 180]} /> : null}
           <span className="glass-on-cover absolute top-4 right-4 rounded-full px-3.5 py-[7px] text-[12px] font-semibold">
             Featured
           </span>
-          {post.series && partCount ? (
-            <span className="glass-on-cover absolute bottom-4 left-4 inline-flex items-center gap-[9px] rounded-full px-4 py-[9px] text-[12.5px] font-semibold">
-              <ListOrdered className="size-3.5 text-brand" strokeWidth={1.75} />
-              Part {post.series.part} of {partCount} · {post.series.title}
-            </span>
-          ) : null}
+          <TopicBadge topic={post.topic} tone="dark" icon className="absolute bottom-6 left-4" />
         </PostCover>
 
-        <div className="p-6.5 pb-6">
-          <div className="flex items-center gap-2.5">
-            <TopicBadge topic={post.topic} className="text-[12px]" />
-            <span className="text-[13px] text-fg-3">
+        <div className="relative z-10 -mt-[34px] overflow-hidden rounded-xl transition-shadow duration-500 ease-expo group-hover:shadow-card-hover-lg">
+          <div className="overlap-panel bg-bg-2 px-6.5 pt-[48px] pb-6">
+            <p className="text-[13px] text-fg-3">
               {formatDate(post.publishedAt)} · {post.readingMinutes} min read
-            </span>
-          </div>
+            </p>
 
-          <h2 className="mt-4 text-[26px] leading-[1.18] font-bold tracking-[-0.02em] text-fg-1 transition-colors duration-300 ease-expo group-hover:text-brand-strong">
-            {post.title}
-          </h2>
-          <p className="mt-3 text-[15.5px] leading-[1.6] text-fg-2">{post.dek}</p>
+            {post.series && partCount ? (
+              <p className="mt-1.5 inline-flex items-center gap-1.5 text-[13px] font-semibold text-brand-strong">
+                <ListOrdered className="size-3.5" strokeWidth={1.75} />
+                Part {post.series.part} of {partCount} · {post.series.title}
+              </p>
+            ) : null}
 
-          <div className="mt-5 flex items-center gap-4 border-t border-line-1 pt-4.5 text-[13px] text-fg-3">
-            <span className="inline-flex items-center gap-1.5">
-              <Heart className="size-[15px]" strokeWidth={1.75} />
-              {post.likes}
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <MessageSquare className="size-[15px]" strokeWidth={1.75} />
-              {post.commentCount}
-            </span>
-            <span className="ml-auto inline-flex items-center">
-              <Bookmark className="size-3.5" strokeWidth={1.75} />
-            </span>
-            <span className="inline-flex items-center gap-1.5 font-semibold text-brand">
-              Read
-              <ArrowRight className="size-3.5" strokeWidth={2} />
-            </span>
+            <h2 className="mt-3 text-[26px] leading-[1.18] font-bold tracking-[-0.02em] text-fg-1 transition-colors duration-300 ease-expo group-hover:text-brand-strong">
+              {post.title}
+            </h2>
+            <p className="mt-3 text-[15.5px] leading-[1.6] text-fg-2">{post.dek}</p>
           </div>
         </div>
       </div>
+
+      <MetricRow post={post} bordered={false} className="mt-4.5" />
     </Link>
   );
 }

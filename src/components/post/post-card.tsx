@@ -17,8 +17,12 @@ const coverRatio: Record<PostCardVariant, string> = {
 };
 
 /**
- * The blog's workhorse card. Variants change the cover ratio and how much
- * metadata is shown; the surface, hover lift and title treatment stay constant.
+ * The blog's workhorse card. `grid` is a two-block overlap layout: the cover
+ * is its own rounded surface, a second rounded panel overlaps its bottom
+ * edge by 22px, and the metric row sits outside both, directly on the page
+ * background — the depth reads from the overlap, not a shadow. `search` and
+ * `compact` stay single-surface cards; they run too dense for a panel to
+ * read as its own block.
  */
 export function PostCard({
   post,
@@ -32,6 +36,49 @@ export function PostCard({
   className?: string;
 }) {
   const visual = getTopicVisual(post.topic);
+
+  if (variant === "grid") {
+    return (
+      <Link
+        href={`/articles/${post.slug}`}
+        className={cn(
+          "group block transition-transform duration-550 ease-bounce active:scale-[0.98] active:duration-150 active:ease-out",
+          className,
+        )}
+      >
+        <div className="transition-transform duration-550 ease-bounce group-hover:-translate-y-1.5">
+          <PostCover
+            topic={post.topic}
+            image={post.coverImage}
+            alt={post.title}
+            notch
+            className={cn(coverRatio.grid, "rounded-xl")}
+          >
+            <TopicBadge
+              topic={post.topic}
+              tone="dark"
+              icon
+              className="absolute bottom-6 left-3.5"
+            />
+          </PostCover>
+
+          <div className="relative z-10 -mt-[34px] overflow-hidden rounded-xl transition-shadow duration-500 ease-expo group-hover:shadow-card-hover-lg">
+            <div className="overlap-panel bg-bg-2 px-6 pt-[46px] pb-5">
+              <p className="text-[12.5px] text-fg-3">
+                {formatDate(post.publishedAt)} · {post.readingMinutes} min read
+              </p>
+              <h3 className="mt-2 text-[18.5px] leading-tight font-bold tracking-[-0.015em] text-fg-1 transition-colors duration-300 ease-expo group-hover:text-brand-strong">
+                {post.title}
+              </h3>
+              <p className="mt-2.5 text-[14.5px] leading-[1.55] text-fg-2">{post.dek}</p>
+            </div>
+          </div>
+        </div>
+
+        {showMetrics ? <MetricRow post={post} bordered={false} className="mt-4.5" /> : null}
+      </Link>
+    );
+  }
 
   return (
     <Link
@@ -47,11 +94,10 @@ export function PostCard({
         topic={post.topic}
         image={post.coverImage}
         alt={post.title}
-        notch={variant !== "compact"}
+        notch={variant === "search"}
         className={coverRatio[variant]}
       >
-        {/* Moved off the top-left: that corner is the notch now. */}
-        {variant !== "compact" ? (
+        {variant === "search" ? (
           <TopicBadge topic={post.topic} tone="onImage" className="absolute top-3.5 right-3.5" />
         ) : null}
       </PostCover>
@@ -59,15 +105,13 @@ export function PostCard({
       <div
         className={cn(
           "flex flex-1 flex-col gap-2.5",
-          variant === "grid" && "p-5 pb-[18px]",
           variant === "search" && "p-[18px]",
           variant === "compact" && "p-[18px]",
         )}
       >
-        {variant === "grid" || variant === "search" ? (
+        {variant === "search" ? (
           <p className="text-[12.5px] text-fg-3">
             {formatDate(post.publishedAt)} · {post.readingMinutes} min
-            {variant === "grid" ? " read" : ""}
           </p>
         ) : null}
 
@@ -78,7 +122,6 @@ export function PostCard({
         <h3
           className={cn(
             "leading-tight font-bold tracking-[-0.015em] text-fg-1 transition-colors duration-300 ease-expo group-hover:text-brand-strong",
-            variant === "grid" && "text-[18.5px]",
             variant === "search" && "text-[16.5px]",
             variant === "compact" && "text-[16px]",
           )}
@@ -86,17 +129,12 @@ export function PostCard({
           {post.title}
         </h3>
 
-        {variant === "grid" ? (
-          <p className="text-[14.5px] leading-[1.55] text-fg-2">{post.dek}</p>
-        ) : null}
-
         {variant === "compact" ? (
           <p className="text-[12.5px] text-fg-3">
             {formatDate(post.publishedAt)} · {post.readingMinutes} min read
           </p>
         ) : null}
 
-        {showMetrics && variant === "grid" ? <MetricRow post={post} /> : null}
         {showMetrics && variant === "search" ? <MetricRow post={post} metrics={["likes"]} /> : null}
       </div>
     </Link>

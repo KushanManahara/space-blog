@@ -729,6 +729,26 @@
   }
 
   /* Cover art sheen — the radial highlight every gradient cover carries. */
+  /*
+   * The angled top edge on a card's content panel. The panel is pulled up over
+   * the cover by a negative margin; this cuts its top-left corner down by
+   * `--panel-rise`, so the boundary between artwork and content reads as one
+   * diagonal instead of a straight seam. Right edge keeps the full overlap,
+   * left edge keeps `overlap - rise`, which is what makes the angle legible
+   * while both sides still sit on the artwork.
+   *
+   * clip-path squares off every corner it touches, so the rounded bottom comes
+   * from a `rounded-xl overflow-hidden` wrapper. The top corners are cut away
+   * by the diagonal anyway, so they lose nothing by being squared first.
+   *
+   * Shared by the grid card, the home hero and the most-viewed lead, so the
+   * angle stays identical across all three rather than being retuned per card.
+   */
+  .overlap-panel {
+    --panel-rise: 22px;
+    clip-path: polygon(0 var(--panel-rise), 100% 0, 100% 100%, 0 100%);
+  }
+
   .cover-sheen {
     background: radial-gradient(
       118% 110% at 20% 14%,

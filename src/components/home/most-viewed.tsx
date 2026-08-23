@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ArrowRight, Eye } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 import { AuthorByline } from "@/components/author/author-byline";
 import { Reveal } from "@/components/motion/reveal";
@@ -11,7 +11,6 @@ import { CoverRings, PostCover } from "@/components/post/post-cover";
 import { PostRow } from "@/components/post/post-row";
 import { TopicBadge } from "@/components/post/topic-badge";
 import { routes, type PostSummary, type TopicName } from "@/lib/content";
-import { formatCount } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 const TABS: readonly TopicName[] = ["Inference", "Systems", "Evaluation", "Engineering"];
@@ -82,34 +81,40 @@ function MostViewedHero({ post }: { post: PostSummary }) {
   return (
     <Link
       href={`/articles/${post.slug}`}
-      className="group block transition-transform duration-150 ease-out active:scale-[0.98]"
+      className="group block transition-transform duration-550 ease-bounce active:scale-[0.98] active:duration-150 active:ease-out"
     >
-      <PostCover
-        topic={post.topic}
-        image={post.coverImage}
-        alt={post.title}
-        pattern={false}
-        notch
-        className="aspect-[16/11] rounded-lg shadow-md transition-[transform,box-shadow] duration-[550ms] ease-bounce group-hover:-translate-y-1.5 group-hover:shadow-card-hover-lg"
-      >
-        {!post.coverImage ? (
-          <CoverRings sizes={[560, 340]} className="[&>div]:top-[74%] [&>div]:left-[58%]" />
-        ) : null}
-        <TopicBadge topic={post.topic} tone="frosted" className="absolute top-4 right-4" />
-        <span className="glass-on-cover absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-[12px] font-semibold">
-          <Eye className="size-[13px] text-brand" strokeWidth={1.75} />
-          {formatCount(post.views)} views
-        </span>
-      </PostCover>
+      <div className="transition-transform duration-550 ease-bounce group-hover:-translate-y-1.5">
+        <PostCover
+          topic={post.topic}
+          image={post.coverImage}
+          alt={post.title}
+          pattern={false}
+          notch
+          className="aspect-[16/11] rounded-xl"
+        >
+          {!post.coverImage ? (
+            <CoverRings sizes={[560, 340]} className="[&>div]:top-[74%] [&>div]:left-[58%]" />
+          ) : null}
+          <TopicBadge topic={post.topic} tone="dark" icon className="absolute bottom-6 left-4" />
+        </PostCover>
 
-      <AuthorByline date={post.publishedAt} className="mt-5" />
+        <div className="relative z-10 -mt-[34px] overflow-hidden rounded-xl transition-shadow duration-500 ease-expo group-hover:shadow-card-hover-lg">
+          <div className="overlap-panel bg-bg-2 px-6 pt-[46px] pb-5">
+            <AuthorByline date={post.publishedAt} />
+            <h3 className="mt-3.5 text-[24px] leading-[1.2] font-bold tracking-[-0.02em] text-fg-1 transition-colors duration-300 ease-expo group-hover:text-brand-strong">
+              {post.title}
+            </h3>
+            <p className="mt-2.5 text-[15.5px] leading-[1.6] text-fg-2">{post.dek}</p>
+          </div>
+        </div>
+      </div>
 
-      <h3 className="mt-3.5 text-[24px] leading-[1.2] font-bold tracking-[-0.02em] text-fg-1 transition-colors duration-300 ease-expo group-hover:text-brand-strong">
-        {post.title}
-      </h3>
-      <p className="mt-2.5 text-[15.5px] leading-[1.6] text-fg-2">{post.dek}</p>
-
-      <MetricRow post={post} className="mt-4.5" />
+      <MetricRow
+        post={post}
+        metrics={["likes", "comments", "views"]}
+        bordered={false}
+        className="mt-4.5"
+      />
     </Link>
   );
 }
