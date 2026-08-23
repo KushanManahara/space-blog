@@ -58,11 +58,11 @@ export function PostCard({
               topic={post.topic}
               tone="dark"
               icon
-              className="absolute bottom-6 left-3.5"
+              className="absolute top-3.5 right-3.5"
             />
           </PostCover>
 
-          <div className="relative z-10 -mt-[34px] overflow-hidden rounded-xl transition-shadow duration-500 ease-expo group-hover:shadow-card-hover-lg">
+          <div className="relative z-10 mx-4 -mt-[48px] overflow-hidden rounded-xl transition-shadow duration-500 ease-expo group-hover:shadow-card-hover-lg">
             <div className="overlap-panel bg-bg-2 px-6 pt-[46px] pb-5">
               <p className="text-[12.5px] text-fg-3">
                 {formatDate(post.publishedAt)} · {post.readingMinutes} min read

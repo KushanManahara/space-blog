@@ -67,13 +67,16 @@ function FeaturedCard({ post }: { post: Post }) {
           className="aspect-[16/10] rounded-xl"
         >
           {!post.coverImage ? <CoverRings sizes={[520, 340, 180]} /> : null}
-          <span className="glass-on-cover absolute top-4 right-4 rounded-full px-3.5 py-[7px] text-[12px] font-semibold">
-            Featured
-          </span>
-          <TopicBadge topic={post.topic} tone="dark" icon className="absolute bottom-6 left-4" />
+          {/* One cluster rather than two absolutes fighting for the same corner. */}
+          <div className="absolute top-4 right-4 flex items-center gap-2">
+            <TopicBadge topic={post.topic} tone="dark" icon />
+            <span className="glass-on-cover rounded-full px-3.5 py-[7px] text-[12px] font-semibold">
+              Featured
+            </span>
+          </div>
         </PostCover>
 
-        <div className="relative z-10 -mt-[34px] overflow-hidden rounded-xl transition-shadow duration-500 ease-expo group-hover:shadow-card-hover-lg">
+        <div className="relative z-10 mx-4 -mt-[48px] overflow-hidden rounded-xl transition-shadow duration-500 ease-expo group-hover:shadow-card-hover-lg">
           <div className="overlap-panel bg-bg-2 px-6.5 pt-[48px] pb-6">
             <p className="text-[13px] text-fg-3">
               {formatDate(post.publishedAt)} · {post.readingMinutes} min read

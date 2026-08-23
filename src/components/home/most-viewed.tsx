@@ -95,10 +95,10 @@ function MostViewedHero({ post }: { post: PostSummary }) {
           {!post.coverImage ? (
             <CoverRings sizes={[560, 340]} className="[&>div]:top-[74%] [&>div]:left-[58%]" />
           ) : null}
-          <TopicBadge topic={post.topic} tone="dark" icon className="absolute bottom-6 left-4" />
+          <TopicBadge topic={post.topic} tone="dark" icon className="absolute top-4 right-4" />
         </PostCover>
 
-        <div className="relative z-10 -mt-[34px] overflow-hidden rounded-xl transition-shadow duration-500 ease-expo group-hover:shadow-card-hover-lg">
+        <div className="relative z-10 mx-4 -mt-[48px] overflow-hidden rounded-xl transition-shadow duration-500 ease-expo group-hover:shadow-card-hover-lg">
           <div className="overlap-panel bg-bg-2 px-6 pt-[46px] pb-5">
             <AuthorByline date={post.publishedAt} />
             <h3 className="mt-3.5 text-[24px] leading-[1.2] font-bold tracking-[-0.02em] text-fg-1 transition-colors duration-300 ease-expo group-hover:text-brand-strong">
