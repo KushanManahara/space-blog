@@ -86,7 +86,7 @@ export function SiteHeader() {
           "mx-auto flex w-full items-center gap-2.5 rounded-full border transition-[max-width,padding,background-color,box-shadow,border-color] duration-500 ease-expo",
           isCollapsed ? "max-w-140" : "max-w-page",
           isScrolled
-            ? "border-veil/70 bg-veil/80 py-[7px] pr-2 pl-4.5 shadow-[var(--shadow-lg),inset_0_1px_0_rgb(255_255_255/0.75)] backdrop-blur-[24px] backdrop-saturate-[180%]"
+            ? "border-line-1 bg-veil/85 py-[7px] pr-2 pl-4.5 shadow-[var(--shadow-lg),0_1px_2px_rgb(15_23_42/0.06),inset_0_1px_0_rgb(255_255_255/0.75)] backdrop-blur-[24px] backdrop-saturate-[180%]"
             : "border-line-1 bg-veil/90 py-[9px] pr-2.5 pl-5.5 shadow-sm backdrop-blur-[14px] backdrop-saturate-140",
         )}
       >

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 
-import { BackgroundDecor } from "@/components/layout/background-decor";
 import { ViewTransitionGuard } from "@/components/motion/view-transition-guard";
 import { CommandMenuProvider } from "@/components/nav/command-menu";
 import { SavedPostsProvider } from "@/components/providers/saved-posts-provider";
@@ -74,7 +73,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body className="flex min-h-full flex-col bg-bg-1 text-fg-1">
-        <BackgroundDecor />
         <script
           type="application/ld+json"
           // Serialised, not user input: every value comes from the content layer.

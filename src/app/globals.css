@@ -198,6 +198,37 @@
 }
 
 :root {
+  /* The light falling across a page header. Owned by the header rather than the
+     page: HeaderAtmosphere stretches it to whatever height its container turns
+     out to be, so a short masthead gets a short wash and a tall one gets a
+     taller one without anyone setting a number.
+
+     Decays on a smoothstep-ish curve, not a straight ramp. A linear two-stop
+     fade holds a constant slope and then stops dead, and that discontinuity is
+     the faint edge the eye picks out. Ends on its own hue at zero alpha, never
+     on `transparent`, which is rgb(0 0 0 / 0) and drags a grey cast through the
+     midpoint.
+
+     Peak alpha 0.075: this should register as light, not as colour. */
+  --header-atmosphere: linear-gradient(
+    180deg,
+    rgb(0 122 255 / 0.075) 0%,
+    rgb(0 122 255 / 0.068) 16%,
+    rgb(99 102 241 / 0.054) 38%,
+    rgb(139 92 246 / 0.034) 56%,
+    rgb(139 92 246 / 0.017) 71%,
+    rgb(139 92 246 / 0.006) 84%,
+    rgb(139 92 246 / 0.0015) 93%,
+    rgb(139 92 246 / 0) 100%
+  );
+
+  /* How far the wash reaches above its header. It has to clear the floating nav
+     *and* whatever top padding the page puts above its header, otherwise the
+     gradient starts partway down the screen and its first stop reads as a hard
+     edge against the plain surface above it. Headers currently start between
+     77px (masthead pages) and 128px (article pages), so this overshoots both
+     and simply runs off the top of the viewport. */
+  --nav-bleed: 160px;
   /* Gradients and glows are painted, not utility-generated. */
   --gradient-brand: linear-gradient(180deg, #38bdf8 0%, #007aff 50%, #0051b3 100%);
   --gradient-brand-diag: linear-gradient(145deg, #38bdf8 0%, #007aff 48%, #0051b3 100%);
@@ -205,131 +236,11 @@
   --glow-violet: radial-gradient(closest-side, rgb(0 122 255 / 0.45), rgb(0 122 255 / 0));
   --glow-blue: radial-gradient(closest-side, rgb(0 122 255 / 0.45), rgb(0 122 255 / 0));
 
-  /* ============================================================
-     AMBIENT BACKGROUND
-     One page-wide atmosphere, split into two layers that BackgroundDecor
-     paints behind everything.
-
-     `--ambient-flow` is document-height, so it scrolls with the page and is
-     what makes the tone evolve vertically: warm white at the hero, cooling
-     through pale blue and a hint of lavender across the middle, neutral again
-     at the series band, a breath of cyan lower down, warm white by the footer.
-
-     `--ambient-edges` is viewport-fixed and hugs the outer margins, keeping
-     colour away from the column where the text and cards live.
-
-     `--footer-wash` is the one deliberate exception to "no section
-     backgrounds": the footer is the end of the page and reads better closing
-     on colour than fading out. SiteFooter paints it on its own layer.
-
-     Nothing is anchored at the top centre any more. A stop there sat directly
-     behind the sticky nav and read as a glow around it.
-
-     Two details keep these from reading as patches. Each ellipse fades over
-     six stops on a smoothstep ramp rather than one linear run: a single run
-     holds a constant alpha slope and then stops dead, and that discontinuity
-     is the faint rim the eye picks up as an edge. And every ramp ends on its
-     own hue at zero alpha, never on `transparent`, which is rgb(0 0 0 / 0)
-     and can drag a grey cast through the midpoint.
-
-     The hue stops are anchored at x <= 7% and x >= 95%. The content column is
-     `max-w-page` centred, so it occupies roughly 9% to 91% of a desktop
-     viewport: keeping the centres outside that band puts the colour in the
-     margins and leaves the surface behind text and cards near-white. The
-     vertical centres overlap by design (16, 27, 44, 61, 78) so no gap between
-     them can register as a band.
-
-     Alphas stay in the 0.03 to 0.05 range on purpose: this should read as
-     light through paper, not as a gradient. No blur() filters, no shapes, no
-     repeating pattern.
-     ============================================================ */
-  /* Ambient intensity dial. Every alpha in the two layers below is
-     calc()'d against this, so the narrow-viewport override is one line
-     instead of a second copy of the gradients. */
-  --amb-k: 1;
-
-  --ambient-flow:
-    radial-gradient(
-      130% 26% at 50% 8%,
-      rgb(148 163 184 / calc(var(--amb-k) * 0.05)) 0%,
-      rgb(148 163 184 / calc(var(--amb-k) * 0.039)) 30%,
-      rgb(148 163 184 / calc(var(--amb-k) * 0.024)) 52%,
-      rgb(148 163 184 / calc(var(--amb-k) * 0.012)) 70%,
-      rgb(148 163 184 / calc(var(--amb-k) * 0.0035)) 86%,
-      rgb(148 163 184 / 0) 100%
-    ),
-    radial-gradient(
-      40% 30% at -2% 18%,
-      rgb(0 122 255 / calc(var(--amb-k) * 0.26)) 0%,
-      rgb(0 122 255 / calc(var(--amb-k) * 0.2028)) 30%,
-      rgb(0 122 255 / calc(var(--amb-k) * 0.1248)) 52%,
-      rgb(0 122 255 / calc(var(--amb-k) * 0.0624)) 70%,
-      rgb(0 122 255 / calc(var(--amb-k) * 0.0182)) 86%,
-      rgb(0 122 255 / 0) 100%
-    ),
-    radial-gradient(
-      38% 28% at 102% 30%,
-      rgb(139 92 246 / calc(var(--amb-k) * 0.208)) 0%,
-      rgb(139 92 246 / calc(var(--amb-k) * 0.1622)) 30%,
-      rgb(139 92 246 / calc(var(--amb-k) * 0.0998)) 52%,
-      rgb(139 92 246 / calc(var(--amb-k) * 0.0499)) 70%,
-      rgb(139 92 246 / calc(var(--amb-k) * 0.0146)) 86%,
-      rgb(139 92 246 / 0) 100%
-    ),
-    radial-gradient(
-      42% 32% at -3% 46%,
-      rgb(0 122 255 / calc(var(--amb-k) * 0.26)) 0%,
-      rgb(0 122 255 / calc(var(--amb-k) * 0.2028)) 30%,
-      rgb(0 122 255 / calc(var(--amb-k) * 0.1248)) 52%,
-      rgb(0 122 255 / calc(var(--amb-k) * 0.0624)) 70%,
-      rgb(0 122 255 / calc(var(--amb-k) * 0.0182)) 86%,
-      rgb(0 122 255 / 0) 100%
-    ),
-    radial-gradient(
-      40% 30% at 103% 62%,
-      rgb(56 189 248 / calc(var(--amb-k) * 0.247)) 0%,
-      rgb(56 189 248 / calc(var(--amb-k) * 0.1927)) 30%,
-      rgb(56 189 248 / calc(var(--amb-k) * 0.1186)) 52%,
-      rgb(56 189 248 / calc(var(--amb-k) * 0.0593)) 70%,
-      rgb(56 189 248 / calc(var(--amb-k) * 0.0173)) 86%,
-      rgb(56 189 248 / 0) 100%
-    ),
-    radial-gradient(
-      40% 30% at -1% 79%,
-      rgb(0 122 255 / calc(var(--amb-k) * 0.208)) 0%,
-      rgb(0 122 255 / calc(var(--amb-k) * 0.1622)) 30%,
-      rgb(0 122 255 / calc(var(--amb-k) * 0.0998)) 52%,
-      rgb(0 122 255 / calc(var(--amb-k) * 0.0499)) 70%,
-      rgb(0 122 255 / calc(var(--amb-k) * 0.0146)) 86%,
-      rgb(0 122 255 / 0) 100%
-    );
-
-  --ambient-edges:
-    radial-gradient(
-      34% 60% at -10% 26%,
-      rgb(0 122 255 / calc(var(--amb-k) * 0.273)) 0%,
-      rgb(0 122 255 / calc(var(--amb-k) * 0.2129)) 30%,
-      rgb(0 122 255 / calc(var(--amb-k) * 0.131)) 52%,
-      rgb(0 122 255 / calc(var(--amb-k) * 0.0655)) 70%,
-      rgb(0 122 255 / calc(var(--amb-k) * 0.0191)) 86%,
-      rgb(0 122 255 / 0) 100%
-    ),
-    radial-gradient(
-      32% 56% at 110% 62%,
-      rgb(56 189 248 / calc(var(--amb-k) * 0.26)) 0%,
-      rgb(56 189 248 / calc(var(--amb-k) * 0.2028)) 30%,
-      rgb(56 189 248 / calc(var(--amb-k) * 0.1248)) 52%,
-      rgb(56 189 248 / calc(var(--amb-k) * 0.0624)) 70%,
-      rgb(56 189 248 / calc(var(--amb-k) * 0.0182)) 86%,
-      rgb(56 189 248 / 0) 100%
-    );
-
   /* Page horizon: the ground the whole document sits on. Azure at the top,
      blending through a faint lilac across the middle third, settling into a
      warm off-white at the foot. Painted document-height by BackgroundDecor,
      below the ambient washes, so it needs no viewport breakout and bounds
      nothing. */
-  --page-horizon: linear-gradient(180deg, #ebf3fe 0%, #ebf3fe 35%, #f3eeff 65%, #fbfaf7 100%);
 
   --footer-wash:
     linear-gradient(
@@ -409,13 +320,6 @@
       rgb(0 122 255 / 0) 100%
     );
 
-  /* Below `md` the content column is effectively the whole viewport, so the
-     edge cores that sit harmlessly in desktop margins would land under text.
-     Pulling the intensity back keeps the same look without costing contrast. */
-  @media (width < 48rem) {
-    --amb-k: 0.6;
-  }
-
   /* Bridge for shadcn primitives so they inherit the design system. */
   --background: var(--color-bg-1);
   --foreground: var(--color-fg-1);
@@ -440,6 +344,17 @@
    Redefines the semantic layer for an obsidian/slate dark theme.
    ============================================================ */
 :root.dark {
+  /* Barely there on a dark ground: a cool lift, never a colour band. */
+  --header-atmosphere: linear-gradient(
+    180deg,
+    rgb(96 165 250 / 0.06) 0%,
+    rgb(96 165 250 / 0.054) 16%,
+    rgb(129 140 248 / 0.042) 38%,
+    rgb(139 92 246 / 0.026) 56%,
+    rgb(139 92 246 / 0.013) 71%,
+    rgb(139 92 246 / 0.004) 84%,
+    rgb(139 92 246 / 0) 100%
+  );
   --color-fg-1: var(--color-n-50);
   --color-fg-2: var(--color-n-300);
   --color-fg-3: var(--color-n-400);
@@ -494,21 +409,6 @@
        wash this faint disappears entirely against a near-black ground. The
        warm stops become a dim slate lift rather than cream, which would read
        as a stain here. */
-  --ambient-flow:
-    radial-gradient(120% 22% at 50% 2%, rgb(96 165 250 / 0.07), transparent 70%),
-    radial-gradient(95% 16% at 18% 17%, rgb(0 122 255 / 0.09), transparent 72%),
-    radial-gradient(90% 15% at 86% 29%, rgb(139 92 246 / 0.07), transparent 72%),
-    radial-gradient(110% 18% at 22% 43%, rgb(0 122 255 / 0.085), transparent 74%),
-    radial-gradient(100% 14% at 78% 60%, rgb(56 189 248 / 0.075), transparent 72%),
-    radial-gradient(95% 16% at 30% 76%, rgb(0 122 255 / 0.06), transparent 74%),
-    radial-gradient(130% 20% at 50% 99%, rgb(148 163 184 / 0.05), transparent 72%);
-
-  --ambient-edges:
-    radial-gradient(38% 52% at -6% 26%, rgb(0 122 255 / 0.1), transparent 70%),
-    radial-gradient(36% 48% at 106% 62%, rgb(56 189 248 / 0.085), transparent 70%),
-    radial-gradient(70% 26% at 50% -4%, rgb(0 122 255 / 0.09), transparent 72%);
-
-  --page-horizon: linear-gradient(180deg, #0a1728 0%, #0a1728 35%, #171233 65%, #14110f 100%);
 
   --shadow-masthead: 0 24px 48px -16px rgb(0 0 0 / 0.62), 0 0 0 1px rgb(255 255 255 / 0.06);
 
@@ -524,6 +424,17 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not(.light) {
+    /* Barely there on a dark ground: a cool lift, never a colour band. */
+    --header-atmosphere: linear-gradient(
+      180deg,
+      rgb(96 165 250 / 0.06) 0%,
+      rgb(96 165 250 / 0.054) 16%,
+      rgb(129 140 248 / 0.042) 38%,
+      rgb(139 92 246 / 0.026) 56%,
+      rgb(139 92 246 / 0.013) 71%,
+      rgb(139 92 246 / 0.004) 84%,
+      rgb(139 92 246 / 0) 100%
+    );
     --color-fg-1: var(--color-n-50);
     --color-fg-2: var(--color-n-300);
     --color-fg-3: var(--color-n-400);
@@ -578,21 +489,6 @@
        wash this faint disappears entirely against a near-black ground. The
        warm stops become a dim slate lift rather than cream, which would read
        as a stain here. */
-    --ambient-flow:
-      radial-gradient(120% 22% at 50% 2%, rgb(96 165 250 / 0.07), transparent 70%),
-      radial-gradient(95% 16% at 18% 17%, rgb(0 122 255 / 0.09), transparent 72%),
-      radial-gradient(90% 15% at 86% 29%, rgb(139 92 246 / 0.07), transparent 72%),
-      radial-gradient(110% 18% at 22% 43%, rgb(0 122 255 / 0.085), transparent 74%),
-      radial-gradient(100% 14% at 78% 60%, rgb(56 189 248 / 0.075), transparent 72%),
-      radial-gradient(95% 16% at 30% 76%, rgb(0 122 255 / 0.06), transparent 74%),
-      radial-gradient(130% 20% at 50% 99%, rgb(148 163 184 / 0.05), transparent 72%);
-
-    --ambient-edges:
-      radial-gradient(38% 52% at -6% 26%, rgb(0 122 255 / 0.1), transparent 70%),
-      radial-gradient(36% 48% at 106% 62%, rgb(56 189 248 / 0.085), transparent 70%),
-      radial-gradient(70% 26% at 50% -4%, rgb(0 122 255 / 0.09), transparent 72%);
-
-    --page-horizon: linear-gradient(180deg, #0a1728 0%, #0a1728 35%, #171233 65%, #14110f 100%);
 
     --shadow-masthead: 0 24px 48px -16px rgb(0 0 0 / 0.62), 0 0 0 1px rgb(255 255 255 / 0.06);
 
@@ -729,26 +625,6 @@
   }
 
   /* Cover art sheen — the radial highlight every gradient cover carries. */
-  /*
-   * The angled top edge on a card's content panel. The panel is pulled up over
-   * the cover by a negative margin; this cuts its top-left corner down by
-   * `--panel-rise`, so the boundary between artwork and content reads as one
-   * diagonal instead of a straight seam. Right edge keeps the full overlap,
-   * left edge keeps `overlap - rise`, which is what makes the angle legible
-   * while both sides still sit on the artwork.
-   *
-   * clip-path squares off every corner it touches, so the rounded bottom comes
-   * from a `rounded-xl overflow-hidden` wrapper. The top corners are cut away
-   * by the diagonal anyway, so they lose nothing by being squared first.
-   *
-   * Shared by the grid card, the home hero and the most-viewed lead, so the
-   * angle stays identical across all three rather than being retuned per card.
-   */
-  .overlap-panel {
-    --panel-rise: 22px;
-    clip-path: polygon(0 var(--panel-rise), 100% 0, 100% 100%, 0 100%);
-  }
-
   .cover-sheen {
     background: radial-gradient(
       118% 110% at 20% 14%,

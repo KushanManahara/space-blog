@@ -1,4 +1,5 @@
 import * as React from "react";
+import { HeaderAtmosphere } from "@/components/layout/header-atmosphere";
 import { Reveal } from "@/components/motion/reveal";
 import { cn } from "@/lib/utils";
 
@@ -66,6 +67,8 @@ export function PageMasthead({
     <section
       className={cn("relative mx-auto max-w-page px-gutter pt-[clamp(28px,4.5vw,48px)]", className)}
     >
+      <HeaderAtmosphere />
+
       <Reveal className="flex flex-col justify-between gap-6 rounded-2xl border border-line-1 bg-bg-2 p-6 shadow-[0_2px_4px_rgb(0_0_0/0.08),0_8px_16px_rgb(0_0_0/0.1),0_20px_40px_rgb(0_0_0/0.14)] backdrop-blur-md sm:p-7 md:p-8 lg:flex-row lg:items-center lg:gap-8 lg:p-9">
         <div className="flex min-w-0 flex-1 flex-col gap-5 sm:flex-row sm:items-center md:gap-6">
           {media ? (
