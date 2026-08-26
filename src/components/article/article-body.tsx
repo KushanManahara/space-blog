@@ -99,7 +99,7 @@ function ArticleBlockView({ block, isFirst }: { block: ArticleBlock; isFirst: bo
 
     case "formula":
       return (
-        <div className="mt-8 overflow-x-auto rounded-lg border border-line-1 bg-bg-2 px-4 py-5 text-center sm:px-6.5 sm:py-6">
+        <div className="mt-8 w-full max-w-full min-w-0 overflow-x-auto rounded-lg border border-line-1 bg-bg-2 px-4 py-5 text-center sm:px-6.5 sm:py-6">
           <p
             className="font-mono text-[15px] leading-[1.8] text-fg-prose sm:text-[17px] sm:leading-[1.9]"
             dangerouslySetInnerHTML={{ __html: block.html }}
@@ -110,7 +110,7 @@ function ArticleBlockView({ block, isFirst }: { block: ArticleBlock; isFirst: bo
 
     case "callout":
       return (
-        <aside className="mt-8 flex gap-3.5 rounded-lg bg-tint-cornflower p-4 sm:gap-4 sm:px-6 sm:py-5.5">
+        <aside className="mt-8 flex w-full max-w-full min-w-0 gap-3.5 rounded-lg bg-tint-cornflower p-4 sm:gap-4 sm:px-6 sm:py-5.5">
           <span className="inline-flex size-[34px] shrink-0 items-center justify-center rounded-full bg-bg-2 text-fg-link shadow-xs">
             <Info className="size-[17px]" strokeWidth={1.75} />
           </span>
@@ -140,7 +140,7 @@ function ArticleBlockView({ block, isFirst }: { block: ArticleBlock; isFirst: bo
             {block.items.map((item, idx) => (
               <li
                 key={idx}
-                className="text-[14px] leading-[1.6] break-words text-fg-2 sm:text-[14.5px]"
+                className="text-[13px] leading-[1.6] break-words text-fg-3"
                 dangerouslySetInnerHTML={{ __html: markdownToHtml(item) }}
               />
             ))}
@@ -155,7 +155,7 @@ const bodyText =
 
 function ChartFigure({ block }: { block: Extract<ArticleBlock, { kind: "chart" }> }) {
   return (
-    <figure className="mt-8 overflow-x-auto rounded-lg border border-line-1 bg-bg-2 p-4 sm:px-6.5 sm:pt-6.5 sm:pb-5">
+    <figure className="mt-8 w-full max-w-full min-w-0 overflow-x-auto rounded-lg border border-line-1 bg-bg-2 p-4 sm:px-6.5 sm:pt-6.5 sm:pb-5">
       <div className="flex flex-wrap items-baseline justify-between gap-4">
         <figcaption className="text-[14.5px] font-bold text-fg-1">{block.title}</figcaption>
         <p className="text-[12.5px] text-fg-3">{block.note}</p>
