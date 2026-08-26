@@ -51,13 +51,11 @@ export function SiteHeader() {
   return (
     <div
       className={cn(
-        "sticky top-0 z-60 w-full px-4 transition-[transform,padding,opacity] duration-350 ease-expo",
+        "sticky top-0 z-60 w-full px-4 transition-[padding] duration-500 ease-expo",
         "sm:px-[clamp(16px,4vw,40px)]",
         isScrolled
           ? "pt-[calc(env(safe-area-inset-top,0px)+0.375rem)] sm:pt-2.5"
           : "pt-[calc(env(safe-area-inset-top,0px)+0.625rem)] sm:pt-4.5",
-        isCollapsed &&
-          "-translate-y-[calc(100%+env(safe-area-inset-top,0px)+1.5rem)] opacity-0 pointer-events-none md:translate-y-0 md:opacity-100 md:pointer-events-auto",
       )}
     >
       {/*
@@ -91,16 +89,32 @@ export function SiteHeader() {
           if (!event.currentTarget.contains(event.relatedTarget)) setHasFocus(false);
         }}
         className={cn(
-          "mx-auto flex w-full items-center gap-2.5 rounded-full border transition-[max-width,padding,background-color,box-shadow,border-color] duration-500 ease-expo",
-          isCollapsed ? "max-w-140" : "max-w-page",
-          isScrolled
-            ? "border-line-1 bg-veil/85 py-[7px] pr-2 pl-4.5 shadow-[var(--shadow-lg),0_1px_2px_rgb(15_23_42/0.06),inset_0_1px_0_rgb(255_255_255/0.75)] backdrop-blur-[24px] backdrop-saturate-[180%]"
-            : "border-line-1 bg-veil/90 py-[9px] pr-2.5 pl-5.5 shadow-sm backdrop-blur-[14px] backdrop-saturate-140",
+          "mx-auto flex w-full items-center justify-between rounded-full border transition-[max-width,padding,background-color,box-shadow,border-color] duration-500 ease-expo",
+          // Dynamic narrowing: shrinks on mobile to 285px and desktop to max-w-140
+          isCollapsed ? "max-w-[285px] sm:max-w-140" : "max-w-page",
+          // Refined frosted glass surface
+          "backdrop-blur-[24px] backdrop-saturate-[180%]",
+          isCollapsed
+            ? "border-white/60 bg-white/75 py-1 pr-1.5 pl-3.5 shadow-[0_12px_32px_rgb(0_0_0/0.12),0_2px_6px_rgb(0_0_0/0.06),inset_0_1px_1px_rgb(255_255_255/0.95)] dark:border-white/12 dark:bg-[#070e22]/80 dark:shadow-[0_16px_36px_rgb(0_0_0/0.7),inset_0_1px_0_rgb(255_255_255/0.14)]"
+            : isScrolled
+              ? "border-white/60 bg-white/70 py-[7px] pr-2 pl-4.5 shadow-[0_8px_24px_rgb(0_0_0/0.08),0_1px_3px_rgb(0_0_0/0.04),inset_0_1px_1px_rgb(255_255_255/0.85)] dark:border-white/12 dark:bg-[#070e22]/75 dark:shadow-[0_12px_28px_rgb(0_0_0/0.6),inset_0_1px_0_rgb(255_255_255/0.12)]"
+              : "border-white/50 bg-white/60 py-[9px] pr-2.5 pl-5.5 shadow-sm dark:border-white/10 dark:bg-[#070e22]/65 dark:shadow-[0_4px_16px_rgb(0_0_0/0.4),inset_0_1px_0_rgb(255_255_255/0.08)]",
         )}
       >
-        <Link href={routes.home} className="flex shrink-0 items-center gap-2.5">
-          <BrandMark />
-          <span className="font-display text-[19px] font-bold tracking-[-0.02em] text-fg-1">
+        <Link
+          href={routes.home}
+          className={cn(
+            "flex shrink-0 items-center transition-[gap] duration-300",
+            isCollapsed ? "gap-2" : "gap-2.5",
+          )}
+        >
+          <BrandMark size={isCollapsed ? 22 : 24} />
+          <span
+            className={cn(
+              "font-display font-bold tracking-[-0.02em] text-fg-1 transition-[font-size] duration-300",
+              isCollapsed ? "text-[16.5px] sm:text-[18.5px]" : "text-[18.5px] sm:text-[19px]",
+            )}
+          >
             {site.name}
           </span>
         </Link>
@@ -124,8 +138,8 @@ export function SiteHeader() {
                 className={cn(
                   "rounded-full px-[15px] py-[9px] text-[14px] font-medium whitespace-nowrap transition-colors duration-300 ease-expo",
                   isActive(item.href)
-                    ? "bg-bg-3 text-fg-1"
-                    : "text-fg-2 hover:bg-veil/60 hover:text-fg-1",
+                    ? "bg-black/[0.06] text-fg-1 dark:bg-white/[0.08]"
+                    : "text-fg-2 hover:bg-black/[0.04] hover:text-fg-1 dark:hover:bg-white/[0.05]",
                 )}
               >
                 {item.label}
@@ -134,14 +148,26 @@ export function SiteHeader() {
           </div>
         </div>
 
-        <div className="ml-auto flex shrink-0 items-center gap-2">
+        <div
+          className={cn(
+            "ml-auto flex shrink-0 items-center transition-[gap] duration-300",
+            isCollapsed ? "gap-1.5" : "gap-2",
+          )}
+        >
           <button
             type="button"
             onClick={commandMenu.open}
             title="Search (⌘K)"
-            className="inline-flex h-[38px] cursor-pointer items-center gap-2 rounded-full border border-line-1 bg-bg-2 px-2.5 text-fg-3 transition-[transform,box-shadow,color] duration-300 ease-bounce hover:-translate-y-px hover:text-fg-2 hover:shadow-sm active:scale-[0.96] active:duration-150 active:ease-out sm:gap-[9px] sm:pr-2 sm:pl-3.5"
+            className={cn(
+              "inline-flex cursor-pointer items-center justify-center rounded-full border transition-[width,height,padding,transform,box-shadow,color] duration-300 ease-bounce",
+              "border-black/[0.06] bg-black/[0.03] text-fg-3 hover:-translate-y-px hover:bg-black/[0.06] hover:text-fg-2 hover:shadow-sm active:scale-[0.95]",
+              "dark:border-white/10 dark:bg-white/[0.05] dark:hover:bg-white/10 dark:hover:text-fg-1",
+              isCollapsed
+                ? "size-8.5 px-0 sm:h-[34px] sm:w-auto sm:px-2.5 sm:gap-2"
+                : "size-[38px] px-2.5 sm:gap-[9px] sm:pr-2 sm:pl-3.5",
+            )}
           >
-            <Search className="size-4" strokeWidth={1.75} />
+            <Search className={cn("shrink-0 transition-transform duration-300", isCollapsed ? "size-3.5" : "size-4")} strokeWidth={1.75} />
             <span
               className={cn(
                 "hidden overflow-hidden text-[13px] whitespace-nowrap transition-[max-width,opacity] duration-500 ease-expo md:inline-block",
@@ -150,23 +176,44 @@ export function SiteHeader() {
             >
               Search
             </span>
-            <span className="hidden rounded-[7px] border border-line-1 bg-bg-3 px-[7px] py-1 text-[11.5px] font-semibold text-fg-3 sm:inline-block">
+            <span
+              className={cn(
+                "hidden rounded-[7px] border border-black/10 bg-black/5 px-[7px] py-0.5 text-[11.5px] font-semibold text-fg-3 transition-opacity duration-300 dark:border-white/10 dark:bg-white/10 sm:inline-block",
+                isCollapsed ? "sm:hidden" : "sm:inline-block",
+              )}
+            >
               ⌘K
             </span>
           </button>
 
-          <AnimatedThemeToggler className="inline-flex size-[38px] shrink-0 items-center justify-center rounded-full border border-line-1 bg-bg-2 text-fg-3 transition-[transform,box-shadow,color] duration-300 ease-bounce hover:-translate-y-px hover:text-fg-2 hover:shadow-sm active:scale-[0.96] active:duration-150 active:ease-out" />
+          <AnimatedThemeToggler
+            className={cn(
+              "inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full border transition-[width,height,transform,box-shadow,color] duration-300 ease-bounce",
+              "border-black/[0.06] bg-black/[0.03] text-fg-3 hover:-translate-y-px hover:bg-black/[0.06] hover:text-fg-2 hover:shadow-sm active:scale-[0.95]",
+              "dark:border-white/10 dark:bg-white/[0.05] dark:hover:bg-white/10 dark:hover:text-fg-1",
+              isCollapsed ? "size-8.5" : "size-[38px]",
+            )}
+          />
 
           <Link
             href={routes.studio}
             title="Studio"
-            className="hidden size-[38px] shrink-0 items-center justify-center rounded-full border border-line-1 bg-bg-2 text-fg-3 transition-[transform,box-shadow,color] duration-300 ease-bounce hover:-translate-y-px hover:text-fg-2 hover:shadow-sm active:scale-[0.96] active:duration-150 active:ease-out md:inline-flex"
+            className={cn(
+              "hidden shrink-0 cursor-pointer items-center justify-center rounded-full border transition-[width,height,transform,box-shadow,color] duration-300 ease-bounce md:inline-flex",
+              "border-black/[0.06] bg-black/[0.03] text-fg-3 hover:-translate-y-px hover:bg-black/[0.06] hover:text-fg-2 hover:shadow-sm active:scale-[0.95]",
+              "dark:border-white/10 dark:bg-white/[0.05] dark:hover:bg-white/10 dark:hover:text-fg-1",
+              isCollapsed ? "size-8.5" : "size-[38px]",
+            )}
           >
-            <LayoutGrid className="size-4" strokeWidth={1.75} />
+            <LayoutGrid className={cn("transition-transform duration-300", isCollapsed ? "size-3.5" : "size-4")} strokeWidth={1.75} />
             <span className="sr-only">Studio</span>
           </Link>
 
-          <MobileNav isActive={isActive} onOpenChange={setMobileNavOpen} />
+          <MobileNav
+            isActive={isActive}
+            onOpenChange={setMobileNavOpen}
+            isCollapsed={isCollapsed}
+          />
         </div>
       </nav>
     </div>
