@@ -30,8 +30,8 @@ export function MobileNav({ isActive }: { isActive: (href: string) => boolean })
       <DialogContent align="top" className="max-w-[360px] p-5">
         <div className="flex items-center justify-between gap-3">
           <DialogTitle className="text-[16px]">Menu</DialogTitle>
-          <DialogClose className="inline-flex size-7.5 cursor-pointer items-center justify-center rounded-full text-fg-3 transition-colors duration-300 ease-expo hover:bg-bg-3">
-            <X className="size-[15px]" strokeWidth={2} />
+          <DialogClose className="inline-flex size-9 cursor-pointer items-center justify-center rounded-full text-fg-3 transition-colors duration-300 ease-expo hover:bg-bg-3 active:scale-95">
+            <X className="size-4" strokeWidth={2} />
             <span className="sr-only">Close</span>
           </DialogClose>
         </div>
