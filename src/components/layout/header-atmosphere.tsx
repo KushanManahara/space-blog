@@ -22,8 +22,8 @@ export function HeaderAtmosphere({ className }: { className?: string }) {
     <div
       aria-hidden
       className={cn(
-        "pointer-events-none absolute inset-x-0 bottom-0 -z-10 sm:inset-x-[calc(50%-50vw)]",
-        "top-[calc(-1*var(--nav-bleed))]",
+        "pointer-events-none absolute -inset-x-4 bottom-0 -z-10 sm:inset-x-[calc(50%-50vw)]",
+        "top-[calc(-1*(var(--nav-bleed)+env(safe-area-inset-top,0px)))]",
         className,
       )}
       style={{ backgroundImage: "var(--header-atmosphere)" }}
