@@ -21,7 +21,9 @@ export function PublicationStrip() {
           <AuthorAvatar className="size-[42px] text-[15px] shadow-sm" />
           <div>
             <p className="text-[14.5px] font-semibold text-fg-1">{author.name}</p>
-            <p className="text-[13px] text-fg-3">{author.role} · single-author publication</p>
+            <p className="text-[13px] text-fg-3">
+              {author.role} · personal engineering publication
+            </p>
           </div>
         </div>
 
