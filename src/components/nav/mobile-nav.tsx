@@ -36,13 +36,13 @@ export function MobileNav({
         onClick={() => setOpen(true)}
         aria-label="Open menu"
         className={cn(
-          "inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full border transition-[width,height,transform,box-shadow,color] duration-300 ease-bounce md:hidden",
+          "inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full border transition-[width,height,transform,box-shadow,color] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] md:hidden",
           "border-black/[0.06] bg-black/[0.03] text-fg-3 hover:-translate-y-px hover:bg-black/[0.06] hover:text-fg-2 hover:shadow-sm active:scale-[0.95]",
           "dark:border-white/10 dark:bg-white/[0.05] dark:hover:bg-white/10 dark:hover:text-fg-1",
           isCollapsed ? "size-8.5" : "size-[38px]",
         )}
       >
-        <Menu className={cn("transition-transform duration-300", isCollapsed ? "size-4" : "size-4.5")} strokeWidth={1.75} />
+        <Menu className={cn("transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]", isCollapsed ? "size-4" : "size-4.5")} strokeWidth={1.75} />
       </button>
 
       <DialogContent align="top" className="max-w-[360px] p-5">
