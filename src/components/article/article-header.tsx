@@ -79,7 +79,7 @@ export function ArticleHeader({
           {/* Soft ambient underglow */}
           <div
             aria-hidden
-            className="pointer-events-none absolute -inset-2 -z-10 rounded-3xl bg-gradient-to-b from-brand/20 via-brand/5 to-transparent opacity-70 blur-2xl dark:opacity-50"
+            className="pointer-events-none absolute inset-0 -z-10 rounded-2xl bg-gradient-to-b from-brand/20 via-brand/5 to-transparent opacity-70 blur-xl md:rounded-3xl dark:opacity-50"
           />
           <PostCover
             topic={post.topic}
