@@ -12,7 +12,7 @@ import { formatDate } from "@/lib/format";
 
 export function Hero({ featured }: { featured: Post }) {
   return (
-    <section className="relative mx-auto max-w-page px-gutter pt-[clamp(40px,6vw,84px)] pb-[clamp(56px,7vw,104px)]">
+    <section className="relative mx-auto w-full min-w-0 max-w-page px-gutter pt-[clamp(40px,6vw,84px)] pb-[clamp(56px,7vw,104px)]">
       <HeaderAtmosphere />
 
       <div className="relative z-1 grid items-center gap-[clamp(32px,5vw,64px)] lg:grid-cols-[1.02fr_0.98fr]">
