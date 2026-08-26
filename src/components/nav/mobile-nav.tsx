@@ -13,11 +13,22 @@ import { cn } from "@/lib/utils";
  * collapses the link row entirely. Reuses the same Dialog primitive as the
  * command menu and share sheet rather than a one-off sheet component.
  */
-export function MobileNav({ isActive }: { isActive: (href: string) => boolean }) {
+export function MobileNav({
+  isActive,
+  onOpenChange,
+}: {
+  isActive: (href: string) => boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
   const [open, setOpen] = React.useState(false);
 
+  const handleOpenChange = (nextOpen: boolean) => {
+    setOpen(nextOpen);
+    onOpenChange?.(nextOpen);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <button
         type="button"
         onClick={() => setOpen(true)}
