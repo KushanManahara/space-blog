@@ -37,12 +37,13 @@ const BLUR_LAYERS = [
 export function SiteHeader() {
   const pathname = usePathname();
   const commandMenu = useCommandMenu();
-  const { direction, isPast, isAtTop } = useScrollDirection({ threshold: 50, delta: 10 });
+  const { direction, isPast, isAtTop } = useScrollDirection({ threshold: 40, delta: 8 });
   const [hasFocus, setHasFocus] = React.useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
 
   const isScrolled = !isAtTop;
-  // Keyboard users tabbing into the header keep the full bar, collapsed or not.
-  const isCollapsed = isPast && direction === "down" && !hasFocus;
+  // Keyboard users tabbing into the header or open mobile nav keep the bar expanded
+  const isCollapsed = isPast && direction === "down" && !hasFocus && !mobileNavOpen;
 
   const isActive = (href: string) =>
     href === routes.home ? pathname === href : pathname.startsWith(href);
@@ -50,23 +51,30 @@ export function SiteHeader() {
   return (
     <div
       className={cn(
-        "sticky top-0 z-60 px-4 transition-[padding] duration-500 ease-expo",
+        "sticky top-0 z-60 w-full px-4 transition-[transform,padding,opacity] duration-350 ease-expo",
         "sm:px-[clamp(16px,4vw,40px)]",
-        isScrolled ? "pt-2.5" : "pt-4.5",
+        isScrolled
+          ? "pt-[calc(env(safe-area-inset-top,0px)+0.375rem)] sm:pt-2.5"
+          : "pt-[calc(env(safe-area-inset-top,0px)+0.625rem)] sm:pt-4.5",
+        isCollapsed &&
+          "-translate-y-[calc(100%+env(safe-area-inset-top,0px)+1.5rem)] opacity-0 pointer-events-none md:translate-y-0 md:opacity-100 md:pointer-events-auto",
       )}
     >
       {/*
-        Progressive blur behind the bar, tightly scoped to header height (80px)
+        Progressive blur behind the bar, scoped to header height + iOS safe area
         so page headings, cards, and content below remain 100% sharp.
       */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-20">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[calc(env(safe-area-inset-top,0px)+5rem)] overflow-hidden"
+      >
         {BLUR_LAYERS.map((layer) => (
           <span
             key={layer.radius}
             className="progressive-blur-layer"
             style={
               {
-                "--pb-height": "80px",
+                "--pb-height": "calc(env(safe-area-inset-top, 0px) + 80px)",
                 "--pb-radius": layer.radius,
                 "--pb-solid": layer.solid,
                 "--pb-fade": layer.fade,
@@ -158,7 +166,7 @@ export function SiteHeader() {
             <span className="sr-only">Studio</span>
           </Link>
 
-          <MobileNav isActive={isActive} />
+          <MobileNav isActive={isActive} onOpenChange={setMobileNavOpen} />
         </div>
       </nav>
     </div>
