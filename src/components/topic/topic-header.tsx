@@ -1,12 +1,15 @@
 import { Share, Sparkles } from "lucide-react";
 
 import { PageMasthead } from "@/components/layout/page-masthead";
-import { CoverRings, PostCover } from "@/components/post/post-cover";
+import { PostCover } from "@/components/post/post-cover";
+import { getTopicVisual } from "@/components/post/topic-visuals";
 import { Button } from "@/components/ui/button";
 import type { Topic } from "@/lib/content";
 
 /** Topic masthead: artwork, description and the follow controls. */
 export function TopicHeader({ topic }: { topic: Topic }) {
+  const visual = getTopicVisual(topic.name);
+
   return (
     <PageMasthead
       eyebrow="Topic"
@@ -19,9 +22,13 @@ export function TopicHeader({ topic }: { topic: Topic }) {
         </>
       }
       media={
-        <PostCover topic={topic.name} zoom={false} className="shadow-md">
-          <CoverRings sizes={[150]} className="[&>div]:top-[60%]" />
-        </PostCover>
+        <PostCover
+          topic={topic.name}
+          image={visual.image}
+          alt={topic.name}
+          zoom={false}
+          className="aspect-square rounded-2xl border border-line-1/80 shadow-md"
+        />
       }
       actions={
         <>

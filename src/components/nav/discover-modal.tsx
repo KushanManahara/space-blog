@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ChevronDown, ListFilter, Tag as TagIcon } from "lucide-react";
 
 import { PostCover } from "@/components/post/post-cover";
+import { getTopicVisual } from "@/components/post/topic-visuals";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import type { Tag, Topic } from "@/lib/content";
@@ -32,33 +33,40 @@ export function DiscoverModal(props: DiscoverModalProps) {
         <ChevronDown className="size-[13px] text-fg-3" strokeWidth={2} />
       </button>
 
-      <DialogContent className={isTopics ? "max-w-[820px] p-6.5" : "max-w-[700px] p-6.5"}>
+      <DialogContent
+        className={isTopics ? "max-w-[820px] p-4.5 sm:p-6.5" : "max-w-[700px] p-4.5 sm:p-6.5"}
+      >
         <DialogTitle className="border-b border-line-1 pb-4.5">
           {isTopics ? "Discover other topics" : "Discover other tags"}
         </DialogTitle>
 
         {isTopics ? (
           <div className="mt-5 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
-            {props.topics.map((topic) => (
-              <Link
-                key={topic.slug}
-                href={`/topics/${topic.slug}`}
-                onClick={() => setOpen(false)}
-                className="flex items-center gap-[13px] rounded-md p-2.5 transition-[background-color,transform] duration-300 ease-bounce hover:-translate-y-0.5 hover:bg-veil/75"
-              >
-                <PostCover
-                  topic={topic.name}
-                  zoom={false}
-                  className="size-11 shrink-0 rounded-[12px]"
-                />
-                <span>
-                  <span className="block text-[14.5px] font-bold text-fg-1">{topic.name}</span>
-                  <span className="mt-0.5 block text-[12.5px] text-fg-3">
-                    {topic.postCount} posts
+            {props.topics.map((topic) => {
+              const visual = getTopicVisual(topic.name);
+              return (
+                <Link
+                  key={topic.slug}
+                  href={`/topics/${topic.slug}`}
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-[13px] rounded-md p-2.5 transition-[background-color,transform] duration-300 ease-bounce hover:-translate-y-0.5 hover:bg-veil/75"
+                >
+                  <PostCover
+                    topic={topic.name}
+                    image={visual.image}
+                    alt={topic.name}
+                    zoom={false}
+                    className="size-11 shrink-0 rounded-[12px] border border-line-1/80 shadow-2xs"
+                  />
+                  <span>
+                    <span className="block text-[14.5px] font-bold text-fg-1">{topic.name}</span>
+                    <span className="mt-0.5 block text-[12.5px] text-fg-3">
+                      {topic.postCount} posts
+                    </span>
                   </span>
-                </span>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         ) : (
           <div className="mt-5 flex flex-wrap gap-2.5">
@@ -76,12 +84,12 @@ export function DiscoverModal(props: DiscoverModalProps) {
           </div>
         )}
 
-        <div className="mt-6 flex justify-end gap-3">
-          <DialogClose className="cursor-pointer px-4.5 py-3 text-[14px] font-semibold text-fg-3">
+        <div className="mt-6 flex flex-col-reverse justify-end gap-2.5 sm:flex-row sm:gap-3">
+          <DialogClose className="cursor-pointer px-4.5 py-2.5 text-center text-[14px] font-semibold text-fg-3 sm:py-3">
             Cancel
           </DialogClose>
           <DialogClose asChild>
-            <Button variant="dark" size="md" className="px-6.5 py-3 text-[14px]">
+            <Button variant="dark" size="md" className="w-full px-6.5 py-3 text-[14px] sm:w-auto">
               Close
             </Button>
           </DialogClose>

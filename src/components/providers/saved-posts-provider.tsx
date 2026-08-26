@@ -11,6 +11,11 @@ type SavedPostsValue = {
 
 const SavedPostsContext = React.createContext<SavedPostsValue | null>(null);
 
+const STORAGE_KEYS = {
+  saved: "space_saved_posts",
+  liked: "space_liked_posts",
+} as const;
+
 /** Reader-side state shared by every card, row and article on the page. */
 export function SavedPostsProvider({
   children,
@@ -24,14 +29,59 @@ export function SavedPostsProvider({
   const [saved, setSaved] = React.useState(() => new Set(initialSaved));
   const [liked, setLiked] = React.useState(() => new Set(initialLiked));
 
+  React.useEffect(() => {
+    try {
+      const storedSaved = localStorage.getItem(STORAGE_KEYS.saved);
+      if (storedSaved) {
+        const parsed = JSON.parse(storedSaved);
+        if (Array.isArray(parsed)) {
+          queueMicrotask(() => setSaved(new Set(parsed)));
+        }
+      }
+      const storedLiked = localStorage.getItem(STORAGE_KEYS.liked);
+      if (storedLiked) {
+        const parsed = JSON.parse(storedLiked);
+        if (Array.isArray(parsed)) {
+          queueMicrotask(() => setLiked(new Set(parsed)));
+        }
+      }
+    } catch {
+      // Ignore storage read errors
+    }
+  }, []);
+
+  const toggleSaved = React.useCallback((slug: string) => {
+    setSaved((current) => {
+      const next = toggle(current, slug);
+      try {
+        localStorage.setItem(STORAGE_KEYS.saved, JSON.stringify([...next]));
+      } catch {
+        // Ignore storage write errors
+      }
+      return next;
+    });
+  }, []);
+
+  const toggleLiked = React.useCallback((slug: string) => {
+    setLiked((current) => {
+      const next = toggle(current, slug);
+      try {
+        localStorage.setItem(STORAGE_KEYS.liked, JSON.stringify([...next]));
+      } catch {
+        // Ignore storage write errors
+      }
+      return next;
+    });
+  }, []);
+
   const value = React.useMemo<SavedPostsValue>(
     () => ({
       isSaved: (slug) => saved.has(slug),
       isLiked: (slug) => liked.has(slug),
-      toggleSaved: (slug) => setSaved((current) => toggle(current, slug)),
-      toggleLiked: (slug) => setLiked((current) => toggle(current, slug)),
+      toggleSaved,
+      toggleLiked,
     }),
-    [saved, liked],
+    [saved, liked, toggleSaved, toggleLiked],
   );
 
   return <SavedPostsContext value={value}>{children}</SavedPostsContext>;

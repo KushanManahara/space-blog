@@ -89,7 +89,7 @@ function CommandMenu({
       <DialogContent align="top" className="max-w-[620px] overflow-hidden p-0">
         <DialogTitle className="sr-only">Search posts and pages</DialogTitle>
 
-        <div className="flex items-center gap-3 border-b border-line-1 p-4.5">
+        <div className="flex items-center gap-3 border-b border-line-1 p-3.5 sm:p-4.5">
           <Search className="size-4.5 text-fg-3" strokeWidth={1.75} />
           <input
             autoFocus
@@ -158,7 +158,7 @@ function CommandMenu({
                 <ArrowRight className="size-3.5" strokeWidth={1.75} />
               </span>
               <span className="flex-1 text-[14.5px] font-medium text-fg-1">{item.label}</span>
-              <span className="rounded-md border border-line-1 bg-bg-3 px-[7px] py-1 text-[11.5px] font-semibold text-fg-3">
+              <span className="hidden rounded-md border border-line-1 bg-bg-3 px-[7px] py-1 text-[11.5px] font-semibold text-fg-3 sm:inline-block">
                 {item.hint}
               </span>
             </Link>

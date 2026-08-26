@@ -1,12 +1,16 @@
+// src/components/studio/posts-table.tsx
+
 import Link from "next/link";
 
 import { PostCover } from "@/components/post/post-cover";
 import { getTopicVisual } from "@/components/post/topic-visuals";
+import { BroadcastButton } from "@/components/studio/broadcast-button";
 import { StatusPill } from "@/components/studio/status-pill";
 import { routes, type Post, type StudioPost } from "@/lib/content";
 import { formatCount, formatDate } from "@/lib/format";
 
-const COLUMNS = "lg:grid-cols-[2.4fr_0.9fr_0.8fr_0.9fr_60px]";
+// GRID COLUMN CONFIGURATION FOR STUDIO POST ROWS
+const COLUMNS = "lg:grid-cols-[2.3fr_0.9fr_0.8fr_0.9fr_160px]";
 
 export function PostsTable({ rows }: { rows: Array<StudioPost & { post: Post }> }) {
   return (
@@ -27,7 +31,7 @@ export function PostsTable({ rows }: { rows: Array<StudioPost & { post: Post }> 
         return (
           <div
             key={post.slug}
-            className={`grid gap-3 border-b border-line-1 px-6 py-4 transition-colors duration-300 ease-expo last:border-b-0 hover:bg-bg-2 lg:items-center lg:gap-4.5 ${COLUMNS}`}
+            className={`grid gap-3 border-b border-line-1 px-4 py-4 transition-colors duration-300 ease-expo last:border-b-0 hover:bg-bg-2 sm:px-6 lg:items-center lg:gap-4.5 ${COLUMNS}`}
           >
             <div className="flex min-w-0 items-center gap-3.5">
               <PostCover
@@ -57,10 +61,11 @@ export function PostsTable({ rows }: { rows: Array<StudioPost & { post: Post }> 
 
             <p className="text-[13px] text-fg-3">{formatDate(post.publishedAt)}</p>
 
-            <div className="lg:text-right">
+            <div className="flex items-center gap-2.5 lg:justify-end">
+              <BroadcastButton postSlug={post.slug} postTitle={post.title} />
               <Link
                 href={`${routes.editor}?post=${post.slug}`}
-                className="text-[13.5px] font-semibold text-fg-1 underline decoration-n-300 underline-offset-[3px] transition-colors duration-300 ease-expo hover:text-brand"
+                className="text-[13px] font-semibold text-fg-1 underline decoration-n-300 underline-offset-[3px] transition-colors duration-300 ease-expo hover:text-brand"
               >
                 Edit
               </Link>

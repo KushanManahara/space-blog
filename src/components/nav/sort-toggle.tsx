@@ -22,7 +22,7 @@ export function SortToggle({
       scroll={false}
       title={`Sort by ${sortLabels[next].toLowerCase()}`}
       className={cn(
-        "inline-flex cursor-pointer items-center gap-2 rounded-full border border-line-1 bg-bg-2 px-4 py-2.5 text-[13px] font-semibold text-fg-2 transition-shadow duration-300 ease-expo hover:shadow-sm active:scale-[0.96] active:duration-150 active:ease-out",
+        "inline-flex cursor-pointer items-center gap-2 rounded-full border border-line-1 bg-bg-2 px-4 py-2.5 text-[13px] font-semibold text-fg-2 transition-[transform,box-shadow,color,border-color] duration-300 ease-bounce hover:-translate-y-0.5 hover:border-line-2 hover:text-fg-1 hover:shadow-xs active:scale-[0.95] active:duration-150 active:ease-out",
         className,
       )}
     >

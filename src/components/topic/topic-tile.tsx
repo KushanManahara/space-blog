@@ -12,9 +12,14 @@ export function TopicTile({ topic, rank }: { topic: Topic; rank?: number }) {
   return (
     <Link
       href={`/topics/${topic.slug}`}
-      className="group block transition-transform duration-150 ease-out active:scale-[0.98]"
+      className="group block transition-[transform,box-shadow] duration-500 ease-bounce hover:-translate-y-1 active:scale-[0.97] active:duration-150 active:ease-out"
     >
-      <PostCover topic={topic.name} className="aspect-square rounded-md">
+      <PostCover
+        topic={topic.name}
+        image={visual.image}
+        alt={topic.name}
+        className="aspect-square rounded-2xl border border-line-1/80 shadow-xs md:rounded-3xl"
+      >
         {rank ? (
           <span
             className={cn(
@@ -42,12 +47,20 @@ export function TopicTile({ topic, rank }: { topic: Topic; rank?: number }) {
 
 /** Wide topic row used in search results and the discover sheet. */
 export function TopicCard({ topic }: { topic: Topic }) {
+  const visual = getTopicVisual(topic.name);
+
   return (
     <Link
       href={`/topics/${topic.slug}`}
-      className="group flex items-center gap-3.5 rounded-lg border border-line-1 bg-bg-2 p-[18px] transition-[transform,box-shadow] duration-500 ease-bounce hover:-translate-y-1 hover:shadow-card-hover-md active:scale-[0.98] active:duration-150 active:ease-out"
+      className="group flex items-center gap-3.5 rounded-xl border border-line-1 bg-bg-2 p-[18px] transition-[transform,box-shadow,border-color] duration-500 ease-bounce hover:-translate-y-1 hover:border-line-2 hover:shadow-card-hover-md active:scale-[0.98] active:duration-150 active:ease-out"
     >
-      <PostCover topic={topic.name} pattern={false} className="size-14 shrink-0 rounded-md" />
+      <PostCover
+        topic={topic.name}
+        image={visual.image}
+        alt={topic.name}
+        pattern={false}
+        className="size-14 shrink-0 rounded-xl border border-line-1/80 shadow-xs"
+      />
       <div>
         <p className="text-[15.5px] font-bold text-fg-1 transition-colors duration-300 ease-expo group-hover:text-brand-strong">
           {topic.name}

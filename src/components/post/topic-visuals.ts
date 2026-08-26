@@ -14,6 +14,8 @@ import type { TopicName } from "@/lib/content";
 export type TopicVisual = {
   /** Cover artwork gradient — stands in for the photography slot. */
   cover: string;
+  /** High quality topic artwork image in public/topics/ */
+  image: string;
   /** Overlaid line/dot pattern that gives each topic its own texture. */
   pattern: string;
   patternSize: string;
@@ -32,6 +34,7 @@ export type TopicVisual = {
 export const topicVisuals: Record<TopicName, TopicVisual> = {
   Inference: {
     cover: "linear-gradient(145deg, #60A5FA 0%, #007AFF 52%, #004DA8 100%)",
+    image: "/topics/inference.png",
     pattern:
       "repeating-radial-gradient(circle at 62% 74%, rgba(255,255,255,.20) 0 1px, rgba(255,255,255,0) 1px 34px)",
     patternSize: "auto",
@@ -43,6 +46,7 @@ export const topicVisuals: Record<TopicName, TopicVisual> = {
   },
   Systems: {
     cover: "linear-gradient(150deg, #93C5FD 0%, #2563EB 55%, #0F172A 100%)",
+    image: "/topics/systems.png",
     pattern:
       "linear-gradient(rgba(255,255,255,.16) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.16) 1px, transparent 1px)",
     patternSize: "34px 34px, 34px 34px",
@@ -54,6 +58,7 @@ export const topicVisuals: Record<TopicName, TopicVisual> = {
   },
   Evaluation: {
     cover: "linear-gradient(155deg, #7DD3FC 0%, #0284C7 55%, #0369A1 100%)",
+    image: "/topics/evaluations.png",
     pattern: "radial-gradient(rgba(255,255,255,.30) 1.6px, transparent 1.6px)",
     patternSize: "22px 22px",
     badge: "bg-tint-cornflower text-fg-link",
@@ -64,6 +69,7 @@ export const topicVisuals: Record<TopicName, TopicVisual> = {
   },
   Engineering: {
     cover: "linear-gradient(150deg, #BAE6FD 0%, #0EA5E9 50%, #0062D2 100%)",
+    image: "/topics/engineering.png",
     pattern:
       "repeating-linear-gradient(58deg, rgba(255,255,255,.15) 0 1px, rgba(255,255,255,0) 1px 16px)",
     patternSize: "auto",
@@ -75,6 +81,7 @@ export const topicVisuals: Record<TopicName, TopicVisual> = {
   },
   Experiments: {
     cover: "linear-gradient(150deg, #93C5FD 0%, #007AFF 50%, #1E3A8A 100%)",
+    image: "/topics/experiments.png",
     pattern:
       "repeating-radial-gradient(circle at 22% 18%, rgba(255,255,255,.18) 0 1px, rgba(255,255,255,0) 1px 15px)",
     patternSize: "auto",
@@ -86,6 +93,7 @@ export const topicVisuals: Record<TopicName, TopicVisual> = {
   },
   Research: {
     cover: "linear-gradient(155deg, #38BDF8 0%, #1D4ED8 55%, #0B192C 100%)",
+    image: "/topics/research.png",
     pattern:
       "repeating-linear-gradient(45deg, rgba(255,255,255,.13) 0 1px, rgba(255,255,255,0) 1px 18px), repeating-linear-gradient(-45deg, rgba(255,255,255,.13) 0 1px, rgba(255,255,255,0) 1px 18px)",
     patternSize: "auto",
@@ -97,6 +105,7 @@ export const topicVisuals: Record<TopicName, TopicVisual> = {
   },
   Findings: {
     cover: "linear-gradient(150deg, #BFDBFE 0%, #3B82F6 50%, #1E40AF 100%)",
+    image: "/topics/finding.png",
     pattern: "repeating-linear-gradient(rgba(255,255,255,.16) 0 1px, rgba(255,255,255,0) 1px 13px)",
     patternSize: "auto",
     badge: "bg-tint-cornflower text-fg-link",

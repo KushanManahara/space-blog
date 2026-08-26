@@ -32,9 +32,9 @@ export function PostRow({
       className={cn(
         "group grid items-center",
         variant === "list" &&
-          "grid-cols-[1fr_120px] gap-6 border-b border-line-1 py-6.5 sm:grid-cols-[1fr_168px]",
+          "grid-cols-[1fr_96px] gap-4 border-b border-line-1 py-5 sm:grid-cols-[1fr_168px] sm:gap-6 sm:py-6.5",
         variant === "card" &&
-          "grid-cols-[1fr_104px] gap-[18px] rounded-lg border border-line-1 bg-bg-2 p-[18px] shadow-xs transition-[transform,box-shadow] duration-500 ease-bounce hover:-translate-y-1 hover:shadow-card-hover-md active:scale-[0.98] active:duration-150 active:ease-out",
+          "grid-cols-[1fr_88px] gap-3.5 rounded-lg border border-line-1 bg-bg-2 p-3.5 shadow-xs transition-[transform,box-shadow] duration-500 ease-bounce hover:-translate-y-1 hover:shadow-card-hover-md active:scale-[0.98] active:duration-150 active:ease-out sm:grid-cols-[1fr_104px] sm:gap-[18px] sm:p-[18px]",
         variant === "mini" && "grid-cols-[1fr_54px] gap-3.5 border-t border-line-1 py-3.5",
         className,
       )}
@@ -109,9 +109,9 @@ export function RankedPostRow({ post, rank }: { post: PostSummary; rank: number 
   return (
     <Link
       href={`/articles/${post.slug}`}
-      className="group grid grid-cols-[42px_1fr_auto] items-center gap-[18px] border-b border-line-1 px-1.5 py-5 transition-[padding,background-color] duration-500 ease-expo hover:bg-bg-2 hover:px-4"
+      className="group grid grid-cols-[32px_1fr_auto] items-center gap-3 border-b border-line-1 px-1 py-4 transition-[padding,background-color] duration-500 ease-expo hover:bg-bg-2 hover:px-4 sm:grid-cols-[42px_1fr_auto] sm:gap-[18px] sm:px-1.5 sm:py-5"
     >
-      <span className="font-display text-[24px] font-light text-fg-faint">
+      <span className="font-display text-[20px] font-light text-fg-faint sm:text-[24px]">
         {String(rank).padStart(2, "0")}
       </span>
       <span className="min-w-0">

@@ -42,17 +42,20 @@ export function PostCard({
       <Link
         href={`/articles/${post.slug}`}
         className={cn(
-          "group block transition-transform duration-550 ease-bounce active:scale-[0.98] active:duration-150 active:ease-out",
+          "group flex h-full flex-col transition-transform duration-550 ease-bounce active:scale-[0.98] active:duration-150 active:ease-out",
           className,
         )}
       >
-        <div className="transition-transform duration-550 ease-bounce group-hover:-translate-y-1.5">
+        <div className="flex h-full flex-1 flex-col transition-transform duration-550 ease-bounce group-hover:-translate-y-1.5">
           <PostCover
             topic={post.topic}
             image={post.coverImage}
             alt={post.title}
             notch
-            className={cn(coverRatio.grid, "rounded-xl")}
+            className={cn(
+              coverRatio.grid,
+              "shrink-0 rounded-2xl [mask-image:linear-gradient(to_bottom,black_75%,transparent_98%)] md:rounded-3xl",
+            )}
           >
             <TopicBadge
               topic={post.topic}
@@ -62,20 +65,26 @@ export function PostCard({
             />
           </PostCover>
 
-          <div className="relative z-10 mx-4 -mt-[48px] overflow-hidden rounded-xl transition-shadow duration-500 ease-expo group-hover:shadow-card-hover-lg">
-            <div className="overlap-panel bg-bg-2 px-6 pt-[46px] pb-5">
+          <div className="relative z-10 mx-2.5 -mt-[36px] flex flex-1 flex-col sm:mx-3.5 sm:-mt-[44px]">
+            <div className="flex flex-1 flex-col rounded-2xl border border-line-1 bg-bg-2 p-4 shadow-xs transition-[box-shadow,border-color] duration-500 ease-expo group-hover:border-line-2 group-hover:shadow-card-hover-lg sm:p-5 md:rounded-[22px] md:p-5.5">
               <p className="text-[12.5px] text-fg-3">
                 {formatDate(post.publishedAt)} · {post.readingMinutes} min read
               </p>
-              <h3 className="mt-2 text-[18.5px] leading-tight font-bold tracking-[-0.015em] text-fg-1 transition-colors duration-300 ease-expo group-hover:text-brand-strong">
+              <h3 className="mt-2 line-clamp-2 min-h-[2.6em] text-[17px] leading-[1.3] font-bold tracking-[-0.015em] text-fg-1 transition-colors duration-300 ease-expo group-hover:text-brand-strong sm:text-[17.5px]">
                 {post.title}
               </h3>
-              <p className="mt-2.5 text-[14.5px] leading-[1.55] text-fg-2">{post.dek}</p>
+              <p className="mt-2.5 line-clamp-2 min-h-[3.1em] text-[14px] leading-[1.55] text-fg-2">
+                {post.dek}
+              </p>
             </div>
           </div>
         </div>
 
-        {showMetrics ? <MetricRow post={post} bordered={false} className="mt-4.5" /> : null}
+        {showMetrics ? (
+          <div className="mt-auto px-1 pt-3.5">
+            <MetricRow post={post} bordered={false} />
+          </div>
+        ) : null}
       </Link>
     );
   }
@@ -121,9 +130,9 @@ export function PostCard({
 
         <h3
           className={cn(
-            "leading-tight font-bold tracking-[-0.015em] text-fg-1 transition-colors duration-300 ease-expo group-hover:text-brand-strong",
-            variant === "search" && "text-[16.5px]",
-            variant === "compact" && "text-[16px]",
+            "line-clamp-2 leading-tight font-bold tracking-[-0.015em] text-fg-1 transition-colors duration-300 ease-expo group-hover:text-brand-strong",
+            variant === "search" && "min-h-[2.5em] text-[16.5px]",
+            variant === "compact" && "min-h-[2.5em] text-[16px]",
           )}
         >
           {post.title}

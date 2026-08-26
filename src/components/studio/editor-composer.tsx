@@ -72,7 +72,7 @@ export function EditorComposer({ initialTitle = "" }: { initialTitle?: string })
           value={title}
           onChange={(event) => setTitle(event.target.value)}
           placeholder="Write a title…"
-          className="mt-5.5 w-full bg-transparent font-display text-[clamp(32px,4.4vw,46px)] leading-[1.1] font-bold tracking-[-0.03em] text-fg-1 outline-none placeholder:text-fg-faint"
+          className="mt-5.5 w-full bg-transparent font-display text-[26px] leading-[1.1] font-bold tracking-[-0.03em] text-fg-1 outline-none placeholder:text-fg-faint sm:text-[clamp(32px,4.4vw,46px)]"
         />
 
         <div className="mt-5.5 flex flex-wrap gap-2">
@@ -107,7 +107,7 @@ export function EditorComposer({ initialTitle = "" }: { initialTitle?: string })
         <div
           role="toolbar"
           aria-label="Formatting"
-          className="mx-auto flex max-w-[780px] flex-wrap items-center gap-1 px-[clamp(20px,5vw,32px)] py-2.5 text-fg-2"
+          className="no-scrollbar mx-auto flex max-w-[780px] items-center gap-1 overflow-x-auto px-[clamp(16px,5vw,32px)] py-2 text-fg-2 sm:flex-wrap sm:py-2.5"
         >
           {TOOLS.map((tool) => {
             const Icon = tool.icon;
@@ -118,18 +118,18 @@ export function EditorComposer({ initialTitle = "" }: { initialTitle?: string })
                 type="button"
                 title={tool.label}
                 aria-label={tool.label}
-                className="inline-flex size-8.5 cursor-pointer items-center justify-center rounded-[9px] text-fg-2 transition-[background-color,color] duration-250 ease-expo hover:bg-bg-3 hover:text-fg-1"
+                className="inline-flex size-8.5 shrink-0 cursor-pointer items-center justify-center rounded-[9px] text-fg-2 transition-[background-color,color] duration-250 ease-expo hover:bg-bg-3 hover:text-fg-1"
               >
                 <Icon className="size-[17px]" strokeWidth={1.75} />
               </button>
             );
           })}
 
-          <span aria-hidden className="mx-1.5 h-5.5 w-px bg-line-1" />
+          <span aria-hidden className="mx-1.5 h-5.5 w-px shrink-0 bg-line-1" />
 
           <button
             type="button"
-            className="inline-flex cursor-pointer items-center gap-2 rounded-full px-3.5 py-2 text-[13px] font-semibold text-fg-2 transition-colors duration-250 ease-expo hover:bg-bg-3"
+            className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-full px-3.5 py-2 text-[13px] font-semibold text-fg-2 transition-colors duration-250 ease-expo hover:bg-bg-3"
           >
             <Plus className="size-3.5" strokeWidth={2} />
             Add block

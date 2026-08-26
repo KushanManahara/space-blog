@@ -33,7 +33,7 @@ export function ContactForm() {
     <form
       ref={formRef}
       action={formAction}
-      className="rounded-lg border border-line-1 bg-bg-2 p-[clamp(24px,3vw,34px)] shadow-sm"
+      className="rounded-lg border border-line-1 bg-bg-2 p-5 shadow-sm sm:p-[clamp(24px,3vw,34px)]"
     >
       <div className="flex flex-col gap-5">
         <Field label="Your name" htmlFor="contact-name">
@@ -81,7 +81,7 @@ export function ContactForm() {
             name="message"
             required
             minLength={10}
-            placeholder="If it's a correction, a link to the trace or the paper helps."
+            placeholder="If it's a correction, a link to what I got wrong helps."
             className="min-h-37.5"
           />
         </Field>
@@ -130,7 +130,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="inline-flex cursor-pointer items-center gap-2.5 self-start rounded-full bg-brand px-7 py-3.5 text-[15px] font-semibold text-on-brand shadow-glow-sm transition-[transform,box-shadow] duration-[350ms] ease-bounce hover:-translate-y-0.5 hover:shadow-glow-md active:scale-[0.96] active:duration-150 active:ease-out disabled:pointer-events-none disabled:opacity-60"
+      className="inline-flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-full bg-brand px-7 py-3.5 text-[15px] font-semibold text-on-brand shadow-glow-sm transition-[transform,box-shadow] duration-[350ms] ease-bounce hover:-translate-y-0.5 hover:shadow-glow-md active:scale-[0.96] active:duration-150 active:ease-out disabled:pointer-events-none disabled:opacity-60 sm:w-auto sm:self-start"
     >
       {pending ? "Sending…" : "Send message"}
       {pending ? (

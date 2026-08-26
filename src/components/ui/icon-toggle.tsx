@@ -19,11 +19,13 @@ export function IconToggle({
   className?: string;
 }) {
   return (
-    <span className={cn("relative inline-flex items-center justify-center", className)}>
+    <span
+      className={cn("relative inline-flex size-4 shrink-0 items-center justify-center", className)}
+    >
       <Icon
         aria-hidden
         className={cn(
-          "absolute inset-0",
+          "absolute inset-0 size-full",
           TRANSITION,
           active ? "scale-100 opacity-100 blur-none" : "scale-[0.25] opacity-0 blur-[4px]",
         )}
@@ -33,6 +35,7 @@ export function IconToggle({
       <Icon
         aria-hidden
         className={cn(
+          "size-full",
           TRANSITION,
           active ? "scale-[0.25] opacity-0 blur-[4px]" : "scale-100 opacity-100 blur-none",
         )}
