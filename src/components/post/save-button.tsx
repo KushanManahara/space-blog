@@ -30,10 +30,11 @@ export function SaveButton({
         toggleSaved(slug);
       }}
       className={cn(
-        "inline-flex cursor-pointer items-center justify-center transition-transform duration-300 ease-bounce",
-        placement === "row" && "hover:-translate-y-px",
+        "inline-flex cursor-pointer items-center justify-center transition-[transform,background-color,color] duration-300 ease-bounce",
+        placement === "row" &&
+          "size-9 -my-2 -mr-2 rounded-full hover:bg-bg-3/80 hover:-translate-y-px active:scale-90",
         placement === "onCover" &&
-          "size-[30px] rounded-full bg-white/85 shadow-xs backdrop-blur-[14px] backdrop-saturate-150 hover:scale-[1.08] active:scale-[0.96] active:duration-150 active:ease-out",
+          "size-9 rounded-full bg-white/85 shadow-xs backdrop-blur-[14px] backdrop-saturate-150 hover:scale-[1.08] active:scale-[0.96] active:duration-150 active:ease-out dark:bg-bg-2/85",
         saved ? "text-brand-strong" : "text-fg-3",
       )}
     >
