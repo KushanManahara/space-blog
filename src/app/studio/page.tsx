@@ -50,7 +50,7 @@ export default async function StudioPage({ searchParams }: PageProps<"/studio">)
               name="q"
               defaultValue={query}
               placeholder="Filter posts"
-              className="w-40 bg-transparent py-1 text-[14px] text-fg-1 outline-none placeholder:text-fg-3"
+              className="w-full min-w-0 bg-transparent py-1 text-[16px] text-fg-1 outline-none placeholder:text-fg-3 sm:w-40 sm:text-[14px]"
             />
           </form>
         </div>
