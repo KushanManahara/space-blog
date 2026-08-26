@@ -19,7 +19,7 @@ export function SiteFooter() {
         <div className="absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-[radial-gradient(circle_at_center,rgb(0_122_255/0.18),transparent_70%)] blur-2xl dark:bg-[radial-gradient(circle_at_center,rgb(56_189_248/0.20),transparent_70%)]" />
       </div>
 
-      <div className="mx-auto max-w-page px-gutter pt-14 pb-10">
+      <div className="mx-auto max-w-page px-gutter pt-14 pb-[calc(env(safe-area-inset-bottom,0px)+2.5rem)]">
         <div className="flex flex-wrap justify-between gap-10">
           <div className="flex max-w-[300px] flex-col gap-3">
             <div className="flex items-center gap-2.5">
