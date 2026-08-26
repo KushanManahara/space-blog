@@ -37,12 +37,12 @@ export function CodeBlock({
         <button
           type="button"
           onClick={copy}
-          className="shrink-0 cursor-pointer px-2 py-1 text-[12px] font-semibold text-white/55 transition-colors duration-300 ease-expo hover:text-white"
+          className="inline-flex h-7.5 shrink-0 cursor-pointer items-center justify-center rounded px-3 text-[12px] font-semibold text-white/60 transition-[background-color,color,transform] duration-200 ease-expo hover:bg-white/10 hover:text-white active:scale-95"
         >
           {copied ? "Copied" : "Copy"}
         </button>
       </div>
-      <pre className="overflow-x-auto bg-n-900 p-3.5 sm:p-5.5">
+      <pre className="w-full max-w-full min-w-0 overflow-x-auto bg-n-900 p-3.5 sm:p-5.5">
         <code className="font-mono text-[12.5px] leading-[1.8] text-n-200 sm:text-[13.5px] sm:leading-[1.85]">
           {code}
         </code>
