@@ -151,12 +151,12 @@ export function CommentThread({
 
   return (
     <section id="responses" className="mt-12 scroll-mt-24">
-      <div className="flex items-center justify-between">
-        <h2 className="text-[22px] font-bold tracking-[-0.015em] text-fg-1">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="text-[20px] font-bold tracking-[-0.015em] text-fg-1 sm:text-[22px]">
           Responses ({total + posted.length})
         </h2>
         {allComments.length > 0 ? (
-          <span className="text-[13px] text-fg-3">Peer review & engineering discussion</span>
+          <span className="hidden text-[13px] text-fg-3 sm:inline">Peer review & engineering discussion</span>
         ) : null}
       </div>
 
@@ -344,7 +344,7 @@ export function CommentThread({
               >
                 {comment.initials}
               </span>
-              <div className="flex-1 rounded-xl border border-line-1 bg-bg-2 px-5 py-4 shadow-xs">
+              <div className="min-w-0 flex-1 break-words rounded-xl border border-line-1 bg-bg-2 px-4 py-3.5 shadow-xs sm:px-5 sm:py-4">
                 <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
                   <p className="text-[14.5px] font-bold text-fg-1">{comment.name}</p>
                   {comment.role ? (
