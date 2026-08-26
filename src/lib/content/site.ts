@@ -16,10 +16,10 @@ export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://space.gimhar
 
 export const site = {
   name: "Space",
-  tagline: "Writing on AI systems & Software Engineering",
+  tagline: "AI Systems & Software Engineering by Kushan Manahara",
   issue: 40,
   description:
-    "A single-author engineering publication on AI systems, machine learning, and software architecture by Kushan Manahara.",
+    "An engineering publication by Kushan Manahara exploring AI systems, machine learning, agents, and software architecture.",
   seriesCount: 0,
   correctionCount: 0,
   subscriberCount: 0,
