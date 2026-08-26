@@ -1,36 +1,145 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Space — AI Systems & Software Engineering
 
-## Getting Started
+> An engineering publication by **Kushan Manahara** exploring AI systems, machine learning, autonomous agents, and production software engineering.
+>
+> 🌐 **Live Site**: [https://space.gimhara.com](https://space.gimhara.com)
 
-First, run the development server:
+---
+
+## 📖 About Space
+
+Space is an independent engineering publication dedicated to what is actually happening underneath the abstractions — from mathematical foundations and model training to neural networks, inference, fine-tuning, and modern LLM systems:
+
+* **Machine Learning & AI**: Neural network architectures, inference latency/throughput, fine-tuning, and modern LLM systems.
+* **AI Agents & Systems**: Tool calling, Model Context Protocol (MCP), RAG, agent architectures, orchestration, evaluation, and protocols connecting models to real tools and data.
+* **The Engineering Underneath**: Linux internals, Python, TypeScript, distributed systems, cloud infrastructure, containers, Kubernetes, Kafka, APIs, databases, and tooling for production AI prototypes.
+* **Milestones & Lessons**: Field notes from the journey across software engineering, AI research, and applied machine learning systems.
+
+---
+
+## 🛠️ Architecture & Tech Stack
+
+| Layer | Technologies |
+| :--- | :--- |
+| **Framework** | [Next.js 16.3.1](https://nextjs.org/) (App Router + Turbopack + React 19) |
+| **Styling & UI** | [Tailwind CSS v4](https://tailwindcss.com/), Radix UI primitives, Lucide Icons |
+| **Typography** | Louis George Café (Custom variable font) |
+| **Database** | [Turso](https://turso.tech/) (Serverless libSQL / SQLite in AWS Mumbai `ap-south-1`) |
+| **ORM** | [Drizzle ORM](https://orm.drizzle.team/) with automated migrations |
+| **Email Service** | [Resend](https://resend.com/) Unified Contacts API & React Email templates |
+| **Content Engine** | Fully typed, build-time Zod schema validation (`src/lib/content/`) |
+| **Hosting & DNS** | [Vercel](https://vercel.com/) Global Edge Network + [Cloudflare](https://cloudflare.com/) DNS |
+
+---
+
+## ✨ Key Features
+
+* 👓 **Distraction-Free Reader Mode**: Dedicated reading canvas with keyboard shortcut (`R`), customizable fonts, column widths, and reading themes (Clean, Warm, Sepia, Night).
+* 📱 **Mobile-First Usability & Ergonomics**: Full-app audit across 12 routes with zero horizontal overflow, iOS Safari auto-zoom prevention (`text-[16px]` inputs), and accessible touch targets (≥ 36px–44px).
+* 💬 **Verified Peer Discussions**: Real-time reader discussion threads with verified author credentials (name, role, and email).
+* 📬 **Newsletter & Broadcast Pipeline**: Automated subscriber synchronization, RFC 8058 One-Click Unsubscribe headers, web-based `/unsubscribe` interface, and an author `/studio` broadcast engine.
+* 🔍 **Multi-Facet Search & Tagging**: Instant search with deep keyword indexing across articles, topics, and reading durations.
+* 🌐 **Rich Social Graph & SEO**: High-resolution OpenGraph previews (512×512 branding), structured JSON-LD schemas, RSS 2.0 feed (`/rss.xml`), and dynamic sitemaps.
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+* **Node.js**: `20.x` or higher
+* **Package Manager**: `pnpm` (v10+ recommended)
+
+### 1. Clone & Install Dependencies
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone git@github.com:KushanManahara/space-blog.git
+cd space-blog
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Configure Environment Variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Copy the example environment configuration:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+cp .env.example .env.local
+```
 
-## Learn More
+Fill in your configuration keys:
 
-To learn more about Next.js, take a look at the following resources:
+```env
+# Canonical Site URL
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Turso Cloud SQLite Database
+TURSO_DATABASE_URL=libsql://[your-database-name].turso.io
+TURSO_AUTH_TOKEN=your-turso-auth-token
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Resend Email Delivery
+RESEND_API_KEY=re_your_api_key
+RESEND_AUDIENCE_ID=your-resend-audience-id
+RESEND_FROM_EMAIL=newsletter.space@gimhara.com
 
-## Deploy on Vercel
+# Studio Security & Unsubscribe Secret
+STUDIO_SECRET=your-studio-passphrase
+UNSUBSCRIBE_SECRET=your-unsubscribe-token-secret
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 3. Initialize the Database
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Push schema definitions and synchronize baseline articles to Turso:
+
+```bash
+pnpm db:push
+pnpm db:sync
+```
+
+### 4. Run Development Server
+
+```bash
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser to view the blog.
+
+---
+
+## ⚡ Useful Scripts
+
+```bash
+# Quality Assurance
+pnpm build           # Production build (compiles all 65 pre-rendered routes)
+pnpm typecheck       # TypeScript type checking
+pnpm lint            # Run ESLint checks
+pnpm format          # Format codebase with Prettier
+
+# Database Operations (Drizzle ORM + Turso)
+pnpm db:push         # Push schema changes from schema.ts to Turso Cloud
+pnpm db:sync         # Safe sync local articles & baseline metrics to database
+pnpm db:sync:force   # Reset and overwrite database baselines from local content
+pnpm db:studio       # Launch visual Drizzle database GUI
+
+# Newsletter Verification
+npx tsx scripts/verify-newsletter-pipeline.ts   # Comprehensive subscription & broadcast test
+npx tsx scripts/test-newsletter.ts              # Send test email to verify headers and inbox rendering
+```
+
+---
+
+## 👤 Author
+
+**Kushan Manahara**
+* Machine Learning Engineer at H2O.ai
+* Website: [https://space.gimhara.com](https://space.gimhara.com)
+* GitHub: [@KushanManahara](https://github.com/KushanManahara)
+* LinkedIn: [/in/kushan-manahara](https://www.linkedin.com/in/kushan-manahara)
+* X (Twitter): [@Kushan_Manahara](https://x.com/Kushan_Manahara)
+* Email: [hi@gimhara.com](mailto:hi@gimhara.com)
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License. Copyright © 2026 Kushan Manahara. All rights reserved.
+
