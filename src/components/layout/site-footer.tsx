@@ -13,12 +13,11 @@ export function SiteFooter() {
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -bottom-20 -left-20 -z-10 h-64 w-64 rounded-full bg-[radial-gradient(circle_at_center,rgb(56_189_248/0.18),transparent_70%)] blur-2xl dark:bg-[radial-gradient(circle_at_center,rgb(0_122_255/0.22),transparent_70%)]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -right-20 -bottom-20 -z-10 h-64 w-64 rounded-full bg-[radial-gradient(circle_at_center,rgb(0_122_255/0.18),transparent_70%)] blur-2xl dark:bg-[radial-gradient(circle_at_center,rgb(56_189_248/0.20),transparent_70%)]"
-      />
+        className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
+      >
+        <div className="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-[radial-gradient(circle_at_center,rgb(56_189_248/0.18),transparent_70%)] blur-2xl dark:bg-[radial-gradient(circle_at_center,rgb(0_122_255/0.22),transparent_70%)]" />
+        <div className="absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-[radial-gradient(circle_at_center,rgb(0_122_255/0.18),transparent_70%)] blur-2xl dark:bg-[radial-gradient(circle_at_center,rgb(56_189_248/0.20),transparent_70%)]" />
+      </div>
 
       <div className="mx-auto max-w-page px-gutter pt-14 pb-10">
         <div className="flex flex-wrap justify-between gap-10">
@@ -76,7 +75,7 @@ export function SiteFooter() {
           <span>
             © {new Date().getUTCFullYear()} {author.name}. All rights reserved.
           </span>
-          <span>Single-author engineering publication on AI & Systems</span>
+          <span>Engineering publication on AI & Systems by {author.name}</span>
         </div>
       </div>
     </footer>
