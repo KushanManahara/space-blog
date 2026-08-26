@@ -113,11 +113,11 @@ export default async function ArticlePage({ params }: PageProps<"/articles/[slug
           }}
         />
 
-        <article className="mx-auto max-w-page px-gutter pt-[clamp(32px,4vw,60px)]">
+        <article className="mx-auto w-full max-w-page min-w-0 px-gutter pt-[clamp(32px,4vw,60px)]">
           <ArticleHeader post={post} summary={summary} partCount={series?.partCount} />
 
-          <div className="mt-[clamp(36px,4vw,56px)] grid items-start gap-[clamp(32px,4.5vw,72px)] pb-[clamp(84px,10vw,150px)] lg:grid-cols-[minmax(0,1fr)_320px]">
-            <div>
+          <div className="mt-[clamp(36px,4vw,56px)] grid w-full min-w-0 grid-cols-1 items-start gap-[clamp(32px,4.5vw,72px)] pb-[clamp(84px,10vw,150px)] lg:grid-cols-[minmax(0,1fr)_320px]">
+            <div className="w-full min-w-0 max-w-full">
               <ArticleBody id={BODY_ID} blocks={post.body} />
 
               <div className="mt-8.5 flex flex-wrap gap-2">
@@ -163,7 +163,7 @@ export default async function ArticlePage({ params }: PageProps<"/articles/[slug
               </div>
             </div>
 
-            <aside className="flex flex-col gap-[18px] lg:sticky lg:top-[104px]">
+            <aside className="flex w-full min-w-0 max-w-full flex-col gap-[18px] lg:sticky lg:top-[104px]">
               <TableOfContents headings={headings} />
               {series && post.series ? (
                 <SeriesNav series={series} currentPart={post.series.part} />
