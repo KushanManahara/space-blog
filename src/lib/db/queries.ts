@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 
 import type { Comment } from "@/lib/content";
 import { comments, db, postStats } from "./index";
@@ -6,16 +6,33 @@ import { comments, db, postStats } from "./index";
 const TONES: ("violet" | "cornflower" | "orchid")[] = ["violet", "cornflower", "orchid"];
 
 /**
- * Fetch all live post stats (likes, views) as a map keyed by slug.
+ * Fetch all live post stats (likes, views, comments) as a map keyed by slug.
  */
 export async function getAllLivePostStatsMap(): Promise<
-  Map<string, { likes: number; views: number }>
+  Map<string, { likes: number; views: number; comments: number }>
 > {
-  const map = new Map<string, { likes: number; views: number }>();
+  const map = new Map<string, { likes: number; views: number; comments: number }>();
   try {
     const rows = await db.select().from(postStats);
     for (const row of rows) {
-      map.set(row.slug, { likes: row.likes, views: row.views });
+      map.set(row.slug, { likes: row.likes, views: row.views, comments: 0 });
+    }
+
+    const commentRows = await db
+      .select({
+        postSlug: comments.postSlug,
+        count: sql<number>`count(*)`,
+      })
+      .from(comments)
+      .groupBy(comments.postSlug);
+
+    for (const row of commentRows) {
+      const existing = map.get(row.postSlug);
+      if (existing) {
+        existing.comments = Number(row.count);
+      } else {
+        map.set(row.postSlug, { likes: 0, views: 0, comments: Number(row.count) });
+      }
     }
   } catch (error) {
     console.error("Error fetching all live post stats:", error);
