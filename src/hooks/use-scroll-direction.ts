@@ -36,8 +36,12 @@ export function useScrollDirection({ threshold = 50, delta = 10 }: Options = {})
 
     const measure = () => {
       frame = 0;
-      const y = window.scrollY;
+      const y = Math.max(0, window.scrollY);
       const movement = y - lastY;
+      const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+
+      // Ignore iOS bottom rubber-band bounce past document end
+      if (maxScroll > 0 && y > maxScroll) return;
 
       setState((current) => {
         const direction =
