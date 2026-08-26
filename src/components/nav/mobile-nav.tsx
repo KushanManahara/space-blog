@@ -16,9 +16,11 @@ import { cn } from "@/lib/utils";
 export function MobileNav({
   isActive,
   onOpenChange,
+  isCollapsed = false,
 }: {
   isActive: (href: string) => boolean;
   onOpenChange?: (open: boolean) => void;
+  isCollapsed?: boolean;
 }) {
   const [open, setOpen] = React.useState(false);
 
@@ -33,9 +35,14 @@ export function MobileNav({
         type="button"
         onClick={() => setOpen(true)}
         aria-label="Open menu"
-        className="inline-flex size-[38px] shrink-0 cursor-pointer items-center justify-center rounded-full border border-line-1 bg-bg-2 text-fg-3 transition-[transform,box-shadow,color] duration-300 ease-bounce hover:-translate-y-px hover:text-fg-2 hover:shadow-sm active:scale-[0.96] active:duration-150 active:ease-out md:hidden"
+        className={cn(
+          "inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full border transition-[width,height,transform,box-shadow,color] duration-300 ease-bounce md:hidden",
+          "border-black/[0.06] bg-black/[0.03] text-fg-3 hover:-translate-y-px hover:bg-black/[0.06] hover:text-fg-2 hover:shadow-sm active:scale-[0.95]",
+          "dark:border-white/10 dark:bg-white/[0.05] dark:hover:bg-white/10 dark:hover:text-fg-1",
+          isCollapsed ? "size-8.5" : "size-[38px]",
+        )}
       >
-        <Menu className="size-4.5" strokeWidth={1.75} />
+        <Menu className={cn("transition-transform duration-300", isCollapsed ? "size-4" : "size-4.5")} strokeWidth={1.75} />
       </button>
 
       <DialogContent align="top" className="max-w-[360px] p-5">
