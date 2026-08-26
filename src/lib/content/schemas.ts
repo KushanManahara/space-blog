@@ -58,6 +58,7 @@ export const postSchema = z.object({
   title: z.string().min(1),
   dek: z.string().min(1),
   topic: topicNameSchema,
+  featured: z.boolean().optional(),
   /** ISO date; formatted for display at the edge of the UI. */
   publishedAt: z.iso.date(),
   readingMinutes: z.number().int().positive(),
@@ -88,12 +89,13 @@ export const seriesSchema = z.object({
 
 export const tagSchema = z.object({
   name: z.string().min(1),
-  postCount: z.number().int().positive(),
+  postCount: z.number().int().nonnegative().default(1),
 });
 
 export const authorSchema = z.object({
   name: z.string().min(1),
   initials: z.string().min(1).max(3),
+  avatar: z.string().min(1).default("/images/kushan.png"),
   role: z.string().min(1),
   bio: z.string().min(1),
   longBio: z.string().min(1),
@@ -101,11 +103,16 @@ export const authorSchema = z.object({
   handle: z.string().min(1),
   location: z.string().min(1),
   timezoneNote: z.string().min(1),
+  github: z.string().min(1).default("https://github.com/KushanManahara"),
+  linkedin: z.string().min(1).default("https://www.linkedin.com/in/kushan-manahara"),
+  twitter: z.string().min(1).default("https://x.com/Kushan_Manahara"),
 });
 
 export const commentSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
+  role: z.string().optional(),
+  email: z.string().optional(),
   initials: z.string().min(1).max(3),
   postedAgo: z.string().min(1),
   likes: z.number().int().nonnegative(),
