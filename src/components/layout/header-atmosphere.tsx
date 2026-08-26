@@ -22,7 +22,7 @@ export function HeaderAtmosphere({ className }: { className?: string }) {
     <div
       aria-hidden
       className={cn(
-        "pointer-events-none absolute inset-x-[calc(50%-50vw)] bottom-0 -z-10",
+        "pointer-events-none absolute inset-x-0 bottom-0 -z-10 sm:inset-x-[calc(50%-50vw)]",
         "top-[calc(-1*var(--nav-bleed))]",
         className,
       )}
