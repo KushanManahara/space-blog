@@ -4,15 +4,22 @@ import { MostReadSection } from "@/components/home/most-read-section";
 import { MostViewed } from "@/components/home/most-viewed";
 import { NewsletterBlock } from "@/components/home/newsletter-block";
 import { PublicationStrip } from "@/components/home/publication-strip";
-import { SeriesGrid } from "@/components/home/series-grid";
 import { TopicsSection } from "@/components/home/topics-section";
 import { getFeaturedPost, isTopicFilter, posts, toSummaries } from "@/lib/content";
+import { getAllLivePostStatsMap } from "@/lib/db/queries";
 
 export default async function HomePage({ searchParams }: PageProps<"/">) {
   const { topic } = await searchParams;
   const requested = typeof topic === "string" ? topic : undefined;
   const activeTopic = isTopicFilter(requested) ? requested : "All";
-  const summaries = toSummaries(posts);
+
+  const liveStatsMap = await getAllLivePostStatsMap();
+  const livePosts = posts.map((p) => {
+    const live = liveStatsMap.get(p.slug);
+    return live ? { ...p, likes: live.likes, views: live.views } : p;
+  });
+
+  const summaries = toSummaries(livePosts);
 
   return (
     <>
@@ -20,7 +27,6 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
       <PublicationStrip />
       <MostViewed posts={summaries} />
       <LatestWriting topic={activeTopic} />
-      <SeriesGrid />
       <TopicsSection />
       <NewsletterBlock />
       <MostReadSection />

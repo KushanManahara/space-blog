@@ -24,7 +24,7 @@ export default function TopicsPage() {
             Everything I keep <span className="text-brand">coming back to.</span>
           </>
         }
-        description="Each topic collects the posts, corrections and traces that belong together."
+        description="Each topic collects the posts that belong together."
         media={<MastheadBadge icon={Layers} />}
         actions={
           <>

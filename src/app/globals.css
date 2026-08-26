@@ -212,14 +212,12 @@
      Peak alpha 0.075: this should register as light, not as colour. */
   --header-atmosphere: linear-gradient(
     180deg,
-    rgb(0 122 255 / 0.075) 0%,
-    rgb(0 122 255 / 0.068) 16%,
-    rgb(99 102 241 / 0.054) 38%,
-    rgb(139 92 246 / 0.034) 56%,
-    rgb(139 92 246 / 0.017) 71%,
-    rgb(139 92 246 / 0.006) 84%,
-    rgb(139 92 246 / 0.0015) 93%,
-    rgb(139 92 246 / 0) 100%
+    rgb(147 197 253 / 0.28) 0%,
+    rgb(165 180 252 / 0.22) 20%,
+    rgb(196 181 253 / 0.16) 42%,
+    rgb(221 214 254 / 0.1) 65%,
+    rgb(186 230 253 / 0.04) 85%,
+    rgb(186 230 253 / 0) 100%
   );
 
   /* How far the wash reaches above its header. It has to clear the floating nav
@@ -347,13 +345,11 @@
   /* Barely there on a dark ground: a cool lift, never a colour band. */
   --header-atmosphere: linear-gradient(
     180deg,
-    rgb(96 165 250 / 0.06) 0%,
-    rgb(96 165 250 / 0.054) 16%,
-    rgb(129 140 248 / 0.042) 38%,
-    rgb(139 92 246 / 0.026) 56%,
-    rgb(139 92 246 / 0.013) 71%,
-    rgb(139 92 246 / 0.004) 84%,
-    rgb(139 92 246 / 0) 100%
+    rgb(56 189 248 / 0.22) 0%,
+    rgb(99 102 241 / 0.17) 22%,
+    rgb(139 92 246 / 0.12) 45%,
+    rgb(96 165 250 / 0.06) 70%,
+    rgb(96 165 250 / 0) 100%
   );
   --color-fg-1: var(--color-n-50);
   --color-fg-2: var(--color-n-300);
@@ -427,13 +423,11 @@
     /* Barely there on a dark ground: a cool lift, never a colour band. */
     --header-atmosphere: linear-gradient(
       180deg,
-      rgb(96 165 250 / 0.06) 0%,
-      rgb(96 165 250 / 0.054) 16%,
-      rgb(129 140 248 / 0.042) 38%,
-      rgb(139 92 246 / 0.026) 56%,
-      rgb(139 92 246 / 0.013) 71%,
-      rgb(139 92 246 / 0.004) 84%,
-      rgb(139 92 246 / 0) 100%
+      rgb(56 189 248 / 0.22) 0%,
+      rgb(99 102 241 / 0.17) 22%,
+      rgb(139 92 246 / 0.12) 45%,
+      rgb(96 165 250 / 0.06) 70%,
+      rgb(96 165 250 / 0) 100%
     );
     --color-fg-1: var(--color-n-50);
     --color-fg-2: var(--color-n-300);
@@ -519,15 +513,19 @@
 
   html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
     position: relative;
+    overflow-x: hidden;
     background: var(--color-bg-1);
     color: var(--color-fg-1);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    -webkit-tap-highlight-color: transparent;
   }
 
   ::selection {
@@ -554,6 +552,14 @@
 }
 
 @layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
   /* Frosted surfaces recur across the nav, badges, modals and hero chips.
      `.glass` and `.glass-panel` follow the theme; `.glass-on-cover` does not,
      because it only ever sits on dark cover artwork. */
@@ -672,13 +678,15 @@ html[data-reveal-ready="true"] [data-reveal="in"] {
 @keyframes pop-in {
   from {
     opacity: 0;
-    scale: 0.985;
-    translate: var(--dialog-tx, -50%) calc(var(--dialog-ty, -50%) + 14px);
+    scale: 0.95;
+    translate: var(--dialog-tx, -50%) calc(var(--dialog-ty, -50%) + 16px);
+    filter: blur(4px);
   }
   to {
     opacity: 1;
     scale: 1;
     translate: var(--dialog-tx, -50%) var(--dialog-ty, -50%);
+    filter: blur(0px);
   }
 }
 
@@ -689,40 +697,46 @@ html[data-reveal-ready="true"] [data-reveal="in"] {
     opacity: 1;
     scale: 1;
     translate: var(--dialog-tx, -50%) var(--dialog-ty, -50%);
+    filter: blur(0px);
   }
   to {
     opacity: 0;
-    scale: 0.98;
-    translate: var(--dialog-tx, -50%) calc(var(--dialog-ty, -50%) + 8px);
+    scale: 0.96;
+    translate: var(--dialog-tx, -50%) calc(var(--dialog-ty, -50%) + 10px);
+    filter: blur(3px);
   }
 }
 
 @keyframes fade-in {
   from {
     opacity: 0;
+    filter: blur(4px);
   }
   to {
     opacity: 1;
+    filter: blur(0px);
   }
 }
 
 @keyframes fade-out {
   from {
     opacity: 1;
+    filter: blur(0px);
   }
   to {
     opacity: 0;
+    filter: blur(4px);
   }
 }
 
 @keyframes bar-up {
   from {
     opacity: 0;
-    transform: translateY(120%);
+    transform: translateY(120%) scale(0.96);
   }
   to {
     opacity: 1;
-    transform: none;
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -746,34 +760,41 @@ html[data-reveal-ready="true"] [data-reveal="in"] {
    slower so the reader has time to register it landed.
    ============================================================ */
 :root {
-  --vt-duration-exit: 150ms;
-  --vt-duration-enter: 220ms;
+  --vt-duration-exit: 160ms;
+  --vt-duration-enter: 280ms;
 }
 
 ::view-transition-old(.page-exit) {
-  animation: var(--vt-duration-exit) ease-in both vt-fade-out;
+  animation: var(--vt-duration-exit) cubic-bezier(0.4, 0, 1, 1) both vt-fade-out;
 }
 ::view-transition-new(.page-enter) {
-  animation: var(--vt-duration-enter) ease-out var(--vt-duration-exit) both vt-fade-in;
+  animation: var(--vt-duration-enter) cubic-bezier(0.16, 1, 0.3, 1) var(--vt-duration-exit) both
+    vt-fade-in;
 }
 
 /* Same-route content swap (filter chips, tabs, sort) — a plain, quick
    crossfade; the surrounding page doesn't move, only this region does. */
 ::view-transition-old(.content-swap) {
-  animation: 120ms ease-in both vt-fade-out;
+  animation: 130ms cubic-bezier(0.4, 0, 1, 1) both vt-fade-out;
 }
 ::view-transition-new(.content-swap) {
-  animation: 180ms ease-out 80ms both vt-fade-in;
+  animation: 200ms cubic-bezier(0.16, 1, 0.3, 1) 70ms both vt-fade-in;
 }
 
 @keyframes vt-fade-out {
   to {
     opacity: 0;
+    transform: translateY(-6px) scale(0.995);
   }
 }
 @keyframes vt-fade-in {
   from {
     opacity: 0;
+    transform: translateY(10px) scale(1);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -824,4 +845,78 @@ html[data-magicui-theme-vt="active"]::view-transition-group(root) {
    theme unclipped between snapshot and the ready.then() JS animation. */
 html[data-magicui-theme-vt="active"]::view-transition-new(root) {
   clip-path: var(--magicui-theme-vt-clip-from);
+}
+
+/* ============================================================
+   FOCUS / READER MODE TRANSITIONS
+   ============================================================ */
+@keyframes focus-overlay-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes focus-overlay-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes focus-canvas-in {
+  0% {
+    opacity: 0;
+    transform: translateY(28px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes focus-canvas-out {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+}
+
+@keyframes focus-toolbar-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-focus-overlay-in {
+  animation: focus-overlay-in 420ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-focus-overlay-out {
+  animation: focus-overlay-out 280ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-focus-canvas-in {
+  animation: focus-canvas-in 460ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-focus-canvas-out {
+  animation: focus-canvas-out 280ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-focus-toolbar-in {
+  animation: focus-toolbar-in 380ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

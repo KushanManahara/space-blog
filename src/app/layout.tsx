@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
+import Script from "next/script";
 
 import { ViewTransitionGuard } from "@/components/motion/view-transition-guard";
 import { CommandMenuProvider } from "@/components/nav/command-menu";
@@ -19,6 +20,16 @@ const louisGeorgeCafe = localFont({
   ],
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#faf9f6" },
+    { media: "(prefers-color-scheme: dark)", color: "#09090b" },
+  ],
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
@@ -30,6 +41,7 @@ export const metadata: Metadata = {
     canonical: "/",
     types: { "application/rss+xml": "/rss.xml" },
   },
+  manifest: "/site.webmanifest",
   openGraph: {
     type: "website",
     siteName: site.name,
@@ -44,6 +56,16 @@ export const metadata: Metadata = {
     description: site.description,
     creator: author.handle,
   },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "512x512" },
+      { url: "/favicon-32x32.png", type: "image/png", sizes: "32x32" },
+      { url: "/logo.png", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -55,7 +77,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
     >
       <head>
-        <script
+        <Script
+          id="theme-init"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               try {
@@ -97,6 +121,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                   description: author.bio,
                   email: `mailto:${author.email}`,
                   url: `${siteUrl}/about`,
+                  image: `${siteUrl}${author.avatar}`,
+                  sameAs: [author.github, author.linkedin, author.twitter],
                 },
               ],
             }),

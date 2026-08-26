@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowRight, Mail } from "lucide-react";
 
 import { ContactForm } from "@/components/contact/contact-form";
-import { GitHubIcon, RssIcon, XIcon } from "@/components/icons/social-icons";
+import { GitHubIcon, LinkedInIcon, RssIcon, XIcon } from "@/components/icons/social-icons";
 import { MastheadBadge, PageMasthead } from "@/components/layout/page-masthead";
 import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
@@ -11,13 +11,14 @@ import { author, routes } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: "Corrections and reproductions get answered first. Everything else, within a week.",
+  description: "Corrections get answered first. Everything else, within a week.",
   alternates: { canonical: "/contact" },
 };
 
 const socials = [
-  { label: "GitHub", href: "https://github.com", icon: GitHubIcon },
-  { label: "X", href: "https://x.com", icon: XIcon },
+  { label: "GitHub", href: author.github, icon: GitHubIcon },
+  { label: "LinkedIn", href: author.linkedin, icon: LinkedInIcon },
+  { label: "X", href: author.twitter, icon: XIcon },
   { label: "RSS", href: "/rss.xml", icon: RssIcon },
 ] as const;
 
@@ -31,7 +32,7 @@ export default function ContactPage() {
             Get in touch <span className="text-brand">or send a note.</span>
           </>
         }
-        description="Corrections and reproductions get answered first. Everything else, within a week."
+        description="Corrections get answered first. Everything else, within a week."
         media={<MastheadBadge icon={Mail} />}
         actions={
           <>
@@ -87,7 +88,9 @@ export default function ContactPage() {
                         key={social.label}
                         href={social.href}
                         aria-label={social.label}
-                        className="inline-flex size-10 items-center justify-center rounded-full border border-line-1 bg-bg-2 text-fg-2 transition-[transform,box-shadow] duration-300 ease-bounce hover:-translate-y-0.5 hover:shadow-sm"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex size-10 items-center justify-center rounded-full border border-line-1 bg-bg-2 text-fg-2 transition-[transform,box-shadow,color,border-color] duration-300 ease-bounce hover:-translate-y-0.5 hover:border-line-brand hover:text-brand hover:shadow-sm"
                       >
                         <Icon className="size-[17px]" />
                       </a>

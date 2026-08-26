@@ -84,9 +84,11 @@ export default async function TopicPage({ params, searchParams }: PageProps<"/to
               Nothing published under {topic.name} yet. It&rsquo;s next on the list.
             </p>
           ) : (
-            <div className="grid gap-5.5 sm:grid-cols-2 lg:grid-cols-3">
-              {posts.map((post) => (
-                <PostCard key={post.slug} post={post} showMetrics={false} />
+            <div className="grid items-stretch gap-5.5 sm:grid-cols-2 lg:grid-cols-3">
+              {posts.map((post, index) => (
+                <Reveal key={post.slug} index={index} className="h-full">
+                  <PostCard post={post} showMetrics={false} className="h-full" />
+                </Reveal>
               ))}
             </div>
           )}

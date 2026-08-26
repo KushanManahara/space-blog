@@ -1,16 +1,22 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
-import { MastheadBadge, PageMasthead } from "@/components/layout/page-masthead";
+import { PageMasthead } from "@/components/layout/page-masthead";
 import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
-import { aboutSetup, author, routes, site, tags, timeline } from "@/lib/content";
+import { aboutSetup, author, routes, tags, timeline } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "About",
   description: author.longBio,
   alternates: { canonical: "/about" },
+  openGraph: {
+    title: `About ${author.name} · Space`,
+    description: author.longBio,
+    images: [{ url: author.avatar, width: 1200, height: 1200, alt: author.name }],
+  },
 };
 
 export default function AboutPage() {
@@ -20,11 +26,20 @@ export default function AboutPage() {
         eyebrow="About"
         title={
           <>
-            I measure things <span className="text-brand">before I believe them.</span>
+            I learn things <span className="text-brand">by taking them apart.</span>
           </>
         }
-        description={`I'm ${author.name}. I work on inference performance and evaluation, and I write here because the notes are more useful in public than in a private file.`}
-        media={<MastheadBadge>{author.initials}</MastheadBadge>}
+        description={`I'm ${author.name}, a machine learning engineer. I write here because the notes are more useful in public than sitting in a private file.`}
+        media={
+          <Image
+            src={author.avatar}
+            alt={author.name}
+            width={120}
+            height={120}
+            priority
+            className="size-full object-cover"
+          />
+        }
         actions={
           <>
             <Button asChild variant="primary" size="md">
@@ -49,19 +64,42 @@ export default function AboutPage() {
             </Reveal>
 
             <Reveal className="flex max-w-[680px] flex-col gap-5">
+              <p className="text-[18px] leading-[1.75] text-fg-prose">Four things, roughly.</p>
+              <div className="flex flex-col gap-4 text-[17px] leading-[1.7] text-fg-prose">
+                <p>
+                  <strong className="font-semibold text-fg-1">Machine learning and AI</strong>,
+                  especially what is actually happening underneath the abstractions &mdash; from
+                  mathematical foundations and model training to neural networks, inference,
+                  fine-tuning, and modern LLM systems.
+                </p>
+                <p>
+                  <strong className="font-semibold text-fg-1">
+                    AI agents and the systems around them
+                  </strong>{" "}
+                  &mdash; tool calling, MCP, RAG, agent architectures, orchestration, evaluation,
+                  and the protocols that connect models to real software, data, and services.
+                </p>
+                <p>
+                  <strong className="font-semibold text-fg-1">The engineering underneath AI</strong>{" "}
+                  &mdash; Python, TypeScript, Linux, distributed systems, cloud infrastructure,
+                  containers, Kubernetes, Kafka, APIs, databases, and the tooling needed to turn an
+                  AI prototype into something that can actually run in production.
+                </p>
+                <p>
+                  <strong className="font-semibold text-fg-1">
+                    Milestones and lessons from the journey
+                  </strong>{" "}
+                  &mdash; things I&rsquo;ve learned while moving from software engineering and AI/ML
+                  research into machine learning engineering and production AI systems.
+                </p>
+              </div>
               <p className="text-[18px] leading-[1.75] text-fg-prose">
-                Four subjects, roughly. How much a token costs and where that cost hides. Why
-                evaluation harnesses tell you good news for months before they tell you the truth.
-                What a kernel is actually doing when the profiler says it is busy. And the weekend
-                experiments that were supposed to take an afternoon.
-              </p>
-              <p className="text-[18px] leading-[1.75] text-fg-prose">
-                Everything here is measured on hardware I have access to. When I can publish the
-                traces, I publish the traces. When a finding turns out to be wrong, the correction
-                sits on top of the original, {site.correctionCount} times so far.
+                Most of what I write starts as something I&rsquo;m trying to understand myself. I
+                learn by taking things apart, following the reasoning all the way down, building
+                something with it, and writing down what I wish I had understood the first time.
               </p>
               <div className="mt-2 flex flex-wrap gap-2.5">
-                {tags.slice(0, 9).map((tag) => (
+                {tags.map((tag) => (
                   <Link
                     key={tag.name}
                     href={`${routes.search}?q=${encodeURIComponent(tag.name.replace("#", ""))}`}
@@ -79,17 +117,16 @@ export default function AboutPage() {
       <section className="mx-auto max-w-page px-gutter py-band">
         <div className="grid items-start gap-[clamp(28px,5vw,72px)] lg:grid-cols-[300px_1fr]">
           <Reveal>
-            <h2 className="text-h3 text-fg-1">Where I&rsquo;ve worked</h2>
+            <h2 className="text-h3 text-fg-1">Milestones</h2>
             <p className="mt-3 text-[16px] leading-[1.65] text-fg-2">
-              Inference and evaluation, mostly at the point where research hands something to
-              production.
+              Where the engineering side of this actually got its footing.
             </p>
           </Reveal>
 
           <div className="max-w-[720px]">
             {timeline.map((entry) => (
               <Reveal
-                key={entry.years}
+                key={`${entry.years}-${entry.role}-${entry.org}`}
                 className="grid gap-6 border-t border-line-1 py-6 sm:grid-cols-[108px_1fr]"
               >
                 <p className="pt-1 font-mono text-[13px] text-fg-3">{entry.years}</p>
@@ -110,11 +147,16 @@ export default function AboutPage() {
         <Reveal className="grid gap-5 lg:grid-cols-3">
           <div className="rounded-lg border border-line-1 bg-bg-2 p-6.5">
             <h3 className="text-[16px] font-bold text-fg-1">The setup</h3>
-            <dl className="mt-3.5 flex flex-col gap-2.5">
+            <dl className="mt-4 flex flex-col gap-3">
               {aboutSetup.map((item) => (
-                <div key={item.label} className="flex justify-between gap-3 text-[14.5px]">
-                  <dt className="text-fg-3">{item.label}</dt>
-                  <dd className="font-semibold text-fg-1">{item.value}</dd>
+                <div
+                  key={item.label}
+                  className="flex flex-col gap-1 border-b border-line-1/40 pb-2.5 last:border-b-0 last:pb-0"
+                >
+                  <dt className="text-[12px] font-semibold tracking-wider text-fg-3 uppercase">
+                    {item.label}
+                  </dt>
+                  <dd className="text-[14px] font-semibold text-fg-1">{item.value}</dd>
                 </div>
               ))}
             </dl>
@@ -122,10 +164,18 @@ export default function AboutPage() {
 
           <div className="rounded-lg border border-line-1 bg-bg-2 p-6.5">
             <h3 className="text-[16px] font-bold text-fg-1">How I publish</h3>
-            <p className="mt-3 text-[15px] leading-[1.7] text-fg-2">
-              One post when it&rsquo;s ready, never on a schedule. Numbers get a method note.
-              Corrections are appended and dated, never quietly edited into the original.
-            </p>
+            <div className="mt-3.5 flex flex-col gap-3 text-[14.5px] leading-[1.7] text-fg-2">
+              <p>One post when it&rsquo;s ready, never on a schedule.</p>
+              <p>
+                Most posts begin as something I&rsquo;m learning, debugging, building, or trying to
+                explain to myself. I prefer understanding the mechanism over memorizing the
+                terminology.
+              </p>
+              <p>
+                When a post relies on someone else&rsquo;s research, numbers, or findings, I try to
+                make the source clear.
+              </p>
+            </div>
           </div>
 
           <div className="relative overflow-hidden rounded-lg bg-bg-inverse p-6.5">
@@ -137,12 +187,41 @@ export default function AboutPage() {
             <div className="relative">
               <h3 className="text-[16px] font-bold text-white">Say hello</h3>
               <p className="mt-3 text-[15px] leading-[1.7] text-white/65">
-                Corrections, reproductions and disagreements are all welcome, especially the third
-                one.
+                Corrections, questions, ideas, and disagreements are all welcome &mdash; especially
+                the last one.
               </p>
-              <div className="mt-4.5 flex flex-col gap-2 font-mono text-[13.5px] text-cornflower-200">
-                <a href={`mailto:${author.email}`}>{author.email}</a>
-                <span>{author.handle}</span>
+              <div className="mt-4.5 flex flex-col gap-2.5 font-mono text-[13.5px] text-cornflower-200">
+                <a href={`mailto:${author.email}`} className="hover:underline">
+                  {author.email}
+                </a>
+                <div className="flex flex-wrap items-center gap-3 font-sans text-[13px] text-white/70">
+                  <a
+                    href={author.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="transition-colors hover:text-white"
+                  >
+                    GitHub
+                  </a>
+                  <span>·</span>
+                  <a
+                    href={author.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="transition-colors hover:text-white"
+                  >
+                    LinkedIn
+                  </a>
+                  <span>·</span>
+                  <a
+                    href={author.twitter}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="transition-colors hover:text-white"
+                  >
+                    X
+                  </a>
+                </div>
               </div>
             </div>
           </div>

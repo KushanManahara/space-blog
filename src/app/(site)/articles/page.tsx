@@ -17,10 +17,12 @@ import {
   isSortOrder,
   isTopicFilter,
   listPosts,
+  posts,
   routes,
   site,
   topicFilters,
 } from "@/lib/content";
+import { getAllLivePostStatsMap } from "@/lib/db/queries";
 import { buildHref } from "@/lib/url";
 
 export const metadata: Metadata = {
@@ -42,7 +44,13 @@ export default async function ArticlesPage({ searchParams }: PageProps<"/article
   const sort = isSortOrder(sortParam) ? sortParam : "recent";
   const page = Number.isFinite(pageParam) && pageParam > 0 ? pageParam : 1;
 
-  const matching = listPosts({ topic, series, sort });
+  const liveStatsMap = await getAllLivePostStatsMap();
+  const livePosts = posts.map((p) => {
+    const live = liveStatsMap.get(p.slug);
+    return live ? { ...p, likes: live.likes, views: live.views } : p;
+  });
+
+  const matching = listPosts({ topic, series, sort }, livePosts);
   const visible = matching.slice((page - 1) * PER_PAGE, page * PER_PAGE);
   const current = { topic: topic === "All" ? undefined : topic, series, sort, page: String(page) };
   const activeSeries = series ? getSeriesBySlug(series) : undefined;
@@ -56,7 +64,7 @@ export default async function ArticlesPage({ searchParams }: PageProps<"/article
             All {site.issue} posts, <span className="text-brand">newest first.</span>
           </>
         }
-        description="Sorted by publish date. Corrections are appended, never silently edited."
+        description="Everything published here so far. Filter by topic, or sort by what gets read most."
         media={<MastheadBadge icon={BookOpen} />}
         actions={
           <>
