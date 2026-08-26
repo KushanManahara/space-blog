@@ -8,7 +8,7 @@ export default function SiteLayout({ children }: LayoutProps<"/">) {
   return (
     <>
       <SiteHeader />
-      <main className="flex-1 overflow-x-clip">{children}</main>
+      <main className="w-full min-w-0 max-w-full flex-1 overflow-x-clip">{children}</main>
       <SiteFooter />
       <ScrollToTop />
     </>
