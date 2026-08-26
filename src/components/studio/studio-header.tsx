@@ -4,8 +4,9 @@ import * as React from "react";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 
+import { AuthorAvatar } from "@/components/author/author-byline";
 import { BrandMark } from "@/components/layout/brand-mark";
-import { routes, site } from "@/lib/content";
+import { author, routes, site } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
 const TABS = ["Posts", "Settings", "Subscription", "Billing"] as const;
@@ -59,6 +60,13 @@ export function StudioHeader() {
             className="hidden text-[13.5px] font-semibold text-fg-3 transition-colors duration-300 ease-expo hover:text-fg-1 sm:inline"
           >
             Exit to site
+          </Link>
+          <Link
+            href={routes.about}
+            title={author.name}
+            className="flex items-center transition-transform duration-300 ease-bounce hover:scale-105 active:scale-95"
+          >
+            <AuthorAvatar className="size-8 shadow-xs" />
           </Link>
         </div>
       </div>

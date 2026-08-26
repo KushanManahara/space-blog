@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import { author } from "@/lib/content";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -29,17 +31,24 @@ export function AuthorByline({
   );
 }
 
-export function AuthorAvatar({ className }: { className?: string }) {
+export function AuthorAvatar({ className, priority }: { className?: string; priority?: boolean }) {
   return (
     <span
       aria-hidden
       className={cn(
-        "inline-flex shrink-0 items-center justify-center rounded-full font-bold text-white",
+        "relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full font-bold text-white shadow-xs select-none",
         className,
       )}
       style={{ background: "var(--gradient-brand-diag)" }}
     >
-      {author.initials}
+      <Image
+        src={author.avatar}
+        alt={author.name}
+        width={96}
+        height={96}
+        priority={priority}
+        className="size-full object-cover"
+      />
     </span>
   );
 }
