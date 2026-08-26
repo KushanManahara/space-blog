@@ -418,85 +418,6 @@
   color-scheme: dark;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not(.light) {
-    /* Barely there on a dark ground: a cool lift, never a colour band. */
-    --header-atmosphere: linear-gradient(
-      180deg,
-      rgb(56 189 248 / 0.22) 0%,
-      rgb(99 102 241 / 0.17) 22%,
-      rgb(139 92 246 / 0.12) 45%,
-      rgb(96 165 250 / 0.06) 70%,
-      rgb(96 165 250 / 0) 100%
-    );
-    --color-fg-1: var(--color-n-50);
-    --color-fg-2: var(--color-n-300);
-    --color-fg-3: var(--color-n-400);
-    --color-fg-link: #60a5fa;
-    --color-fg-prose: var(--color-n-200);
-    --color-fg-faint: #748196;
-
-    --color-bg-1: var(--color-n-950);
-    --color-bg-2: var(--color-n-900);
-    --color-bg-3: var(--color-n-800);
-    --color-bg-inverse: var(--color-n-800);
-
-    --color-line-1: #1e293b;
-    --color-line-2: #334155;
-
-    --color-veil: var(--color-n-800);
-
-    --color-brand: #4ba0fc;
-    --color-on-brand: var(--color-n-900);
-    --color-accent: #38bdf8;
-    --color-brand-strong: #60a5fa;
-    --color-accent-orchid: #38bdf8;
-    --color-accent-indigo: #93c5fd;
-    --color-line-brand: #1e3a8a;
-
-    --color-tint-orchid: #0c263d;
-    --color-tint-violet: #0d2847;
-    --color-tint-indigo: #0f1d33;
-    --color-tint-cornflower: #0a2342;
-
-    --color-ink: var(--color-n-50);
-    --color-on-ink: var(--color-n-900);
-    --color-plate: #1e3a8a;
-
-    --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.4);
-    --shadow-sm: 0 2px 8px rgb(0 0 0 / 0.44), 0 1px 2px rgb(0 0 0 / 0.3);
-    --shadow-md: 0 8px 24px rgb(0 0 0 / 0.5), 0 2px 6px rgb(0 0 0 / 0.34);
-    --shadow-lg: 0 20px 48px rgb(0 0 0 / 0.56), 0 6px 16px rgb(0 0 0 / 0.38);
-    --shadow-xl: 0 36px 80px rgb(0 0 0 / 0.62), 0 12px 28px rgb(0 0 0 / 0.42);
-    --shadow-glow-sm: 0 8px 32px rgb(0 122 255 / 0.26);
-    --shadow-glow-md: 0 16px 60px rgb(0 122 255 / 0.34);
-    --shadow-glow-accent: 0 12px 48px rgb(56 189 248 / 0.36);
-    --shadow-card-hover-md: var(--shadow-md), 0 0 28px -8px rgb(0 122 255 / 0.3);
-    --shadow-card-hover-lg: var(--shadow-lg), 0 0 36px -6px rgb(0 122 255 / 0.32);
-    --shadow-card-hover-xl: var(--shadow-xl), 0 0 44px -4px rgb(0 122 255 / 0.34);
-
-    --ring: #38bdf8;
-    --glow-violet: radial-gradient(closest-side, rgb(0 122 255 / 0.35), rgb(0 122 255 / 0));
-    --glow-blue: radial-gradient(closest-side, rgb(0 122 255 / 0.35), rgb(0 122 255 / 0));
-
-    /* Dark carries the same structure at roughly double the alpha, because a
-       wash this faint disappears entirely against a near-black ground. The
-       warm stops become a dim slate lift rather than cream, which would read
-       as a stain here. */
-
-    --shadow-masthead: 0 24px 48px -16px rgb(0 0 0 / 0.62), 0 0 0 1px rgb(255 255 255 / 0.06);
-
-    --glass-bg: rgb(15 23 42 / 0.72);
-    --glass-border: rgb(255 255 255 / 0.09);
-    --glass-panel-bg: rgb(15 23 42 / 0.88);
-    --glass-panel-border: rgb(255 255 255 / 0.11);
-    --glass-highlight: rgb(255 255 255 / 0.07);
-    --glass-brightness: 1;
-
-    color-scheme: dark;
-  }
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -536,13 +457,6 @@
   :root.dark ::selection {
     background: #0056b3;
     color: #f8fafc;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :root:not(.light) ::selection {
-      background: #0056b3;
-      color: #f8fafc;
-    }
   }
 
   :focus-visible {

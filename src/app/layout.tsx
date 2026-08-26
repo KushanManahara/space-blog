@@ -84,7 +84,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             __html: `
               try {
                 var theme = localStorage.getItem('theme');
-                if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                if (theme === 'dark') {
                   document.documentElement.classList.add('dark');
                   document.documentElement.classList.remove('light');
                 } else {
