@@ -52,42 +52,50 @@ export function ArticleHeader({
             ) : null}
           </div>
 
-          <h1 className="mt-5.5 text-[clamp(34px,4.4vw,56px)] leading-[1.08] font-bold tracking-[-0.03em] text-fg-1">
+          <h1 className="mt-5.5 text-[clamp(28px,4.4vw,56px)] leading-[1.12] font-bold tracking-[-0.03em] break-words text-fg-1 sm:leading-[1.08]">
             {post.title}
           </h1>
-          <p className="mt-5 text-[20px] leading-[1.55] text-fg-2">{post.dek}</p>
+          <p className="mt-4 text-[17px] leading-[1.55] text-fg-2 sm:mt-5 sm:text-[20px]">
+            {post.dek}
+          </p>
 
-          <div className="mt-7 flex flex-wrap items-center gap-4 border-y border-line-1 py-4.5">
-            <AuthorAvatar className="size-11 text-[15px]" />
-            <div>
-              <p className="text-[14.5px] font-bold text-fg-1">{author.name}</p>
-              <p className="text-[13px] text-fg-3">
-                {formatDate(post.publishedAt, "long")} · {post.readingMinutes} min read
-              </p>
+          <div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-y border-line-1 py-4.5">
+            <div className="flex items-center gap-3.5">
+              <AuthorAvatar className="size-11 text-[15px]" />
+              <div>
+                <p className="text-[14.5px] font-bold text-fg-1">{author.name}</p>
+                <p className="text-[13px] text-fg-3">
+                  {formatDate(post.publishedAt, "long")} · {post.readingMinutes} min read
+                </p>
+              </div>
             </div>
             <ArticleActions post={summary} />
           </div>
         </Reveal>
       </div>
 
-      <Reveal className="mt-8">
-        {/* TODO: article cover photograph, 2100x900 (21:9). Drop it in as a
-            <next/image fill priority> layer above PostCover; the topic gradient
-            below stays as the no-asset fallback. */}
-        <PostCover
-          topic={post.topic}
-          image={post.coverImage}
-          alt={post.title}
-          priority
-          pattern={false}
-          zoom={false}
-          notch
-          className="aspect-[21/9] rounded-xl shadow-md [--notch-surface:var(--color-bg-1)]"
-        >
-          {!post.coverImage ? (
-            <CoverRings sizes={[900, 620, 340]} className="[&>div]:top-[72%]" />
-          ) : null}
-        </PostCover>
+      <Reveal className="mt-8.5 md:mt-10">
+        <div className="relative rounded-2xl shadow-[0_24px_54px_-12px_rgba(0,0,0,0.16),0_12px_24px_-8px_rgba(0,0,0,0.1),0_0_0_1px_rgba(0,0,0,0.05)] transition-shadow duration-500 md:rounded-3xl dark:shadow-[0_28px_70px_-15px_rgba(0,0,0,0.88),0_12px_28px_-8px_rgba(0,0,0,0.75),0_0_0_1px_rgba(255,255,255,0.09)]">
+          {/* Soft ambient underglow */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -inset-2 -z-10 rounded-3xl bg-gradient-to-b from-brand/20 via-brand/5 to-transparent opacity-70 blur-2xl dark:opacity-50"
+          />
+          <PostCover
+            topic={post.topic}
+            image={post.coverImage}
+            alt={post.title}
+            priority
+            pattern={false}
+            zoom={false}
+            notch
+            className="aspect-[16/9] rounded-2xl [--notch-surface:var(--color-bg-1)] sm:aspect-[21/9] md:rounded-3xl"
+          >
+            {!post.coverImage ? (
+              <CoverRings sizes={[900, 620, 340]} className="[&>div]:top-[72%]" />
+            ) : null}
+          </PostCover>
+        </div>
       </Reveal>
     </>
   );

@@ -8,6 +8,10 @@ export function TableOfContents({ headings }: { headings: Array<{ id: string; te
   const { progress, activeHeadingId } = useReadingProgress();
   const percent = Math.round(progress * 100);
 
+  // Posts imported from plain-text sources carry no headings, and an empty
+  // "On this page" card stuck at 0% reads as a broken widget.
+  if (headings.length === 0) return null;
+
   return (
     <nav aria-label="On this page" className="rounded-lg border border-line-1 bg-bg-2 p-5.5">
       <div className="flex items-center justify-between">
