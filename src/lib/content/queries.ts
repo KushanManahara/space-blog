@@ -32,9 +32,10 @@ function byViews(a: Post, b: Post): number {
 
 export function listPosts(
   options: { topic?: TopicFilter; series?: string; sort?: SortOrder; limit?: number } = {},
+  sourcePosts: Post[] = posts,
 ): Post[] {
   const { topic = "All", series, sort = "recent", limit } = options;
-  const filtered = posts.filter(
+  const filtered = sourcePosts.filter(
     (post) =>
       (topic === "All" || post.topic === topic) && (!series || post.series?.slug === series),
   );
@@ -43,6 +44,8 @@ export function listPosts(
 }
 
 export function getFeaturedPost(): Post {
+  const explicit = posts.find((post) => post.featured);
+  if (explicit) return explicit;
   return [...posts].sort(byRecency)[0];
 }
 
