@@ -12,7 +12,7 @@ export function TopicTile({ topic, rank }: { topic: Topic; rank?: number }) {
   return (
     <Link
       href={`/topics/${topic.slug}`}
-      className="group block transition-[transform,box-shadow] duration-500 ease-bounce hover:-translate-y-1 active:scale-[0.97] active:duration-150 active:ease-out"
+      className="group block transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-1 active:scale-[0.97] active:duration-150 active:ease-out"
     >
       <PostCover
         topic={topic.name}
@@ -35,7 +35,7 @@ export function TopicTile({ topic, rank }: { topic: Topic; rank?: number }) {
       <div className="mt-3 flex items-center gap-[9px]">
         <span className={cn("size-2.5 shrink-0 rounded-full", visual.dot)} />
         <div>
-          <p className="text-[14.5px] font-semibold text-fg-1 transition-colors duration-300 ease-expo group-hover:text-brand-strong">
+          <p className="text-[14.5px] font-semibold text-fg-1 transition-colors duration-300 ease-out group-hover:text-brand-strong">
             {topic.name}
           </p>
           <p className="text-[12.5px] text-fg-3">{topic.postCount} posts</p>
@@ -52,17 +52,18 @@ export function TopicCard({ topic }: { topic: Topic }) {
   return (
     <Link
       href={`/topics/${topic.slug}`}
-      className="group flex items-center gap-3.5 rounded-xl border border-line-1 bg-bg-2 p-[18px] transition-[transform,box-shadow,border-color] duration-500 ease-bounce hover:-translate-y-1 hover:border-line-2 hover:shadow-card-hover-md active:scale-[0.98] active:duration-150 active:ease-out"
+      className="group flex items-center gap-3.5 rounded-xl border border-line-1 bg-bg-2 p-[18px] transition-[transform,box-shadow,border-color] duration-300 ease-out hover:-translate-y-1 hover:border-line-2 hover:shadow-card-hover-md active:scale-[0.98] active:duration-150 active:ease-out"
     >
       <PostCover
         topic={topic.name}
         image={visual.image}
         alt={topic.name}
         pattern={false}
-        className="size-14 shrink-0 rounded-xl border border-line-1/80 shadow-xs"
+        zoom={false}
+        className="size-14 shrink-0 rounded-xl border border-line-1/80 shadow-xs transition-transform duration-300 ease-out group-hover:scale-105"
       />
       <div>
-        <p className="text-[15.5px] font-bold text-fg-1 transition-colors duration-300 ease-expo group-hover:text-brand-strong">
+        <p className="text-[15.5px] font-bold text-fg-1 transition-colors duration-300 ease-out group-hover:text-brand-strong">
           {topic.name}
         </p>
         <p className="mt-[3px] text-[13px] text-fg-3">{topic.postCount} posts</p>
