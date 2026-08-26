@@ -40,7 +40,7 @@ export function ArticleActions({ post }: { post: PostSummary }) {
         onClick={toggleReaderMode}
         title="Distraction-Free Reader Mode (Press R)"
         aria-label="Distraction-Free Reader Mode (Press R)"
-        className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-line-1 bg-bg-2 px-3.5 py-2 text-[13.5px] font-semibold text-fg-2 transition-[transform,box-shadow,color,border-color] duration-300 ease-bounce hover:-translate-y-0.5 hover:border-brand/40 hover:text-brand hover:shadow-sm active:scale-[0.96] active:duration-150 active:ease-out"
+        className="inline-flex size-10 cursor-pointer items-center justify-center gap-2 rounded-full border border-line-1 bg-bg-2 text-[13.5px] font-semibold text-fg-2 transition-[transform,box-shadow,color,border-color] duration-300 ease-bounce hover:-translate-y-0.5 hover:border-brand/40 hover:text-brand hover:shadow-sm active:scale-[0.96] active:duration-150 active:ease-out sm:size-auto sm:px-3.5 sm:py-2"
       >
         <BookOpen className="size-4" strokeWidth={1.75} />
         <span className="hidden sm:inline">Read mode</span>
