@@ -18,21 +18,28 @@ export function ShareSheet({
   title: string;
   url: string;
 }) {
-  const [copied, setCopied] = React.useState(false);
+  const [copyState, setCopyState] = React.useState<"idle" | "copied" | "failed">("idle");
+  const copied = copyState === "copied";
+
+  const handleOpenChange = (next: boolean) => {
+    setCopyState("idle");
+    onOpenChange(next);
+  };
 
   const targets = [
     {
-      label: "Copy link",
+      label: copyState === "failed" ? "Press Ctrl/Cmd+C to copy" : "Copy link",
       note: url,
       icon: copied ? Check : Link2,
       action: async () => {
-        try {
-          await navigator.clipboard.writeText(url);
-          setCopied(true);
-          setTimeout(() => setCopied(false), 2000);
-        } catch {
-          setCopied(false);
+        if (await copyToClipboard(url)) {
+          setCopyState("copied");
+          setTimeout(() => setCopyState("idle"), 2000);
+          return;
         }
+        // Clipboard blocked (insecure context, denied permission, older browser).
+        // The URL below is select-all, so one click grabs it for a manual copy.
+        setCopyState("failed");
       },
     },
     {
@@ -56,7 +63,7 @@ export function ShareSheet({
   ];
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-[400px] p-5.5">
         <div className="flex items-center justify-between gap-3">
           <DialogTitle className="text-[16px]">Share this post</DialogTitle>
@@ -78,7 +85,9 @@ export function ShareSheet({
                   <span className="block text-[14.5px] font-semibold text-fg-1">
                     {target.label}
                   </span>
-                  <span className="block truncate text-[12.5px] text-fg-3">{target.note}</span>
+                  <span className="block truncate text-[12.5px] text-fg-3 select-all">
+                    {target.note}
+                  </span>
                 </span>
               </>
             );
@@ -111,4 +120,31 @@ export function ShareSheet({
       </DialogContent>
     </Dialog>
   );
+}
+
+/** Async clipboard with a synchronous fallback for blocked or legacy contexts. */
+async function copyToClipboard(text: string): Promise<boolean> {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch {
+    // Fall through to the legacy path below.
+  }
+
+  try {
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.opacity = "0";
+    document.body.appendChild(area);
+    area.select();
+    const ok = document.execCommand("copy");
+    document.body.removeChild(area);
+    return ok;
+  } catch {
+    return false;
+  }
 }

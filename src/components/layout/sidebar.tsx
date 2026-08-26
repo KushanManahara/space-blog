@@ -42,12 +42,14 @@ export function AuthorCard() {
         >
           About
         </Link>
-        <Link
+        <a
           href="/rss.xml"
+          target="_blank"
+          rel="noopener noreferrer"
           className="flex-1 rounded-full border border-line-2 bg-bg-1 px-3.5 py-3 text-center text-[13.5px] font-semibold text-fg-1 transition-transform duration-300 ease-bounce hover:-translate-y-0.5 active:scale-[0.96] active:duration-150 active:ease-out"
         >
           RSS
-        </Link>
+        </a>
       </div>
     </SidebarCard>
   );
