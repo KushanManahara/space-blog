@@ -47,7 +47,9 @@ export default async function ArticlesPage({ searchParams }: PageProps<"/article
   const liveStatsMap = await getAllLivePostStatsMap();
   const livePosts = posts.map((p) => {
     const live = liveStatsMap.get(p.slug);
-    return live ? { ...p, likes: live.likes, views: live.views } : p;
+    return live
+      ? { ...p, likes: live.likes, views: live.views, commentCount: live.comments }
+      : p;
   });
 
   const matching = listPosts({ topic, series, sort }, livePosts);
