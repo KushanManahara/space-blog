@@ -118,7 +118,7 @@ export function ReadingBar({ post, next }: { post: PostSummary; next: PostSummar
       aria-hidden={footerApproaching}
       inert={footerApproaching}
       className={cn(
-        "pointer-events-none fixed inset-x-0 bottom-0 z-70 flex justify-center px-3 pb-4 transition-[opacity,translate] duration-300 ease-out sm:px-4 sm:pb-5",
+        "pointer-events-none fixed inset-x-0 bottom-0 z-70 flex justify-center px-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.875rem)] transition-[opacity,translate] duration-300 ease-out sm:px-4 sm:pb-5",
         footerApproaching
           ? "translate-y-3 opacity-0"
           : "translate-y-0 [animation:bar-up_.4s_var(--ease-expo)] opacity-100",
