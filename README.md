@@ -35,7 +35,7 @@ Space is an independent engineering publication dedicated to what is actually ha
 ## ✨ Key Features
 
 * 👓 **Distraction-Free Reader Mode**: Dedicated reading canvas with keyboard shortcut (`R`), customizable fonts, column widths, and reading themes (Clean, Warm, Sepia, Night).
-* 📱 **Mobile-First Usability & Ergonomics**: Full-app audit across 12 routes with zero horizontal overflow, iOS Safari auto-zoom prevention (`text-[16px]` inputs), and accessible touch targets (≥ 36px–44px).
+* 📱 **Mobile-First Ergonomics & Native iOS Experience**: Edge-to-edge safe area rendering (`viewport-fit=cover`, translucent status bar), smart auto-collapsing sticky navbar on scroll down and expanding on scroll up, zero horizontal overflow, iOS auto-zoom elimination (`text-[16px]` inputs), and accessible touch targets (≥ 36px–44px).
 * 💬 **Verified Peer Discussions**: Real-time reader discussion threads with verified author credentials (name, role, and email).
 * 📬 **Newsletter & Broadcast Pipeline**: Automated subscriber synchronization, RFC 8058 One-Click Unsubscribe headers, web-based `/unsubscribe` interface, and an author `/studio` broadcast engine.
 * 🔍 **Multi-Facet Search & Tagging**: Instant search with deep keyword indexing across articles, topics, and reading durations.
