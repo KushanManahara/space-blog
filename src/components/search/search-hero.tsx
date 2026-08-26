@@ -30,7 +30,7 @@ export function SearchHero({ query, resultCount }: { query: string; resultCount:
           name="q"
           defaultValue={query}
           placeholder={`Search ${site.issue} posts`}
-          className="min-w-0 flex-1 bg-transparent py-3 text-[15.5px] text-fg-1 outline-none placeholder:text-fg-3"
+          className="min-w-0 flex-1 bg-transparent py-3 text-[16px] text-fg-1 outline-none placeholder:text-fg-3 sm:text-[15.5px]"
         />
         <button
           type="submit"
