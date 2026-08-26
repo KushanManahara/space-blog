@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ============================================================
    GIMHARA DESIGN SYSTEM — token layer
    Ported from the design project's colors_and_type.css.
