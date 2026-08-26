@@ -43,10 +43,10 @@ export function listPosts(
   return limit === undefined ? sorted : sorted.slice(0, limit);
 }
 
-export function getFeaturedPost(): Post {
-  const explicit = posts.find((post) => post.featured);
+export function getFeaturedPost(sourcePosts: Post[] = posts): Post {
+  const explicit = sourcePosts.find((post) => post.featured);
   if (explicit) return explicit;
-  return [...posts].sort(byRecency)[0];
+  return [...sourcePosts].sort(byRecency)[0];
 }
 
 export function getPostBySlug(slug: string): Post | undefined {
