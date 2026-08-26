@@ -18,24 +18,26 @@ export function Hero({ featured }: { featured: Post }) {
       <div className="relative z-1 grid items-center gap-[clamp(32px,5vw,64px)] lg:grid-cols-[1.02fr_0.98fr]">
         <Reveal>
           <h1 className="mt-6 max-w-[15ch] text-[clamp(40px,5.4vw,68px)] leading-[1.04] font-light tracking-[-0.03em] text-balance text-fg-1">
-            Notes from building machine learning{" "}
-            <span className="text-gradient font-bold">that has to work.</span>
+            Working notes on AI systems{" "}
+            <span className="text-gradient font-bold">and the software under them.</span>
           </h1>
 
           <p className="mt-6 max-w-115 text-[19px] leading-[1.6] text-fg-2">
-            Inference economics, evaluation that survives contact with production, and the
-            occasional weekend experiment. Written in the open, one post at a time.
+            Language models, agents and the protocols wiring them to real tools. Linux, Python and
+            the tooling underneath. Written up as I learn it, one post at a time.
           </p>
 
-          <div className="mt-8.5 flex flex-wrap gap-3">
+          <div className="mt-8.5 flex w-full flex-wrap gap-3 sm:w-auto [&>*]:w-full sm:[&>*]:w-auto">
             <Button asChild variant="primary" size="lg">
-              <Link href={`/articles/${featured.slug}`}>
+              <Link href={`/articles/${featured.slug}`} className="justify-center">
                 Read the latest
                 <ArrowRight className="size-4" strokeWidth={1.75} />
               </Link>
             </Button>
             <Button asChild variant="secondary" size="lg">
-              <Link href={routes.articles}>Browse all {site.issue} posts</Link>
+              <Link href={routes.articles} className="justify-center">
+                Browse all {site.issue} posts
+              </Link>
             </Button>
           </div>
         </Reveal>
@@ -76,16 +78,8 @@ function FeaturedCard({ post }: { post: Post }) {
           </div>
         </PostCover>
 
-        <div className="relative z-10 mx-4 -mt-[54px]">
-          <svg
-            viewBox="0 0 400 32"
-            preserveAspectRatio="none"
-            className="-mb-[1px] block h-8 w-full fill-bg-2"
-            aria-hidden
-          >
-            <path d="M 0 32 L 0 16 Q 0 8 12 7 L 386 0 Q 400 0 400 12 L 400 32 Z" />
-          </svg>
-          <div className="rounded-b-2xl bg-bg-2 px-6.5 pt-2 pb-6 shadow-sm transition-shadow duration-500 ease-expo group-hover:shadow-card-hover-lg md:rounded-b-[22px]">
+        <div className="relative z-10 mx-2 -mt-[36px] sm:mx-4 sm:-mt-[44px]">
+          <div className="rounded-2xl border border-line-1 bg-bg-2 p-4.5 shadow-lg transition-[box-shadow,border-color] duration-500 ease-expo group-hover:border-line-2 group-hover:shadow-card-hover-xl sm:p-6 md:rounded-[24px] md:p-6.5 md:shadow-xl">
             <p className="text-[13px] text-fg-3">
               {formatDate(post.publishedAt)} · {post.readingMinutes} min read
             </p>
@@ -97,10 +91,12 @@ function FeaturedCard({ post }: { post: Post }) {
               </p>
             ) : null}
 
-            <h2 className="mt-3 text-[26px] leading-[1.18] font-bold tracking-[-0.02em] text-fg-1 transition-colors duration-300 ease-expo group-hover:text-brand-strong">
+            <h2 className="mt-3 text-[22px] leading-[1.18] font-bold tracking-[-0.02em] text-fg-1 transition-colors duration-300 ease-expo group-hover:text-brand-strong sm:text-[26px]">
               {post.title}
             </h2>
-            <p className="mt-3 text-[15.5px] leading-[1.6] text-fg-2">{post.dek}</p>
+            <p className="mt-3 text-[14.5px] leading-[1.6] text-fg-2 sm:text-[15.5px]">
+              {post.dek}
+            </p>
           </div>
         </div>
       </div>

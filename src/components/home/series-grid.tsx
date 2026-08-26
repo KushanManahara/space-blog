@@ -17,6 +17,8 @@ const seriesTone = [
  * already spent on `LatestWriting` further up the page.
  */
 export function SeriesGrid() {
+  if (seriesList.length === 0) return null;
+
   return (
     <section>
       <div className="mx-auto max-w-page px-gutter py-band">

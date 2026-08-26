@@ -90,7 +90,7 @@ function MostViewedHero({ post }: { post: PostSummary }) {
           alt={post.title}
           pattern={false}
           notch
-          className="aspect-[16/11] rounded-xl"
+          className="aspect-[16/11] rounded-2xl [mask-image:linear-gradient(to_bottom,black_75%,transparent_98%)] md:rounded-3xl"
         >
           {!post.coverImage ? (
             <CoverRings sizes={[560, 340]} className="[&>div]:top-[74%] [&>div]:left-[58%]" />
@@ -98,13 +98,15 @@ function MostViewedHero({ post }: { post: PostSummary }) {
           <TopicBadge topic={post.topic} tone="dark" icon className="absolute top-4 right-4" />
         </PostCover>
 
-        <div className="relative z-10 mx-4 -mt-[48px] overflow-hidden rounded-xl transition-shadow duration-500 ease-expo group-hover:shadow-card-hover-lg">
-          <div className="overlap-panel bg-bg-2 px-6 pt-[46px] pb-5">
+        <div className="relative z-10 mx-2 -mt-[36px] sm:mx-4 sm:-mt-[44px]">
+          <div className="rounded-2xl border border-line-1 bg-bg-2 p-4.5 shadow-lg transition-[box-shadow,border-color] duration-500 ease-expo group-hover:border-line-2 group-hover:shadow-card-hover-xl sm:p-6 md:rounded-[24px] md:p-6.5 md:shadow-xl">
             <AuthorByline date={post.publishedAt} />
-            <h3 className="mt-3.5 text-[24px] leading-[1.2] font-bold tracking-[-0.02em] text-fg-1 transition-colors duration-300 ease-expo group-hover:text-brand-strong">
+            <h3 className="mt-3.5 text-[21px] leading-[1.2] font-bold tracking-[-0.02em] text-fg-1 transition-colors duration-300 ease-expo group-hover:text-brand-strong sm:text-[24px]">
               {post.title}
             </h3>
-            <p className="mt-2.5 text-[15.5px] leading-[1.6] text-fg-2">{post.dek}</p>
+            <p className="mt-2.5 text-[14.5px] leading-[1.6] text-fg-2 sm:text-[15.5px]">
+              {post.dek}
+            </p>
           </div>
         </div>
       </div>
@@ -113,7 +115,7 @@ function MostViewedHero({ post }: { post: PostSummary }) {
         post={post}
         metrics={["likes", "comments", "views"]}
         bordered={false}
-        className="mt-4.5"
+        className="mt-3.5 px-1"
       />
     </Link>
   );

@@ -131,7 +131,7 @@ export function SiteHeader() {
             type="button"
             onClick={commandMenu.open}
             title="Search (⌘K)"
-            className="inline-flex h-[38px] cursor-pointer items-center gap-[9px] rounded-full border border-line-1 bg-bg-2 pr-2 pl-3.5 text-fg-3 transition-[transform,box-shadow,color] duration-300 ease-bounce hover:-translate-y-px hover:text-fg-2 hover:shadow-sm active:scale-[0.96] active:duration-150 active:ease-out"
+            className="inline-flex h-[38px] cursor-pointer items-center gap-2 rounded-full border border-line-1 bg-bg-2 px-2.5 text-fg-3 transition-[transform,box-shadow,color] duration-300 ease-bounce hover:-translate-y-px hover:text-fg-2 hover:shadow-sm active:scale-[0.96] active:duration-150 active:ease-out sm:gap-[9px] sm:pr-2 sm:pl-3.5"
           >
             <Search className="size-4" strokeWidth={1.75} />
             <span
@@ -142,7 +142,7 @@ export function SiteHeader() {
             >
               Search
             </span>
-            <span className="rounded-[7px] border border-line-1 bg-bg-3 px-[7px] py-1 text-[11.5px] font-semibold text-fg-3">
+            <span className="hidden rounded-[7px] border border-line-1 bg-bg-3 px-[7px] py-1 text-[11.5px] font-semibold text-fg-3 sm:inline-block">
               ⌘K
             </span>
           </button>

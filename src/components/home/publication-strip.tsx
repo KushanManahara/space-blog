@@ -1,11 +1,11 @@
 import { AuthorAvatar } from "@/components/author/author-byline";
 import { Reveal } from "@/components/motion/reveal";
-import { author, site } from "@/lib/content";
+import { author, posts, topics } from "@/lib/content";
 
 const stats = [
-  { value: site.issue, label: "posts" },
-  { value: site.seriesCount, label: "series" },
-  { value: site.correctionCount, label: "corrections" },
+  { value: posts.length, label: "articles" },
+  { value: topics.length, label: "topics" },
+  { value: "0", label: "reposts" },
 ] as const;
 
 /**

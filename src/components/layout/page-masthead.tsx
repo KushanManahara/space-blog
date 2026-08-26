@@ -69,7 +69,7 @@ export function PageMasthead({
     >
       <HeaderAtmosphere />
 
-      <Reveal className="flex flex-col justify-between gap-6 rounded-2xl border border-line-1 bg-bg-2 p-6 shadow-[0_2px_4px_rgb(0_0_0/0.08),0_8px_16px_rgb(0_0_0/0.1),0_20px_40px_rgb(0_0_0/0.14)] backdrop-blur-md sm:p-7 md:p-8 lg:flex-row lg:items-center lg:gap-8 lg:p-9">
+      <Reveal className="flex flex-col justify-between gap-5 rounded-2xl border border-line-1 bg-bg-2 p-4.5 shadow-[0_2px_4px_rgb(0_0_0/0.08),0_8px_16px_rgb(0_0_0/0.1),0_20px_40px_rgb(0_0_0/0.14)] backdrop-blur-md sm:gap-6 sm:p-7 md:p-8 lg:flex-row lg:items-center lg:gap-8 lg:p-9">
         <div className="flex min-w-0 flex-1 flex-col gap-5 sm:flex-row sm:items-center md:gap-6">
           {media ? (
             <div className="size-20 shrink-0 overflow-hidden rounded-xl shadow-md sm:size-24 md:size-26 [&>*]:size-full">
@@ -103,7 +103,9 @@ export function PageMasthead({
         </div>
 
         {actions ? (
-          <div className="flex shrink-0 flex-wrap items-center gap-3">{actions}</div>
+          <div className="flex w-full shrink-0 flex-wrap items-center gap-2.5 sm:w-auto [&>*]:w-full [&>*]:justify-center sm:[&>*]:w-auto sm:[&>*]:justify-start">
+            {actions}
+          </div>
         ) : null}
       </Reveal>
     </section>

@@ -7,7 +7,8 @@ import { Reveal } from "@/components/motion/reveal";
 import { FilterChips } from "@/components/nav/filter-chips";
 import { PostCard } from "@/components/post/post-card";
 import { PostSkeletonGrid } from "@/components/post/post-skeleton";
-import { listPosts, routes, topicFilters, type TopicFilter } from "@/lib/content";
+import { listPosts, posts, routes, topicFilters, type TopicFilter } from "@/lib/content";
+import { getAllLivePostStatsMap } from "@/lib/db/queries";
 import { buildHref } from "@/lib/url";
 
 /** Latest six posts, filtered by topic through the URL. */
@@ -51,7 +52,12 @@ export function LatestWriting({ topic }: { topic: TopicFilter }) {
 }
 
 async function LatestGrid({ topic }: { topic: TopicFilter }) {
-  const visible = listPosts({ topic, limit: 6 });
+  const liveStatsMap = await getAllLivePostStatsMap();
+  const livePosts = posts.map((p) => {
+    const live = liveStatsMap.get(p.slug);
+    return live ? { ...p, likes: live.likes, views: live.views } : p;
+  });
+  const visible = listPosts({ topic, limit: 6 }, livePosts);
 
   if (visible.length === 0) {
     return (
@@ -63,10 +69,10 @@ async function LatestGrid({ topic }: { topic: TopicFilter }) {
 
   return (
     <ViewTransition key={topic} enter="content-swap" exit="content-swap">
-      <div className="grid gap-5.5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid items-stretch gap-5.5 sm:grid-cols-2 lg:grid-cols-3">
         {visible.map((post, index) => (
-          <Reveal key={post.slug} index={index}>
-            <PostCard post={post} />
+          <Reveal key={post.slug} index={index} className="h-full">
+            <PostCard post={post} className="h-full" />
           </Reveal>
         ))}
       </div>
