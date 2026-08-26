@@ -55,7 +55,9 @@ async function LatestGrid({ topic }: { topic: TopicFilter }) {
   const liveStatsMap = await getAllLivePostStatsMap();
   const livePosts = posts.map((p) => {
     const live = liveStatsMap.get(p.slug);
-    return live ? { ...p, likes: live.likes, views: live.views } : p;
+    return live
+      ? { ...p, likes: live.likes, views: live.views, commentCount: live.comments }
+      : p;
   });
   const visible = listPosts({ topic, limit: 6 }, livePosts);
 
