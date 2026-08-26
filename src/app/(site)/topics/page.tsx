@@ -43,8 +43,8 @@ export default function TopicsPage() {
 
       <section className="mx-auto max-w-page px-gutter pt-[clamp(28px,4vw,44px)] pb-tail">
         <div className="grid gap-4.5 sm:grid-cols-2 xl:grid-cols-4">
-          {topics.map((topic) => (
-            <Reveal key={topic.slug}>
+          {topics.map((topic, index) => (
+            <Reveal key={topic.slug} index={index}>
               <TopicCard topic={topic} />
             </Reveal>
           ))}
