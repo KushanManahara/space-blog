@@ -194,32 +194,30 @@ export default function AboutPage() {
                 <a href={`mailto:${author.email}`} className="hover:underline">
                   {author.email}
                 </a>
-                <div className="flex flex-wrap items-center gap-3 font-sans text-[13px] text-white/70">
+                <div className="flex flex-wrap items-center gap-2 font-sans text-[13px] text-white/80">
                   <a
                     href={author.github}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="transition-colors hover:text-white"
+                    className="rounded-full bg-white/10 px-3 py-1.5 font-medium transition-colors hover:bg-white/20 hover:text-white active:scale-95"
                   >
                     GitHub
                   </a>
-                  <span>·</span>
                   <a
                     href={author.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="transition-colors hover:text-white"
+                    className="rounded-full bg-white/10 px-3 py-1.5 font-medium transition-colors hover:bg-white/20 hover:text-white active:scale-95"
                   >
                     LinkedIn
                   </a>
-                  <span>·</span>
                   <a
                     href={author.twitter}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="transition-colors hover:text-white"
+                    className="rounded-full bg-white/10 px-3 py-1.5 font-medium transition-colors hover:bg-white/20 hover:text-white active:scale-95"
                   >
-                    X
+                    X (Twitter)
                   </a>
                 </div>
               </div>
