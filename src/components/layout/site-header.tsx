@@ -37,7 +37,7 @@ const BLUR_LAYERS = [
 export function SiteHeader() {
   const pathname = usePathname();
   const commandMenu = useCommandMenu();
-  const { direction, isPast, isAtTop } = useScrollDirection({ threshold: 40, delta: 8 });
+  const { direction, isPast, isAtTop } = useScrollDirection({ threshold: 40, delta: 12 });
   const [hasFocus, setHasFocus] = React.useState(false);
   const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
 
@@ -51,7 +51,7 @@ export function SiteHeader() {
   return (
     <div
       className={cn(
-        "sticky top-0 z-60 w-full px-4 transition-[padding] duration-500 ease-expo",
+        "sticky top-0 z-60 w-full px-4 transition-[padding] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]",
         "sm:px-[clamp(16px,4vw,40px)]",
         isScrolled
           ? "pt-[calc(env(safe-area-inset-top,0px)+0.375rem)] sm:pt-2.5"
@@ -89,9 +89,9 @@ export function SiteHeader() {
           if (!event.currentTarget.contains(event.relatedTarget)) setHasFocus(false);
         }}
         className={cn(
-          "mx-auto flex w-full items-center justify-between rounded-full border transition-[max-width,padding,background-color,box-shadow,border-color] duration-500 ease-expo",
-          // Dynamic narrowing: shrinks on mobile to 285px and desktop to max-w-140
-          isCollapsed ? "max-w-[285px] sm:max-w-140" : "max-w-page",
+          "mx-auto flex w-full items-center justify-between rounded-full border transition-[max-width,padding,background-color,box-shadow,border-color] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]",
+          // Dynamic narrowing: shrinks on mobile to 285px and desktop to max-w-140; expands to 100% on mobile and max-w-page on desktop
+          isCollapsed ? "max-w-[285px] sm:max-w-140" : "max-w-full sm:max-w-page",
           // Refined frosted glass surface
           "backdrop-blur-[24px] backdrop-saturate-[180%]",
           isCollapsed
@@ -104,14 +104,14 @@ export function SiteHeader() {
         <Link
           href={routes.home}
           className={cn(
-            "flex shrink-0 items-center transition-[gap] duration-300",
+            "flex shrink-0 items-center transition-[gap] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]",
             isCollapsed ? "gap-2" : "gap-2.5",
           )}
         >
           <BrandMark size={isCollapsed ? 22 : 24} />
           <span
             className={cn(
-              "font-display font-bold tracking-[-0.02em] text-fg-1 transition-[font-size] duration-300",
+              "font-display font-bold tracking-[-0.02em] text-fg-1 transition-[font-size] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]",
               isCollapsed ? "text-[16.5px] sm:text-[18.5px]" : "text-[18.5px] sm:text-[19px]",
             )}
           >
@@ -150,7 +150,7 @@ export function SiteHeader() {
 
         <div
           className={cn(
-            "ml-auto flex shrink-0 items-center transition-[gap] duration-300",
+            "ml-auto flex shrink-0 items-center transition-[gap] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]",
             isCollapsed ? "gap-1.5" : "gap-2",
           )}
         >
@@ -159,18 +159,18 @@ export function SiteHeader() {
             onClick={commandMenu.open}
             title="Search (⌘K)"
             className={cn(
-              "inline-flex cursor-pointer items-center justify-center rounded-full border transition-[width,height,padding,transform,box-shadow,color] duration-300 ease-bounce",
+              "inline-flex cursor-pointer items-center justify-center rounded-full border transition-[width,height,padding,transform,box-shadow,color] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]",
               "border-black/[0.06] bg-black/[0.03] text-fg-3 hover:-translate-y-px hover:bg-black/[0.06] hover:text-fg-2 hover:shadow-sm active:scale-[0.95]",
               "dark:border-white/10 dark:bg-white/[0.05] dark:hover:bg-white/10 dark:hover:text-fg-1",
               isCollapsed
-                ? "size-8.5 px-0 sm:h-[34px] sm:w-auto sm:px-2.5 sm:gap-2"
-                : "size-[38px] px-2.5 sm:gap-[9px] sm:pr-2 sm:pl-3.5",
+                ? "size-8.5 px-0 sm:size-[34px]"
+                : "size-[38px] px-0 sm:h-[38px] sm:w-auto sm:gap-[9px] sm:pr-2 sm:pl-3.5",
             )}
           >
-            <Search className={cn("shrink-0 transition-transform duration-300", isCollapsed ? "size-3.5" : "size-4")} strokeWidth={1.75} />
+            <Search className={cn("shrink-0 transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]", isCollapsed ? "size-3.5" : "size-4")} strokeWidth={1.75} />
             <span
               className={cn(
-                "hidden overflow-hidden text-[13px] whitespace-nowrap transition-[max-width,opacity] duration-500 ease-expo md:inline-block",
+                "hidden overflow-hidden text-[13px] whitespace-nowrap transition-[max-width,opacity] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] md:inline-block",
                 isCollapsed ? "max-w-0 opacity-0" : "max-w-20 opacity-100",
               )}
             >
@@ -178,7 +178,7 @@ export function SiteHeader() {
             </span>
             <span
               className={cn(
-                "hidden rounded-[7px] border border-black/10 bg-black/5 px-[7px] py-0.5 text-[11.5px] font-semibold text-fg-3 transition-opacity duration-300 dark:border-white/10 dark:bg-white/10 sm:inline-block",
+                "hidden rounded-[7px] border border-black/10 bg-black/5 px-[7px] py-0.5 text-[11.5px] font-semibold text-fg-3 transition-opacity duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] dark:border-white/10 dark:bg-white/10 sm:inline-block",
                 isCollapsed ? "sm:hidden" : "sm:inline-block",
               )}
             >
@@ -188,10 +188,10 @@ export function SiteHeader() {
 
           <AnimatedThemeToggler
             className={cn(
-              "inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full border transition-[width,height,transform,box-shadow,color] duration-300 ease-bounce",
+              "inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full border transition-[width,height,transform,box-shadow,color] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]",
               "border-black/[0.06] bg-black/[0.03] text-fg-3 hover:-translate-y-px hover:bg-black/[0.06] hover:text-fg-2 hover:shadow-sm active:scale-[0.95]",
               "dark:border-white/10 dark:bg-white/[0.05] dark:hover:bg-white/10 dark:hover:text-fg-1",
-              isCollapsed ? "size-8.5" : "size-[38px]",
+              isCollapsed ? "size-8.5 sm:size-[34px]" : "size-[38px]",
             )}
           />
 
@@ -199,10 +199,10 @@ export function SiteHeader() {
             href={routes.studio}
             title="Studio"
             className={cn(
-              "hidden shrink-0 cursor-pointer items-center justify-center rounded-full border transition-[width,height,transform,box-shadow,color] duration-300 ease-bounce md:inline-flex",
+              "hidden shrink-0 cursor-pointer items-center justify-center rounded-full border transition-[width,height,transform,box-shadow,color] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] md:inline-flex",
               "border-black/[0.06] bg-black/[0.03] text-fg-3 hover:-translate-y-px hover:bg-black/[0.06] hover:text-fg-2 hover:shadow-sm active:scale-[0.95]",
               "dark:border-white/10 dark:bg-white/[0.05] dark:hover:bg-white/10 dark:hover:text-fg-1",
-              isCollapsed ? "size-8.5" : "size-[38px]",
+              isCollapsed ? "size-8.5 sm:size-[34px]" : "size-[38px]",
             )}
           >
             <LayoutGrid className={cn("transition-transform duration-300", isCollapsed ? "size-3.5" : "size-4")} strokeWidth={1.75} />
