@@ -24,6 +24,7 @@ import {
   topicFilters,
 } from "@/lib/content";
 import { getAllLivePostStatsMap } from "@/lib/db/queries";
+import { paginate } from "@/lib/pagination";
 import { buildHref } from "@/lib/url";
 
 export const metadata: Metadata = {
@@ -52,8 +53,13 @@ export default async function ArticlesPage({ searchParams }: PageProps<"/article
   });
 
   const matching = listPosts({ topic, series, sort }, livePosts);
-  const visible = matching.slice((page - 1) * PER_PAGE, page * PER_PAGE);
-  const current = { topic: topic === "All" ? undefined : topic, series, sort, page: String(page) };
+  const { items: visible, page: currentPage, pageCount } = paginate(matching, page, PER_PAGE);
+  const current = {
+    topic: topic === "All" ? undefined : topic,
+    series,
+    sort,
+    page: String(currentPage),
+  };
   const activeSeries = series ? getSeriesBySlug(series) : undefined;
 
   return (
@@ -120,7 +126,7 @@ export default async function ArticlesPage({ searchParams }: PageProps<"/article
             </Reveal>
 
             <ViewTransition
-              key={`${topic}-${sort}-${page}`}
+              key={`${topic}-${sort}-${currentPage}`}
               enter="content-swap"
               exit="content-swap"
             >
@@ -139,8 +145,8 @@ export default async function ArticlesPage({ searchParams }: PageProps<"/article
 
             <Pagination
               className="mt-9"
-              page={page}
-              total={site.archivePageCount}
+              page={currentPage}
+              total={pageCount}
               hrefFor={(next) =>
                 buildHref(routes.articles, current, { page: next === 1 ? undefined : String(next) })
               }
