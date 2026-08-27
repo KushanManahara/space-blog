@@ -90,12 +90,12 @@ export function SiteHeader() {
         }}
         className={cn(
           "mx-auto flex w-full items-center justify-between rounded-full border transition-[max-width,padding,background-color,box-shadow,border-color] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]",
-          // Dynamic narrowing: shrinks on mobile to 285px and desktop to max-w-140; expands to 100% on mobile and max-w-page on desktop
-          isCollapsed ? "max-w-[285px] sm:max-w-140" : "max-w-full sm:max-w-page",
+          // Dynamic narrowing: shrinks on mobile to fit only the logo, and on desktop to max-w-140
+          isCollapsed ? "max-w-[114px] sm:max-w-140" : "max-w-full sm:max-w-page",
           // Refined frosted glass surface
           "backdrop-blur-[24px] backdrop-saturate-[180%]",
           isCollapsed
-            ? "border-white/60 bg-white/75 py-1 pr-1.5 pl-3.5 shadow-[0_12px_32px_rgb(0_0_0/0.12),0_2px_6px_rgb(0_0_0/0.06),inset_0_1px_1px_rgb(255_255_255/0.95)] dark:border-white/12 dark:bg-[#070e22]/80 dark:shadow-[0_16px_36px_rgb(0_0_0/0.7),inset_0_1px_0_rgb(255_255_255/0.14)]"
+            ? "border-white/60 bg-white/75 py-1 px-3 sm:pr-2 sm:pl-3.5 shadow-[0_12px_32px_rgb(0_0_0/0.12),0_2px_6px_rgb(0_0_0/0.06),inset_0_1px_1px_rgb(255_255_255/0.95)] dark:border-white/12 dark:bg-[#070e22]/80 dark:shadow-[0_16px_36px_rgb(0_0_0/0.7),inset_0_1px_0_rgb(255_255_255/0.14)]"
             : isScrolled
               ? "border-white/60 bg-white/70 py-[7px] pr-2 pl-4.5 shadow-[0_8px_24px_rgb(0_0_0/0.08),0_1px_3px_rgb(0_0_0/0.04),inset_0_1px_1px_rgb(255_255_255/0.85)] dark:border-white/12 dark:bg-[#070e22]/75 dark:shadow-[0_12px_28px_rgb(0_0_0/0.6),inset_0_1px_0_rgb(255_255_255/0.12)]"
               : "border-white/50 bg-white/60 py-[9px] pr-2.5 pl-5.5 shadow-sm dark:border-white/10 dark:bg-[#070e22]/65 dark:shadow-[0_4px_16px_rgb(0_0_0/0.4),inset_0_1px_0_rgb(255_255_255/0.08)]",
@@ -105,7 +105,7 @@ export function SiteHeader() {
           href={routes.home}
           className={cn(
             "flex shrink-0 items-center transition-[gap] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]",
-            isCollapsed ? "gap-2" : "gap-2.5",
+            isCollapsed ? "mx-auto gap-2 sm:mx-0" : "gap-2.5",
           )}
         >
           <BrandMark size={isCollapsed ? 22 : 24} />
@@ -150,8 +150,10 @@ export function SiteHeader() {
 
         <div
           className={cn(
-            "ml-auto flex shrink-0 items-center transition-[gap] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]",
-            isCollapsed ? "gap-1.5" : "gap-2",
+            "ml-auto flex shrink-0 items-center transition-[max-width,opacity,transform,gap] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]",
+            isCollapsed
+              ? "pointer-events-none max-w-0 scale-90 overflow-hidden opacity-0 sm:pointer-events-auto sm:max-w-none sm:scale-100 sm:overflow-visible sm:opacity-100 sm:gap-1.5"
+              : "pointer-events-auto max-w-[200px] scale-100 opacity-100 gap-2",
           )}
         >
           <button
