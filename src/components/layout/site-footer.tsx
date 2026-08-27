@@ -11,12 +11,9 @@ export function SiteFooter() {
         aria-hidden
         className="pointer-events-none absolute -top-20 left-1/2 -z-10 h-44 w-full max-w-[1000px] -translate-x-1/2 bg-[radial-gradient(ellipse_60%_80%_at_50%_0%,rgb(0_122_255/0.18),transparent)] dark:bg-[radial-gradient(ellipse_60%_80%_at_50%_0%,rgb(0_122_255/0.25),transparent)]"
       />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
-      >
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-[radial-gradient(circle_at_center,rgb(56_189_248/0.18),transparent_70%)] blur-2xl dark:bg-[radial-gradient(circle_at_center,rgb(0_122_255/0.22),transparent_70%)]" />
-        <div className="absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-[radial-gradient(circle_at_center,rgb(0_122_255/0.18),transparent_70%)] blur-2xl dark:bg-[radial-gradient(circle_at_center,rgb(56_189_248/0.20),transparent_70%)]" />
+        <div className="absolute -right-20 -bottom-20 h-64 w-64 rounded-full bg-[radial-gradient(circle_at_center,rgb(0_122_255/0.18),transparent_70%)] blur-2xl dark:bg-[radial-gradient(circle_at_center,rgb(56_189_248/0.20),transparent_70%)]" />
       </div>
 
       <div className="mx-auto max-w-page px-gutter pt-14 pb-[calc(env(safe-area-inset-bottom,0px)+2.5rem)]">

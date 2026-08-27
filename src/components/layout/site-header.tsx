@@ -167,7 +167,13 @@ export function SiteHeader() {
                 : "size-[38px] px-0 sm:h-[38px] sm:w-auto sm:gap-[9px] sm:pr-2 sm:pl-3.5",
             )}
           >
-            <Search className={cn("shrink-0 transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]", isCollapsed ? "size-3.5" : "size-4")} strokeWidth={1.75} />
+            <Search
+              className={cn(
+                "shrink-0 transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]",
+                isCollapsed ? "size-3.5" : "size-4",
+              )}
+              strokeWidth={1.75}
+            />
             <span
               className={cn(
                 "hidden overflow-hidden text-[13px] whitespace-nowrap transition-[max-width,opacity] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] md:inline-block",
@@ -178,7 +184,7 @@ export function SiteHeader() {
             </span>
             <span
               className={cn(
-                "hidden rounded-[7px] border border-black/10 bg-black/5 px-[7px] py-0.5 text-[11.5px] font-semibold text-fg-3 transition-opacity duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] dark:border-white/10 dark:bg-white/10 sm:inline-block",
+                "hidden rounded-[7px] border border-black/10 bg-black/5 px-[7px] py-0.5 text-[11.5px] font-semibold text-fg-3 transition-opacity duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] sm:inline-block dark:border-white/10 dark:bg-white/10",
                 isCollapsed ? "sm:hidden" : "sm:inline-block",
               )}
             >
@@ -205,7 +211,13 @@ export function SiteHeader() {
               isCollapsed ? "size-8.5 sm:size-[34px]" : "size-[38px]",
             )}
           >
-            <LayoutGrid className={cn("transition-transform duration-300", isCollapsed ? "size-3.5" : "size-4")} strokeWidth={1.75} />
+            <LayoutGrid
+              className={cn(
+                "transition-transform duration-300",
+                isCollapsed ? "size-3.5" : "size-4",
+              )}
+              strokeWidth={1.75}
+            />
             <span className="sr-only">Studio</span>
           </Link>
 

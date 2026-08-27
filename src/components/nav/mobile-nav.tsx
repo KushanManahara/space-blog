@@ -42,7 +42,13 @@ export function MobileNav({
           isCollapsed ? "size-8.5" : "size-[38px]",
         )}
       >
-        <Menu className={cn("transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]", isCollapsed ? "size-4" : "size-4.5")} strokeWidth={1.75} />
+        <Menu
+          className={cn(
+            "transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]",
+            isCollapsed ? "size-4" : "size-4.5",
+          )}
+          strokeWidth={1.75}
+        />
       </button>
 
       <DialogContent align="top" className="max-w-[360px] p-5">
