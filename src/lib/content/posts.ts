@@ -94,9 +94,36 @@ export const posts: Post[] = postSchema.array().parse([
         text: "The Layered Agent Architecture",
       },
       {
-        kind: "code",
-        filename: "architecture.txt",
-        code: `┌─────────────────────────────────────────────────────────────┐\n│                     AGENT ORCHESTRATION LAYER               │\n│             A2A Protocol (REST / SSE / Asynchronous)        │\n│   • Capability discovery (Agent Cards)                      │\n│   • Cross-organization task delegation                      │\n│   • Human-in-the-loop approvals & long-running sessions     │\n└──────────────┬───────────────────────────────┬──────────────┘\n               │ Task Delegation               │ Task Delegation\n               ▼                               ▼\n┌──────────────────────────────┐ ┌─────────────────────────────┐\n│    SPECIALIZED AGENT A       │ │     SPECIALIZED AGENT B     │\n│    (e.g., Code Reviewer)     │ │     (e.g., Deploy Master)   │\n└──────────────┬───────────────┘ └─────────────┬───────────────┘\n               │ MCP (JSON-RPC 2.0)            │ MCP (JSON-RPC 2.0)\n               ▼                               ▼\n┌──────────────────────────────┐ ┌─────────────────────────────┐\n│     MCP TOOL SERVERS         │ │      MCP TOOL SERVERS       │\n│   • Git / GitHub API         │ │   • Kubernetes Cluster API  │\n│   • Static Analysis Engine   │ │   • Cloudflare DNS          │\n└──────────────────────────────┘ └─────────────────────────────┘`,
+        kind: "mermaid",
+        caption:
+          "The layered agent architecture. A2A governs horizontal collaboration and long-running task delegation across organizations, while MCP provides fast, synchronous model-to-tool integration over JSON-RPC 2.0.",
+        code: `flowchart TD
+    subgraph ORCH["AGENT ORCHESTRATION LAYER"]
+        direction TB
+        O_BODY["<b>A2A Protocol</b> (REST / SSE / Asynchronous)<br/>• Capability discovery (Agent Cards)<br/>• Cross-organization task delegation<br/>• Human-in-the-loop approvals & long-running sessions"]
+    end
+
+    subgraph AGENTS["SPECIALIZED AGENT LAYER"]
+        direction LR
+        AGENT_A["<b>Specialized Agent A</b><br/>(e.g., Code Reviewer)"]
+        AGENT_B["<b>Specialized Agent B</b><br/>(e.g., Deploy Master)"]
+    end
+
+    subgraph TOOLS_A["MCP TOOL SERVERS"]
+        direction TB
+        TOOL_A["• Git / GitHub API<br/>• Static Analysis Engine"]
+    end
+
+    subgraph TOOLS_B["MCP TOOL SERVERS"]
+        direction TB
+        TOOL_B["• Kubernetes Cluster API<br/>• Cloudflare DNS"]
+    end
+
+    ORCH -->|"Task Delegation"| AGENT_A
+    ORCH -->|"Task Delegation"| AGENT_B
+
+    AGENT_A -->|"MCP (JSON-RPC 2.0)"| TOOLS_A
+    AGENT_B -->|"MCP (JSON-RPC 2.0)"| TOOLS_B`,
       },
       {
         kind: "heading",
