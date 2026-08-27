@@ -114,6 +114,9 @@
   /* Hairline in brand colour, used on chips and toggles that carry a tint. */
   --color-line-brand: #c7e2fe;
 
+  /* Diagonal sheen used by GlareHover. Dimmed for dark surfaces below. */
+  --glare-tint: rgba(255, 255, 255, 0.55);
+
   /* Ink: the maximum-contrast solid used by primary buttons, active chips and
      pagination. It is the opposite end of the page, so it inverts with the
      theme — near-black plate in light, near-white plate in dark. */
@@ -377,6 +380,7 @@
   --color-accent-orchid: #38bdf8;
   --color-accent-indigo: #93c5fd;
   --color-line-brand: #1e3a8a;
+  --glare-tint: rgba(255, 255, 255, 0.14);
 
   --color-tint-orchid: #0c263d;
   --color-tint-violet: #0d2847;
@@ -421,6 +425,20 @@
 }
 
 @theme inline {
+  --animate-shine: shine var(--duration) infinite linear;
+
+  @keyframes shine {
+    0% {
+      background-position: 0% 0%;
+    }
+    50% {
+      background-position: 100% 100%;
+    }
+    to {
+      background-position: 0% 0%;
+    }
+  }
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-border: var(--border);
