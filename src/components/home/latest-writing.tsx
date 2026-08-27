@@ -1,6 +1,5 @@
 import { Suspense, ViewTransition } from "react";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 
 import { SectionHeader } from "@/components/layout/section-header";
 import { Reveal } from "@/components/motion/reveal";
@@ -20,13 +19,13 @@ export function LatestWriting({ topic }: { topic: TopicFilter }) {
           title="Latest writing"
           subtitle="Filter by what you came for."
           action={
-            <Link
+            <InteractiveHoverButton
               href={routes.articles}
-              className="inline-flex items-center gap-2 rounded-full border border-line-2 bg-bg-2 px-5 py-[11px] text-[14px] font-semibold text-fg-1 transition-[transform,box-shadow] duration-[350ms] ease-bounce hover:-translate-y-0.5 hover:shadow-md active:scale-[0.96] active:duration-150 active:ease-out"
+              variant="secondary"
+              className="px-5 py-[11px] text-[14px]"
             >
               View all
-              <ArrowRight className="size-[15px]" strokeWidth={1.75} />
-            </Link>
+            </InteractiveHoverButton>
           }
           className="mb-7"
         />
@@ -55,9 +54,7 @@ async function LatestGrid({ topic }: { topic: TopicFilter }) {
   const liveStatsMap = await getAllLivePostStatsMap();
   const livePosts = posts.map((p) => {
     const live = liveStatsMap.get(p.slug);
-    return live
-      ? { ...p, likes: live.likes, views: live.views, commentCount: live.comments }
-      : p;
+    return live ? { ...p, likes: live.likes, views: live.views, commentCount: live.comments } : p;
   });
   const visible = listPosts({ topic, limit: 6 }, livePosts);
 

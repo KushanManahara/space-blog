@@ -1,11 +1,12 @@
 import { AuthorAvatar } from "@/components/author/author-byline";
 import { Reveal } from "@/components/motion/reveal";
+import { NumberTicker } from "@/components/ui/number-ticker";
 import { author, posts, topics } from "@/lib/content";
 
 const stats = [
   { value: posts.length, label: "articles" },
   { value: topics.length, label: "topics" },
-  { value: "0", label: "reposts" },
+  { value: 0, label: "reposts" },
 ] as const;
 
 /**
@@ -31,7 +32,9 @@ export function PublicationStrip() {
           {stats.map((stat) => (
             <div key={stat.label} className="inline-flex items-baseline gap-[7px]">
               <dt className="sr-only">{stat.label}</dt>
-              <dd className="font-display text-[19px] font-bold text-fg-1">{stat.value}</dd>
+              <dd className="font-display text-[19px] font-bold text-fg-1">
+                <NumberTicker value={stat.value} className="font-display font-bold" />
+              </dd>
               <span aria-hidden className="text-[13px] text-fg-3">
                 {stat.label}
               </span>

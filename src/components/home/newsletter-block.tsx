@@ -5,10 +5,12 @@ import * as React from "react";
 import Image from "next/image";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
-import { ArrowRight, Check, Loader2 } from "lucide-react";
+import { Check, Loader2 } from "lucide-react";
 
 import { subscribeAction } from "@/app/actions";
 import { Reveal } from "@/components/motion/reveal";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
+import { ShineBorder } from "@/components/ui/shine-border";
 import { newsletterBenefits } from "@/lib/content";
 import { initialFormState } from "@/lib/form-state";
 import { cn } from "@/lib/utils";
@@ -56,7 +58,8 @@ export function NewsletterBlock() {
           </ul>
 
           <form ref={formRef} action={formAction} className="mt-6.5 max-w-[400px]">
-            <div className="flex items-center gap-2 rounded-full border border-line-1 bg-bg-2 p-1.5 pl-4 sm:pl-5">
+            <div className="relative flex items-center gap-2 rounded-full border border-line-1 bg-bg-2 p-1.5 pl-4 sm:pl-5">
+              <ShineBorder borderWidth={1} duration={12} />
               <label htmlFor="newsletter-email" className="sr-only">
                 Email address
               </label>
@@ -110,17 +113,13 @@ function SubscribeButton() {
   const { pending } = useFormStatus();
 
   return (
-    <button
+    <InteractiveHoverButton
       type="submit"
       disabled={pending}
       aria-label="Subscribe to the mailing list"
-      className="inline-flex size-[42px] shrink-0 cursor-pointer items-center justify-center rounded-full bg-ink text-on-ink transition-transform duration-300 ease-bounce hover:-translate-y-px active:scale-[0.96] active:duration-150 active:ease-out disabled:pointer-events-none disabled:opacity-60"
+      className="relative z-10 shrink-0 px-5 py-[11px] text-[14px]"
     >
-      {pending ? (
-        <Loader2 className="size-[17px] animate-spin" strokeWidth={1.75} />
-      ) : (
-        <ArrowRight className="size-[17px]" strokeWidth={1.75} />
-      )}
-    </button>
+      {pending ? <Loader2 className="size-[17px] animate-spin" strokeWidth={1.75} /> : "Subscribe"}
+    </InteractiveHoverButton>
   );
 }

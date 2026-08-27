@@ -16,9 +16,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
   const liveStatsMap = await getAllLivePostStatsMap();
   const livePosts = posts.map((p) => {
     const live = liveStatsMap.get(p.slug);
-    return live
-      ? { ...p, likes: live.likes, views: live.views, commentCount: live.comments }
-      : p;
+    return live ? { ...p, likes: live.likes, views: live.views, commentCount: live.comments } : p;
   });
 
   const summaries = toSummaries(livePosts);

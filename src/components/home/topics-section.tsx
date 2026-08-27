@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 
 import { Reveal } from "@/components/motion/reveal";
 import { TopicTile } from "@/components/topic/topic-tile";
@@ -13,15 +12,13 @@ export function TopicsSection() {
           <h2 className="text-h2 text-fg-1">Topics</h2>
           <p className="mt-2.5 text-[16.5px] text-fg-2">Things I keep coming back to.</p>
         </div>
-        <Link
+        <InteractiveHoverButton
           href={routes.topics}
-          className="inline-flex items-center gap-2.5 text-[14px] font-semibold text-brand transition-opacity duration-300 ease-expo hover:opacity-70"
+          variant="secondary"
+          className="px-5 py-[11px] text-[14px]"
         >
           All topics
-          <span className="inline-flex size-[38px] items-center justify-center rounded-full border border-line-1 bg-bg-2 text-fg-2">
-            <ArrowRight className="size-4" strokeWidth={1.75} />
-          </span>
-        </Link>
+        </InteractiveHoverButton>
       </Reveal>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">

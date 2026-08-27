@@ -2,7 +2,8 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 
 import { AuthorByline } from "@/components/author/author-byline";
 import { Reveal } from "@/components/motion/reveal";
@@ -56,13 +57,13 @@ export function MostViewed({ posts }: { posts: PostSummary[] }) {
           ))}
         </div>
 
-        <Link
+        <InteractiveHoverButton
           href={routes.articles}
-          className="glass inline-flex items-center gap-2 rounded-full px-5 py-[11px] text-[14px] font-semibold text-fg-1 transition-[transform,box-shadow] duration-[350ms] ease-bounce hover:-translate-y-0.5 hover:shadow-md active:scale-[0.96] active:duration-150 active:ease-out"
+          variant="glass"
+          className="px-5 py-[11px] text-[14px]"
         >
           View all
-          <ArrowRight className="size-[15px]" strokeWidth={1.75} />
-        </Link>
+        </InteractiveHoverButton>
       </Reveal>
 
       <div className="mt-6.5 grid items-start gap-[clamp(20px,3vw,32px)] lg:grid-cols-[1.06fr_1fr]">
