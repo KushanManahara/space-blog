@@ -23,7 +23,6 @@ export const site = {
   seriesCount: 0,
   correctionCount: 0,
   subscriberCount: 0,
-  archivePageCount: 1,
 } as const;
 
 export const author: Author = authorSchema.parse({
