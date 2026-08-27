@@ -39,7 +39,21 @@ export const articleBlockSchema = z.discriminatedUnion("kind", [
       )
       .min(1),
   }),
-  z.object({ kind: z.literal("formula"), html: z.string().min(1), caption: z.string().min(1) }),
+  /**
+   * Display equation. `tex` is LaTeX, rendered with KaTeX.
+   * `html` is the pre-KaTeX plain-text form, still accepted so older blocks
+   * keep rendering; prefer `tex` for anything new.
+   */
+  z
+    .object({
+      kind: z.literal("formula"),
+      tex: z.string().min(1).optional(),
+      html: z.string().min(1).optional(),
+      caption: z.string().min(1),
+    })
+    .refine((block) => Boolean(block.tex ?? block.html), {
+      message: "A formula block needs either `tex` or `html`.",
+    }),
   z.object({
     kind: z.literal("callout"),
     title: z.string().min(1),
@@ -51,6 +65,57 @@ export const articleBlockSchema = z.discriminatedUnion("kind", [
     code: z.string().min(1),
   }),
   z.object({ kind: z.literal("footnotes"), items: z.array(z.string().min(1)).min(1) }),
+
+  /** Mermaid source, rendered client-side. `caption` labels the figure. */
+  z.object({
+    kind: z.literal("mermaid"),
+    code: z.string().min(1),
+    caption: z.string().min(1).optional(),
+  }),
+
+  /**
+   * A figure. `src` may be a local path under /public or an absolute URL;
+   * external hosts must also be allowed in next.config.ts. Width and height are
+   * the intrinsic pixel size, used to reserve space and avoid layout shift.
+   */
+  z.object({
+    kind: z.literal("image"),
+    src: z.string().min(1),
+    alt: z.string().min(1),
+    caption: z.string().min(1).optional(),
+    width: z.number().int().positive().optional(),
+    height: z.number().int().positive().optional(),
+    /** Let the image break out of the prose column on wide screens. */
+    wide: z.boolean().optional(),
+  }),
+
+  /** Data table. Every row must be the same length as `headers`. */
+  z
+    .object({
+      kind: z.literal("table"),
+      headers: z.array(z.string()).min(1),
+      rows: z.array(z.array(z.string())).min(1),
+      caption: z.string().min(1).optional(),
+      /** Column indices to right-align, for numeric columns. */
+      numericColumns: z.array(z.number().int().nonnegative()).optional(),
+    })
+    .refine((block) => block.rows.every((row) => row.length === block.headers.length), {
+      message: "Every table row must have the same number of cells as headers.",
+    }),
+
+  /** Interactive chart: hover for values, toggle series through the legend. */
+  z.object({
+    kind: z.literal("figure"),
+    variant: z.enum(["line", "area", "bar"]),
+    title: z.string().min(1),
+    caption: z.string().min(1).optional(),
+    note: z.string().min(1).optional(),
+    xKey: z.string().min(1),
+    xLabel: z.string().min(1).optional(),
+    yLabel: z.string().min(1).optional(),
+    series: z.array(z.object({ key: z.string().min(1), label: z.string().min(1) })).min(1),
+    data: z.array(z.record(z.string(), z.union([z.string(), z.number()]))).min(1),
+  }),
 ]);
 
 export const postSchema = z.object({
