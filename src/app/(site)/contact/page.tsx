@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 
 import { ContactForm } from "@/components/contact/contact-form";
 import { GitHubIcon, LinkedInIcon, RssIcon, XIcon } from "@/components/icons/social-icons";
 import { MastheadBadge, PageMasthead } from "@/components/layout/page-masthead";
 import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { author, routes } from "@/lib/content";
 
 export const metadata: Metadata = {
@@ -36,12 +37,12 @@ export default function ContactPage() {
         media={<MastheadBadge icon={Mail} />}
         actions={
           <>
-            <Button asChild variant="primary" size="md">
-              <Link href={routes.articles}>
-                Read the archive
-                <ArrowRight className="size-4" strokeWidth={2} />
-              </Link>
-            </Button>
+            <InteractiveHoverButton
+              href={routes.articles}
+              className="px-[22px] py-[11px] text-[14px]"
+            >
+              Read the archive
+            </InteractiveHoverButton>
             <Button asChild variant="subtle" size="md">
               <Link href={routes.about}>About author</Link>
             </Button>
