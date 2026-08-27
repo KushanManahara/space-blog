@@ -11,6 +11,7 @@ import { SearchHero } from "@/components/search/search-hero";
 import { TopicCard } from "@/components/topic/topic-tile";
 import { isSortOrder, routes, searchPosts, site, tags, topics } from "@/lib/content";
 import { buildHref } from "@/lib/url";
+import { paginate } from "@/lib/pagination";
 
 export const metadata: Metadata = {
   title: "Search",
@@ -25,6 +26,9 @@ function isTab(value: string | undefined): value is Tab {
   return value !== undefined && (TABS as readonly string[]).includes(value);
 }
 
+/** Matches the slice the results list used before it was paginated. */
+const PER_PAGE = 8;
+
 export default async function SearchPage({ searchParams }: PageProps<"/search">) {
   const params = await searchParams;
   const query = typeof params.q === "string" ? params.q : "";
@@ -37,7 +41,8 @@ export default async function SearchPage({ searchParams }: PageProps<"/search">)
   const page = Number.isFinite(pageParam) && pageParam > 0 ? pageParam : 1;
 
   const results = searchPosts(query, sort);
-  const current = { q: query || undefined, tab, sort, page: String(page) };
+  const { items: visibleResults, page: currentPage, pageCount } = paginate(results, page, PER_PAGE);
+  const current = { q: query || undefined, tab, sort, page: String(currentPage) };
 
   return (
     <>
@@ -74,7 +79,7 @@ export default async function SearchPage({ searchParams }: PageProps<"/search">)
               </p>
             ) : (
               <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-                {results.slice(0, 8).map((post) => (
+                {visibleResults.map((post) => (
                   <PostCard key={post.slug} post={post} variant="search" />
                 ))}
               </div>
@@ -108,8 +113,8 @@ export default async function SearchPage({ searchParams }: PageProps<"/search">)
           <Pagination
             className="mt-11"
             align="center"
-            page={page}
-            total={site.archivePageCount}
+            page={currentPage}
+            total={pageCount}
             hrefFor={(next) =>
               buildHref(routes.search, current, { page: next === 1 ? undefined : String(next) })
             }
