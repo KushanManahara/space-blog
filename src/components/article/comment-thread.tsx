@@ -156,7 +156,9 @@ export function CommentThread({
           Responses ({total + posted.length})
         </h2>
         {allComments.length > 0 ? (
-          <span className="hidden text-[13px] text-fg-3 sm:inline">Peer review & engineering discussion</span>
+          <span className="hidden text-[13px] text-fg-3 sm:inline">
+            Peer review & engineering discussion
+          </span>
         ) : null}
       </div>
 
@@ -344,7 +346,7 @@ export function CommentThread({
               >
                 {comment.initials}
               </span>
-              <div className="min-w-0 flex-1 break-words rounded-xl border border-line-1 bg-bg-2 px-4 py-3.5 shadow-xs sm:px-5 sm:py-4">
+              <div className="min-w-0 flex-1 rounded-xl border border-line-1 bg-bg-2 px-4 py-3.5 break-words shadow-xs sm:px-5 sm:py-4">
                 <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
                   <p className="text-[14.5px] font-bold text-fg-1">{comment.name}</p>
                   {comment.role ? (

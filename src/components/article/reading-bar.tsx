@@ -1,12 +1,12 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
-import { ArrowRight, BookOpen, Share, Sparkles } from "lucide-react";
+import { BookOpen, Share, Sparkles } from "lucide-react";
 
 import { useReaderMode } from "@/components/article/reader-mode-provider";
 import { useReadingProgress } from "@/components/article/reading-progress";
 import { ShareSheet } from "@/components/article/share-sheet";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { PostCover } from "@/components/post/post-cover";
 import { siteUrl, type PostSummary } from "@/lib/content";
 import { cn } from "@/lib/utils";
@@ -216,18 +216,18 @@ export function ReadingBar({ post, next }: { post: PostSummary; next: PostSummar
             </p>
           </div>
 
-          <Link
+          <InteractiveHoverButton
             href={`/articles/${next.slug}`}
+            variant={isPastArticle ? "primary" : "ink"}
             className={cn(
-              "inline-flex shrink-0 items-center gap-1.5 rounded-full font-semibold shadow-xs transition-[transform,box-shadow,background-color] hover:scale-[1.03] active:scale-[0.97]",
+              "shrink-0 shadow-xs",
               isPastArticle
-                ? "bg-brand px-4 py-2 text-[13px] text-white shadow-md hover:bg-brand-strong sm:px-5 sm:py-2.5"
-                : "bg-ink px-3.5 py-1.5 text-[12.5px] text-on-ink sm:px-4 sm:py-2",
+                ? "px-4 py-2 text-[13px] sm:px-5 sm:py-2.5"
+                : "px-3.5 py-1.5 text-[12.5px] sm:px-4 sm:py-2",
             )}
           >
-            <span>{isPastArticle ? "Read next article" : "Read"}</span>
-            <ArrowRight className="size-3.5" strokeWidth={1.8} />
-          </Link>
+            {isPastArticle ? "Read next article" : "Read"}
+          </InteractiveHoverButton>
         </div>
       </div>
 

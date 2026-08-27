@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ViewTransition } from "react";
 
-import { ArrowRight, BookOpen } from "lucide-react";
+import { BookOpen } from "lucide-react";
 
 import { MastheadBadge, PageMasthead } from "@/components/layout/page-masthead";
 import { Sidebar } from "@/components/layout/sidebar";
@@ -12,6 +12,7 @@ import { Pagination } from "@/components/nav/pagination";
 import { SortToggle } from "@/components/nav/sort-toggle";
 import { PostRow } from "@/components/post/post-row";
 import { Button } from "@/components/ui/button";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import {
   getSeriesBySlug,
   isSortOrder,
@@ -47,9 +48,7 @@ export default async function ArticlesPage({ searchParams }: PageProps<"/article
   const liveStatsMap = await getAllLivePostStatsMap();
   const livePosts = posts.map((p) => {
     const live = liveStatsMap.get(p.slug);
-    return live
-      ? { ...p, likes: live.likes, views: live.views, commentCount: live.comments }
-      : p;
+    return live ? { ...p, likes: live.likes, views: live.views, commentCount: live.comments } : p;
   });
 
   const matching = listPosts({ topic, series, sort }, livePosts);
@@ -70,12 +69,12 @@ export default async function ArticlesPage({ searchParams }: PageProps<"/article
         media={<MastheadBadge icon={BookOpen} />}
         actions={
           <>
-            <Button asChild variant="primary" size="md">
-              <Link href={routes.topics}>
-                Explore topics
-                <ArrowRight className="size-4" strokeWidth={2} />
-              </Link>
-            </Button>
+            <InteractiveHoverButton
+              href={routes.topics}
+              className="px-[22px] py-[11px] text-[14px]"
+            >
+              Explore topics
+            </InteractiveHoverButton>
             <Button asChild variant="subtle" size="md">
               <Link href={routes.about}>About author</Link>
             </Button>

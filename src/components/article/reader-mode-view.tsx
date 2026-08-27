@@ -384,7 +384,7 @@ export function ReaderModeView({ post }: { post: Post }) {
       {/* Main Distraction-Free Article Content */}
       <main
         className={cn(
-          "mx-auto w-full min-w-0 max-w-full px-4.5 py-10 sm:px-6 sm:py-12 md:py-20",
+          "mx-auto w-full max-w-full min-w-0 px-4.5 py-10 sm:px-6 sm:py-12 md:py-20",
           currentWidth,
           isExiting ? "animate-focus-canvas-out" : "animate-focus-canvas-in",
         )}
