@@ -650,6 +650,21 @@ export const posts: Post[] = postSchema.array().parse([
         html: "**The weights live on-chip.** GPUs inherited a memory hierarchy designed for training, where HBM is the primary store and the chip fetches weights from it. Every fetch costs hundreds of nanoseconds, and inference is particularly exposed to that because layers run sequentially and there is not much arithmetic per byte loaded to hide the wait behind. The LPU instead uses hundreds of megabytes of on-chip SRAM as the primary weight storage, not as a cache in front of something slower. Groq puts their on-chip bandwidth upwards of 80 TB/s against roughly 8 TB/s for off-chip HBM, and attributes as much as a 10x speed advantage to that difference alone.",
       },
       {
+        kind: "figure",
+        variant: "bar",
+        title: "Where the weights are read from",
+        note: "Figures published by Groq",
+        xKey: "memory",
+        yLabel: "TB/s",
+        caption:
+          "Roughly an order of magnitude, and it is the gap Groq attributes much of the speed advantage to. Hover a bar for the value.",
+        series: [{ key: "bandwidth", label: "Memory bandwidth (TB/s)" }],
+        data: [
+          { memory: "LPU on-chip SRAM", bandwidth: 80 },
+          { memory: "GPU off-chip HBM", bandwidth: 8 },
+        ],
+      },
+      {
         kind: "paragraph",
         html: "**The schedule is deterministic.** The Groq compiler places every memory load, operation, and packet transmission at a known cycle. There is no waiting on a cache that has not filled, no resending a packet after a collision, no stalling for memory. A GPU spends real time on exactly those things, and because they are dynamic you cannot schedule around them in advance.",
       },
@@ -718,6 +733,23 @@ export const posts: Post[] = postSchema.array().parse([
       {
         kind: "paragraph",
         html: "Mozilla used the model to find and fix 271 vulnerabilities in Firefox 150, over ten times what they caught in Firefox 148 using Claude Opus 4.6. Cloudflare reported 2,000 bugs, 400 of them severe. The model also uncovered a critical flaw in the wolfSSL cryptography library, assigned CVE-2026-5194, where it autonomously built an exploit allowing certificate forgery that could mimic banking websites on billions of embedded devices. In red-teaming exercises it found a zero-day networking bug that had gone undetected for 27 years, reaching it through logical code reasoning for under 20,000 dollars in compute.",
+      },
+      {
+        kind: "figure",
+        variant: "bar",
+        title: "Findings by severity",
+        note: "Anthropic, Project Glasswing initial update",
+        xKey: "scope",
+        caption:
+          "The totals differ by an order of magnitude, so switch off Total findings in the legend to compare the severe counts against each other.",
+        series: [
+          { key: "total", label: "Total findings" },
+          { key: "severe", label: "High or critical" },
+        ],
+        data: [
+          { scope: "Open-source scan", total: 23019, severe: 6202 },
+          { scope: "Cloudflare", total: 2000, severe: 400 },
+        ],
       },
       {
         kind: "heading",
@@ -1425,6 +1457,24 @@ export const posts: Post[] = postSchema.array().parse([
         html: "Yarn Classic behaves like npm, hoisting into a flat tree. Yarn Modern took a different route with Plug'n'Play, which skips `node_modules` altogether and resolves packages through a lockfile-driven map. It solves the same strictness problem pnpm solves, by removing the directory rather than restructuring it.",
       },
       {
+        kind: "table",
+        caption:
+          "Behaviour as described by each tool's own documentation. The layout column is what drives everything else.",
+        headers: ["", "npm", "Yarn Classic", "Yarn Modern (PnP)", "pnpm"],
+        rows: [
+          ["node_modules layout", "Flat, hoisted", "Flat, hoisted", "None", "Nested + symlinked"],
+          [
+            "Files on disk",
+            "One copy per project",
+            "One copy per project",
+            "Zips in a cache",
+            "Hard-linked from one store",
+          ],
+          ["Phantom dependencies", "Possible", "Possible", "Blocked", "Blocked"],
+          ["Ships with Node", "Yes", "No", "No", "No"],
+        ],
+      },
+      {
         kind: "heading",
         id: "picking-one",
         text: "Picking one",
@@ -1550,6 +1600,12 @@ export const posts: Post[] = postSchema.array().parse([
         ],
       },
       {
+        kind: "mermaid",
+        caption:
+          "The retrieval loop. Everything left of the model is ordinary information retrieval; the model only ever sees text that was already selected for it.",
+        code: 'flowchart TD\n    Q["Question"] --> E["Embedding model"]\n    E --> V["Query vector"]\n    V --> S{"Cosine similarity<br/>search"}\n    D[("Vector database")] --> S\n    S --> K["Top-k chunks"]\n    K --> P["Prompt:<br/>question + context"]\n    Q --> P\n    P --> L["Language model"]\n    L --> A["Grounded answer"]\n\n    DOC["Source documents"] -.chunk + embed.-> D',
+      },
+      {
         kind: "heading",
         id: "the-mathematics-of-cosine-similarity",
         text: "The Mathematics of Vector Similarity",
@@ -1560,7 +1616,7 @@ export const posts: Post[] = postSchema.array().parse([
       },
       {
         kind: "formula",
-        html: "cos(θ) = (A · B) / (‖A‖ ‖B‖) = ∑ (A_i * B_i) / ( √∑ A_i² * √∑ B_i² )",
+        tex: "\\cos(\\theta) = \\frac{A \\cdot B}{\\lVert A \\rVert \\, \\lVert B \\rVert} = \\frac{\\sum_{i} A_i B_i}{\\sqrt{\\sum_{i} A_i^{2}} \; \\sqrt{\\sum_{i} B_i^{2}}}",
         caption:
           "Cosine similarity measures the angle between vectors. 1.0 means identical orientation; 0.0 means orthogonal / unrelated.",
       },
@@ -1721,6 +1777,15 @@ export const posts: Post[] = postSchema.array().parse([
         html: "This was Starship's fifth test flight, and the catch worked on the first attempt. About seven minutes after liftoff the booster came back to the tower and hovered while the arms closed around it. Getting that right first time is the part that is hard to overstate, because there was no way to rehearse the final seconds at full scale.",
       },
       {
+        kind: "image",
+        src: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Starship_Booster_Return_on_Final_Approach_%2854063904149%29.jpg/1280px-Starship_Booster_Return_on_Final_Approach_%2854063904149%29.jpg",
+        alt: "The Super Heavy booster descending vertically alongside the launch tower on final approach, engines lit.",
+        caption:
+          "The booster on final approach to the tower during Flight 5. Photo by Steve Jurvetson, CC BY 2.0, via Wikimedia Commons.",
+        width: 1280,
+        height: 1780,
+      },
+      {
         kind: "paragraph",
         html: "That is a major step toward making rockets rapidly reusable, which could significantly reduce the cost of space missions. Recovering a booster intact and on the pad, rather than downrange or in the ocean, is what turns reuse from a refurbishment project into something closer to a turnaround.",
       },
@@ -1761,9 +1826,18 @@ export const posts: Post[] = postSchema.array().parse([
       },
       {
         kind: "formula",
-        html: "σ(z) = 1 / (1 + e<sup>−z</sup>)",
+        tex: "\\sigma(z) = \\frac{1}{1 + e^{-z}}",
         caption:
           "Where z is the linear combination of the input features and their corresponding coefficients.",
+      },
+      {
+        kind: "image",
+        src: "/articles/sigmoid-curve.svg",
+        alt: "The logistic sigmoid curve, an S-shape rising from near 0 on the left to near 1 on the right, crossing 0.5 at z equals 0.",
+        caption:
+          "The sigmoid never quite reaches 0 or 1, which is why the model returns a probability rather than a verdict. z = 0 is the decision boundary at the default threshold.",
+        width: 720,
+        height: 360,
       },
       {
         kind: "paragraph",
@@ -1829,7 +1903,7 @@ export const posts: Post[] = postSchema.array().parse([
       },
       {
         kind: "formula",
-        html: "y = β<sub>0</sub> + β<sub>1</sub>x<sub>1</sub> + β<sub>2</sub>x<sub>2</sub> + … + β<sub>n</sub>x<sub>n</sub>",
+        tex: "y = \\beta_0 + \\beta_1 x_1 + \\beta_2 x_2 + \\dots + \\beta_n x_n",
         caption: "β₀ is the intercept and each β is the coefficient on one feature.",
       },
       {
@@ -2969,6 +3043,15 @@ export const posts: Post[] = postSchema.array().parse([
       {
         kind: "paragraph",
         html: "This warning comes from the APT package manager and the MySQL repository. It means the signing key is sitting in the old central keyring, `/etc/apt/trusted.gpg`, which apt still reads but has deprecated.",
+      },
+      {
+        kind: "image",
+        src: "/articles/kali-apt-key-warning.png",
+        alt: "Terminal output from sudo apt update, ending in a warning that the MySQL repository key is stored in the legacy trusted.gpg keyring.",
+        caption:
+          "The warning as it appears at the end of an otherwise clean apt update. Everything above it succeeded, which is why it is easy to ignore.",
+        width: 672,
+        height: 334,
       },
       {
         kind: "heading",
