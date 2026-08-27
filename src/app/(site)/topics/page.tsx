@@ -1,11 +1,12 @@
-import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Layers } from "lucide-react";
+import type { Metadata } from "next";
+import { Layers } from "lucide-react";
 
 import { MastheadBadge, PageMasthead } from "@/components/layout/page-masthead";
 import { Reveal } from "@/components/motion/reveal";
 import { TopicCard } from "@/components/topic/topic-tile";
 import { Button } from "@/components/ui/button";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { routes, site, topics } from "@/lib/content";
 
 export const metadata: Metadata = {
@@ -28,12 +29,12 @@ export default function TopicsPage() {
         media={<MastheadBadge icon={Layers} />}
         actions={
           <>
-            <Button asChild variant="primary" size="md">
-              <Link href={routes.articles}>
-                Browse archive
-                <ArrowRight className="size-4" strokeWidth={2} />
-              </Link>
-            </Button>
+            <InteractiveHoverButton
+              href={routes.articles}
+              className="px-[22px] py-[11px] text-[14px]"
+            >
+              Browse archive
+            </InteractiveHoverButton>
             <Button asChild variant="subtle" size="md">
               <Link href={routes.about}>About author</Link>
             </Button>
