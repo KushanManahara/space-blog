@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { LayoutGrid, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { primaryNav, routes } from "@/lib/content";
@@ -78,15 +78,6 @@ export function MobileNav({
             </Link>
           ))}
         </nav>
-
-        <Link
-          href={routes.studio}
-          onClick={() => setOpen(false)}
-          className="mt-3.5 flex items-center justify-center gap-2 rounded-md bg-ink px-3.5 py-3 text-[14.5px] font-semibold text-on-ink transition-colors duration-300 ease-expo hover:bg-n-800"
-        >
-          <LayoutGrid className="size-[15px]" strokeWidth={1.75} />
-          Studio
-        </Link>
       </DialogContent>
     </Dialog>
   );
