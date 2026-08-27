@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutGrid, Search } from "lucide-react";
+import { Search } from "lucide-react";
 
 import { BrandMark } from "@/components/layout/brand-mark";
 import { useCommandMenu } from "@/components/nav/command-menu";
@@ -206,26 +206,6 @@ export function SiteHeader() {
               isCollapsed ? "size-8.5 sm:size-[34px]" : "size-[38px]",
             )}
           />
-
-          <Link
-            href={routes.studio}
-            title="Studio"
-            className={cn(
-              "hidden shrink-0 cursor-pointer items-center justify-center rounded-full border transition-[width,height,transform,box-shadow,color] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] md:inline-flex",
-              "border-black/[0.06] bg-black/[0.03] text-fg-3 hover:-translate-y-px hover:bg-black/[0.06] hover:text-fg-2 hover:shadow-sm active:scale-[0.95]",
-              "dark:border-white/10 dark:bg-white/[0.05] dark:hover:bg-white/10 dark:hover:text-fg-1",
-              isCollapsed ? "size-8.5 sm:size-[34px]" : "size-[38px]",
-            )}
-          >
-            <LayoutGrid
-              className={cn(
-                "transition-transform duration-300",
-                isCollapsed ? "size-3.5" : "size-4",
-              )}
-              strokeWidth={1.75}
-            />
-            <span className="sr-only">Studio</span>
-          </Link>
 
           <MobileNav
             isActive={isActive}
