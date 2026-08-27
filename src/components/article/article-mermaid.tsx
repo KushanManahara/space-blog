@@ -27,10 +27,16 @@ function themeVariables() {
     primaryColor: token("--color-tint-cornflower", "#e8f2fe"),
     primaryBorderColor: token("--color-brand", "#0062d2"),
     primaryTextColor: token("--color-fg-1", "#0f172a"),
+    textColor: token("--color-fg-1", "#0f172a"),
+    nodeTextColor: token("--color-fg-1", "#0f172a"),
     lineColor: token("--color-line-2", "#94a3b8"),
     secondaryColor: token("--color-tint-violet", "#e5f2ff"),
     tertiaryColor: token("--color-bg-3", "#f1f5f9"),
-    fontSize: "15px",
+    edgeLabelBackground: token("--color-bg-2", "#ffffff"),
+    clusterBkg: token("--color-bg-1", "#ffffff"),
+    clusterBorder: token("--color-line-1", "#e2e8f0"),
+    titleColor: token("--color-fg-1", "#0f172a"),
+    fontSize: "14px",
   };
 }
 
@@ -55,10 +61,12 @@ export function ArticleMermaid({
     const render = async () => {
       try {
         const mermaid = await loadMermaid();
+        const isDark = document.documentElement.classList.contains("dark");
         mermaid.initialize({
           startOnLoad: false,
           securityLevel: "strict",
           theme: "base",
+          darkMode: isDark,
           themeVariables: themeVariables(),
           fontFamily: "inherit",
         });
