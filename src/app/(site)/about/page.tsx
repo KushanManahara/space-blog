@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 
 import { PageMasthead } from "@/components/layout/page-masthead";
 import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
+import { GlareHover } from "@/components/ui/glare-hover";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { aboutSetup, author, routes, tags, timeline } from "@/lib/content";
 
 export const metadata: Metadata = {
@@ -42,12 +43,12 @@ export default function AboutPage() {
         }
         actions={
           <>
-            <Button asChild variant="primary" size="md">
-              <Link href={routes.articles}>
-                Read the archive
-                <ArrowRight className="size-4" strokeWidth={2} />
-              </Link>
-            </Button>
+            <InteractiveHoverButton
+              href={routes.articles}
+              className="px-[22px] py-[11px] text-[14px]"
+            >
+              Read the archive
+            </InteractiveHoverButton>
             <Button asChild variant="subtle" size="md">
               <Link href={routes.contact}>Get in touch</Link>
             </Button>
@@ -178,51 +179,53 @@ export default function AboutPage() {
             </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-lg bg-bg-inverse p-6.5">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute top-[-130px] right-[-140px] size-[340px]"
-              style={{ background: "var(--glow-violet)" }}
-            />
-            <div className="relative">
-              <h3 className="text-[16px] font-bold text-white">Say hello</h3>
-              <p className="mt-3 text-[15px] leading-[1.7] text-white/65">
-                Corrections, questions, ideas, and disagreements are all welcome &mdash; especially
-                the last one.
-              </p>
-              <div className="mt-4.5 flex flex-col gap-2.5 font-mono text-[13.5px] text-cornflower-200">
-                <a href={`mailto:${author.email}`} className="hover:underline">
-                  {author.email}
-                </a>
-                <div className="flex flex-wrap items-center gap-2 font-sans text-[13px] text-white/80">
-                  <a
-                    href={author.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="rounded-full bg-white/10 px-3 py-1.5 font-medium transition-colors hover:bg-white/20 hover:text-white active:scale-95"
-                  >
-                    GitHub
+          <GlareHover className="h-full rounded-lg">
+            <div className="relative h-full overflow-hidden rounded-lg bg-bg-inverse p-6.5">
+              <div
+                aria-hidden
+                className="pointer-events-none absolute top-[-130px] right-[-140px] size-[340px]"
+                style={{ background: "var(--glow-violet)" }}
+              />
+              <div className="relative">
+                <h3 className="text-[16px] font-bold text-white">Say hello</h3>
+                <p className="mt-3 text-[15px] leading-[1.7] text-white/65">
+                  Corrections, questions, ideas, and disagreements are all welcome &mdash;
+                  especially the last one.
+                </p>
+                <div className="mt-4.5 flex flex-col gap-2.5 font-mono text-[13.5px] text-cornflower-200">
+                  <a href={`mailto:${author.email}`} className="hover:underline">
+                    {author.email}
                   </a>
-                  <a
-                    href={author.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="rounded-full bg-white/10 px-3 py-1.5 font-medium transition-colors hover:bg-white/20 hover:text-white active:scale-95"
-                  >
-                    LinkedIn
-                  </a>
-                  <a
-                    href={author.twitter}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="rounded-full bg-white/10 px-3 py-1.5 font-medium transition-colors hover:bg-white/20 hover:text-white active:scale-95"
-                  >
-                    X (Twitter)
-                  </a>
+                  <div className="flex flex-wrap items-center gap-2 font-sans text-[13px] text-white/80">
+                    <a
+                      href={author.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-full bg-white/10 px-3 py-1.5 font-medium transition-colors hover:bg-white/20 hover:text-white active:scale-95"
+                    >
+                      GitHub
+                    </a>
+                    <a
+                      href={author.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-full bg-white/10 px-3 py-1.5 font-medium transition-colors hover:bg-white/20 hover:text-white active:scale-95"
+                    >
+                      LinkedIn
+                    </a>
+                    <a
+                      href={author.twitter}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-full bg-white/10 px-3 py-1.5 font-medium transition-colors hover:bg-white/20 hover:text-white active:scale-95"
+                    >
+                      X (Twitter)
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </GlareHover>
         </Reveal>
       </section>
     </>
