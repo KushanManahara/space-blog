@@ -95,7 +95,7 @@ export function SiteHeader() {
           // Refined frosted glass surface
           "backdrop-blur-[24px] backdrop-saturate-[180%]",
           isCollapsed
-            ? "border-white/60 bg-white/75 py-1 px-3 sm:pr-2 sm:pl-3.5 shadow-[0_12px_32px_rgb(0_0_0/0.12),0_2px_6px_rgb(0_0_0/0.06),inset_0_1px_1px_rgb(255_255_255/0.95)] dark:border-white/12 dark:bg-[#070e22]/80 dark:shadow-[0_16px_36px_rgb(0_0_0/0.7),inset_0_1px_0_rgb(255_255_255/0.14)]"
+            ? "border-white/60 bg-white/75 px-3 py-1 shadow-[0_12px_32px_rgb(0_0_0/0.12),0_2px_6px_rgb(0_0_0/0.06),inset_0_1px_1px_rgb(255_255_255/0.95)] sm:pr-2 sm:pl-3.5 dark:border-white/12 dark:bg-[#070e22]/80 dark:shadow-[0_16px_36px_rgb(0_0_0/0.7),inset_0_1px_0_rgb(255_255_255/0.14)]"
             : isScrolled
               ? "border-white/60 bg-white/70 py-[7px] pr-2 pl-4.5 shadow-[0_8px_24px_rgb(0_0_0/0.08),0_1px_3px_rgb(0_0_0/0.04),inset_0_1px_1px_rgb(255_255_255/0.85)] dark:border-white/12 dark:bg-[#070e22]/75 dark:shadow-[0_12px_28px_rgb(0_0_0/0.6),inset_0_1px_0_rgb(255_255_255/0.12)]"
               : "border-white/50 bg-white/60 py-[9px] pr-2.5 pl-5.5 shadow-sm dark:border-white/10 dark:bg-[#070e22]/65 dark:shadow-[0_4px_16px_rgb(0_0_0/0.4),inset_0_1px_0_rgb(255_255_255/0.08)]",
@@ -152,8 +152,12 @@ export function SiteHeader() {
           className={cn(
             "ml-auto flex shrink-0 items-center transition-[max-width,opacity,transform,gap] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]",
             isCollapsed
-              ? "pointer-events-none max-w-0 scale-90 overflow-hidden opacity-0 sm:pointer-events-auto sm:max-w-none sm:scale-100 sm:overflow-visible sm:opacity-100 sm:gap-1.5"
-              : "pointer-events-auto max-w-[200px] scale-100 opacity-100 gap-2",
+              ? "pointer-events-none max-w-0 scale-90 overflow-hidden opacity-0 sm:pointer-events-auto sm:max-w-none sm:scale-100 sm:gap-1.5 sm:overflow-visible sm:opacity-100"
+              : // Cap has to clear the widest expanded content (search pill +
+                // toggle + studio + gaps ≈ 223px at md). At 200px the shrink-0
+                // children spilled out of the nav pill. max-width only caps, so
+                // the group still renders at its content width.
+                "pointer-events-auto max-w-[320px] scale-100 gap-2 opacity-100",
           )}
         >
           <button
