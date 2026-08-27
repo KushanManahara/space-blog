@@ -1,52 +1,14 @@
 import * as React from "react";
 import { Info } from "lucide-react";
 
+import { ArticleFormula } from "@/components/article/article-formula";
+import { ArticleGraph } from "@/components/article/article-graph";
+import { ArticleImage } from "@/components/article/article-image";
+import { ArticleMermaid } from "@/components/article/article-mermaid";
+import { ArticleTable } from "@/components/article/article-table";
 import { CodeBlock } from "@/components/article/code-block";
+import { markdownToHtml } from "@/components/article/markdown";
 import type { ArticleBlock } from "@/lib/content";
-
-/**
- * Converts markdown inline syntax (**bold**, *italic*, `code`, [link](url), ~~strike~~)
- * to valid HTML strings while preserving any existing HTML tags.
- */
-export function markdownToHtml(raw: string): string {
-  if (!raw) return "";
-
-  // Code spans come out first and go back in last. Otherwise the emphasis rules
-  // chew through their contents: `GOOGLE_API_KEY` would render as GOOGLE<em>API</em>KEY.
-  const codeSpans: string[] = [];
-  const withoutCode = raw.replace(/`([^`]+)`/g, (_, code: string) => {
-    codeSpans.push(code);
-    return `\u0000${codeSpans.length - 1}\u0000`;
-  });
-
-  return (
-    withoutCode
-      // Links: [text](url)
-      .replace(
-        /\[([^\]]+)\]\(([^)]+)\)/g,
-        '<a href="$2" target="_blank" rel="noopener noreferrer" class="font-medium text-fg-link underline decoration-line-brand underline-offset-4 transition-colors hover:text-brand">$1</a>',
-      )
-      // Ensure raw HTML external links open in a new tab
-      .replace(/<a\s+([^>]*href=["']https?:\/\/[^"']+["'][^>]*)>/gi, (match, attrs) => {
-        if (/target\s*=/i.test(attrs)) return match;
-        return `<a ${attrs} target="_blank" rel="noopener noreferrer">`;
-      })
-      // Bold: **text** or __text__
-      .replace(/\*\*([^*]+)\*\*/g, '<strong class="font-bold text-fg-1">$1</strong>')
-      .replace(/__([^_]+)__/g, '<strong class="font-bold text-fg-1">$1</strong>')
-      // Italic: *text* or _text_ (excluding inside HTML tags)
-      .replace(/(^|[^\*])\*([^*]+)\*([^\*]|$)/g, '$1<em class="text-fg-prose italic">$2</em>$3')
-      .replace(/(^|[^_])_([^_]+)_([^_]|$)/g, '$1<em class="text-fg-prose italic">$2</em>$3')
-      // Strikethrough: ~~text~~
-      .replace(/~~([^~]+)~~/g, '<del class="text-fg-3 line-through">$1</del>')
-      // Inline code: restored verbatim
-      .replace(
-        /\u0000(\d+)\u0000/g,
-        (_, index: string) =>
-          `<code class="rounded border border-line-1 bg-bg-2 px-1.5 py-0.5 font-mono text-[0.88em] font-medium text-brand">${codeSpans[Number(index)]}</code>`,
-      )
-  );
-}
 
 /** Renders the clean, unboxed markdown article content. */
 export function ArticleBody({ blocks, id }: { blocks: ArticleBlock[]; id: string }) {
@@ -98,15 +60,7 @@ function ArticleBlockView({ block, isFirst }: { block: ArticleBlock; isFirst: bo
       return <ChartFigure block={block} />;
 
     case "formula":
-      return (
-        <div className="mt-8 w-full max-w-full min-w-0 overflow-x-auto rounded-lg border border-line-1 bg-bg-2 px-4 py-5 text-center sm:px-6.5 sm:py-6">
-          <p
-            className="font-mono text-[15px] leading-[1.8] text-fg-prose sm:text-[17px] sm:leading-[1.9]"
-            dangerouslySetInnerHTML={{ __html: block.html }}
-          />
-          <p className="mt-3.5 text-[13px] text-fg-3 sm:text-[13.5px]">{block.caption}</p>
-        </div>
-      );
+      return <ArticleFormula tex={block.tex} html={block.html} caption={block.caption} />;
 
     case "callout":
       return (
@@ -129,6 +83,46 @@ function ArticleBlockView({ block, isFirst }: { block: ArticleBlock; isFirst: bo
 
     case "code":
       return <CodeBlock filename={block.filename} code={block.code} className="mt-6" />;
+
+    case "mermaid":
+      return <ArticleMermaid code={block.code} caption={block.caption} />;
+
+    case "image":
+      return (
+        <ArticleImage
+          src={block.src}
+          alt={block.alt}
+          caption={block.caption}
+          width={block.width}
+          height={block.height}
+          wide={block.wide}
+        />
+      );
+
+    case "table":
+      return (
+        <ArticleTable
+          headers={block.headers}
+          rows={block.rows}
+          caption={block.caption}
+          numericColumns={block.numericColumns}
+        />
+      );
+
+    case "figure":
+      return (
+        <ArticleGraph
+          variant={block.variant}
+          title={block.title}
+          caption={block.caption}
+          note={block.note}
+          xKey={block.xKey}
+          xLabel={block.xLabel}
+          yLabel={block.yLabel}
+          series={block.series}
+          data={block.data}
+        />
+      );
 
     case "footnotes":
       return (
