@@ -165,7 +165,7 @@ export function CommentThread({
       {/* Main Comment Draft Input */}
       <form
         onSubmit={handleOpenModal}
-        className="mt-5 rounded-2xl border border-line-1 bg-bg-2 p-5 shadow-xs md:p-6"
+        className="mt-5 rounded-lg border border-line-1 bg-bg-2 p-5 shadow-xs md:p-6"
       >
         <label htmlFor="comment-body" className="block text-[13px] font-semibold text-fg-2">
           Add to the discussion
@@ -176,7 +176,7 @@ export function CommentThread({
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
           placeholder="Share your perspective, benchmarks, corrections, or follow-up questions..."
-          className="mt-2.5 min-h-24 resize-y rounded-xl border-line-1 bg-bg-1 p-3 text-[16px] text-fg-1 focus-visible:ring-brand sm:text-[14px]"
+          className="mt-2.5 min-h-24 resize-y rounded-md border-line-1 bg-bg-1 p-3 text-[16px] text-fg-1 focus-visible:ring-brand sm:text-[14px]"
         />
 
         <div className="mt-3.5 flex flex-wrap items-center justify-between gap-3 border-t border-line-1/60 pt-3.5">
@@ -318,7 +318,7 @@ export function CommentThread({
 
       {/* Existing Responses List */}
       {allComments.length === 0 ? (
-        <div className="mt-6 flex flex-col items-center justify-center rounded-xl border border-dashed border-line-1 py-10 text-center">
+        <div className="mt-6 flex flex-col items-center justify-center rounded-lg border border-dashed border-line-1 py-10 text-center">
           <div className="mb-2.5 inline-flex size-10 items-center justify-center rounded-full bg-bg-2 text-fg-3">
             <MessageSquare className="size-5" />
           </div>
@@ -346,7 +346,7 @@ export function CommentThread({
               >
                 {comment.initials}
               </span>
-              <div className="min-w-0 flex-1 rounded-xl border border-line-1 bg-bg-2 px-4 py-3.5 break-words shadow-xs sm:px-5 sm:py-4">
+              <div className="min-w-0 flex-1 rounded-lg border border-line-1 bg-bg-2 px-4 py-3.5 break-words shadow-xs sm:px-5 sm:py-4">
                 <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
                   <p className="text-[14.5px] font-bold text-fg-1">{comment.name}</p>
                   {comment.role ? (
