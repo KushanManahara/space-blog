@@ -24,6 +24,10 @@ export function Pagination({
   align?: "between" | "center";
   className?: string;
 }) {
+  // A single page has nothing to navigate: a lone "1" between two dead arrows
+  // reads as broken controls rather than as a one-page result.
+  if (total <= 1) return null;
+
   const pages = pageWindow(page, total);
 
   const numbers = (
