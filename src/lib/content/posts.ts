@@ -1,14 +1,14 @@
 // src/lib/content/posts.ts
+import { readingMinutes } from "./reading-time";
 import { postSchema, type Post } from "./schemas";
 
-export const posts: Post[] = postSchema.array().parse([
+const parsedPosts = postSchema.array().parse([
   {
     slug: "engineering-council-sri-lanka",
     title: "Registered as an Associate Engineer with the Engineering Council of Sri Lanka",
     dek: "Receiving official registration under the ECSL Act No. 4 of 2017. What statutory engineering recognition means for software and systems practitioners.",
     topic: "Findings",
     publishedAt: "2025-04-01",
-    readingMinutes: 3,
     likes: 0,
     views: 0,
     commentCount: 0,
@@ -69,11 +69,11 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "The consolidation under open standards settled the protocol question. MCP solves tool access; A2A solves agent collaboration. Here is how they stack in production.",
     topic: "Systems",
     publishedAt: "2025-02-25",
-    readingMinutes: 4,
     likes: 0,
     views: 0,
     commentCount: 0,
     tags: ["#mcp", "#acp", "#aiagents", "#protocols"],
+    series: { slug: "mcp", title: "The Model Context Protocol", part: 3 },
     coverImage: "/articles/mcp-vs-acp.png",
     body: [
       {
@@ -196,11 +196,11 @@ export const posts: Post[] = postSchema.array().parse([
     topic: "Engineering",
     featured: true,
     publishedAt: "2025-02-24",
-    readingMinutes: 5,
     likes: 0,
     views: 0,
     commentCount: 0,
     tags: ["#mcp", "#docker", "#aiagents", "#devtools"],
+    series: { slug: "mcp", title: "The Model Context Protocol", part: 2 },
     coverImage: "/articles/docker-mcp.png",
     body: [
       {
@@ -335,11 +335,11 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "A standard way to hand a model your files, your tools, and your prompts, without custom glue code holding it all together.",
     topic: "Systems",
     publishedAt: "2025-02-22",
-    readingMinutes: 3,
     likes: 0,
     views: 0,
     commentCount: 0,
     tags: ["#mcp", "#claude", "#tools", "#devtools"],
+    series: { slug: "mcp", title: "The Model Context Protocol", part: 1 },
     coverImage: "/articles/my-mcp.png",
     body: [
       {
@@ -436,7 +436,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "How Apple built predictive code completion directly into Xcode 16 using the Apple Neural Engine. Zero cloud roundtrips, offline privacy, and Swift specialization.",
     topic: "Engineering",
     publishedAt: "2025-02-18",
-    readingMinutes: 3,
     likes: 0,
     views: 0,
     commentCount: 0,
@@ -495,7 +494,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "RAG searches for information on every turn. CAG pre-computes the KV cache. Where Time-to-First-Token and conversational latency matter, caching flips the architecture.",
     topic: "Inference",
     publishedAt: "2025-02-12",
-    readingMinutes: 4,
     likes: 0,
     views: 0,
     commentCount: 0,
@@ -595,7 +593,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "Tokens, vectors, attention, and next-token prediction. What is actually happening underneath something that feels like a conversation.",
     topic: "Research",
     publishedAt: "2025-02-05",
-    readingMinutes: 2,
     likes: 0,
     views: 0,
     commentCount: 0,
@@ -644,7 +641,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "Language Processing Units are purpose-built for language models rather than general compute. The specialization shows up in where the weights live.",
     topic: "Inference",
     publishedAt: "2025-01-30",
-    readingMinutes: 3,
     likes: 0,
     views: 0,
     commentCount: 0,
@@ -741,7 +737,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "In one month a restricted Claude model scanned over 1,000 open-source projects and isolated more than 10,000 high or critical severity bugs.",
     topic: "Research",
     publishedAt: "2026-05-26",
-    readingMinutes: 2,
     likes: 0,
     views: 0,
     commentCount: 0,
@@ -812,7 +807,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "What the registration of genai.apple.com signaled: on-device 3B foundation models, the Apple Neural Engine, and the verifiable security of Private Cloud Compute.",
     topic: "Research",
     publishedAt: "2024-05-25",
-    readingMinutes: 3,
     likes: 0,
     views: 0,
     commentCount: 0,
@@ -873,7 +867,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "ChatGPT did not cause the wildfires. The conversation that formed around the claim is still worth having.",
     topic: "Evaluation",
     publishedAt: "2025-01-12",
-    readingMinutes: 2,
     likes: 0,
     views: 0,
     commentCount: 0,
@@ -916,7 +909,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "There are not enough GPUs to go around, so the company behind ChatGPT is looking at making the hardware itself.",
     topic: "Systems",
     publishedAt: "2025-01-05",
-    readingMinutes: 2,
     likes: 0,
     views: 0,
     commentCount: 0,
@@ -982,7 +974,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "Gemma is capable and open source. Hugging Face is what makes getting to it straightforward.",
     topic: "Engineering",
     publishedAt: "2024-12-25",
-    readingMinutes: 2,
     likes: 0,
     views: 0,
     commentCount: 0,
@@ -1071,7 +1062,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "Full parameter training requires clusters of H100s. Parameter-Efficient Fine-Tuning (PEFT) with low-rank matrix decomposition brings specialized adaptation to a single GPU.",
     topic: "Experiments",
     publishedAt: "2024-12-18",
-    readingMinutes: 4,
     likes: 0,
     views: 0,
     commentCount: 0,
@@ -1161,7 +1151,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "Running self-hosted LLMs used to mean stitching vLLM, Triton, and CUDA drivers by hand. NVIDIA NIM packages TensorRT-LLM in standardized, production-ready OCI containers.",
     topic: "Inference",
     publishedAt: "2024-12-10",
-    readingMinutes: 4,
     likes: 0,
     views: 0,
     commentCount: 0,
@@ -1239,7 +1228,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "A web-based prototyping environment with foundation models, knowledge bases, agents, and guardrails. Public preview, two regions.",
     topic: "Engineering",
     publishedAt: "2024-12-02",
-    readingMinutes: 2,
     likes: 0,
     views: 0,
     commentCount: 0,
@@ -1300,7 +1288,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "Pinecone Serverless for sub-50ms vector retrieval, Google's Gemini for grounded synthesis. A complete end-to-end Python implementation with metadata filtering.",
     topic: "Engineering",
     publishedAt: "2024-11-25",
-    readingMinutes: 4,
     likes: 0,
     views: 0,
     commentCount: 0,
@@ -1370,7 +1357,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "Massive context windows, native multimodality, and structured schema outputs: how developers can build production systems on Google AI Studio.",
     topic: "Engineering",
     publishedAt: "2024-11-18",
-    readingMinutes: 4,
     likes: 0,
     views: 0,
     commentCount: 0,
@@ -1433,7 +1419,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "They all install packages. Where they diverge is the shape of node_modules, and that difference has consequences for disk space and for correctness.",
     topic: "Engineering",
     publishedAt: "2024-11-10",
-    readingMinutes: 2,
     likes: 0,
     views: 0,
     commentCount: 0,
@@ -1526,7 +1511,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "Moving beyond single-agent prompt loops: orchestrating multi-agent collaboration with specialized roles, tools, and sequential or hierarchical processes.",
     topic: "Engineering",
     publishedAt: "2024-11-03",
-    readingMinutes: 4,
     likes: 0,
     views: 0,
     commentCount: 0,
@@ -1598,7 +1582,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "A vector database, cosine similarity, and an LLM context injection. The mathematical and code mechanics of grounding language models.",
     topic: "Evaluation",
     publishedAt: "2024-10-28",
-    readingMinutes: 4,
     likes: 0,
     views: 0,
     commentCount: 0,
@@ -1695,7 +1678,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "High test accuracy is meaningless if a model exploits spurious correlations. How cooperative game theory and local linear surrogates bring mathematical interpretability to deep learning.",
     topic: "Research",
     publishedAt: "2024-10-22",
-    readingMinutes: 4,
     likes: 0,
     views: 0,
     commentCount: 0,
@@ -1788,7 +1770,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "On 13 October 2024, the Super Heavy booster came back to the pad and was caught mid-air by a pair of mechanical arms, on the first attempt.",
     topic: "Experiments",
     publishedAt: "2024-10-14",
-    readingMinutes: 1,
     likes: 0,
     views: 0,
     commentCount: 0,
@@ -1832,11 +1813,11 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "Despite the name, it is a classification algorithm. It models the probability of a binary outcome from one or more predictor variables.",
     topic: "Research",
     publishedAt: "2024-10-05",
-    readingMinutes: 2,
     likes: 0,
     views: 0,
     commentCount: 0,
     tags: ["#machine-learning", "#classification", "#statistics"],
+    series: { slug: "regression-explained", title: "Regression, Explained", part: 2 },
     coverImage: "/articles/logistic-regression.png",
     body: [
       {
@@ -1890,6 +1871,7 @@ export const posts: Post[] = postSchema.array().parse([
       {
         kind: "code",
         filename: "logistic_regression.py",
+        runnable: true,
         code: "from sklearn.datasets import load_iris\nfrom sklearn.linear_model import LogisticRegression\n\nX, y = load_iris(return_X_y=True)\nclf = LogisticRegression(random_state=0).fit(X, y)\n\nclf.predict(X[:2, :])\n# array([0, 0])\n\nclf.predict_proba(X[:2, :])\n# array([[9.82e-01, 1.82e-02, 1.44e-08],\n#        [9.72e-01, 2.82e-02, 3.02e-08]])\n\nclf.score(X, y)\n# 0.97",
       },
       {
@@ -1917,11 +1899,11 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "A supervised algorithm that models the relationship between your features and a target, on the assumption that the relationship is a straight line.",
     topic: "Research",
     publishedAt: "2024-09-28",
-    readingMinutes: 2,
     likes: 0,
     views: 0,
     commentCount: 0,
     tags: ["#machine-learning", "#statistics", "#datascience"],
+    series: { slug: "regression-explained", title: "Regression, Explained", part: 1 },
     coverImage: "/articles/linear-regression.png",
     body: [
       {
@@ -1959,6 +1941,7 @@ export const posts: Post[] = postSchema.array().parse([
       {
         kind: "code",
         filename: "linear_regression.py",
+        runnable: true,
         code: "import numpy as np\nfrom sklearn.linear_model import LinearRegression\n\nX = np.array([[1, 1], [1, 2], [2, 2], [2, 3]])\n# y = 1 * x_0 + 2 * x_1 + 3\ny = np.dot(X, np.array([1, 2])) + 3\n\nreg = LinearRegression().fit(X, y)\n\nprint(reg.coef_)       # array([1., 2.])\nprint(reg.intercept_)  # 3.0\nprint(reg.score(X, y)) # 1.0\nprint(reg.predict(np.array([[3, 5]])))  # array([16.])",
       },
       {
@@ -1986,7 +1969,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "I started on Windows 10 and 11 and thought I had everything I needed. Then the projects got complex enough to show me otherwise.",
     topic: "Systems",
     publishedAt: "2024-09-20",
-    readingMinutes: 2,
     likes: 0,
     views: 0,
     commentCount: 0,
@@ -2045,7 +2027,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "How Rob Pike and Ken Thompson's deliberate refusal of language complexity turned Go into the undisputed operating system of the modern cloud.",
     topic: "Engineering",
     publishedAt: "2024-09-12",
-    readingMinutes: 4,
     likes: 0,
     views: 0,
     commentCount: 0,
@@ -2120,7 +2101,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "From llama.cpp and TensorRT to low-latency game engines, modern C++ remains the undisputed champion of bare-metal control and zero-cost abstractions.",
     topic: "Systems",
     publishedAt: "2024-09-05",
-    readingMinutes: 4,
     likes: 0,
     views: 0,
     commentCount: 0,
@@ -2195,7 +2175,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "Don Bradman hit only six sixes in his entire Test career and finished with an average of 99.94. The mathematics of eliminating failure modes in sport and software.",
     topic: "Findings",
     publishedAt: "2024-08-28",
-    readingMinutes: 3,
     likes: 0,
     views: 0,
     commentCount: 0,
@@ -2283,7 +2262,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "Inside Creative Software with the Peradeniya Computer Engineering team. Observing how enterprise architecture, CI/CD, and agile engineering operate at global scale.",
     topic: "Findings",
     publishedAt: "2024-08-15",
-    readingMinutes: 3,
     likes: 0,
     views: 0,
     commentCount: 0,
@@ -2345,7 +2323,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "Reflections on completing my B.Sc. (Hons) in Engineering at Peradeniya: four years of systems programming, hardware-software co-design, and lifelong engineering friendships.",
     topic: "Findings",
     publishedAt: "2024-08-01",
-    readingMinutes: 3,
     likes: 0,
     views: 0,
     commentCount: 0,
@@ -2404,7 +2381,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "Developing an end-to-end long-read transcriptomics pipeline using Oxford Nanopore sequencing: basecalling, splice-aware alignment, isoform discovery, and differential expression.",
     topic: "Findings",
     publishedAt: "2024-05-20",
-    readingMinutes: 4,
     likes: 0,
     views: 0,
     commentCount: 0,
@@ -2481,7 +2457,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "My uncle gave me a PC when I was eleven. Almost every part of it eventually broke, and repairing it became the way I learned.",
     topic: "Findings",
     publishedAt: "2024-03-15",
-    readingMinutes: 2,
     likes: 0,
     views: 0,
     commentCount: 0,
@@ -2528,7 +2503,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "From an empty Linux machine to a working Django app: environment, project, models, views, templates, and URLs.",
     topic: "Engineering",
     publishedAt: "2023-03-12",
-    readingMinutes: 3,
     likes: 0,
     views: 735,
     commentCount: 0,
@@ -2725,7 +2699,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "Conda was slowing my machine down, so I stopped it from activating the base environment in every new shell.",
     topic: "Engineering",
     publishedAt: "2023-03-12",
-    readingMinutes: 1,
     likes: 0,
     views: 728,
     commentCount: 0,
@@ -2801,7 +2774,6 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "Python 3.11 refused the install because the environment is externally managed. That is a deliberate protection, and there are three ways past it.",
     topic: "Engineering",
     publishedAt: "2023-03-06",
-    readingMinutes: 2,
     likes: 0,
     views: 683,
     commentCount: 0,
@@ -2905,11 +2877,11 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "Kali ships with MariaDB, and it conflicts with MySQL. Here is the sequence that finally worked for me.",
     topic: "Systems",
     publishedAt: "2023-03-04",
-    readingMinutes: 2,
     likes: 0,
     views: 356,
     commentCount: 0,
     tags: ["#kalilinux", "#mysql", "#database", "#linux"],
+    series: { slug: "linux-switch", title: "Moving to Linux", part: 3 },
     coverImage: "/articles/install-my-sql-in-kali-linux.png",
     body: [
       {
@@ -3060,11 +3032,11 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "Copying the keyring into trusted.gpg.d silences the warning. Scoping the key to the one repository that needs it is the fix apt actually wants.",
     topic: "Systems",
     publishedAt: "2023-03-04",
-    readingMinutes: 2,
     likes: 0,
     views: 24,
     commentCount: 0,
     tags: ["#linux", "#apt", "#kalilinux", "#debian"],
+    series: { slug: "linux-switch", title: "Moving to Linux", part: 4 },
     coverImage: "/articles/kali-linux-update-warninig.png",
     body: [
       {
@@ -3159,11 +3131,11 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "There is no single best answer. It depends on your preferences, your languages, and the tools you work with.",
     topic: "Systems",
     publishedAt: "2023-02-17",
-    readingMinutes: 2,
     likes: 0,
     views: 18,
     commentCount: 0,
     tags: ["#os", "#linux", "#macos", "#windows"],
+    series: { slug: "linux-switch", title: "Moving to Linux", part: 2 },
     coverImage: "/articles/programing-environment-os.png",
     body: [
       {
@@ -3221,11 +3193,11 @@ export const posts: Post[] = postSchema.array().parse([
     dek: "Open source, stable, and built around the command line. What makes Linux a good place to develop.",
     topic: "Systems",
     publishedAt: "2023-02-17",
-    readingMinutes: 2,
     likes: 0,
     views: 28,
     commentCount: 0,
     tags: ["#linux", "#opensource", "#operating-systems"],
+    series: { slug: "linux-switch", title: "Moving to Linux", part: 1 },
     coverImage: "/articles/intro-to-linux.png",
     body: [
       {
@@ -3299,3 +3271,12 @@ export const posts: Post[] = postSchema.array().parse([
     ],
   },
 ]);
+
+/**
+ * Reading time is computed here rather than stored above, so it always
+ * describes the body as it currently reads.
+ */
+export const posts: Post[] = parsedPosts.map((post) => ({
+  ...post,
+  readingMinutes: readingMinutes(post.body),
+}));
