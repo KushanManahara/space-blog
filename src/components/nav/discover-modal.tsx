@@ -8,7 +8,7 @@ import { PostCover } from "@/components/post/post-cover";
 import { getTopicVisual } from "@/components/post/topic-visuals";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import type { Tag, Topic } from "@/lib/content";
+import { tagSlug, type Tag, type Topic } from "@/lib/content";
 
 type DiscoverModalProps = { kind: "topics"; topics: Topic[] } | { kind: "tags"; tags: Tag[] };
 
@@ -73,7 +73,7 @@ export function DiscoverModal(props: DiscoverModalProps) {
             {props.tags.map((tag) => (
               <Link
                 key={tag.name}
-                href={`/search?q=${encodeURIComponent(tag.name.replace("#", ""))}`}
+                href={`/tags/${tagSlug(tag.name)}`}
                 onClick={() => setOpen(false)}
                 className="inline-flex items-center gap-2 rounded-full border border-line-1 bg-bg-2 px-[15px] py-2.5 text-[13.5px] font-medium text-fg-2 transition-[color,border-color,transform] duration-300 ease-bounce hover:-translate-y-0.5 hover:border-line-brand hover:text-brand"
               >
