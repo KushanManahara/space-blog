@@ -124,7 +124,7 @@ export function SiteHeader() {
             "hidden overflow-hidden transition-[max-width,opacity,transform] duration-500 ease-expo md:block",
             isCollapsed
               ? "pointer-events-none max-w-0 -translate-x-2 opacity-0"
-              : "max-w-[460px] translate-x-0 opacity-100",
+              : "max-w-[560px] translate-x-0 opacity-100",
           )}
           // Links keep their tab order out of the way while the bar is collapsed.
           inert={isCollapsed}
