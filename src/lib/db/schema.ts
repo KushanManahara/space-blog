@@ -24,6 +24,11 @@ export const comments = sqliteTable("comments", {
   tone: text("tone").default("cornflower").notNull(),
   body: text("body").notNull(),
   likes: integer("likes").default(0).notNull(),
+  /**
+   * Comments are held for review by default. Nothing reaches the article until
+   * this is flipped, so an open form cannot publish straight to the site.
+   */
+  published: integer("published").default(0).notNull(),
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
@@ -46,4 +51,18 @@ export const contactMessages = sqliteTable("contact_messages", {
   subject: text("subject").notNull(),
   message: text("message").notNull(),
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
+/**
+ * Generic counter for abuse control, keyed by "<action>:<subject>".
+ *
+ * Serverless instances do not share memory, so the window has to live
+ * somewhere both the rate limiter and the like/view de-duplication can read.
+ * `subject` is always a hashed value — never a raw IP address.
+ */
+export const rateLimits = sqliteTable("rate_limits", {
+  key: text("key").primaryKey(),
+  count: integer("count").default(0).notNull(),
+  /** Unix seconds when the current window opened. */
+  windowStart: integer("window_start").notNull(),
 });
