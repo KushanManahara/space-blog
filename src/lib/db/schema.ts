@@ -29,6 +29,12 @@ export const comments = sqliteTable("comments", {
    * this is flipped, so an open form cannot publish straight to the site.
    */
   published: integer("published").default(0).notNull(),
+  /**
+   * One level of nesting only: a reply points at a top-level comment, and a
+   * reply to a reply is flattened onto the same parent. Full threading is not
+   * the goal — being able to answer a correction in place is.
+   */
+  parentId: text("parent_id"),
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
