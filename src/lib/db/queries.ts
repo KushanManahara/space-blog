@@ -1,6 +1,6 @@
 import { and, desc, eq, sql } from "drizzle-orm";
 
-import type { Comment } from "@/lib/content";
+import { author, type Comment, type CommentNode } from "@/lib/content";
 import { comments, db, postStats } from "./index";
 
 const TONES: ("violet" | "cornflower" | "orchid")[] = ["violet", "cornflower", "orchid"];
@@ -58,7 +58,7 @@ export async function getLivePostStats(slug: string) {
 /**
  * Fetch live reader comments for a specific article from Turso DB.
  */
-export async function getLiveComments(slug: string): Promise<Comment[]> {
+export async function getLiveComments(slug: string): Promise<CommentNode[]> {
   try {
     const rows = await db
       .select()
@@ -67,7 +67,7 @@ export async function getLiveComments(slug: string): Promise<Comment[]> {
       .where(and(eq(comments.postSlug, slug), eq(comments.published, 1)))
       .orderBy(desc(comments.createdAt));
 
-    return rows.map((row, index) => ({
+    const toComment = (row: (typeof rows)[number], index: number): Comment => ({
       id: row.id,
       name: row.authorName,
       role: row.authorRole ?? undefined,
@@ -76,7 +76,31 @@ export async function getLiveComments(slug: string): Promise<Comment[]> {
       likes: row.likes,
       body: row.body,
       tone: TONES[index % TONES.length],
-    }));
+      parentId: row.parentId ?? undefined,
+      isAuthor: row.authorEmail?.toLowerCase() === author.email.toLowerCase(),
+    });
+
+    const all = rows.map(toComment);
+    const byId = new Map(all.map((comment) => [comment.id, comment]));
+
+    // A reply whose parent is missing (unpublished, or deleted since) would
+    // otherwise vanish from the thread entirely, so it is promoted to top level.
+    const isOrphan = (comment: Comment) =>
+      comment.parentId === undefined || !byId.has(comment.parentId);
+
+    const roots = all.filter(isOrphan).map((comment) => ({ ...comment, replies: [] as Comment[] }));
+    const rootsById = new Map(roots.map((root) => [root.id, root]));
+
+    for (const comment of all) {
+      if (isOrphan(comment)) continue;
+      rootsById.get(comment.parentId!)?.replies.push(comment);
+    }
+
+    // Replies read as a conversation, so they run oldest first under a parent
+    // that is itself listed newest first.
+    for (const root of roots) root.replies.reverse();
+
+    return roots;
   } catch (error) {
     console.error("Error fetching live comments:", error);
     return [];
