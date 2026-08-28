@@ -2,7 +2,7 @@
 
 import fs from "fs";
 import path from "path";
-import { resend, SENDER_EMAIL } from "@/lib/resend";
+import { emailEnabled, getResend, SENDER_EMAIL } from "@/lib/resend";
 import { db, newsletterSubscribers } from "@/lib/db";
 import { WelcomeEmail, getWelcomeEmailText } from "@/emails/welcome";
 import {
@@ -33,8 +33,10 @@ function getComplianceHeaders(email: string) {
  * SYNCS A SUBSCRIBER EMAIL TO RESEND CONTACTS (UNIFIED API)
  */
 export async function syncResendContact(email: string) {
+  if (!emailEnabled) return { success: false, error: "Email is not configured." };
+
   try {
-    const { data, error } = await resend.contacts.create({
+    const { data, error } = await getResend().contacts.create({
       email,
       unsubscribed: false,
     });
@@ -55,10 +57,12 @@ export async function syncResendContact(email: string) {
  * SENDS TRANSACTIONAL WELCOME EMAIL VIA RESEND WITH MULTIPART PLAIN-TEXT FALLBACK
  */
 export async function sendWelcomeEmail(email: string) {
+  if (!emailEnabled) return { success: false, error: "Email is not configured." };
+
   const unsubscribeUrl = `${SITE_URL}/api/newsletter/unsubscribe?email=${encodeURIComponent(email)}`;
 
   try {
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResend().emails.send({
       from: SENDER_EMAIL,
       to: email,
       subject: "Welcome to Space",
@@ -93,6 +97,8 @@ export async function sendWelcomeEmail(email: string) {
  * MULTIPART PLAIN TEXT, COMPLIANCE HEADERS, AND RESEND BATCHING
  */
 export async function broadcastArticleNotification(post: Post) {
+  if (!emailEnabled) return { success: false, error: "Email is not configured." };
+
   try {
     // FETCH ALL ACTIVE REGISTERED SUBSCRIBERS FROM DATABASE
     const subscribers = await db
@@ -171,7 +177,7 @@ export async function broadcastArticleNotification(post: Post) {
 
     for (let i = 0; i < emailPayloads.length; i += BATCH_SIZE) {
       const batch = emailPayloads.slice(i, i + BATCH_SIZE);
-      const { data, error } = await resend.batch.send(batch);
+      const { data, error } = await getResend().batch.send(batch);
 
       if (error) {
         console.error(`RESEND BATCH CHUNK ERROR (OFFSET ${i}):`, error);
@@ -208,6 +214,11 @@ export async function sendContactNotification(input: {
   subject: string;
   message: string;
 }) {
+  if (!emailEnabled) {
+    console.warn("Email is not configured — contact message saved but not emailed.");
+    return { success: false, error: "Email is not configured." };
+  }
+
   const to = process.env.CONTACT_TO_EMAIL;
 
   if (!to) {
@@ -218,7 +229,7 @@ export async function sendContactNotification(input: {
   }
 
   try {
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResend().emails.send({
       from: process.env.CONTACT_FROM_EMAIL || SENDER_EMAIL,
       to,
       replyTo: input.email,
