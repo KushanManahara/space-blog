@@ -53,6 +53,18 @@ async function list() {
       `  id       ${String(r.id).slice(0, 8)}   ${r.published ? "PUBLISHED" : "PENDING"}`,
     );
     console.log(`  article  ${r.post_slug}`);
+    if (r.parent_id) {
+      // A reply is only visible once its parent is published too, so say so.
+      const parent = await client.execute({
+        sql: "SELECT author_name, published FROM comments WHERE id = ?",
+        args: [r.parent_id],
+      });
+      const p = parent.rows[0];
+      console.log(
+        `  reply to ${String(r.parent_id).slice(0, 8)}` +
+          (p ? ` — ${p.author_name}${p.published ? "" : " (PARENT STILL PENDING)"}` : " — missing"),
+      );
+    }
     console.log(
       `  author   ${r.author_name} <${r.author_email ?? "no email"}> — ${r.author_role ?? "—"}`,
     );
