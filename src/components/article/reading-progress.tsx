@@ -112,7 +112,9 @@ export function ReadingProgressBar() {
   return (
     <div
       aria-hidden
-      className="fixed top-0 left-0 z-90 h-[3px] rounded-r-[3px] transition-[width] duration-100 ease-linear"
+      // Sits below the notch rather than under it: at top:0 the bar is a 3px
+      // indicator hidden behind the Dynamic Island on every notched phone.
+      className="fixed top-[env(safe-area-inset-top,0px)] left-0 z-90 h-[3px] rounded-r-[3px] transition-[width] duration-100 ease-linear"
       style={{ width: `${Math.round(progress * 100)}%`, background: "var(--gradient-accent)" }}
     />
   );
