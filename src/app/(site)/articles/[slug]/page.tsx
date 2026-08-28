@@ -21,8 +21,11 @@ import {
   getPostBySlug,
   getRelatedPosts,
   getSeriesBySlug,
+  getSeriesParts,
   posts,
   siteUrl,
+  tagSlug,
+  toSummaries,
   toSummary,
 } from "@/lib/content";
 import { getLiveComments, getLivePostStats } from "@/lib/db/queries";
@@ -124,7 +127,7 @@ export default async function ArticlePage({ params }: PageProps<"/articles/[slug
                 {post.tags.map((tag) => (
                   <Link
                     key={tag}
-                    href={`/search?q=${encodeURIComponent(tag.replace("#", ""))}`}
+                    href={`/tags/${tagSlug(tag)}`}
                     className="rounded-full border border-line-1 bg-bg-2 px-3.5 py-2 text-[13px] text-fg-2 transition-[color,border-color] duration-300 ease-expo hover:border-line-brand hover:text-brand"
                   >
                     {tag}
@@ -166,7 +169,11 @@ export default async function ArticlePage({ params }: PageProps<"/articles/[slug
             <aside className="flex w-full max-w-full min-w-0 flex-col gap-[18px] lg:sticky lg:top-[104px]">
               <TableOfContents headings={headings} />
               {series && post.series ? (
-                <SeriesNav series={series} currentPart={post.series.part} />
+                <SeriesNav
+                  series={series}
+                  parts={toSummaries(getSeriesParts(post.series.slug))}
+                  currentPart={post.series.part}
+                />
               ) : null}
               <section className="rounded-lg border border-line-1 bg-bg-2 p-5.5">
                 <h2 className="text-[15px] font-bold text-fg-1">Related</h2>
