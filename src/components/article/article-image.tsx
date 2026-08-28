@@ -39,7 +39,7 @@ export function ArticleImage({
       )}
     >
       <div
-        className="mx-auto overflow-hidden rounded-lg border border-line-1 bg-bg-2"
+        className="mx-auto overflow-hidden rounded-lg border border-line-1 bg-bg-2 print:border-neutral-200 print:bg-white print:break-inside-avoid"
         // Never scale past the intrinsic size. Upscaling a screenshot to fill
         // the column just makes its text soft.
         style={hasIntrinsicSize ? { maxWidth: width } : undefined}
@@ -50,6 +50,8 @@ export function ArticleImage({
             alt={alt}
             width={width}
             height={height}
+            loading="eager"
+            priority
             unoptimized={isSvg}
             sizes="(max-width: 768px) 100vw, 780px"
             className="h-auto w-full"
@@ -62,6 +64,8 @@ export function ArticleImage({
               src={src}
               alt={alt}
               fill
+              loading="eager"
+              priority
               unoptimized={isSvg}
               sizes="(max-width: 768px) 100vw, 780px"
               className="object-contain"
