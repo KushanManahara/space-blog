@@ -1,5 +1,5 @@
 import { posts } from "./posts";
-import type { Post, PostSummary, StudioPost, Topic } from "./schemas";
+import type { ArticleBlock, Post, PostSummary, StudioPost, Topic } from "./schemas";
 import { seriesList, topics } from "./site";
 
 export type SortOrder = "recent" | "views";
@@ -74,13 +74,88 @@ export function getPostsByTopic(topic: Topic, sort: SortOrder = "recent"): Post[
     .sort(sort === "views" ? byViews : byRecency);
 }
 
+/** Every piece of reader-visible text in one block, whatever its kind. */
+function blockText(block: ArticleBlock): string {
+  switch (block.kind) {
+    case "paragraph":
+      return block.html;
+    case "heading":
+      return block.text;
+    case "list":
+    case "footnotes":
+      return block.items.join(" ");
+    case "code":
+      return `${block.filename} ${block.code}`;
+    case "callout":
+      return `${block.title} ${block.body}`;
+    case "formula":
+      return `${block.tex ?? block.html ?? ""} ${block.caption}`;
+    case "mermaid":
+      return `${block.code} ${block.caption ?? ""}`;
+    case "image":
+      return `${block.alt} ${block.caption ?? ""}`;
+    case "table":
+      return [
+        block.headers.join(" "),
+        ...block.rows.map((r) => r.join(" ")),
+        block.caption ?? "",
+      ].join(" ");
+    case "figure":
+      return [
+        block.title,
+        block.caption ?? "",
+        block.note ?? "",
+        ...block.series.map((s) => s.label),
+      ].join(" ");
+    case "chart":
+      return `${block.title} ${block.note} ${block.caption} ${block.bars.map((b) => b.label).join(" ")}`;
+  }
+}
+
+/**
+ * Search text per post, built once at module load.
+ *
+ * Titles and tags alone missed everything the articles are actually about —
+ * a reader searching for a command, a formula or a diagram label found nothing
+ * even though it was on the page. Strips markdown and HTML so `**bold**` and
+ * `<strong>` do not swallow the words inside them.
+ */
+function normalize(text: string): string {
+  return (
+    text
+      .replace(/<[^>]+>/g, " ")
+      // Emphasis markers only. Underscores stay: they carry meaning in the
+      // identifiers people actually search for, like `predict_proba`.
+      .replace(/[*`~#]+/g, "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toLowerCase()
+  );
+}
+
+const searchIndex = new Map<string, string>(
+  posts.map((post) => [
+    post.slug,
+    normalize(
+      [post.title, post.dek, post.topic, ...post.tags, ...post.body.map(blockText)].join(" "),
+    ),
+  ]),
+);
+
 export function searchPosts(query: string, sort: SortOrder = "recent"): Post[] {
-  const needle = query.trim().toLowerCase();
+  // The query goes through the same transform as the index, so whatever is
+  // stripped from one is stripped from the other.
+  const needle = normalize(query);
   const sorted = [...posts].sort(sort === "views" ? byViews : byRecency);
   if (!needle) return sorted;
-  return sorted.filter((post) =>
-    [post.title, post.dek, post.topic, ...post.tags].join(" ").toLowerCase().includes(needle),
-  );
+
+  // Every whitespace-separated term must appear somewhere in the post, so
+  // "kali mysql" narrows rather than returning everything matching either.
+  const terms = needle.split(/\s+/).filter(Boolean);
+  return sorted.filter((post) => {
+    const haystack = searchIndex.get(post.slug) ?? "";
+    return terms.every((term) => haystack.includes(term));
+  });
 }
 
 export function getSeriesBySlug(slug: string) {
