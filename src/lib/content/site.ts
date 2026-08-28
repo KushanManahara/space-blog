@@ -1,12 +1,14 @@
+import { posts } from "./posts";
 import {
   authorSchema,
-  tagSchema,
+  readingPathSchema,
+  seriesSchema,
   timelineEntrySchema,
   topicSchema,
   type Author,
   type Comment,
+  type ReadingPath,
   type Series,
-  type Tag,
   type TimelineEntry,
   type Topic,
 } from "./schemas";
@@ -17,11 +19,10 @@ export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://space.gimhar
 export const site = {
   name: "Space",
   tagline: "AI Systems & Software Engineering by Kushan Manahara",
-  issue: 40,
+  /** Derived, so it cannot disagree with the archive it describes. */
+  issue: posts.length,
   description:
     "An engineering publication by Kushan Manahara exploring AI systems, machine learning, agents, and software architecture.",
-  seriesCount: 0,
-  correctionCount: 0,
   subscriberCount: 0,
 } as const;
 
@@ -94,26 +95,146 @@ export const topics: Topic[] = topicSchema.array().parse([
   },
 ]);
 
-export const seriesList: Series[] = [];
+/**
+ * The blurb for each series. Everything countable — how many parts there are,
+ * what they are called, what order they run in — is derived from the posts
+ * below rather than restated here, so a series cannot drift out of step with
+ * its own articles. A series exists here only if posts actually claim it.
+ */
+const seriesBlurbs: Record<string, { title: string; dek: string }> = {
+  "linux-switch": {
+    title: "Moving to Linux",
+    dek: "Picking the OS, understanding why the tooling favours it, then fixing the things that break first.",
+  },
+  "regression-explained": {
+    title: "Regression, Explained",
+    dek: "The two models everything else is built on, worked through from the maths outward.",
+  },
+  mcp: {
+    title: "The Model Context Protocol",
+    dek: "What MCP solves, what happens to the context window at scale, and where it sits next to A2A.",
+  },
+};
 
-export const tags: Tag[] = tagSchema.array().parse([
-  { name: "#machine-learning", postCount: 3 },
-  { name: "#llm", postCount: 6 },
-  { name: "#ai-agents", postCount: 3 },
-  { name: "#mcp", postCount: 3 },
-  { name: "#rag", postCount: 3 },
-  { name: "#inference", postCount: 3 },
-  { name: "#deep-learning", postCount: 2 },
-  { name: "#pytorch", postCount: 2 },
-  { name: "#python", postCount: 3 },
-  { name: "#distributed-systems", postCount: 2 },
-  { name: "#kafka", postCount: 1 },
-  { name: "#kubernetes", postCount: 1 },
-  { name: "#linux", postCount: 7 },
-  { name: "#cloud", postCount: 2 },
-  { name: "#mlops", postCount: 1 },
-  { name: "#llmops", postCount: 1 },
-  { name: "#devtools", postCount: 3 },
+/**
+ * Series in the order their first part was published, each carrying its real
+ * parts. `currentPart` is the number published: every part of every series here
+ * is out, so the ladder reads as complete rather than implying a pending one.
+ */
+export const seriesList: Series[] = seriesSchema.array().parse(
+  Object.entries(seriesBlurbs)
+    .map(([slug, blurb]) => {
+      const parts = posts
+        .filter((post) => post.series?.slug === slug)
+        .sort((a, b) => (a.series?.part ?? 0) - (b.series?.part ?? 0));
+
+      return {
+        slug,
+        ...blurb,
+        status: "Read the series",
+        partCount: parts.length,
+        parts: parts.map((post) => post.title),
+        currentPart: parts.length,
+        firstPublished: parts[0]?.publishedAt ?? "",
+      };
+    })
+    .sort((a, b) => a.firstPublished.localeCompare(b.firstPublished))
+    .map(({ firstPublished: _firstPublished, ...series }) => series),
+);
+
+/**
+ * Ways in, for someone who has not read any of this.
+ *
+ * Forty posts in reverse-chronological order is a record, not a route. These
+ * cross topics and years on purpose — that is the thing the topic pages and the
+ * series ladder cannot do. A post may appear in more than one path, and may
+ * also belong to a series; the two answer different questions.
+ */
+export const readingPaths: ReadingPath[] = readingPathSchema.array().parse([
+  {
+    slug: "retrieval",
+    title: "How retrieval actually works",
+    dek: "Grounding a language model in documents it was never trained on, from the mechanics up to when not to bother.",
+    forWho: "You have heard RAG described and want the machinery underneath it.",
+    steps: [
+      {
+        slug: "llm-think",
+        why: "Start with what the model is doing at all: tokens, vectors, attention.",
+      },
+      {
+        slug: "how-rag-works",
+        why: "The loop itself — embedding, cosine similarity, context injection.",
+      },
+      {
+        slug: "gemini-vector-database",
+        why: "The same loop as working code, against a real vector database.",
+      },
+      {
+        slug: "cag-vs-rag",
+        why: "Then the case against it, when latency is the constraint that matters.",
+      },
+    ],
+  },
+  {
+    slug: "serving-models",
+    title: "Getting a model into production",
+    dek: "Open weights, the hardware they run on, adapting them to your problem, and packaging the result.",
+    forWho: "You can call an API and now need to run the thing yourself.",
+    steps: [
+      { slug: "llmhg", why: "Get an open model running at all, with the least ceremony." },
+      {
+        slug: "llm-finetuning",
+        why: "Adapt it on one GPU instead of a cluster — PEFT, LoRA, QLoRA.",
+      },
+      { slug: "nvidia-nim", why: "Package it as a service rather than a script." },
+      { slug: "lpu-vs-gpu", why: "And the hardware question underneath all of it." },
+    ],
+  },
+  {
+    slug: "agents",
+    title: "Agents and the protocol layer",
+    dek: "How a model gets access to tools, why that breaks at scale, and where agent-to-agent sits next to it.",
+    forWho: "You are wiring a model to real tools and want the standards, not the glue code.",
+    steps: [
+      { slug: "my-mcp", why: "The problem MCP exists to solve." },
+      { slug: "docker-mcp", why: "What happens to the context window once you have fifty tools." },
+      { slug: "mcp-vs-acp", why: "How MCP and A2A stack, rather than compete." },
+      { slug: "crewai-agents", why: "And what you build on top: several agents with roles." },
+    ],
+  },
+  {
+    slug: "fundamentals",
+    title: "The maths under the models",
+    dek: "The two algorithms everything else is built on, and how to tell whether a model learned the right thing.",
+    forWho: "You want the ground floor before the language models.",
+    steps: [
+      { slug: "linear-regression", why: "Fitting a straight line, worked through properly." },
+      { slug: "logistic-regression", why: "The same machinery turned into a classifier." },
+      { slug: "explaiable-ai", why: "Then how to check a model is right for the right reasons." },
+    ],
+  },
+  {
+    slug: "set-up",
+    title: "Set up a machine you can work on",
+    dek: "Choosing the operating system, living with the choice, and fixing the things that break first.",
+    forWho: "You are early enough that the tooling is still in the way.",
+    steps: [
+      {
+        slug: "programing-environment-os",
+        why: "The choice itself, without a single right answer.",
+      },
+      { slug: "intro-to-linux", why: "Why the tooling keeps pointing one way." },
+      { slug: "windows-vs-linux", why: "What actually changes day to day after switching." },
+      {
+        slug: "pip-install-pipenv-issue-solved",
+        why: "The first error a fresh Python install throws at you.",
+      },
+      {
+        slug: "django-and-python-web-development",
+        why: "And something real, from empty machine to running app.",
+      },
+    ],
+  },
 ]);
 
 export const comments: Comment[] = [];
@@ -164,8 +285,13 @@ export const routes = {
   search: "/search",
   about: "/about",
   contact: "/contact",
+  tags: "/tags",
+  paths: "/paths",
+  corrections: "/corrections",
   saved: "/saved",
   unsubscribe: "/unsubscribe",
+  // Not routed while Studio is parked in `src/app/_studio/`; kept so that code
+  // still typechecks and the paths are in one place when it comes back.
   studio: "/studio",
   editor: "/studio/editor",
 } as const;
@@ -201,7 +327,10 @@ export const footerColumns = [
     title: "Read",
     links: [
       { label: "All articles", href: routes.articles },
+      { label: "Where to start", href: routes.paths },
       { label: "Topics", href: routes.topics },
+      { label: "Tags", href: routes.tags },
+      { label: "Corrections", href: routes.corrections },
       { label: "Search", href: routes.search },
       { label: "Saved", href: routes.saved },
       { label: "About", href: routes.about },
