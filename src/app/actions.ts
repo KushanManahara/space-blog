@@ -15,7 +15,7 @@ import {
   sendWelcomeEmail,
   syncResendContact,
 } from "@/lib/newsletter";
-import { resend } from "@/lib/resend";
+import { getResend } from "@/lib/resend";
 
 const subscribeSchema = z.object({
   email: z.string().email("Enter an email address we can actually reach."),
@@ -114,7 +114,7 @@ export async function unsubscribeAction(
     await db.delete(newsletterSubscribers).where(eq(newsletterSubscribers.email, email));
 
     // 2. UPDATE RESEND CONTACT STATUS
-    await resend.contacts.update({
+    await getResend().contacts.update({
       email,
       unsubscribed: true,
     });
