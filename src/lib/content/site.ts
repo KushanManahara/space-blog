@@ -286,6 +286,7 @@ export const routes = {
   about: "/about",
   contact: "/contact",
   tags: "/tags",
+  series: "/series",
   paths: "/paths",
   corrections: "/corrections",
   saved: "/saved",
@@ -299,6 +300,7 @@ export const routes = {
 export const primaryNav = [
   { label: "Home", href: routes.home },
   { label: "Articles", href: routes.articles },
+  { label: "Series", href: routes.series },
   { label: "Topics", href: routes.topics },
   { label: "About", href: routes.about },
   { label: "Contact", href: routes.contact },
@@ -328,6 +330,7 @@ export const footerColumns = [
     links: [
       { label: "All articles", href: routes.articles },
       { label: "Where to start", href: routes.paths },
+      { label: "Series", href: routes.series },
       { label: "Topics", href: routes.topics },
       { label: "Tags", href: routes.tags },
       { label: "Corrections", href: routes.corrections },
