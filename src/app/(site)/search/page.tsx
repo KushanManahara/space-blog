@@ -8,8 +8,18 @@ import { Pagination } from "@/components/nav/pagination";
 import { SortToggle } from "@/components/nav/sort-toggle";
 import { PostCard } from "@/components/post/post-card";
 import { SearchHero } from "@/components/search/search-hero";
+import { SemanticResults } from "@/components/search/semantic-results";
 import { TopicCard } from "@/components/topic/topic-tile";
-import { isSortOrder, routes, searchPosts, site, tags, topics } from "@/lib/content";
+import {
+  isSortOrder,
+  listPosts,
+  listTags,
+  routes,
+  searchPosts,
+  site,
+  toSummaries,
+  topics,
+} from "@/lib/content";
 import { buildHref } from "@/lib/url";
 import { paginate } from "@/lib/pagination";
 
@@ -86,6 +96,18 @@ export default async function SearchPage({ searchParams }: PageProps<"/search">)
             )
           ) : null}
 
+          {/* Offered under the keyword results rather than instead of them:
+              keyword search wins on exact identifiers, meaning-based search
+              wins on questions, and a reader can see both. */}
+          {tab === "Articles" ? (
+            <SemanticResults
+              key={query}
+              query={query}
+              posts={toSummaries(listPosts())}
+              ragHref={`${routes.articles}/how-rag-works`}
+            />
+          ) : null}
+
           {tab === "Topics" ? (
             <div className="grid gap-4.5 sm:grid-cols-2 xl:grid-cols-4">
               {topics.map((topic) => (
@@ -96,10 +118,10 @@ export default async function SearchPage({ searchParams }: PageProps<"/search">)
 
           {tab === "Tags" ? (
             <div className="flex flex-wrap gap-2.5 rounded-lg border border-line-1 bg-bg-2 p-7.5">
-              {tags.map((tag) => (
+              {listTags().map((tag) => (
                 <Link
                   key={tag.name}
-                  href={buildHref(routes.search, {}, { q: tag.name.replace("#", "") })}
+                  href={`${routes.tags}/${tag.slug}`}
                   className="rounded-full border border-line-1 bg-bg-1 px-4.5 py-2.5 text-[14px] text-fg-2 transition-[color,border-color,transform] duration-300 ease-bounce hover:-translate-y-0.5 hover:border-line-brand hover:text-brand"
                 >
                   {tag.name}
