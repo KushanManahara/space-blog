@@ -873,3 +873,61 @@ html[data-magicui-theme-vt="active"]::view-transition-new(root) {
     font-size: 1em;
   }
 }
+
+/* ---------- Route loader: the logo's moon, set orbiting ----------
+   The brandmark is a planet with a moon docked in a crescent notch, so the
+   loading state is that moon leaving the notch and coming back round. The
+   orbit plane is tilted in 3D and the scene keeps `preserve-3d`, which means
+   the satellite genuinely passes behind the planet on the far half rather
+   than faking depth with z-index. */
+
+@keyframes orbit-spin {
+  from {
+    transform: rotateX(72deg) rotateZ(0deg);
+  }
+  to {
+    transform: rotateX(72deg) rotateZ(360deg);
+  }
+}
+
+/* Counter-rotates the satellite so it stays a circle facing the reader
+   instead of squashing into the tilted plane. */
+@keyframes orbit-satellite-face {
+  from {
+    transform: rotateZ(0deg) rotateX(-72deg);
+  }
+  to {
+    transform: rotateZ(-360deg) rotateX(-72deg);
+  }
+}
+
+@keyframes planet-breathe {
+  /* translateZ is restated in both stops: the animated transform replaces the
+     element's own, and dropping it would pull the planet out of the orbit
+     plane's depth and break the sorting. */
+  0%,
+  100% {
+    transform: translateZ(0) scale(1);
+    filter: drop-shadow(0 0 14px rgb(0 122 255 / 0.35));
+  }
+  50% {
+    transform: translateZ(0) scale(1.035);
+    filter: drop-shadow(0 0 26px rgb(0 122 255 / 0.5));
+  }
+}
+
+@keyframes loader-dot {
+  0%,
+  80%,
+  100% {
+    opacity: 0.2;
+    transform: translateY(0);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
+
+/* With reduced motion the global rule below freezes these; the planet, its
+   ring and the label still read as a loading state without any movement. */
