@@ -302,6 +302,9 @@ export type SeriesSummary = Series & {
   minutes: number;
   firstPublished: string;
   lastPublished: string;
+  /** Artwork and topic taken from part one, so a series looks like itself. */
+  cover?: string;
+  coverTopic: TopicName;
 };
 
 export type SeriesSort = "recent" | "longest" | "views";
@@ -331,6 +334,8 @@ export function getSeriesSummary(slug: string): SeriesSummary | undefined {
     minutes: parts.reduce((total, post) => total + post.readingMinutes, 0),
     firstPublished: dates[0] ?? "",
     lastPublished: dates[dates.length - 1] ?? "",
+    cover: parts[0]?.coverImage,
+    coverTopic: parts[0]?.topic ?? "Systems",
   };
 }
 
