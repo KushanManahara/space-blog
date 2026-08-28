@@ -8,6 +8,7 @@ import {
   Heart,
   Lock,
   MessageSquare,
+  Reply,
   Send,
   Sparkles,
   X,
@@ -19,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import type { Comment } from "@/lib/content";
+import type { Comment, CommentNode } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
 const toneStyles = {
@@ -38,7 +39,7 @@ export function CommentThread({
   total,
 }: {
   slug?: string;
-  comments: Comment[];
+  comments: CommentNode[];
   total: number;
 }) {
   const [name, setName] = React.useState("");
@@ -49,7 +50,9 @@ export function CommentThread({
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
 
-  const [posted] = React.useState<Comment[]>([]);
+  const [posted] = React.useState<CommentNode[]>([]);
+  // Which comment the composer is answering; undefined means a new thread.
+  const [replyTo, setReplyTo] = React.useState<Comment | undefined>(undefined);
   // Comments are reviewed before they appear, so submitting shows a receipt
   // rather than the comment itself.
   const [held, setHeld] = React.useState(false);
@@ -72,6 +75,14 @@ export function CommentThread({
       }
     });
     return () => cancelAnimationFrame(handle);
+  }, []);
+
+  const startReply = React.useCallback((comment: Comment) => {
+    setReplyTo(comment);
+    setHeld(false);
+    const composer = document.getElementById("comment-composer");
+    composer?.scrollIntoView({ behavior: "smooth", block: "center" });
+    document.getElementById("comment-body")?.focus({ preventScroll: true });
   }, []);
 
   const allComments = [...posted, ...comments];
@@ -125,12 +136,14 @@ export function CommentThread({
         role: trimmedRole,
         email: trimmedEmail,
         body: trimmedBody,
+        parentId: replyTo?.id,
         website: honeypot,
       });
 
       if (res.success) {
         setHeld(true);
         setHoneypot("");
+        setReplyTo(undefined);
       } else {
         setErrorMsg(res.error || "Failed to submit comment.");
       }
@@ -154,8 +167,9 @@ export function CommentThread({
 
       {/* Main Comment Draft Input */}
       <form
+        id="comment-composer"
         onSubmit={handleOpenModal}
-        className="relative mt-5 rounded-lg border border-line-1 bg-bg-2 p-5 shadow-xs md:p-6"
+        className="relative mt-5 scroll-mt-24 rounded-lg border border-line-1 bg-bg-2 p-5 shadow-xs md:p-6"
       >
         {/* Honeypot: off-screen and hidden from assistive tech, so only a bot
             filling every field will complete it. */}
@@ -172,8 +186,24 @@ export function CommentThread({
           />
         </div>
 
+        {replyTo ? (
+          <div className="mb-3.5 flex items-center justify-between gap-3 rounded-md bg-bg-3 px-3.5 py-2.5">
+            <span className="min-w-0 truncate text-[13px] text-fg-2">
+              Replying to <span className="font-semibold text-fg-1">{replyTo.name}</span>
+            </span>
+            <button
+              type="button"
+              onClick={() => setReplyTo(undefined)}
+              className="inline-flex shrink-0 cursor-pointer items-center gap-1 text-[12.5px] font-semibold text-fg-3 transition-colors hover:text-fg-1"
+            >
+              <X className="size-3.5" />
+              Cancel
+            </button>
+          </div>
+        ) : null}
+
         <label htmlFor="comment-body" className="block text-[13px] font-semibold text-fg-2">
-          Add to the discussion
+          {replyTo ? `Reply to ${replyTo.name}` : "Add to the discussion"}
         </label>
         <Textarea
           id="comment-body"
@@ -355,36 +385,23 @@ export function CommentThread({
           )}
         >
           {visibleComments.map((comment) => (
-            <article key={comment.id} className="flex gap-3.5">
-              <span
-                className={cn(
-                  "inline-flex size-10 shrink-0 items-center justify-center rounded-full text-[13px] font-bold shadow-xs",
-                  toneStyles[comment.tone],
-                )}
-              >
-                {comment.initials}
-              </span>
-              <div className="min-w-0 flex-1 rounded-lg border border-line-1 bg-bg-2 px-4 py-3.5 break-words shadow-xs sm:px-5 sm:py-4">
-                <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
-                  <p className="text-[14.5px] font-bold text-fg-1">{comment.name}</p>
-                  {comment.role ? (
-                    <span className="inline-flex items-center rounded-md bg-tint-cornflower px-2 py-0.5 text-[11.5px] font-medium text-fg-link">
-                      {comment.role}
-                    </span>
-                  ) : null}
-                  <span className="text-[12.5px] text-fg-3">· {comment.postedAgo}</span>
+            <div key={comment.id} className="flex flex-col gap-3">
+              <CommentCard comment={comment} onReply={() => startReply(comment)} />
+
+              {comment.replies.length > 0 ? (
+                <div className="flex flex-col gap-3 border-l border-line-1 pl-4 sm:pl-6">
+                  {comment.replies.map((reply) => (
+                    <CommentCard
+                      key={reply.id}
+                      comment={reply}
+                      compact
+                      // One level only, so a reply answers the thread it is in.
+                      onReply={() => startReply(comment)}
+                    />
+                  ))}
                 </div>
-                <p className="mt-2.5 text-[14.5px] leading-[1.65] whitespace-pre-wrap text-fg-2">
-                  {comment.body}
-                </p>
-                <div className="mt-3.5 flex items-center gap-4 text-[12.5px] text-fg-3">
-                  <span className="inline-flex items-center gap-1.5">
-                    <Heart className="size-[13px]" strokeWidth={1.75} />
-                    {comment.likes}
-                  </span>
-                </div>
-              </div>
-            </article>
+              ) : null}
+            </div>
           ))}
         </div>
       )}
@@ -413,5 +430,72 @@ export function CommentThread({
         </div>
       ) : null}
     </section>
+  );
+}
+
+/**
+ * One comment. Replies use the same card a shade smaller, so a thread reads as
+ * one conversation rather than two different components.
+ */
+function CommentCard({
+  comment,
+  onReply,
+  compact = false,
+}: {
+  comment: Comment;
+  onReply: () => void;
+  compact?: boolean;
+}) {
+  return (
+    <article className="flex gap-3.5">
+      <span
+        className={cn(
+          "inline-flex shrink-0 items-center justify-center rounded-full font-bold shadow-xs",
+          compact ? "size-8 text-[11.5px]" : "size-10 text-[13px]",
+          toneStyles[comment.tone],
+        )}
+      >
+        {comment.initials}
+      </span>
+      <div
+        className={cn(
+          "min-w-0 flex-1 rounded-lg border bg-bg-2 px-4 py-3.5 break-words shadow-xs sm:px-5 sm:py-4",
+          // The author answering in their own thread is the whole point of
+          // replies, so it is worth marking.
+          comment.isAuthor ? "border-line-brand" : "border-line-1",
+        )}
+      >
+        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+          <p className="text-[14.5px] font-bold text-fg-1">{comment.name}</p>
+          {comment.isAuthor ? (
+            <span className="inline-flex items-center rounded-md bg-brand px-2 py-0.5 text-[11.5px] font-semibold text-on-brand">
+              Author
+            </span>
+          ) : comment.role ? (
+            <span className="inline-flex items-center rounded-md bg-tint-cornflower px-2 py-0.5 text-[11.5px] font-medium text-fg-link">
+              {comment.role}
+            </span>
+          ) : null}
+          <span className="text-[12.5px] text-fg-3">· {comment.postedAgo}</span>
+        </div>
+        <p className="mt-2.5 text-[14.5px] leading-[1.65] whitespace-pre-wrap text-fg-2">
+          {comment.body}
+        </p>
+        <div className="mt-3.5 flex items-center gap-4 text-[12.5px] text-fg-3">
+          <span className="inline-flex items-center gap-1.5">
+            <Heart className="size-[13px]" strokeWidth={1.75} />
+            {comment.likes}
+          </span>
+          <button
+            type="button"
+            onClick={onReply}
+            className="inline-flex cursor-pointer items-center gap-1.5 font-semibold transition-colors hover:text-brand"
+          >
+            <Reply className="size-[13px]" strokeWidth={1.75} />
+            Reply
+          </button>
+        </div>
+      </div>
+    </article>
   );
 }
