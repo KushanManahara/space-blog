@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { AuthorAvatar } from "@/components/author/author-byline";
 import { PostRow } from "@/components/post/post-row";
-import { author, getPopularPosts, routes, tags } from "@/lib/content";
+import { author, getPopularPosts, listTags, routes } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
 /** Sticky rail used beside the archive listing. */
@@ -60,20 +60,22 @@ function TagsCard() {
     <SidebarCard>
       <div className="flex items-center justify-between">
         <h2 className="text-[16px] font-bold text-fg-1">Tags</h2>
-        <Link href={routes.topics} className="text-[12.5px] font-semibold text-brand">
+        <Link href={routes.tags} className="text-[12.5px] font-semibold text-brand">
           View all ↗
         </Link>
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
-        {tags.slice(0, 9).map((tag) => (
-          <Link
-            key={tag.name}
-            href={`${routes.search}?q=${encodeURIComponent(tag.name.replace("#", ""))}`}
-            className="rounded-full border border-line-1 bg-bg-1 px-3 py-[7px] text-[13px] text-fg-2 transition-[color,border-color] duration-300 ease-expo hover:border-line-brand hover:text-brand"
-          >
-            {tag.name}
-          </Link>
-        ))}
+        {listTags()
+          .slice(0, 9)
+          .map((tag) => (
+            <Link
+              key={tag.name}
+              href={`${routes.tags}/${tag.slug}`}
+              className="rounded-full border border-line-1 bg-bg-1 px-3 py-[7px] text-[13px] text-fg-2 transition-[color,border-color] duration-300 ease-expo hover:border-line-brand hover:text-brand"
+            >
+              {tag.name}
+            </Link>
+          ))}
       </div>
     </SidebarCard>
   );
