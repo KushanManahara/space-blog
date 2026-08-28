@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import {
+  Check,
   ChevronDown,
   ChevronUp,
   Heart,
@@ -13,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { addCommentAction } from "@/app/actions";
+import { author } from "@/lib/content";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -47,7 +49,11 @@ export function CommentThread({
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
 
-  const [posted, setPosted] = React.useState<Comment[]>([]);
+  const [posted] = React.useState<Comment[]>([]);
+  // Comments are reviewed before they appear, so submitting shows a receipt
+  // rather than the comment itself.
+  const [held, setHeld] = React.useState(false);
+  const [honeypot, setHoneypot] = React.useState("");
   const [isExpanded, setIsExpanded] = React.useState(false);
 
   // Restore saved commenter profile from localStorage on mount
@@ -109,26 +115,6 @@ export function CommentThread({
       // Ignore local storage error
     }
 
-    const initials =
-      trimmedName
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase() || "AN";
-
-    const localComment: Comment = {
-      id: `local-${Date.now()}`,
-      name: trimmedName,
-      role: trimmedRole,
-      initials,
-      postedAgo: "just now",
-      likes: 0,
-      tone: "cornflower",
-      body: trimmedBody,
-    };
-
-    setPosted((current) => [localComment, ...current]);
     setDraft("");
     setIsModalOpen(false);
 
@@ -139,9 +125,13 @@ export function CommentThread({
         role: trimmedRole,
         email: trimmedEmail,
         body: trimmedBody,
+        website: honeypot,
       });
 
-      if (!res.success) {
+      if (res.success) {
+        setHeld(true);
+        setHoneypot("");
+      } else {
         setErrorMsg(res.error || "Failed to submit comment.");
       }
     }
@@ -165,8 +155,23 @@ export function CommentThread({
       {/* Main Comment Draft Input */}
       <form
         onSubmit={handleOpenModal}
-        className="mt-5 rounded-lg border border-line-1 bg-bg-2 p-5 shadow-xs md:p-6"
+        className="relative mt-5 rounded-lg border border-line-1 bg-bg-2 p-5 shadow-xs md:p-6"
       >
+        {/* Honeypot: off-screen and hidden from assistive tech, so only a bot
+            filling every field will complete it. */}
+        <div aria-hidden className="absolute left-[-9999px] h-px w-px overflow-hidden">
+          <label htmlFor="comment-company-website">Company website</label>
+          <input
+            id="comment-company-website"
+            name="company_website"
+            type="text"
+            tabIndex={-1}
+            autoComplete="off"
+            value={honeypot}
+            onChange={(event) => setHoneypot(event.target.value)}
+          />
+        </div>
+
         <label htmlFor="comment-body" className="block text-[13px] font-semibold text-fg-2">
           Add to the discussion
         </label>
@@ -179,10 +184,23 @@ export function CommentThread({
           className="mt-2.5 min-h-24 resize-y rounded-md border-line-1 bg-bg-1 p-3 text-[16px] text-fg-1 focus-visible:ring-brand sm:text-[14px]"
         />
 
+        {held ? (
+          <p
+            role="status"
+            className="mt-3.5 flex items-start gap-2 rounded-md bg-tint-cornflower px-3.5 py-3 text-[13px] leading-[1.55] text-accent-indigo"
+          >
+            <Check className="mt-px size-4 shrink-0" strokeWidth={2} />
+            <span>
+              Thanks. Your response is with {author.name} for review and will appear here once it is
+              approved.
+            </span>
+          </p>
+        ) : null}
+
         <div className="mt-3.5 flex flex-wrap items-center justify-between gap-3 border-t border-line-1/60 pt-3.5">
           <p className="inline-flex items-center gap-1.5 text-[12px] text-fg-3">
             <Lock className="size-3.5 text-fg-3/80" />
-            Verified name, role, and email required before posting.
+            Name, role and email required. Responses are reviewed before they appear.
           </p>
 
           <div className="flex w-full items-center justify-end gap-2.5 sm:w-auto">
