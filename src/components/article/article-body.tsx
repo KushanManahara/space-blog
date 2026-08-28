@@ -1,6 +1,9 @@
+"use client";
+
 import * as React from "react";
 import { Info, PencilLine } from "lucide-react";
 
+import { useArticleAudio } from "@/components/article/article-audio-provider";
 import { ArticleFormula } from "@/components/article/article-formula";
 import { ArticleGraph } from "@/components/article/article-graph";
 import { ArticleImage } from "@/components/article/article-image";
@@ -11,17 +14,35 @@ import { markdownToHtml } from "@/components/article/markdown";
 import { RunnableCode } from "@/components/article/runnable-code";
 import type { ArticleBlock } from "@/lib/content";
 import { formatDate } from "@/lib/format";
+import { cn } from "@/lib/utils";
 
 /** Renders the clean, unboxed markdown article content. */
 export function ArticleBody({ blocks, id }: { blocks: ArticleBlock[]; id: string }) {
+  const audio = useArticleAudio();
+  const activeBlockIndex = audio?.currentSegment?.blockIndex;
+  const isAudioActive = audio?.isAudioActive ?? false;
+
   return (
     <div
       id={id}
       className="article-body-markdown w-full max-w-[780px] min-w-0 break-words text-fg-prose"
     >
-      {blocks.map((block, index) => (
-        <ArticleBlockView key={index} block={block} isFirst={index === 0} />
-      ))}
+      {blocks.map((block, index) => {
+        const isActive = isAudioActive && activeBlockIndex === index;
+        return (
+          <div
+            key={index}
+            id={`article-block-${index}`}
+            data-audio-block-index={index}
+            className={cn(
+              "transition-[box-shadow,background-color,border-color] duration-300 rounded-xl",
+              isActive && "ring-2 ring-brand/40 bg-brand/[0.04] p-3 -mx-3 dark:ring-brand/35 dark:bg-brand/[0.08]",
+            )}
+          >
+            <ArticleBlockView block={block} isFirst={index === 0} />
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -86,9 +107,6 @@ function ArticleBlockView({ block, isFirst }: { block: ArticleBlock; isFirst: bo
     case "correction":
       return (
         <aside className="mt-8 w-full max-w-full min-w-0 border-l-[3px] border-fg-1 bg-bg-2 py-4 pr-4 pl-4 sm:py-5 sm:pr-6 sm:pl-6">
-          {/* Deliberately not another tinted callout: every tint in this palette
-              is a blue, so colour cannot carry the distinction. The ink rule and
-              the missing fill do. */}
           <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
             <PencilLine className="size-[15px] text-fg-1" strokeWidth={2} />
             <p className="text-[12px] font-bold tracking-[0.16em] text-fg-1 uppercase">
@@ -98,11 +116,9 @@ function ArticleBlockView({ block, isFirst }: { block: ArticleBlock; isFirst: bo
               {formatDate(block.date)}
             </time>
           </div>
-
           {block.was ? (
             <p className="mt-3 text-[14.5px] leading-[1.6] text-fg-3 line-through">{block.was}</p>
           ) : null}
-
           <p
             className="mt-2 text-[15px] leading-[1.65] text-fg-prose sm:text-[15.5px]"
             dangerouslySetInnerHTML={{ __html: markdownToHtml(block.note) }}
@@ -115,6 +131,21 @@ function ArticleBlockView({ block, isFirst }: { block: ArticleBlock; isFirst: bo
         <RunnableCode filename={block.filename} code={block.code} className="mt-6" />
       ) : (
         <CodeBlock filename={block.filename} code={block.code} className="mt-6" />
+      );
+
+    case "figure":
+      return (
+        <ArticleGraph
+          variant={block.variant}
+          title={block.title}
+          caption={block.caption}
+          note={block.note}
+          xKey={block.xKey}
+          xLabel={block.xLabel}
+          yLabel={block.yLabel}
+          series={block.series}
+          data={block.data}
+        />
       );
 
     case "mermaid":
@@ -139,21 +170,6 @@ function ArticleBlockView({ block, isFirst }: { block: ArticleBlock; isFirst: bo
           rows={block.rows}
           caption={block.caption}
           numericColumns={block.numericColumns}
-        />
-      );
-
-    case "figure":
-      return (
-        <ArticleGraph
-          variant={block.variant}
-          title={block.title}
-          caption={block.caption}
-          note={block.note}
-          xKey={block.xKey}
-          xLabel={block.xLabel}
-          yLabel={block.yLabel}
-          series={block.series}
-          data={block.data}
         />
       );
 
