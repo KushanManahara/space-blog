@@ -9,6 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     routes.articles,
     routes.topics,
     routes.tags,
+    routes.series,
     routes.paths,
     routes.corrections,
     routes.about,
