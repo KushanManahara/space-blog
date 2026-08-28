@@ -63,8 +63,30 @@ export const articleBlockSchema = z.discriminatedUnion("kind", [
     kind: z.literal("code"),
     filename: z.string().min(1),
     code: z.string().min(1),
+    /**
+     * Render with an editor and a Run button. Only for Python that genuinely
+     * executes in the browser — no network, no API keys — and only where
+     * changing a value and re-running teaches something.
+     */
+    runnable: z.boolean().optional(),
   }),
   z.object({ kind: z.literal("footnotes"), items: z.array(z.string().min(1)).min(1) }),
+
+  /**
+   * A dated correction, sitting at the point in the article it applies to.
+   *
+   * The publication's stated policy is that corrections are appended and dated,
+   * never edited quietly into the original — so a correction is a block in the
+   * body rather than a rewrite of the paragraph above it. `was` is optional and
+   * holds the claim being withdrawn, for the cases where the original wording
+   * matters.
+   */
+  z.object({
+    kind: z.literal("correction"),
+    date: z.iso.date(),
+    note: z.string().min(1),
+    was: z.string().min(1).optional(),
+  }),
 
   /** Mermaid source, rendered client-side. `caption` labels the figure. */
   z.object({
@@ -126,7 +148,8 @@ export const postSchema = z.object({
   featured: z.boolean().optional(),
   /** ISO date; formatted for display at the edge of the UI. */
   publishedAt: z.iso.date(),
-  readingMinutes: z.number().int().positive(),
+  /** Derived from the body in `posts.ts`; never authored by hand. */
+  readingMinutes: z.number().int().positive().default(1),
   likes: z.number().int().nonnegative(),
   views: z.number().int().nonnegative(),
   commentCount: z.number().int().nonnegative(),
@@ -150,6 +173,21 @@ export const seriesSchema = z.object({
   status: z.string().min(1),
   parts: z.array(z.string().min(1)).min(1),
   currentPart: z.number().int().positive(),
+});
+
+/**
+ * A curated route through the archive.
+ *
+ * Distinct from a series: a series is a run the author wrote in order, a path
+ * is a way in for someone who has not read any of it. Paths cross topics and
+ * years freely and may reuse a post that also belongs to a series.
+ */
+export const readingPathSchema = z.object({
+  slug: z.string().min(1),
+  title: z.string().min(1),
+  dek: z.string().min(1),
+  forWho: z.string().min(1),
+  steps: z.array(z.object({ slug: z.string().min(1), why: z.string().min(1) })).min(2),
 });
 
 export const tagSchema = z.object({
@@ -183,6 +221,10 @@ export const commentSchema = z.object({
   likes: z.number().int().nonnegative(),
   body: z.string().min(1),
   tone: z.enum(["violet", "cornflower", "orchid"]),
+  /** Set on replies; top-level comments leave it undefined. */
+  parentId: z.string().optional(),
+  /** Author of the post, so replies from them can be badged. */
+  isAuthor: z.boolean().optional(),
 });
 
 export const timelineEntrySchema = z.object({
@@ -209,12 +251,22 @@ export type Topic = z.infer<typeof topicSchema>;
 export type ArticleBlock = z.infer<typeof articleBlockSchema>;
 export type Post = z.infer<typeof postSchema>;
 export type Series = z.infer<typeof seriesSchema>;
+export type ReadingPath = z.infer<typeof readingPathSchema>;
 export type Tag = z.infer<typeof tagSchema>;
 export type Author = z.infer<typeof authorSchema>;
+export type CorrectionBlock = Extract<ArticleBlock, { kind: "correction" }>;
 export type Comment = z.infer<typeof commentSchema>;
+
+/** A top-level comment with its replies attached, which is how threads render. */
+export type CommentNode = Comment & { replies: Comment[] };
 export type TimelineEntry = z.infer<typeof timelineEntrySchema>;
 export type ComponentInventoryItem = z.infer<typeof componentInventoryItemSchema>;
 export type StudioPost = z.infer<typeof studioPostSchema>;
 
-/** Everything about a post except its body — what list surfaces need. */
-export type PostSummary = Omit<Post, "body">;
+/**
+ * Everything about a post except its body — what list surfaces need.
+ *
+ * `correctedAt` is carried across because the body is not: a card has to be
+ * able to badge a corrected post without the whole article in the payload.
+ */
+export type PostSummary = Omit<Post, "body"> & { correctedAt?: string };
