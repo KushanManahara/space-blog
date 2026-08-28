@@ -1,46 +1,92 @@
 "use client";
 
 import * as React from "react";
-import { Check, Link2, Mail, Share, X } from "lucide-react";
+import { Check, Copy, Link2, Mail, Printer, Share, X } from "lucide-react";
 
 import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { author } from "@/lib/content";
+import {
+  author,
+  copyArticleToClipboard,
+  getPostBySlug,
+  type Post,
+  type PostSummary,
+} from "@/lib/content";
 
-/** Share targets. “Copy link” is the only one wired to a browser API. */
+/** Share targets, including Copy Link, Copy Article (with watermark), and Print. */
 export function ShareSheet({
   open,
   onOpenChange,
   title,
   url,
+  slug,
+  post,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
   url: string;
+  slug?: string;
+  post?: Post | PostSummary;
 }) {
-  const [copyState, setCopyState] = React.useState<"idle" | "copied" | "failed">("idle");
-  const copied = copyState === "copied";
+  const [copyLinkState, setCopyLinkState] = React.useState<"idle" | "copied" | "failed">("idle");
+  const [copyArticleState, setCopyArticleState] = React.useState<"idle" | "copied" | "failed">(
+    "idle",
+  );
+
+  const linkCopied = copyLinkState === "copied";
+  const articleCopied = copyArticleState === "copied";
 
   const handleOpenChange = (next: boolean) => {
-    setCopyState("idle");
+    setCopyLinkState("idle");
+    setCopyArticleState("idle");
     onOpenChange(next);
+  };
+
+  const handleCopyArticle = async () => {
+    const targetSlug = slug ?? (post ? post.slug : undefined);
+    const fullPost = post && "body" in post ? (post as Post) : targetSlug ? getPostBySlug(targetSlug) : undefined;
+    if (!fullPost) return;
+
+    if (await copyArticleToClipboard(fullPost)) {
+      setCopyArticleState("copied");
+      setTimeout(() => setCopyArticleState("idle"), 2000);
+      return;
+    }
+    setCopyArticleState("failed");
+  };
+
+  const handlePrint = () => {
+    if (typeof window !== "undefined") {
+      onOpenChange(false);
+      setTimeout(() => window.print(), 200);
+    }
   };
 
   const targets = [
     {
-      label: copyState === "failed" ? "Press Ctrl/Cmd+C to copy" : "Copy link",
+      label: copyLinkState === "failed" ? "Press Ctrl/Cmd+C to copy" : "Copy link",
       note: url,
-      icon: copied ? Check : Link2,
+      icon: linkCopied ? Check : Link2,
       action: async () => {
         if (await copyToClipboard(url)) {
-          setCopyState("copied");
-          setTimeout(() => setCopyState("idle"), 2000);
+          setCopyLinkState("copied");
+          setTimeout(() => setCopyLinkState("idle"), 2000);
           return;
         }
-        // Clipboard blocked (insecure context, denied permission, older browser).
-        // The URL below is select-all, so one click grabs it for a manual copy.
-        setCopyState("failed");
+        setCopyLinkState("failed");
       },
+    },
+    {
+      label: articleCopied ? "Article copied!" : "Copy full article",
+      note: "Formatted text with copyright watermark",
+      icon: articleCopied ? Check : Copy,
+      action: handleCopyArticle,
+    },
+    {
+      label: "Print article",
+      note: "Clean layout with watermark (⌘P)",
+      icon: Printer,
+      action: handlePrint,
     },
     {
       label: "Share on X",
@@ -64,9 +110,9 @@ export function ShareSheet({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-[400px] p-5.5">
+      <DialogContent className="max-w-[420px] p-5.5">
         <div className="flex items-center justify-between gap-3">
-          <DialogTitle className="text-[16px]">Share this post</DialogTitle>
+          <DialogTitle className="text-[16px]">Share or export article</DialogTitle>
           <DialogClose className="inline-flex size-7.5 cursor-pointer items-center justify-center rounded-full text-fg-3 transition-colors duration-300 ease-expo hover:bg-bg-3">
             <X className="size-[15px]" strokeWidth={2} />
             <span className="sr-only">Close</span>
@@ -130,7 +176,7 @@ async function copyToClipboard(text: string): Promise<boolean> {
       return true;
     }
   } catch {
-    // Fall through to the legacy path below.
+    // Fall through to legacy path
   }
 
   try {

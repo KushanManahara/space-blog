@@ -1,8 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { BookOpen, Share, Sparkles } from "lucide-react";
+import { BookOpen, Headphones, Pause, Share, Sparkles } from "lucide-react";
 
+import { useArticleAudio } from "@/components/article/article-audio-provider";
 import { useReaderMode } from "@/components/article/reader-mode-provider";
 import { useReadingProgress } from "@/components/article/reading-progress";
 import { ShareSheet } from "@/components/article/share-sheet";
@@ -103,12 +104,16 @@ function ProgressRing({ progress }: { progress: number }) {
  */
 export function ReadingBar({ post, next }: { post: PostSummary; next: PostSummary }) {
   const { toggleReaderMode } = useReaderMode();
+  const audio = useArticleAudio();
   const { progress } = useReadingProgress();
   const [shareOpen, setShareOpen] = React.useState(false);
   const footerApproaching = useFooterApproaching();
   const commentsEntered = useCommentsEntered();
 
   const isPastArticle = progress >= 0.95 || commentsEntered;
+
+  // Don't show reading dock if audio player is actively open (to avoid overlapping floating bars)
+  if (audio?.isAudioActive) return null;
 
   if (progress <= 0.04) return null;
 
@@ -133,7 +138,7 @@ export function ReadingBar({ post, next }: { post: PostSummary; next: PostSummar
             "dark:shadow-[0_20px_50px_-10px_rgba(0,0,0,0.9),0_8px_20px_-6px_rgba(0,0,0,0.8),0_0_0_1px_rgba(255,255,255,0.12)]",
             isPastArticle
               ? "pointer-events-none mr-0 max-w-0 -translate-x-8 scale-90 overflow-hidden border-transparent px-0 py-0 opacity-0"
-              : "pointer-events-auto mr-2.5 max-w-[340px] translate-x-0 scale-100 px-3 py-1.5 opacity-100 sm:mr-3 sm:px-3.5 sm:py-2",
+              : "pointer-events-auto mr-2.5 max-w-[380px] translate-x-0 scale-100 px-3 py-1.5 opacity-100 sm:mr-3 sm:px-3.5 sm:py-2",
           )}
         >
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
@@ -146,6 +151,28 @@ export function ReadingBar({ post, next }: { post: PostSummary; next: PostSummar
             </div>
 
             <div className="h-4 w-px bg-line-2" />
+
+            {/* Audio Narrator Trigger */}
+            {audio?.isSupported ? (
+              <button
+                type="button"
+                onClick={audio.togglePlayPause}
+                title={audio.isPlaying ? "Pause narration" : "Listen to article audio"}
+                aria-label={audio.isPlaying ? "Pause narration" : "Listen to article audio"}
+                className={cn(
+                  "inline-flex size-7.5 cursor-pointer items-center justify-center rounded-full transition-[background-color,color,transform] active:scale-95",
+                  audio.isPlaying
+                    ? "bg-brand/15 text-brand"
+                    : "text-fg-2 hover:bg-bg-3 hover:text-brand",
+                )}
+              >
+                {audio.isPlaying ? (
+                  <Pause className="size-3.5 fill-current" />
+                ) : (
+                  <Headphones className="size-3.5" strokeWidth={1.8} />
+                )}
+              </button>
+            ) : null}
 
             {/* Reader Mode Trigger */}
             <button
@@ -236,6 +263,7 @@ export function ReadingBar({ post, next }: { post: PostSummary; next: PostSummar
         onOpenChange={setShareOpen}
         title={post.title}
         url={`${siteUrl}/articles/${post.slug}`}
+        slug={post.slug}
       />
     </aside>
   );

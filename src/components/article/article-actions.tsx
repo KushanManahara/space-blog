@@ -1,22 +1,31 @@
 "use client";
 
 import * as React from "react";
-import { BookOpen, Eye, Heart, MessageSquare, Share } from "lucide-react";
+import { BookOpen, Check, Copy, Eye, Headphones, Heart, MessageSquare, Pause, Printer, Share } from "lucide-react";
 
 import { likePostAction } from "@/app/actions";
+import { useArticleAudio } from "@/components/article/article-audio-provider";
 import { useReaderMode } from "@/components/article/reader-mode-provider";
 import { ShareSheet } from "@/components/article/share-sheet";
 import { useSavedPosts } from "@/components/providers/saved-posts-provider";
 import { IconToggle } from "@/components/ui/icon-toggle";
-import { siteUrl, type PostSummary } from "@/lib/content";
+import {
+  copyArticleToClipboard,
+  getPostBySlug,
+  siteUrl,
+  type Post,
+  type PostSummary,
+} from "@/lib/content";
 import { formatCount } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-/** Like, comment count, views, reader mode and share — the rail under the article byline. */
-export function ArticleActions({ post }: { post: PostSummary }) {
+/** Like, comment count, views, reader mode, print, copy and share — the rail under the article byline. */
+export function ArticleActions({ post }: { post: PostSummary | Post }) {
   const { toggleReaderMode } = useReaderMode();
+  const audio = useArticleAudio();
   const { isLiked, toggleLiked } = useSavedPosts();
   const [shareOpen, setShareOpen] = React.useState(false);
+  const [copied, setCopied] = React.useState(false);
   const liked = isLiked(post.slug);
 
   const [optimisticLikes, setOptimisticLikes] = React.useOptimistic(
@@ -33,8 +42,51 @@ export function ArticleActions({ post }: { post: PostSummary }) {
     });
   };
 
+  const handleCopyPage = async () => {
+    const fullPost = "body" in post ? (post as Post) : getPostBySlug(post.slug);
+    if (!fullPost) return;
+
+    const ok = await copyArticleToClipboard(fullPost);
+    if (ok) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    }
+  };
+
+  const handlePrint = () => {
+    if (typeof window !== "undefined") {
+      window.print();
+    }
+  };
+
   return (
     <div className="flex w-full flex-wrap items-center justify-between gap-2 sm:ml-auto sm:w-auto sm:justify-start">
+      {/* 0. Listen / Audio Read */}
+      {audio?.isSupported !== false ? (
+        <button
+          type="button"
+          onClick={audio?.togglePlayPause}
+          title={audio?.isPlaying ? "Pause narration" : "Listen to article audio"}
+          aria-label={audio?.isPlaying ? "Pause article narration" : "Listen to article narration"}
+          className={cn(
+            "inline-flex size-10 cursor-pointer items-center justify-center gap-2 rounded-full border text-[13.5px] font-semibold transition-[background-color,transform,box-shadow,color,border-color] duration-300 ease-bounce hover:-translate-y-0.5 hover:shadow-sm active:scale-[0.96] active:duration-150 active:ease-out sm:size-auto sm:px-3.5 sm:py-2",
+            audio?.isPlaying
+              ? "border-brand/50 bg-brand/10 text-brand dark:border-brand/40 dark:bg-brand/20"
+              : "border-line-1 bg-bg-2 text-fg-2 hover:border-brand/40 hover:text-brand",
+          )}
+        >
+          {audio?.isPlaying ? (
+            <Pause className="size-4 fill-current" />
+          ) : (
+            <Headphones className="size-4" strokeWidth={1.75} />
+          )}
+          <span className="hidden sm:inline">
+            {audio?.isPlaying ? "Listening…" : "Listen"}
+          </span>
+        </button>
+      ) : null}
+
+      {/* 1. Focus Read Mode */}
       <button
         type="button"
         onClick={toggleReaderMode}
@@ -48,6 +100,46 @@ export function ArticleActions({ post }: { post: PostSummary }) {
           R
         </kbd>
       </button>
+
+      {/* 2. Copy Page with Watermark */}
+      <button
+        type="button"
+        onClick={handleCopyPage}
+        title="Copy article with watermark & copyright notice"
+        aria-label="Copy full article with watermark"
+        className={cn(
+          "inline-flex size-10 cursor-pointer items-center justify-center gap-1.5 rounded-full border text-[13.5px] font-semibold transition-[background-color,transform,box-shadow,color,border-color] duration-300 ease-bounce hover:-translate-y-0.5 hover:shadow-sm active:scale-[0.96] active:duration-150 active:ease-out sm:size-auto sm:px-3.5 sm:py-2",
+          copied
+            ? "border-emerald-500/50 bg-emerald-50 text-emerald-700 dark:border-emerald-500/40 dark:bg-emerald-950/40 dark:text-emerald-300"
+            : "border-line-1 bg-bg-2 text-fg-2 hover:border-line-2 hover:text-fg-1",
+        )}
+      >
+        {copied ? (
+          <>
+            <Check className="size-4 text-emerald-600 dark:text-emerald-400" strokeWidth={2.2} />
+            <span className="hidden sm:inline">Copied!</span>
+          </>
+        ) : (
+          <>
+            <Copy className="size-4" strokeWidth={1.75} />
+            <span className="hidden sm:inline">Copy page</span>
+          </>
+        )}
+      </button>
+
+      {/* 3. Print Article */}
+      <button
+        type="button"
+        onClick={handlePrint}
+        title="Print article (⌘P / Ctrl+P)"
+        aria-label="Print this article"
+        className="inline-flex size-10 cursor-pointer items-center justify-center gap-1.5 rounded-full border border-line-1 bg-bg-2 text-[13.5px] font-semibold text-fg-2 transition-[transform,box-shadow,color,border-color] duration-300 ease-bounce hover:-translate-y-0.5 hover:border-line-2 hover:text-fg-1 hover:shadow-sm active:scale-[0.96] active:duration-150 active:ease-out sm:size-auto sm:px-3.5 sm:py-2"
+      >
+        <Printer className="size-4" strokeWidth={1.75} />
+        <span className="hidden sm:inline">Print</span>
+      </button>
+
+      {/* 4. Likes */}
       <button
         type="button"
         aria-pressed={liked}
@@ -63,6 +155,7 @@ export function ArticleActions({ post }: { post: PostSummary }) {
         <span>{optimisticLikes}</span>
       </button>
 
+      {/* 5. Responses Link */}
       <a
         href="#responses"
         className="inline-flex items-center gap-2 rounded-full border border-line-1 bg-bg-2 px-4 py-2.5 text-[13.5px] font-semibold text-fg-2 transition-shadow duration-300 ease-expo hover:shadow-sm"
@@ -71,11 +164,13 @@ export function ArticleActions({ post }: { post: PostSummary }) {
         {post.commentCount}
       </a>
 
+      {/* 6. View Count */}
       <span className="inline-flex items-center gap-2 px-1.5 py-2.5 text-[13.5px] text-fg-3">
         <Eye className="size-[15px]" strokeWidth={1.75} />
         {formatCount(post.views)}
       </span>
 
+      {/* 7. Share Modal */}
       <button
         type="button"
         onClick={() => setShareOpen(true)}
@@ -90,6 +185,7 @@ export function ArticleActions({ post }: { post: PostSummary }) {
         onOpenChange={setShareOpen}
         title={post.title}
         url={`${siteUrl}/articles/${post.slug}`}
+        slug={post.slug}
       />
     </div>
   );

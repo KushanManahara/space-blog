@@ -1,8 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { AlignLeft, BookOpen, Check, Minus, Plus, Type, X } from "lucide-react";
+import { AlignLeft, BookOpen, Check, Copy, Headphones, Minus, Pause, Plus, Printer, Type, X } from "lucide-react";
 
+import { useArticleAudio } from "@/components/article/article-audio-provider";
 import { ArticleBody } from "@/components/article/article-body";
 import {
   useReaderMode,
@@ -12,7 +13,7 @@ import {
   type ReaderTheme,
 } from "@/components/article/reader-mode-provider";
 import { AuthorAvatar } from "@/components/author/author-byline";
-import { author, type Post } from "@/lib/content";
+import { author, copyArticleToClipboard, type Post } from "@/lib/content";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -99,6 +100,7 @@ export function ReaderModeView({ post }: { post: Post }) {
     columnWidth,
     setColumnWidth,
   } = useReaderMode();
+  const audio = useArticleAudio();
 
   const [isExiting, setIsExiting] = React.useState(false);
   const [scrollProgress, setScrollProgress] = React.useState(0);
@@ -154,6 +156,21 @@ export function ReaderModeView({ post }: { post: Post }) {
   const currentFont = FONT_FAMILY_CLASSES[fontFamily];
   const currentSizes = FONT_SIZE_CLASSES[fontSize];
   const currentWidth = COLUMN_WIDTH_CLASSES[columnWidth];
+
+  const [copied, setCopied] = React.useState(false);
+
+  const handleCopy = async () => {
+    if (await copyArticleToClipboard(post)) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handlePrint = () => {
+    if (typeof window !== "undefined") {
+      window.print();
+    }
+  };
 
   const fontSizes: ReaderFontSize[] = ["sm", "md", "lg", "xl"];
   const currentSizeIndex = fontSizes.indexOf(fontSize);
@@ -371,6 +388,58 @@ export function ReaderModeView({ post }: { post: Post }) {
                 </div>
               ) : null}
             </div>
+
+            {/* Listen / Read Aloud */}
+            {audio?.isSupported !== false ? (
+              <button
+                type="button"
+                onClick={audio?.togglePlayPause}
+                title={audio?.isPlaying ? "Pause narration" : "Listen to article audio"}
+                aria-label={audio?.isPlaying ? "Pause narration" : "Listen to article audio"}
+                className={cn(
+                  "hidden cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-[13px] font-semibold transition-colors sm:inline-flex",
+                  audio?.isPlaying
+                    ? "border-brand/50 bg-brand/10 text-brand dark:border-brand/40 dark:bg-brand/20"
+                    : "hover:bg-black/5 dark:hover:bg-white/5",
+                )}
+              >
+                {audio?.isPlaying ? (
+                  <Pause className="size-3.5 fill-current" />
+                ) : (
+                  <Headphones className="size-3.5" />
+                )}
+                <span>{audio?.isPlaying ? "Listening…" : "Listen"}</span>
+              </button>
+            ) : null}
+
+            {/* Copy Article (with watermark) */}
+            <button
+              type="button"
+              onClick={handleCopy}
+              title="Copy article with watermark (⌘C)"
+              aria-label="Copy full article with watermark"
+              className={cn(
+                "hidden cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-[13px] font-semibold transition-colors sm:inline-flex",
+                copied
+                  ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                  : "hover:bg-black/5 dark:hover:bg-white/5",
+              )}
+            >
+              {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+              <span>{copied ? "Copied!" : "Copy"}</span>
+            </button>
+
+            {/* Print Article */}
+            <button
+              type="button"
+              onClick={handlePrint}
+              title="Print article (⌘P)"
+              aria-label="Print article"
+              className="hidden cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-[13px] font-semibold transition-colors hover:bg-black/5 sm:inline-flex dark:hover:bg-white/5"
+            >
+              <Printer className="size-3.5" />
+              <span>Print</span>
+            </button>
 
             {/* Exit Reader Mode */}
             <button
