@@ -34,6 +34,8 @@ const commentSchema = z.object({
   role: z.string().min(1, "Role / headline is required (e.g. Software Engineer)."),
   email: z.string().email("A valid email address is required."),
   body: z.string().min(2, "Comment must be at least 2 characters."),
+  /** Set when answering an existing comment. */
+  parentId: z.string().min(1).optional(),
 });
 
 /**
@@ -261,6 +263,7 @@ export async function addCommentAction(data: {
   role: string;
   email: string;
   body: string;
+  parentId?: string;
   /** Honeypot; always empty for a real reader. */
   website?: string;
 }) {
@@ -296,6 +299,7 @@ export async function addCommentAction(data: {
       authorEmail: parsed.data.email,
       authorInitials: initials,
       body: parsed.data.body,
+      parentId: parsed.data.parentId,
       // Held for review. Publishing is a deliberate act, not a side effect of
       // an anonymous form submission.
       published: 0,
