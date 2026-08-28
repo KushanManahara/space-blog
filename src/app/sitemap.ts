@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-import { listPosts, routes, siteUrl, topics } from "@/lib/content";
+import { listPosts, listTags, routes, siteUrl, topics } from "@/lib/content";
 
 /** Public surfaces only. The studio is noindex and stays out of the sitemap. */
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -8,6 +8,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     routes.home,
     routes.articles,
     routes.topics,
+    routes.tags,
+    routes.paths,
+    routes.corrections,
     routes.about,
     routes.contact,
   ] as const;
@@ -22,6 +25,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${siteUrl}${routes.topics}/${topic.slug}`,
       changeFrequency: "weekly" as const,
       priority: 0.6,
+    })),
+    ...listTags().map((tag) => ({
+      url: `${siteUrl}${routes.tags}/${tag.slug}`,
+      changeFrequency: "weekly" as const,
+      priority: 0.5,
     })),
     ...listPosts().map((post) => ({
       url: `${siteUrl}${routes.articles}/${post.slug}`,
