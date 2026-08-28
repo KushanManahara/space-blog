@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Info } from "lucide-react";
+import { Info, PencilLine } from "lucide-react";
 
 import { ArticleFormula } from "@/components/article/article-formula";
 import { ArticleGraph } from "@/components/article/article-graph";
@@ -8,7 +8,9 @@ import { ArticleMermaid } from "@/components/article/article-mermaid";
 import { ArticleTable } from "@/components/article/article-table";
 import { CodeBlock } from "@/components/article/code-block";
 import { markdownToHtml } from "@/components/article/markdown";
+import { RunnableCode } from "@/components/article/runnable-code";
 import type { ArticleBlock } from "@/lib/content";
+import { formatDate } from "@/lib/format";
 
 /** Renders the clean, unboxed markdown article content. */
 export function ArticleBody({ blocks, id }: { blocks: ArticleBlock[]; id: string }) {
@@ -81,8 +83,39 @@ function ArticleBlockView({ block, isFirst }: { block: ArticleBlock; isFirst: bo
         </aside>
       );
 
+    case "correction":
+      return (
+        <aside className="mt-8 w-full max-w-full min-w-0 border-l-[3px] border-fg-1 bg-bg-2 py-4 pr-4 pl-4 sm:py-5 sm:pr-6 sm:pl-6">
+          {/* Deliberately not another tinted callout: every tint in this palette
+              is a blue, so colour cannot carry the distinction. The ink rule and
+              the missing fill do. */}
+          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+            <PencilLine className="size-[15px] text-fg-1" strokeWidth={2} />
+            <p className="text-[12px] font-bold tracking-[0.16em] text-fg-1 uppercase">
+              Correction
+            </p>
+            <time dateTime={block.date} className="text-[12.5px] font-medium text-fg-3">
+              {formatDate(block.date)}
+            </time>
+          </div>
+
+          {block.was ? (
+            <p className="mt-3 text-[14.5px] leading-[1.6] text-fg-3 line-through">{block.was}</p>
+          ) : null}
+
+          <p
+            className="mt-2 text-[15px] leading-[1.65] text-fg-prose sm:text-[15.5px]"
+            dangerouslySetInnerHTML={{ __html: markdownToHtml(block.note) }}
+          />
+        </aside>
+      );
+
     case "code":
-      return <CodeBlock filename={block.filename} code={block.code} className="mt-6" />;
+      return block.runnable ? (
+        <RunnableCode filename={block.filename} code={block.code} className="mt-6" />
+      ) : (
+        <CodeBlock filename={block.filename} code={block.code} className="mt-6" />
+      );
 
     case "mermaid":
       return <ArticleMermaid code={block.code} caption={block.caption} />;
