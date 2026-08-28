@@ -175,7 +175,9 @@ export function ReaderModeView({ post }: { post: Post }) {
       ref={containerRef}
       onScroll={handleScroll}
       className={cn(
-        "fixed inset-0 z-100 overflow-y-auto transition-colors duration-300 selection:bg-brand/25",
+        "fixed inset-0 z-100 overflow-y-auto overscroll-contain transition-colors duration-300 selection:bg-brand/25",
+        // Keeps the closing button clear of the home indicator.
+        "pb-[env(safe-area-inset-bottom,0px)]",
         isExiting ? "animate-focus-overlay-out pointer-events-none" : "animate-focus-overlay-in",
         currentTheme.bg,
         currentTheme.text,
@@ -185,7 +187,9 @@ export function ReaderModeView({ post }: { post: Post }) {
       {/* Top sticky progress & toolbar */}
       <div
         className={cn(
-          "sticky top-0 z-50 border-b backdrop-blur-md transition-colors duration-300",
+          // Background stays edge-to-edge; only the toolbar's contents are
+          // pushed clear of the notch.
+          "sticky top-0 z-50 border-b pt-[env(safe-area-inset-top,0px)] backdrop-blur-md transition-colors duration-300",
           isExiting ? "opacity-0" : "animate-focus-toolbar-in",
           currentTheme.headerBg,
         )}
