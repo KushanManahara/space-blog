@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { AuthorByline } from "@/components/author/author-byline";
 import { MetricRow } from "@/components/post/metric-row";
 import { PostCover } from "@/components/post/post-cover";
+import { CorrectedBadge } from "@/components/post/corrected-badge";
 import { TopicBadge } from "@/components/post/topic-badge";
 import type { PostSummary } from "@/lib/content";
 import { formatCount, formatDate } from "@/lib/format";
@@ -41,16 +42,20 @@ export function PostRow({
     >
       <div className="min-w-0">
         {variant === "list" ? (
-          <div className="flex items-center gap-2.5">
+          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
             <TopicBadge topic={post.topic} />
             <span className="text-[12.5px] text-fg-3">
               {formatDate(post.publishedAt)} · {post.readingMinutes} min read
             </span>
+            {post.correctedAt ? <CorrectedBadge date={post.correctedAt} /> : null}
           </div>
         ) : null}
 
         {variant === "card" ? (
-          <TopicBadge topic={post.topic} className="px-[11px] py-[5px]" />
+          <div className="flex flex-wrap items-center gap-2">
+            <TopicBadge topic={post.topic} className="px-[11px] py-[5px]" />
+            {post.correctedAt ? <CorrectedBadge date={post.correctedAt} /> : null}
+          </div>
         ) : null}
 
         <h3
