@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 
 import { Reveal } from "@/components/motion/reveal";
-import { seriesList, type Series } from "@/lib/content";
+import { routes, seriesList, type Series } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
 const seriesTone = [
@@ -22,9 +22,18 @@ export function SeriesGrid() {
   return (
     <section>
       <div className="mx-auto max-w-page px-gutter py-band">
-        <Reveal className="mb-7.5">
-          <h2 className="text-h2 text-fg-1">Series</h2>
-          <p className="mt-2.5 text-[16.5px] text-fg-2">Longer arguments, split into parts.</p>
+        <Reveal className="mb-7.5 flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
+          <div>
+            <h2 className="text-h2 text-fg-1">Series</h2>
+            <p className="mt-2.5 text-[16.5px] text-fg-2">Longer arguments, split into parts.</p>
+          </div>
+          <Link
+            href={routes.series}
+            className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-brand transition-colors duration-300 ease-expo hover:text-brand-strong"
+          >
+            All series
+            <ArrowRight className="size-4 transition-transform duration-300 ease-expo hover:translate-x-0.5" />
+          </Link>
         </Reveal>
 
         <div>
