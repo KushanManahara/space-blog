@@ -87,7 +87,10 @@ function CommandMenu({
         if (!next) setQuery("");
       }}
     >
-      <DialogContent align="top" className="max-w-[620px] overflow-hidden p-0">
+      <DialogContent
+        align="top"
+        className="max-w-[620px] overflow-hidden p-0 data-[state=open]:[animation:command-pop-in_.34s_var(--ease-bounce)]"
+      >
         <DialogTitle className="sr-only">Search posts and pages</DialogTitle>
 
         <div className="flex items-center gap-3 border-b border-line-1 p-3.5 sm:p-4.5">
@@ -109,7 +112,7 @@ function CommandMenu({
           </button>
         </div>
 
-        <div className="max-h-[56vh] overflow-y-auto p-3">
+        <div className="max-h-[56vh] overflow-y-auto p-3 motion-safe:[animation:command-rise_.32s_.06s_var(--ease-expo)_backwards]">
           <p className="px-2.5 py-1.5 text-[11px] font-semibold tracking-[0.12em] text-fg-3 uppercase">
             Posts
           </p>
