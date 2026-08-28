@@ -22,6 +22,8 @@ pnpm lint         # eslint (flat config, eslint-config-next)
 pnpm typecheck    # tsc --noEmit
 pnpm format       # prettier --write . (tailwind class sorting via plugin)
 pnpm format:check # prettier --check .
+pnpm comments     # moderate held comments: list / approve <id> / approve --all / reject <id>
+pnpm embeddings   # rebuild src/lib/content/embeddings.json — run after editing article bodies
 ```
 
 There is no test runner configured yet. If one is added, record the single-test invocation here.
