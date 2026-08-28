@@ -1,6 +1,15 @@
 import { blockText } from "./block-text";
 import { posts } from "./posts";
-import type { CorrectionBlock, Post, PostSummary, StudioPost, Tag, Topic } from "./schemas";
+import type {
+  CorrectionBlock,
+  Post,
+  PostSummary,
+  Series,
+  StudioPost,
+  Tag,
+  Topic,
+  TopicName,
+} from "./schemas";
 import { readingPaths, seriesList, topics } from "./site";
 
 export type SortOrder = "recent" | "views";
@@ -277,6 +286,78 @@ export function searchPosts(query: string, sort: SortOrder = "recent"): Post[] {
 
 export function getSeriesBySlug(slug: string) {
   return seriesList.find((series) => series.slug === slug);
+}
+
+/**
+ * A series with everything a list surface needs to show and filter it.
+ *
+ * All of it derives from the parts, so a series cannot advertise a topic, a
+ * length or a date that its own articles disagree with.
+ */
+export type SeriesSummary = Series & {
+  parts: string[];
+  posts: PostSummary[];
+  topics: TopicName[];
+  views: number;
+  minutes: number;
+  firstPublished: string;
+  lastPublished: string;
+};
+
+export type SeriesSort = "recent" | "longest" | "views";
+
+export const seriesSortLabels: Record<SeriesSort, string> = {
+  recent: "Newest first",
+  longest: "Most parts",
+  views: "Most read",
+};
+
+export function isSeriesSort(value: string | undefined): value is SeriesSort {
+  return value === "recent" || value === "longest" || value === "views";
+}
+
+export function getSeriesSummary(slug: string): SeriesSummary | undefined {
+  const series = seriesList.find((entry) => entry.slug === slug);
+  if (!series) return undefined;
+
+  const parts = getSeriesParts(slug);
+  const dates = parts.map((post) => post.publishedAt).sort();
+
+  return {
+    ...series,
+    posts: toSummaries(parts),
+    topics: [...new Set(parts.map((post) => post.topic))],
+    views: parts.reduce((total, post) => total + post.views, 0),
+    minutes: parts.reduce((total, post) => total + post.readingMinutes, 0),
+    firstPublished: dates[0] ?? "",
+    lastPublished: dates[dates.length - 1] ?? "",
+  };
+}
+
+export function listSeries({
+  topic = "All",
+  sort = "recent",
+}: { topic?: TopicFilter; sort?: SeriesSort } = {}): SeriesSummary[] {
+  const all = seriesList
+    .map((series) => getSeriesSummary(series.slug))
+    .filter((series): series is SeriesSummary => Boolean(series));
+
+  // A series matches a topic if any of its parts do — series cross topics by
+  // nature, so requiring every part to match would filter out most of them.
+  const filtered =
+    topic === "All" ? all : all.filter((series) => series.topics.includes(topic as TopicName));
+
+  return filtered.sort((a, b) => {
+    if (sort === "longest") return b.partCount - a.partCount || b.views - a.views;
+    if (sort === "views") return b.views - a.views;
+    return b.lastPublished.localeCompare(a.lastPublished);
+  });
+}
+
+/** The topics that actually appear across the series, for the filter chips. */
+export function listSeriesTopics(): TopicName[] {
+  const present = new Set(listSeries().flatMap((series) => series.topics));
+  return topics.map((topic) => topic.name).filter((name) => present.has(name));
 }
 
 /** The posts in a series, in reading order. */
