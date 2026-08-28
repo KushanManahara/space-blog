@@ -7,6 +7,7 @@ import { Reveal } from "@/components/motion/reveal";
 import { FilterChips } from "@/components/nav/filter-chips";
 import { Pagination } from "@/components/nav/pagination";
 import { SortToggle } from "@/components/nav/sort-toggle";
+import { PostCover } from "@/components/post/post-cover";
 import { TopicBadge } from "@/components/post/topic-badge";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import {
@@ -130,13 +131,21 @@ export default async function SeriesPage({ searchParams }: PageProps<"/series">)
                 <article className="grid gap-x-10 gap-y-6 border-b border-line-1 py-[clamp(26px,3.5vw,40px)] lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)]">
                   <div>
                     <div className="flex items-start gap-4">
-                      <span className="inline-flex size-[46px] shrink-0 items-center justify-center rounded-md bg-tint-violet text-[15px] font-bold text-brand-strong">
-                        {series.partCount}
-                      </span>
+                      {/* Part one's artwork, so a series is recognisable by the
+                          same image its first article carries. The part count
+                          moved to the metadata line, where the other numbers are. */}
+                      <PostCover
+                        topic={series.coverTopic}
+                        image={series.cover}
+                        alt={series.title}
+                        zoom={false}
+                        pattern={false}
+                        className="size-[58px] shrink-0 rounded-md"
+                      />
                       <div className="min-w-0">
                         <h2 className="text-[20px] leading-[1.25] font-bold tracking-[-0.015em] text-fg-1">
                           <Link
-                            href={`${routes.articles}?series=${series.slug}`}
+                            href={`${routes.series}/${series.slug}`}
                             className="transition-colors duration-300 ease-expo hover:text-brand-strong"
                           >
                             {series.title}
@@ -153,8 +162,9 @@ export default async function SeriesPage({ searchParams }: PageProps<"/series">)
                     </div>
 
                     <p className="mt-3 text-[12.5px] text-fg-3">
-                      {formatDate(series.firstPublished)} – {formatDate(series.lastPublished)} ·{" "}
-                      {series.minutes} min · {formatCount(series.views)} views
+                      {series.partCount} parts · {formatDate(series.firstPublished)} –{" "}
+                      {formatDate(series.lastPublished)} · {series.minutes} min ·{" "}
+                      {formatCount(series.views)} views
                     </p>
                   </div>
 
