@@ -55,20 +55,20 @@ export function CodeBlock({
     <div
       className={cn("w-full max-w-full min-w-0 overflow-hidden rounded-lg shadow-md", className)}
     >
-      <div className="flex items-center justify-between gap-3 border-b border-white/8 bg-n-950 px-4 py-2.5 sm:px-4.5 sm:py-3">
-        <span className="truncate font-mono text-[12px] text-white/55 sm:text-[12.5px]">
+      <div className="flex items-center justify-between gap-3 border-b border-white/8 bg-n-950 px-4 py-2.5 sm:px-4.5 sm:py-3 print:border-neutral-300 print:bg-neutral-100">
+        <span className="truncate font-mono text-[12px] text-white/55 sm:text-[12.5px] print:font-semibold print:text-neutral-800">
           {filename}
         </span>
         <div className="flex shrink-0 items-center gap-2">
           {language !== "plain" ? (
-            <span className="hidden font-mono text-[11px] tracking-[0.08em] text-white/35 uppercase sm:inline">
+            <span className="hidden font-mono text-[11px] tracking-[0.08em] text-white/35 uppercase sm:inline print:inline print:text-neutral-600">
               {language}
             </span>
           ) : null}
           <button
             type="button"
             onClick={copy}
-            className="inline-flex h-7.5 shrink-0 cursor-pointer items-center justify-center rounded px-3 text-[12px] font-semibold text-white/60 transition-[background-color,color,transform] duration-200 ease-expo hover:bg-white/10 hover:text-white active:scale-95"
+            className="inline-flex h-7.5 shrink-0 cursor-pointer items-center justify-center rounded px-3 text-[12px] font-semibold text-white/60 transition-[background-color,color,transform] duration-200 ease-expo hover:bg-white/10 hover:text-white active:scale-95 print:hidden"
           >
             {copied ? "Copied" : "Copy"}
           </button>
