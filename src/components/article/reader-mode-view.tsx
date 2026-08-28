@@ -105,6 +105,7 @@ export function ReaderModeView({ post }: { post: Post }) {
   const [isExiting, setIsExiting] = React.useState(false);
   const [scrollProgress, setScrollProgress] = React.useState(0);
   const [showTypographyMenu, setShowTypographyMenu] = React.useState(false);
+  const [copied, setCopied] = React.useState(false);
   const containerRef = React.useRef<HTMLDivElement>(null);
   const menuRef = React.useRef<HTMLDivElement>(null);
 
@@ -150,15 +151,6 @@ export function ReaderModeView({ post }: { post: Post }) {
     }
   }, [showTypographyMenu]);
 
-  if (!isReaderMode && !isExiting) return null;
-
-  const currentTheme = THEME_STYLES[theme];
-  const currentFont = FONT_FAMILY_CLASSES[fontFamily];
-  const currentSizes = FONT_SIZE_CLASSES[fontSize];
-  const currentWidth = COLUMN_WIDTH_CLASSES[columnWidth];
-
-  const [copied, setCopied] = React.useState(false);
-
   const handleCopy = async () => {
     if (await copyArticleToClipboard(post)) {
       setCopied(true);
@@ -186,6 +178,13 @@ export function ReaderModeView({ post }: { post: Post }) {
       setFontSize(fontSizes[currentSizeIndex + 1]);
     }
   };
+
+  if (!isReaderMode && !isExiting) return null;
+
+  const currentTheme = THEME_STYLES[theme];
+  const currentFont = FONT_FAMILY_CLASSES[fontFamily];
+  const currentSizes = FONT_SIZE_CLASSES[fontSize];
+  const currentWidth = COLUMN_WIDTH_CLASSES[columnWidth];
 
   return (
     <div
