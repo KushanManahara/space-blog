@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PencilLine } from "lucide-react";
 
 import { ArticleActions } from "@/components/article/article-actions";
 import { AuthorAvatar } from "@/components/author/author-byline";
@@ -6,7 +7,7 @@ import { HeaderAtmosphere } from "@/components/layout/header-atmosphere";
 import { Reveal } from "@/components/motion/reveal";
 import { CoverRings, PostCover } from "@/components/post/post-cover";
 import { getTopicVisual } from "@/components/post/topic-visuals";
-import { author, type Post, type PostSummary } from "@/lib/content";
+import { author, routes, tagSlug, type Post, type PostSummary } from "@/lib/content";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -39,10 +40,19 @@ export function ArticleHeader({
             </span>
             {secondaryTag ? (
               <Link
-                href={`/search?q=${encodeURIComponent(secondaryTag.replace("#", ""))}`}
+                href={`/tags/${tagSlug(secondaryTag)}`}
                 className="rounded-full bg-tint-cornflower px-3.5 py-1.5 text-[12px] font-semibold text-fg-link"
               >
                 {secondaryTag.replace("#", "").replace(/^./, (char) => char.toUpperCase())}
+              </Link>
+            ) : null}
+            {summary.correctedAt ? (
+              <Link
+                href={routes.corrections}
+                className="inline-flex items-center gap-1.5 rounded-full border border-line-2 px-3.5 py-1.5 text-[12px] font-semibold text-fg-1 transition-colors duration-300 ease-expo hover:border-fg-1"
+              >
+                <PencilLine className="size-3.5" strokeWidth={2} />
+                Corrected {formatDate(summary.correctedAt)}
               </Link>
             ) : null}
             {post.series && partCount ? (
