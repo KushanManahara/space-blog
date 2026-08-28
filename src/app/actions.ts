@@ -5,6 +5,7 @@ import { eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
+import { callerFingerprint, firstTimeInWindow, isHoneypotTripped, underLimit } from "@/lib/abuse";
 import { contactMessages, comments, db, newsletterSubscribers, postStats } from "@/lib/db";
 import type { FormState } from "@/lib/form-state";
 import { getPostBySlug } from "@/lib/content";
@@ -44,6 +45,11 @@ export async function subscribeAction(
   formData: FormData,
 ): Promise<FormState> {
   // VALIDATE SUBSCRIBER EMAIL ADDRESS
+  if (isHoneypotTripped(formData)) {
+    // Silently accept so a bot cannot tell it was caught.
+    return { status: "success", message: "You're on the list." };
+  }
+
   const parsed = subscribeSchema.safeParse({ email: formData.get("email") });
 
   if (!parsed.success) {
@@ -51,6 +57,13 @@ export async function subscribeAction(
   }
 
   const email = parsed.data.email.trim().toLowerCase();
+
+  if (!(await underLimit("subscribe", await callerFingerprint(), 5, 3600))) {
+    return {
+      status: "error",
+      message: "That is a lot of signups from one place. Try again in an hour.",
+    };
+  }
 
   try {
     // 1. SAVE SUBSCRIBER TO DATABASE
@@ -124,6 +137,10 @@ export async function unsubscribeAction(
  * the database write is what decides success.
  */
 export async function contactAction(_previous: FormState, formData: FormData): Promise<FormState> {
+  if (isHoneypotTripped(formData)) {
+    return { status: "success", message: "Message received." };
+  }
+
   const parsed = contactSchema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),
@@ -133,6 +150,13 @@ export async function contactAction(_previous: FormState, formData: FormData): P
 
   if (!parsed.success) {
     return { status: "error", message: parsed.error.issues[0].message };
+  }
+
+  if (!(await underLimit("contact", await callerFingerprint(), 3, 3600))) {
+    return {
+      status: "error",
+      message: "You have sent a few messages already. Try again in an hour.",
+    };
   }
 
   try {
@@ -162,6 +186,13 @@ export async function contactAction(_previous: FormState, formData: FormData): P
  * Toggle or increment like count for a post in Turso.
  */
 export async function likePostAction(slug: string, increment: boolean = true) {
+  // The client also tracks this in localStorage, but that is a UI convenience,
+  // not a guard — clearing it must not let the counter be driven up.
+  const caller = await callerFingerprint();
+  if (!(await underLimit(`like:${slug}`, caller, 4, 86_400))) {
+    return { success: false };
+  }
+
   try {
     const diff = increment ? 1 : -1;
     await db
@@ -192,6 +223,12 @@ export async function likePostAction(slug: string, increment: boolean = true) {
  * Increment view count for a post in Turso.
  */
 export async function recordViewAction(slug: string) {
+  // Session storage de-duplicates in the browser; this makes the count mean
+  // something even when that is bypassed.
+  if (!(await firstTimeInWindow(`view:${slug}`, await callerFingerprint(), 86_400))) {
+    return { success: true };
+  }
+
   try {
     await db
       .insert(postStats)
@@ -224,10 +261,21 @@ export async function addCommentAction(data: {
   role: string;
   email: string;
   body: string;
+  /** Honeypot; always empty for a real reader. */
+  website?: string;
 }) {
   const parsed = commentSchema.safeParse(data);
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0].message };
+  }
+
+  if (data.website && data.website.trim().length > 0) {
+    // Honeypot. Report success so a bot has nothing to tune against.
+    return { success: true, id: "held" };
+  }
+
+  if (!(await underLimit("comment", await callerFingerprint(), 3, 3600))) {
+    return { success: false, error: "Too many responses from here. Try again in an hour." };
   }
 
   const id = crypto.randomUUID();
@@ -248,6 +296,9 @@ export async function addCommentAction(data: {
       authorEmail: parsed.data.email,
       authorInitials: initials,
       body: parsed.data.body,
+      // Held for review. Publishing is a deliberate act, not a side effect of
+      // an anonymous form submission.
+      published: 0,
     });
 
     try {
@@ -255,7 +306,7 @@ export async function addCommentAction(data: {
     } catch {
       // Ignored outside Next.js request context
     }
-    return { success: true, id };
+    return { success: true, id, held: true };
   } catch (error) {
     console.error("Add comment error:", error);
     return { success: false, error: "Failed to post comment." };
