@@ -2,9 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ArticleAudioPlayer } from "@/components/article/article-audio-player";
+import { ArticleAudioProvider } from "@/components/article/article-audio-provider";
 import { ArticleBody } from "@/components/article/article-body";
 import { ArticleHeader } from "@/components/article/article-header";
 import { CommentThread } from "@/components/article/comment-thread";
+import { CopySelectionWatermark } from "@/components/article/copy-selection-watermark";
+import { PrintFooterWatermark, PrintHeaderWatermark } from "@/components/article/print-watermark";
 import { ReaderModeProvider } from "@/components/article/reader-mode-provider";
 import { ReaderModeView } from "@/components/article/reader-mode-view";
 import { ReadingBar } from "@/components/article/reading-bar";
@@ -91,11 +95,14 @@ export default async function ArticlePage({ params }: PageProps<"/articles/[slug
   );
 
   return (
-    <ReaderModeProvider>
-      <ReadingProgressProvider bodyId={BODY_ID} headingIds={headings.map((heading) => heading.id)}>
-        <ViewTracker slug={post.slug} />
-        <ReadingProgressBar />
-        <ReaderModeView post={post} />
+    <ArticleAudioProvider post={post}>
+      <ReaderModeProvider>
+        <ReadingProgressProvider bodyId={BODY_ID} headingIds={headings.map((heading) => heading.id)}>
+          <ViewTracker slug={post.slug} />
+          <CopySelectionWatermark post={post} />
+          <ReadingProgressBar />
+          <ReaderModeView post={post} />
+          <ArticleAudioPlayer />
         <script
           type="application/ld+json"
           // Serialised, not user input: every value comes from the content layer.
@@ -117,13 +124,14 @@ export default async function ArticlePage({ params }: PageProps<"/articles/[slug
         />
 
         <article className="mx-auto w-full max-w-page min-w-0 px-gutter pt-[clamp(32px,4vw,60px)]">
+          <PrintHeaderWatermark post={post} />
           <ArticleHeader post={post} summary={summary} partCount={series?.partCount} />
 
           <div className="mt-[clamp(36px,4vw,56px)] grid w-full min-w-0 grid-cols-1 items-start gap-[clamp(32px,4.5vw,72px)] pb-[clamp(84px,10vw,150px)] lg:grid-cols-[minmax(0,1fr)_320px]">
             <div className="w-full max-w-full min-w-0">
               <ArticleBody id={BODY_ID} blocks={post.body} />
 
-              <div className="mt-8.5 flex flex-wrap gap-2">
+              <div className="mt-8.5 flex flex-wrap gap-2 print:hidden">
                 {post.tags.map((tag) => (
                   <Link
                     key={tag}
@@ -136,7 +144,7 @@ export default async function ArticlePage({ params }: PageProps<"/articles/[slug
               </div>
 
               {series && post.series ? (
-                <nav aria-label="Series navigation" className="mt-9 grid gap-3.5 sm:grid-cols-2">
+                <nav aria-label="Series navigation" className="mt-9 grid gap-3.5 sm:grid-cols-2 print:hidden">
                   {series.parts[post.series.part - 2] ? (
                     <SeriesStep
                       href={`/articles?series=${series.slug}`}
@@ -157,7 +165,9 @@ export default async function ArticlePage({ params }: PageProps<"/articles/[slug
 
               <AuthorCard />
 
-              <div id="responses" className="scroll-mt-28">
+              <PrintFooterWatermark post={post} />
+
+              <div id="responses" className="scroll-mt-28 print:hidden">
                 <CommentThread
                   slug={post.slug}
                   comments={articleComments}
@@ -166,7 +176,7 @@ export default async function ArticlePage({ params }: PageProps<"/articles/[slug
               </div>
             </div>
 
-            <aside className="flex w-full max-w-full min-w-0 flex-col gap-[18px] lg:sticky lg:top-[104px]">
+            <aside className="flex w-full max-w-full min-w-0 flex-col gap-[18px] lg:sticky lg:top-[104px] print:hidden">
               <TableOfContents headings={headings} />
               {series && post.series ? (
                 <SeriesNav
@@ -187,7 +197,7 @@ export default async function ArticlePage({ params }: PageProps<"/articles/[slug
           </div>
         </article>
 
-        <section>
+        <section className="print:hidden">
           <div className="mx-auto max-w-page px-gutter py-band">
             <Reveal>
               <h2 className="mb-6.5 text-[clamp(26px,3vw,36px)] font-bold tracking-[-0.025em] text-fg-1">
@@ -205,6 +215,7 @@ export default async function ArticlePage({ params }: PageProps<"/articles/[slug
         <ReadingBar post={summary} next={toSummary(keepReading[0])} />
       </ReadingProgressProvider>
     </ReaderModeProvider>
+  </ArticleAudioProvider>
   );
 }
 
