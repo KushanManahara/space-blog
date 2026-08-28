@@ -4,6 +4,7 @@ import { MostReadSection } from "@/components/home/most-read-section";
 import { MostViewed } from "@/components/home/most-viewed";
 import { NewsletterBlock } from "@/components/home/newsletter-block";
 import { PublicationStrip } from "@/components/home/publication-strip";
+import { SeriesGrid } from "@/components/home/series-grid";
 import { TopicsSection } from "@/components/home/topics-section";
 import { getFeaturedPost, isTopicFilter, posts, toSummaries } from "@/lib/content";
 import { getAllLivePostStatsMap } from "@/lib/db/queries";
@@ -27,6 +28,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
       <PublicationStrip />
       <MostViewed posts={summaries} />
       <LatestWriting topic={activeTopic} />
+      <SeriesGrid />
       <TopicsSection />
       <NewsletterBlock />
       <MostReadSection />
