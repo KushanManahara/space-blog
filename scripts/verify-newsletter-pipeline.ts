@@ -3,7 +3,7 @@
 import "dotenv/config";
 import { eq } from "drizzle-orm";
 import { db, newsletterSubscribers } from "../src/lib/db";
-import { resend } from "../src/lib/resend";
+import { getResend } from "../src/lib/resend";
 import { subscribeAction, broadcastArticleAction } from "../src/app/actions";
 
 const TEST_EMAIL = "kushanmanaharahettige@gmail.com";
@@ -40,7 +40,7 @@ async function runHealthCheck() {
 
   // TEST 3: CONFIRM RESEND CONTACT
   console.log("\nTEST 3: CONFIRMING RESEND CONTACT CREATION...");
-  const contact = await resend.contacts.get({ email: TEST_EMAIL });
+  const contact = await getResend().contacts.get({ email: TEST_EMAIL });
   console.log(
     "RESEND CONTACT CONFIRMED:",
     contact.data?.id,

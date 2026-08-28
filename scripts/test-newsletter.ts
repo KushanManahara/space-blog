@@ -3,7 +3,7 @@
 import "dotenv/config";
 import { eq } from "drizzle-orm";
 import { db, newsletterSubscribers } from "../src/lib/db";
-import { resend, SENDER_EMAIL } from "../src/lib/resend";
+import { getResend, SENDER_EMAIL } from "../src/lib/resend";
 import { sendWelcomeEmail, syncResendContact } from "../src/lib/newsletter";
 import { ArticleNotificationEmail } from "../src/emails/article-notification";
 import { posts } from "../src/lib/content/posts";
@@ -45,7 +45,7 @@ async function runEndToEndTest() {
   const samplePost = posts[0]; // e.g. programing-environment-os
   console.log(`TEST ARTICLE: "${samplePost.title}" (${samplePost.slug})`);
 
-  const broadcastResult = await resend.emails.send({
+  const broadcastResult = await getResend().emails.send({
     from: SENDER_EMAIL,
     to: TEST_EMAIL,
     subject: `New on Space: ${samplePost.title}`,
