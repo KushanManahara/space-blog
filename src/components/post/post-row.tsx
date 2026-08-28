@@ -82,7 +82,12 @@ export function PostRow({
         ) : null}
 
         {showMetrics && variant === "list" ? (
-          <MetricRow post={post} bordered={false} className="mt-3.5" />
+          <MetricRow
+            post={post}
+            metrics={["likes", "comments", "views"]}
+            bordered={false}
+            className="mt-3.5"
+          />
         ) : null}
         {showMetrics && variant === "card" ? (
           <MetricRow
