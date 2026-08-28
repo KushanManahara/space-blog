@@ -12,8 +12,8 @@ import {
   getPostsByTopic,
   getTopicBySlug,
   isSortOrder,
+  listTags,
   sortLabels,
-  tags,
   topics,
 } from "@/lib/content";
 import { buildHref } from "@/lib/url";
@@ -59,7 +59,7 @@ export default async function TopicPage({ params, searchParams }: PageProps<"/to
       <section className="mx-auto max-w-page px-gutter pt-[clamp(36px,4.5vw,56px)] pb-tail">
         <Reveal className="mb-5 flex flex-wrap items-center gap-2.5">
           <DiscoverModal kind="topics" topics={topics} />
-          <DiscoverModal kind="tags" tags={tags} />
+          <DiscoverModal kind="tags" tags={listTags().slice(0, 24)} />
         </Reveal>
 
         <Reveal className="mb-6.5 flex flex-wrap items-center justify-between gap-4">
