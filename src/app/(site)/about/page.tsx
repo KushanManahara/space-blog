@@ -7,7 +7,7 @@ import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
 import { GlareHover } from "@/components/ui/glare-hover";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
-import { aboutSetup, author, routes, tags, timeline } from "@/lib/content";
+import { aboutSetup, author, listTags, routes, timeline } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "About",
@@ -100,15 +100,23 @@ export default function AboutPage() {
                 something with it, and writing down what I wish I had understood the first time.
               </p>
               <div className="mt-2 flex flex-wrap gap-2.5">
-                {tags.map((tag) => (
-                  <Link
-                    key={tag.name}
-                    href={`${routes.search}?q=${encodeURIComponent(tag.name.replace("#", ""))}`}
-                    className="rounded-full border border-line-1 bg-bg-1 px-3.5 py-2 text-[13px] text-fg-2 transition-[color,border-color] duration-300 ease-expo hover:border-line-brand hover:text-brand"
-                  >
-                    {tag.name}
-                  </Link>
-                ))}
+                {listTags()
+                  .slice(0, 18)
+                  .map((tag) => (
+                    <Link
+                      key={tag.name}
+                      href={`${routes.tags}/${tag.slug}`}
+                      className="rounded-full border border-line-1 bg-bg-1 px-3.5 py-2 text-[13px] text-fg-2 transition-[color,border-color] duration-300 ease-expo hover:border-line-brand hover:text-brand"
+                    >
+                      {tag.name}
+                    </Link>
+                  ))}
+                <Link
+                  href={routes.tags}
+                  className="rounded-full border border-line-1 bg-bg-1 px-3.5 py-2 text-[13px] font-semibold text-brand transition-colors duration-300 ease-expo hover:border-line-brand"
+                >
+                  All tags
+                </Link>
               </div>
             </Reveal>
           </div>
