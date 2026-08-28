@@ -13,6 +13,7 @@ const NAVIGATE_ITEMS = [
   { label: "Go to Articles", hint: "G A", href: routes.articles },
   { label: "Go to Topics", hint: "G T", href: routes.topics },
   { label: "Search all posts", hint: "/", href: routes.search },
+  { label: "Saved articles", hint: "G S", href: routes.saved },
   { label: "About the author", hint: "G B", href: routes.about },
 ] as const;
 
