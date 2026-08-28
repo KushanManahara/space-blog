@@ -1,4 +1,4 @@
-import { desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 
 import type { Comment } from "@/lib/content";
 import { comments, db, postStats } from "./index";
@@ -24,6 +24,8 @@ export async function getAllLivePostStatsMap(): Promise<
         count: sql<number>`count(*)`,
       })
       .from(comments)
+      // Counts on cards must match what a reader can actually open.
+      .where(eq(comments.published, 1))
       .groupBy(comments.postSlug);
 
     for (const row of commentRows) {
@@ -61,7 +63,8 @@ export async function getLiveComments(slug: string): Promise<Comment[]> {
     const rows = await db
       .select()
       .from(comments)
-      .where(eq(comments.postSlug, slug))
+      // Unreviewed comments exist in the table but never reach the article.
+      .where(and(eq(comments.postSlug, slug), eq(comments.published, 1)))
       .orderBy(desc(comments.createdAt));
 
     return rows.map((row, index) => ({
