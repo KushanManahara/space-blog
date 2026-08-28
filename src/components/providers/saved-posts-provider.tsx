@@ -3,6 +3,11 @@
 import * as React from "react";
 
 type SavedPostsValue = {
+  /**
+   * False until localStorage has been read. Surfaces that render *from* the
+   * saved set need this, or they flash an empty state on first paint.
+   */
+  hydrated: boolean;
   isSaved: (slug: string) => boolean;
   toggleSaved: (slug: string) => void;
   isLiked: (slug: string) => boolean;
@@ -28,6 +33,7 @@ export function SavedPostsProvider({
 }) {
   const [saved, setSaved] = React.useState(() => new Set(initialSaved));
   const [liked, setLiked] = React.useState(() => new Set(initialLiked));
+  const [hydrated, setHydrated] = React.useState(false);
 
   React.useEffect(() => {
     try {
@@ -48,6 +54,8 @@ export function SavedPostsProvider({
     } catch {
       // Ignore storage read errors
     }
+    // Queued like the reads above so the flag lands with the values it describes.
+    queueMicrotask(() => setHydrated(true));
   }, []);
 
   const toggleSaved = React.useCallback((slug: string) => {
@@ -76,12 +84,13 @@ export function SavedPostsProvider({
 
   const value = React.useMemo<SavedPostsValue>(
     () => ({
+      hydrated,
       isSaved: (slug) => saved.has(slug),
       isLiked: (slug) => liked.has(slug),
       toggleSaved,
       toggleLiked,
     }),
-    [saved, liked, toggleSaved, toggleLiked],
+    [hydrated, saved, liked, toggleSaved, toggleLiked],
   );
 
   return <SavedPostsContext value={value}>{children}</SavedPostsContext>;
