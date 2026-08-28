@@ -3,7 +3,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db, newsletterSubscribers } from "@/lib/db";
-import { resend } from "@/lib/resend";
+import { emailEnabled, getResend } from "@/lib/resend";
 
 /**
  * HANDLES ONE-CLICK UNSUBSCRIBE (RFC 8058) AND DIRECT BROWSER CLICKS
@@ -21,11 +21,14 @@ export async function GET(request: NextRequest) {
       .delete(newsletterSubscribers)
       .where(eq(newsletterSubscribers.email, email.toLowerCase()));
 
-    // UPDATE RESEND CONTACT STATUS
-    await resend.contacts.update({
-      email: email.toLowerCase(),
-      unsubscribed: true,
-    });
+    // UPDATE RESEND CONTACT STATUS. Removal from our own table above is what
+    // actually stops the mail, so a missing key must not fail the unsubscribe.
+    if (emailEnabled) {
+      await getResend().contacts.update({
+        email: email.toLowerCase(),
+        unsubscribed: true,
+      });
+    }
 
     // RETURN CLEAN HTML CONFIRMATION RESPONSE
     return new NextResponse(
