@@ -165,6 +165,16 @@ function CommandMenu({
             </Link>
           ))}
         </div>
+
+        {/* The other bindings were unadvertised, so ⌘K was the only one anyone
+            found. This is the one place a reader is already looking for keys. */}
+        <p className="flex items-center gap-1.5 border-t border-line-1 px-5 py-3 text-[12.5px] text-fg-3">
+          Press
+          <kbd className="inline-flex items-center rounded-sm border border-line-1 bg-bg-3 px-1.5 py-0.5 font-mono text-[11.5px] font-semibold text-fg-2">
+            ?
+          </kbd>
+          for all keyboard shortcuts
+        </p>
       </DialogContent>
     </Dialog>
   );
