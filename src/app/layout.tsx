@@ -111,7 +111,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           }}
         />
       </head>
-      <body className="flex min-h-full flex-col bg-bg-1 text-fg-1">
+      <body className="flex min-h-dvh flex-col bg-bg-1 text-fg-1">
         <script
           type="application/ld+json"
           // Serialised, not user input: every value comes from the content layer.
