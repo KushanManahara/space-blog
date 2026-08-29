@@ -2,16 +2,16 @@ import Link from "next/link";
 
 import { AuthorAvatar } from "@/components/author/author-byline";
 import { PostRow } from "@/components/post/post-row";
-import { author, getPopularPosts, listTags, routes } from "@/lib/content";
+import { author, getPopularPosts, listTags, routes, type Post } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
 /** Sticky rail used beside the archive listing. */
-export function Sidebar({ className }: { className?: string }) {
+export function Sidebar({ posts, className }: { posts: Post[]; className?: string }) {
   return (
     <aside className={cn("flex flex-col gap-[18px] lg:sticky lg:top-[104px]", className)}>
       <AuthorCard />
       <TagsCard />
-      <MostReadCard />
+      <MostReadCard posts={posts} />
     </aside>
   );
 }
@@ -81,8 +81,8 @@ function TagsCard() {
   );
 }
 
-function MostReadCard() {
-  const popular = getPopularPosts(4);
+function MostReadCard({ posts }: { posts: Post[] }) {
+  const popular = getPopularPosts(4, posts);
 
   return (
     <SidebarCard>

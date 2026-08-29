@@ -150,6 +150,15 @@ export const postSchema = z.object({
   publishedAt: z.iso.date(),
   /** Derived from the body in `posts.ts`; never authored by hand. */
   readingMinutes: z.number().int().positive().default(1),
+  /**
+   * Engagement is owned by the database, not by this file.
+   *
+   * These stay 0 in `posts.ts`; `getAllLivePostStatsMap` overlays the real
+   * counts from Turso at request time. They were once seeded with numbers that
+   * survived only until a post got its first genuine view, at which point the
+   * live row replaced them — so a real view could drop a post from 735 to 1 and
+   * reorder every "most viewed" surface. Do not re-seed them.
+   */
   likes: z.number().int().nonnegative(),
   views: z.number().int().nonnegative(),
   commentCount: z.number().int().nonnegative(),

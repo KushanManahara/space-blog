@@ -39,17 +39,33 @@ export function ArticleActions({ post }: { post: PostSummary | Post }) {
   const [copied, setCopied] = React.useState(false);
   const liked = isLiked(post.slug);
 
-  const [optimisticLikes, setOptimisticLikes] = React.useOptimistic(
-    post.likes,
-    (current: number, change: number) => Math.max(0, current + change),
-  );
+  // `post.likes` is the build-time value: article pages are statically
+  // generated with a 60s revalidate, so it does not change when the write
+  // lands. `useOptimistic` therefore snapped the count back to the old number
+  // as soon as the transition settled, and a like looked like it did nothing.
+  // The server now returns the stored count and it is held here instead.
+  const [storedLikes, setStoredLikes] = React.useState<number | null>(null);
+  const likes = storedLikes ?? post.likes;
 
   const handleLike = () => {
     const willLike = !liked;
+    const optimistic = Math.max(0, likes + (willLike ? 1 : -1));
+
     toggleLiked(post.slug);
+    setStoredLikes(optimistic);
+
     React.startTransition(async () => {
-      setOptimisticLikes(willLike ? 1 : -1);
-      await likePostAction(post.slug, willLike);
+      const result = await likePostAction(post.slug, willLike);
+
+      if (!result.success) {
+        // Rate limited or the write failed — put the button back rather than
+        // leaving a count the server never accepted.
+        toggleLiked(post.slug);
+        setStoredLikes(likes);
+        return;
+      }
+
+      if (typeof result.likes === "number") setStoredLikes(result.likes);
     });
   };
 
@@ -152,6 +168,7 @@ export function ArticleActions({ post }: { post: PostSummary | Post }) {
       <button
         type="button"
         aria-pressed={liked}
+        aria-label={liked ? "Unlike this article" : "Like this article"}
         onClick={handleLike}
         className={cn(
           "inline-flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2.5 text-[13.5px] font-semibold transition-[background-color,color,transform,border-color] duration-300 ease-bounce active:scale-[0.96] active:duration-150 active:ease-out",
@@ -161,7 +178,7 @@ export function ArticleActions({ post }: { post: PostSummary | Post }) {
         )}
       >
         <IconToggle icon={Heart} active={liked} className="size-[15px]" />
-        <span>{optimisticLikes}</span>
+        <span>{likes}</span>
       </button>
 
       {/* 5. Responses Link */}

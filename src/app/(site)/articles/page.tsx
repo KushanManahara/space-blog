@@ -187,7 +187,7 @@ export default async function ArticlesPage({ searchParams }: PageProps<"/article
             />
           </div>
 
-          <Sidebar />
+          <Sidebar posts={livePosts} />
         </div>
       </section>
     </>

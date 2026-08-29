@@ -3,10 +3,10 @@ import { RankedPostRow } from "@/components/post/post-row";
 import { GlareHover } from "@/components/ui/glare-hover";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { NumberTicker } from "@/components/ui/number-ticker";
-import { getPopularPosts, routes, site, topics } from "@/lib/content";
+import { getPopularPosts, routes, site, topics, type Post } from "@/lib/content";
 
-export function MostReadSection() {
-  const popular = getPopularPosts(5);
+export function MostReadSection({ posts }: { posts: Post[] }) {
+  const popular = getPopularPosts(5, posts);
 
   return (
     <section className="mx-auto max-w-page px-gutter pb-tail">

@@ -42,8 +42,16 @@ function byRecency(a: Post, b: Post): number {
   return b.publishedAt.localeCompare(a.publishedAt);
 }
 
+/**
+ * Most viewed, then most liked, then newest.
+ *
+ * The tiebreaks matter more than they look: engagement counts start at 0 for
+ * every post, so on a fresh deployment every comparison is a tie and without
+ * them the "most viewed" surfaces would fall back to the order posts happen to
+ * sit in `posts.ts`.
+ */
 function byViews(a: Post, b: Post): number {
-  return b.views - a.views;
+  return b.views - a.views || b.likes - a.likes || byRecency(a, b);
 }
 
 export function listPosts(
@@ -164,8 +172,16 @@ export function getPostBySlug(slug: string): Post | undefined {
   return posts.find((post) => post.slug === slug);
 }
 
-export function getPopularPosts(limit: number): Post[] {
-  return [...posts].sort(byViews).slice(0, limit);
+/**
+ * Most-viewed posts.
+ *
+ * Takes the same live-stats source `listPosts` does. Without it this ranked and
+ * displayed the seed counts baked into `posts.ts`, so the homepage showed one
+ * set of view numbers in "Most read this year" and a different set in "Most
+ * viewed articles" directly above it.
+ */
+export function getPopularPosts(limit: number, sourcePosts: Post[] = posts): Post[] {
+  return [...sourcePosts].sort(byViews).slice(0, limit);
 }
 
 /** Same topic first, then the next most-read posts, never the post itself. */

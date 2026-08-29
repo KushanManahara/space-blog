@@ -14,20 +14,42 @@ import { TopicBadge } from "@/components/post/topic-badge";
 import { routes, type PostSummary, type TopicName } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
-const TABS: readonly TopicName[] = ["Inference", "Systems", "Evaluation", "Engineering"];
+/**
+ * The four topics with the most posts, so every tab can fill the layout.
+ *
+ * This used to be a hardcoded list left over from the mock data, which offered
+ * Evaluation (2 posts) while omitting Findings and Research (6 each).
+ */
+function topicTabs(posts: PostSummary[]): TopicName[] {
+  const counts = new Map<TopicName, number>();
+  for (const post of posts) counts.set(post.topic, (counts.get(post.topic) ?? 0) + 1);
+
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, 4)
+    .map(([topic]) => topic);
+}
 
 /**
- * “Most viewed”: a topic tab picks which posts lead, but the section always
- * fills to four so the layout never collapses on a thin topic.
+ * “Most viewed”, by topic.
+ *
+ * The tab is a real filter. It used to front-load the matching topic and then
+ * pad the remaining slots with everything else, which put a one-view post at
+ * the head of a section headed “Most viewed” above a 728-view post from a
+ * topic the reader had just filtered away.
  */
 export function MostViewed({ posts }: { posts: PostSummary[] }) {
-  const [activeTab, setActiveTab] = React.useState<TopicName>(TABS[0]);
+  const tabs = topicTabs(posts);
+  const [activeTab, setActiveTab] = React.useState<TopicName | null>(null);
+  const topic = activeTab ?? tabs[0];
 
-  const ranked = [...posts].sort((a, b) => b.views - a.views);
-  const [hero, ...rest] = [
-    ...ranked.filter((post) => post.topic === activeTab),
-    ...ranked.filter((post) => post.topic !== activeTab),
-  ].slice(0, 4);
+  const [hero, ...rest] = posts
+    .filter((post) => post.topic === topic)
+    .sort(
+      (a, b) =>
+        b.views - a.views || b.likes - a.likes || b.publishedAt.localeCompare(a.publishedAt),
+    )
+    .slice(0, 4);
 
   return (
     <section className="mx-auto max-w-page px-gutter pt-[clamp(24px,3vw,40px)] pb-[clamp(76px,9vw,132px)]">
@@ -38,16 +60,16 @@ export function MostViewed({ posts }: { posts: PostSummary[] }) {
 
       <Reveal className="mt-6.5 flex flex-wrap items-center justify-between gap-4">
         <div role="tablist" aria-label="Most viewed topics" className="flex flex-wrap gap-2">
-          {TABS.map((tab) => (
+          {tabs.map((tab) => (
             <button
               key={tab}
               type="button"
               role="tab"
-              aria-selected={tab === activeTab}
+              aria-selected={tab === topic}
               onClick={() => setActiveTab(tab)}
               className={cn(
                 "cursor-pointer rounded-full border px-5 py-[11px] text-[13.5px] font-semibold backdrop-blur-[14px] backdrop-saturate-[140%] transition-[background-color,color,transform] duration-300 ease-expo active:scale-[0.96] active:duration-150 active:ease-out",
-                tab === activeTab
+                tab === topic
                   ? "border-ink bg-ink text-on-ink"
                   : "border-line-1 bg-veil/70 text-fg-2",
               )}

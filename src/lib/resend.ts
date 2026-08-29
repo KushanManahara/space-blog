@@ -7,11 +7,19 @@ import { Resend } from "resend";
  *
  * Callers check this before sending so a missing key degrades to "no email was
  * sent" rather than an exception.
+ *
+ * `NEWSLETTER_SECRET` counts as configuration too: without it, unsubscribe
+ * links cannot be signed, and the route rejects unsigned ones. Sending mail
+ * whose unsubscribe link is guaranteed to fail is worse than not sending.
  */
-export const emailEnabled = Boolean(process.env.RESEND_API_KEY);
+export const emailEnabled = Boolean(process.env.RESEND_API_KEY && process.env.NEWSLETTER_SECRET);
 
 if (!emailEnabled) {
-  console.warn("RESEND_API_KEY is not set — outbound email is disabled.");
+  const missing = [
+    process.env.RESEND_API_KEY ? null : "RESEND_API_KEY",
+    process.env.NEWSLETTER_SECRET ? null : "NEWSLETTER_SECRET",
+  ].filter(Boolean);
+  console.warn(`Outbound email is disabled — not set: ${missing.join(", ")}.`);
 }
 
 /**

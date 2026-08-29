@@ -31,7 +31,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
       <SeriesGrid />
       <TopicsSection />
       <NewsletterBlock />
-      <MostReadSection />
+      <MostReadSection posts={livePosts} />
     </>
   );
 }

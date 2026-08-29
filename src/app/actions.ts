@@ -186,13 +186,19 @@ export async function contactAction(_previous: FormState, formData: FormData): P
 
 /**
  * Toggle or increment like count for a post in Turso.
+ *
+ * Returns the stored count so the client can show the real number immediately.
+ * It cannot wait for the page to re-render: article pages are statically
+ * generated with a 60s revalidate, so `post.likes` keeps its build-time value
+ * long after the write lands, and a purely optimistic count snaps back to the
+ * old one the moment the transition settles.
  */
 export async function likePostAction(slug: string, increment: boolean = true) {
   // The client also tracks this in localStorage, but that is a UI convenience,
   // not a guard — clearing it must not let the counter be driven up.
   const caller = await callerFingerprint();
   if (!(await underLimit(`like:${slug}`, caller, 4, 86_400))) {
-    return { success: false };
+    return { success: false as const, likes: null };
   }
 
   try {
@@ -212,12 +218,18 @@ export async function likePostAction(slug: string, increment: boolean = true) {
         },
       });
 
+    const [row] = await db
+      .select({ likes: postStats.likes })
+      .from(postStats)
+      .where(eq(postStats.slug, slug))
+      .limit(1);
+
     revalidatePath(`/articles/${slug}`);
     revalidatePath("/");
-    return { success: true };
+    return { success: true as const, likes: row?.likes ?? null };
   } catch (error) {
     console.error("Like post error:", error);
-    return { success: false };
+    return { success: false as const, likes: null };
   }
 }
 

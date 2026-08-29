@@ -29,9 +29,9 @@ export function getWelcomeEmailText({
   siteUrl = "https://gimhara.com",
   unsubscribeUrl,
 }: WelcomeEmailProps): string {
-  const unsubs =
-    unsubscribeUrl ||
-    `${siteUrl}/api/newsletter/unsubscribe?email=${encodeURIComponent(subscriberEmail)}`;
+  // No unsigned fallback: the route rejects links without a token, so building
+  // one here would ship a dead unsubscribe link. Callers pass the signed URL.
+  const unsubs = unsubscribeUrl ?? `${siteUrl}/api/newsletter/unsubscribe`;
 
   return `SPACE PUBLICATION
 
@@ -65,9 +65,9 @@ export function WelcomeEmail({
 }: WelcomeEmailProps) {
   // CLEAN PREVIEW TEXT FOR EMAIL CLIENTS
   const previewText = "Welcome to Space. You are now subscribed to new article releases.";
-  const unsubs =
-    unsubscribeUrl ||
-    `${siteUrl}/api/newsletter/unsubscribe?email=${encodeURIComponent(subscriberEmail)}`;
+  // No unsigned fallback: the route rejects links without a token, so building
+  // one here would ship a dead unsubscribe link. Callers pass the signed URL.
+  const unsubs = unsubscribeUrl ?? `${siteUrl}/api/newsletter/unsubscribe`;
 
   return (
     <Html>

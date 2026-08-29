@@ -13,16 +13,29 @@ import {
   ContactNotificationEmail,
   getContactNotificationText,
 } from "@/emails/contact-notification";
+import { signUnsubscribe } from "@/lib/newsletter-token";
 import type { Post } from "@/lib/content";
 
 // BASE PRODUCTION DOMAIN FOR LINK GENERATION
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://space.gimhara.com";
 
 /**
+ * A signed unsubscribe link for one address.
+ *
+ * The token is what stops a URL being edited to unsubscribe somebody else, and
+ * what lets the route refuse anything that did not come from an email we sent.
+ */
+function unsubscribeLink(email: string): string {
+  const address = email.trim().toLowerCase();
+  const token = signUnsubscribe(address);
+  return `${SITE_URL}/api/newsletter/unsubscribe?email=${encodeURIComponent(address)}&t=${encodeURIComponent(token)}`;
+}
+
+/**
  * GENERATES COMPLIANCE HEADERS FOR DELIVERABILITY AND ONE-CLICK UNSUBSCRIBE (RFC 8058)
  */
 function getComplianceHeaders(email: string) {
-  const unsubscribeUrl = `${SITE_URL}/api/newsletter/unsubscribe?email=${encodeURIComponent(email)}`;
+  const unsubscribeUrl = unsubscribeLink(email);
   return {
     "List-Unsubscribe": `<${unsubscribeUrl}>, <mailto:newsletter.space@gimhara.com?subject=unsubscribe>`,
     "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
@@ -59,7 +72,7 @@ export async function syncResendContact(email: string) {
 export async function sendWelcomeEmail(email: string) {
   if (!emailEnabled) return { success: false, error: "Email is not configured." };
 
-  const unsubscribeUrl = `${SITE_URL}/api/newsletter/unsubscribe?email=${encodeURIComponent(email)}`;
+  const unsubscribeUrl = unsubscribeLink(email);
 
   try {
     const { data, error } = await getResend().emails.send({
@@ -140,7 +153,7 @@ export async function broadcastArticleNotification(post: Post) {
     }
 
     const emailPayloads = subscribers.map((sub) => {
-      const unsubscribeUrl = `${SITE_URL}/api/newsletter/unsubscribe?email=${encodeURIComponent(sub.email)}`;
+      const unsubscribeUrl = unsubscribeLink(sub.email);
 
       return {
         from: SENDER_EMAIL,
