@@ -357,7 +357,9 @@ export function ArticleAudioProvider({
         title: post.title,
         artist: "Kushan Manahara",
         album: "Space Blog",
-        artwork: post.coverImage ? [{ src: post.coverImage, sizes: "512x512", type: "image/png" }] : [],
+        artwork: post.coverImage
+          ? [{ src: post.coverImage, sizes: "512x512", type: "image/png" }]
+          : [],
       });
 
       navigator.mediaSession.playbackState = isPlaying ? "playing" : "paused";
@@ -368,7 +370,17 @@ export function ArticleAudioProvider({
       navigator.mediaSession.setActionHandler("nexttrack", () => skipForward());
       navigator.mediaSession.setActionHandler("previoustrack", () => skipBackward());
     }
-  }, [isAudioActive, isPlaying, post.title, post.coverImage, resume, pause, stop, skipForward, skipBackward]);
+  }, [
+    isAudioActive,
+    isPlaying,
+    post.title,
+    post.coverImage,
+    resume,
+    pause,
+    stop,
+    skipForward,
+    skipBackward,
+  ]);
 
   const contextValue: ArticleAudioContextValue = {
     isSupported,
@@ -400,9 +412,7 @@ export function ArticleAudioProvider({
   };
 
   return (
-    <ArticleAudioContext.Provider value={contextValue}>
-      {children}
-    </ArticleAudioContext.Provider>
+    <ArticleAudioContext.Provider value={contextValue}>{children}</ArticleAudioContext.Provider>
   );
 }
 

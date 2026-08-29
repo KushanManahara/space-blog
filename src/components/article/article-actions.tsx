@@ -1,7 +1,18 @@
 "use client";
 
 import * as React from "react";
-import { BookOpen, Check, Copy, Eye, Headphones, Heart, MessageSquare, Pause, Printer, Share } from "lucide-react";
+import {
+  BookOpen,
+  Check,
+  Copy,
+  Eye,
+  Headphones,
+  Heart,
+  MessageSquare,
+  Pause,
+  Printer,
+  Share,
+} from "lucide-react";
 
 import { likePostAction } from "@/app/actions";
 import { useArticleAudio } from "@/components/article/article-audio-provider";
@@ -80,9 +91,7 @@ export function ArticleActions({ post }: { post: PostSummary | Post }) {
           ) : (
             <Headphones className="size-4" strokeWidth={1.75} />
           )}
-          <span className="hidden sm:inline">
-            {audio?.isPlaying ? "Listening…" : "Listen"}
-          </span>
+          <span className="hidden sm:inline">{audio?.isPlaying ? "Listening…" : "Listen"}</span>
         </button>
       ) : null}
 

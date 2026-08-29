@@ -62,7 +62,7 @@ export function ArticleHeader({
             ) : null}
           </div>
 
-          <div id="article-header-intro" className="transition-all duration-300 rounded-xl">
+          <div id="article-header-intro" className="rounded-xl transition-all duration-300">
             <h1 className="mt-5.5 text-[clamp(28px,4.4vw,56px)] leading-[1.12] font-bold tracking-[-0.03em] break-words text-fg-1 sm:leading-[1.08]">
               {post.title}
             </h1>
@@ -93,7 +93,7 @@ export function ArticleHeader({
           {/* Soft ambient underglow */}
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 -z-10 rounded-2xl bg-gradient-to-b from-brand/20 via-brand/5 to-transparent opacity-70 blur-xl md:rounded-3xl print:hidden dark:opacity-50"
+            className="pointer-events-none absolute inset-0 -z-10 rounded-2xl bg-gradient-to-b from-brand/20 via-brand/5 to-transparent opacity-70 blur-xl md:rounded-3xl dark:opacity-50 print:hidden"
           />
           <PostCover
             topic={post.topic}

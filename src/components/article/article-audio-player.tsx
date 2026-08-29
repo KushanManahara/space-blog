@@ -109,7 +109,7 @@ export function ArticleAudioPlayer() {
   return (
     <aside
       aria-label="Article Audio Narrator"
-      className="fixed inset-x-0 bottom-4 z-[120] mx-auto w-[calc(100%-1.5rem)] max-w-2xl px-2 print:hidden sm:bottom-6"
+      className="fixed inset-x-0 bottom-4 z-[120] mx-auto w-[calc(100%-1.5rem)] max-w-2xl px-2 sm:bottom-6 print:hidden"
     >
       <div className="relative overflow-hidden rounded-2xl border border-line-1/80 bg-bg-1/95 shadow-[0_20px_50px_rgba(0,0,0,0.18)] backdrop-blur-2xl transition-all duration-300 dark:border-white/12 dark:bg-bg-2/95 dark:shadow-[0_24px_60px_rgba(0,0,0,0.85)]">
         {/* Scrubber Progress Bar */}
@@ -130,7 +130,7 @@ export function ArticleAudioPlayer() {
           />
           {/* Scrubber thumb */}
           <div
-            className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 size-3.5 rounded-full bg-brand shadow-md ring-2 ring-white opacity-0 transition-opacity group-hover:opacity-100 dark:ring-black"
+            className="absolute top-1/2 size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand opacity-0 shadow-md ring-2 ring-white transition-opacity group-hover:opacity-100 dark:ring-black"
             style={{ left: `${progress * 100}%` }}
           />
         </div>
@@ -143,10 +143,22 @@ export function ArticleAudioPlayer() {
             <div className="relative flex size-8.5 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand dark:bg-brand/20">
               {isPlaying ? (
                 <div className="flex h-3.5 items-end gap-0.5">
-                  <span className="w-0.5 rounded-full bg-brand animate-[pulse_0.6s_ease-in-out_infinite]" style={{ height: "60%" }} />
-                  <span className="w-0.5 rounded-full bg-brand animate-[pulse_0.9s_ease-in-out_infinite]" style={{ height: "100%" }} />
-                  <span className="w-0.5 rounded-full bg-brand animate-[pulse_0.7s_ease-in-out_infinite]" style={{ height: "40%" }} />
-                  <span className="w-0.5 rounded-full bg-brand animate-[pulse_0.8s_ease-in-out_infinite]" style={{ height: "80%" }} />
+                  <span
+                    className="w-0.5 animate-[pulse_0.6s_ease-in-out_infinite] rounded-full bg-brand"
+                    style={{ height: "60%" }}
+                  />
+                  <span
+                    className="w-0.5 animate-[pulse_0.9s_ease-in-out_infinite] rounded-full bg-brand"
+                    style={{ height: "100%" }}
+                  />
+                  <span
+                    className="w-0.5 animate-[pulse_0.7s_ease-in-out_infinite] rounded-full bg-brand"
+                    style={{ height: "40%" }}
+                  />
+                  <span
+                    className="w-0.5 animate-[pulse_0.8s_ease-in-out_infinite] rounded-full bg-brand"
+                    style={{ height: "80%" }}
+                  />
                 </div>
               ) : (
                 <Headphones className="size-4" strokeWidth={2} />
@@ -161,7 +173,7 @@ export function ArticleAudioPlayer() {
               aria-label="Click to jump to currently spoken line in article"
               className="min-w-0 flex-1 cursor-pointer text-left transition-opacity hover:opacity-80 active:scale-[0.99]"
             >
-              <p className="truncate text-[13px] font-semibold leading-snug text-fg-1">
+              <p className="truncate text-[13px] leading-snug font-semibold text-fg-1">
                 {currentSegment?.text ? (
                   <HighlightedSpokenText
                     text={currentSegment.text}
@@ -204,7 +216,7 @@ export function ArticleAudioPlayer() {
               {isPlaying ? (
                 <Pause className="size-4.5 fill-current" />
               ) : (
-                <Play className="size-4.5 fill-current translate-x-0.5" />
+                <Play className="size-4.5 translate-x-0.5 fill-current" />
               )}
             </button>
 
@@ -238,7 +250,9 @@ export function ArticleAudioPlayer() {
               type="button"
               onClick={toggleWordHighlight}
               title={isWordHighlightEnabled ? "Word highlight enabled" : "Word highlight disabled"}
-              aria-label={isWordHighlightEnabled ? "Disable word highlighting" : "Enable word highlighting"}
+              aria-label={
+                isWordHighlightEnabled ? "Disable word highlighting" : "Enable word highlighting"
+              }
               className={cn(
                 "hidden size-7.5 cursor-pointer items-center justify-center rounded-full border transition-colors active:scale-95 sm:inline-flex",
                 isWordHighlightEnabled

@@ -35,8 +35,9 @@ export function ArticleBody({ blocks, id }: { blocks: ArticleBlock[]; id: string
             id={`article-block-${index}`}
             data-audio-block-index={index}
             className={cn(
-              "transition-[box-shadow,background-color,border-color] duration-300 rounded-xl",
-              isActive && "ring-2 ring-brand/40 bg-brand/[0.04] p-3 -mx-3 dark:ring-brand/35 dark:bg-brand/[0.08]",
+              "rounded-xl transition-[box-shadow,background-color,border-color] duration-300",
+              isActive &&
+                "-mx-3 bg-brand/[0.04] p-3 ring-2 ring-brand/40 dark:bg-brand/[0.08] dark:ring-brand/35",
             )}
           >
             <ArticleBlockView block={block} isFirst={index === 0} />

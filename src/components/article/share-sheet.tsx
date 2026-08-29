@@ -44,7 +44,8 @@ export function ShareSheet({
 
   const handleCopyArticle = async () => {
     const targetSlug = slug ?? (post ? post.slug : undefined);
-    const fullPost = post && "body" in post ? (post as Post) : targetSlug ? getPostBySlug(targetSlug) : undefined;
+    const fullPost =
+      post && "body" in post ? (post as Post) : targetSlug ? getPostBySlug(targetSlug) : undefined;
     if (!fullPost) return;
 
     if (await copyArticleToClipboard(fullPost)) {

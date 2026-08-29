@@ -11,7 +11,7 @@ export function PrintHeaderWatermark({ post }: { post: Post }) {
   return (
     <div
       aria-hidden
-      className="hidden print:block print:w-full print:border-b-2 print:border-neutral-900 print:pb-4 print:mb-8"
+      className="hidden print:mb-8 print:block print:w-full print:border-b-2 print:border-neutral-900 print:pb-4"
     >
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
@@ -29,7 +29,7 @@ export function PrintHeaderWatermark({ post }: { post: Post }) {
         </div>
       </div>
 
-      <div className="mt-3 flex items-center justify-between text-[11px] font-mono text-neutral-500">
+      <div className="mt-3 flex items-center justify-between font-mono text-[11px] text-neutral-500">
         <span>{articleUrl}</span>
         <span>
           {formattedDate} · {post.topic} · {post.readingMinutes} min read
@@ -46,7 +46,7 @@ export function PrintFooterWatermark({ post }: { post: Post }) {
   return (
     <div
       aria-hidden
-      className="hidden print:block print:w-full print:mt-10 print:pt-6 print:border-t-2 print:border-neutral-900 print:break-inside-avoid"
+      className="hidden print:mt-10 print:block print:w-full print:break-inside-avoid print:border-t-2 print:border-neutral-900 print:pt-6"
     >
       <div className="rounded-lg border border-neutral-300 bg-neutral-50 p-4 text-[12px] leading-relaxed text-neutral-700">
         <div className="flex items-center justify-between gap-2 border-b border-neutral-200 pb-2">

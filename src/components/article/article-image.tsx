@@ -39,7 +39,7 @@ export function ArticleImage({
       )}
     >
       <div
-        className="mx-auto overflow-hidden rounded-lg border border-line-1 bg-bg-2 print:border-neutral-200 print:bg-white print:break-inside-avoid"
+        className="mx-auto overflow-hidden rounded-lg border border-line-1 bg-bg-2 print:break-inside-avoid print:border-neutral-200 print:bg-white"
         // Never scale past the intrinsic size. Upscaling a screenshot to fill
         // the column just makes its text soft.
         style={hasIntrinsicSize ? { maxWidth: width } : undefined}

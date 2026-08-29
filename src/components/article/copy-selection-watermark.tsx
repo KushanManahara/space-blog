@@ -13,7 +13,10 @@ export function CopySelectionWatermark({ post }: { post: Post }) {
     const handleCopy = (e: ClipboardEvent) => {
       // If the copy originated from inside an input/textarea or runnable editor, don't alter it
       const target = e.target as HTMLElement | null;
-      if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) {
+      if (
+        target &&
+        (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)
+      ) {
         return;
       }
 

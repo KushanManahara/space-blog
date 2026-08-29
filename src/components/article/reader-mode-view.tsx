@@ -1,7 +1,19 @@
 "use client";
 
 import * as React from "react";
-import { AlignLeft, BookOpen, Check, Copy, Headphones, Minus, Pause, Plus, Printer, Type, X } from "lucide-react";
+import {
+  AlignLeft,
+  BookOpen,
+  Check,
+  Copy,
+  Headphones,
+  Minus,
+  Pause,
+  Plus,
+  Printer,
+  Type,
+  X,
+} from "lucide-react";
 
 import { useArticleAudio } from "@/components/article/article-audio-provider";
 import { ArticleBody } from "@/components/article/article-body";
