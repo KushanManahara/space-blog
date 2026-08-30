@@ -74,6 +74,16 @@ export function Hero({ featured }: { featured: Post }) {
                 &nbsp;posts
               </Link>
             </Button>
+            {/* Forty posts in reverse-chronological order serves a returning
+                reader and strands a first-time one. `/paths` is the answer to
+                "where do I begin" and was otherwise reachable only from the
+                footer. */}
+            <Link
+              href={routes.paths}
+              className="text-[14.5px] font-semibold text-fg-3 underline decoration-line-2 underline-offset-4 transition-colors duration-300 ease-expo hover:text-brand hover:decoration-line-brand"
+            >
+              New here? Start with a path
+            </Link>
           </div>
         </Reveal>
 
