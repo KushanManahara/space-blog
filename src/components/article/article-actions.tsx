@@ -45,7 +45,12 @@ export function ArticleActions({ post }: { post: PostSummary | Post }) {
   // as soon as the transition settled, and a like looked like it did nothing.
   // The server now returns the stored count and it is held here instead.
   const [storedLikes, setStoredLikes] = React.useState<number | null>(null);
+  const [likeNotice, setLikeNotice] = React.useState<string | null>(null);
   const likes = storedLikes ?? post.likes;
+
+  React.useEffect(() => {
+    setStoredLikes(null);
+  }, [post.slug]);
 
   const handleLike = () => {
     const willLike = !liked;
@@ -53,15 +58,23 @@ export function ArticleActions({ post }: { post: PostSummary | Post }) {
 
     toggleLiked(post.slug);
     setStoredLikes(optimistic);
+    setLikeNotice(null);
 
     React.startTransition(async () => {
       const result = await likePostAction(post.slug, willLike);
 
       if (!result.success) {
-        // Rate limited or the write failed — put the button back rather than
-        // leaving a count the server never accepted.
+        // Put the button back rather than leaving a count the server never
+        // accepted — and say why, because silently snapping back is
+        // indistinguishable from the feature being broken.
         toggleLiked(post.slug);
         setStoredLikes(likes);
+        setLikeNotice(
+          result.limited
+            ? "That is plenty of likes from here today."
+            : "Could not save that just now.",
+        );
+        setTimeout(() => setLikeNotice(null), 4000);
         return;
       }
 
@@ -180,6 +193,12 @@ export function ArticleActions({ post }: { post: PostSummary | Post }) {
         <IconToggle icon={Heart} active={liked} className="size-[15px]" />
         <span>{likes}</span>
       </button>
+
+      {likeNotice ? (
+        <span role="status" className="text-[12.5px] text-fg-3">
+          {likeNotice}
+        </span>
+      ) : null}
 
       {/* 5. Responses Link */}
       <a

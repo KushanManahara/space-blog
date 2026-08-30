@@ -82,7 +82,7 @@ export function ArticleHeader({
               </div>
             </div>
             <div className="print:hidden">
-              <ArticleActions post={post} />
+              <ArticleActions post={summary} />
             </div>
           </div>
         </Reveal>

@@ -39,6 +39,17 @@ const BODY_ID = "article-body";
 /** Counters are read at render time, so the page needs a refresh window to show them moving. */
 export const revalidate = 60;
 
+/**
+ * Unknown slugs must 404, not render.
+ *
+ * This segment has a `loading.tsx`, so the response starts streaming and the
+ * 200 headers flush before the component can call `notFound()` — the status is
+ * already committed by then, and every typo became an indexable soft 404.
+ * Every slug is known at build time, so rejecting unknown params up front is
+ * both correct and free.
+ */
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return posts.map((post) => ({ slug: post.slug }));
 }
@@ -95,16 +106,16 @@ export default async function ArticlePage({ params }: PageProps<"/articles/[slug
   );
 
   return (
-    <ArticleAudioProvider post={post}>
+    <ArticleAudioProvider post={livePost}>
       <ReaderModeProvider>
         <ReadingProgressProvider
           bodyId={BODY_ID}
           headingIds={headings.map((heading) => heading.id)}
         >
           <ViewTracker slug={post.slug} />
-          <CopySelectionWatermark post={post} />
+          <CopySelectionWatermark post={livePost} />
           <ReadingProgressBar />
-          <ReaderModeView post={post} />
+          <ReaderModeView post={livePost} />
           <ArticleAudioPlayer />
           <script
             type="application/ld+json"
@@ -127,8 +138,8 @@ export default async function ArticlePage({ params }: PageProps<"/articles/[slug
           />
 
           <article className="mx-auto w-full max-w-page min-w-0 px-gutter pt-[clamp(32px,4vw,60px)]">
-            <PrintHeaderWatermark post={post} />
-            <ArticleHeader post={post} summary={summary} partCount={series?.partCount} />
+            <PrintHeaderWatermark post={livePost} />
+            <ArticleHeader post={livePost} summary={summary} partCount={series?.partCount} />
 
             <div className="mt-[clamp(36px,4vw,56px)] grid w-full min-w-0 grid-cols-1 items-start gap-[clamp(32px,4.5vw,72px)] pb-[clamp(84px,10vw,150px)] lg:grid-cols-[minmax(0,1fr)_320px]">
               <div className="w-full max-w-full min-w-0">
