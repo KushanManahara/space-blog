@@ -7,6 +7,7 @@ import { Reveal } from "@/components/motion/reveal";
 import { PostRow } from "@/components/post/post-row";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { getPostsByTag, listTags, routes, toSummaries } from "@/lib/content";
+import { truncate } from "@/lib/format";
 import { getAllLivePostStatsMap } from "@/lib/db/queries";
 
 /**
@@ -25,7 +26,21 @@ export async function generateMetadata({ params }: PageProps<"/tags/[tag]">): Pr
   const posts = getPostsByTag(tag);
   if (posts.length === 0) return {};
 
-  const description = `${posts.length} ${posts.length === 1 ? "article" : "articles"} tagged #${tag}.`;
+  /**
+   * Name the actual articles rather than just counting them.
+   *
+   * "7 articles tagged #linux." is accurate and useless — 25 characters in a
+   * slot that takes 160, telling a searcher nothing they did not know from the
+   * URL. Leading with the newest titles describes what is actually on the page.
+   */
+  const titles = posts
+    .slice(0, 3)
+    .map((post) => post.title)
+    .join(" · ");
+
+  const count = `${posts.length} ${posts.length === 1 ? "article" : "articles"} tagged #${tag}`;
+  const description =
+    titles.length > 0 ? truncate(`${count}, newest first: ${titles}.`, 158) : `${count}.`;
 
   return {
     title: `#${tag}`,
