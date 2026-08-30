@@ -11,7 +11,10 @@ import { aboutSetup, author, listTags, routes, timeline } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "About",
-  description: author.longBio,
+  // `bio` rather than `longBio`: 135 characters survives a search result,
+  // 246 does not. The longer one still carries the link preview below, where
+  // there is room for it.
+  description: author.bio,
   alternates: { canonical: "/about" },
   openGraph: {
     title: `About ${author.name} · Space`,
