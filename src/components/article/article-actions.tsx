@@ -44,20 +44,21 @@ export function ArticleActions({ post }: { post: PostSummary | Post }) {
   // lands. `useOptimistic` therefore snapped the count back to the old number
   // as soon as the transition settled, and a like looked like it did nothing.
   // The server now returns the stored count and it is held here instead.
-  const [storedLikes, setStoredLikes] = React.useState<number | null>(null);
+  // Scoped to the slug it was recorded against, so switching posts falls back
+  // to the new post's server value on its own. Resetting it from an effect
+  // instead would set state during an effect body and cascade a second render.
+  const [stored, setStored] = React.useState<{ slug: string; likes: number } | null>(null);
   const [likeNotice, setLikeNotice] = React.useState<string | null>(null);
-  const likes = storedLikes ?? post.likes;
+  const likes = stored?.slug === post.slug ? stored.likes : post.likes;
 
-  React.useEffect(() => {
-    setStoredLikes(null);
-  }, [post.slug]);
+  const rememberLikes = (value: number) => setStored({ slug: post.slug, likes: value });
 
   const handleLike = () => {
     const willLike = !liked;
     const optimistic = Math.max(0, likes + (willLike ? 1 : -1));
 
     toggleLiked(post.slug);
-    setStoredLikes(optimistic);
+    rememberLikes(optimistic);
     setLikeNotice(null);
 
     React.startTransition(async () => {
@@ -68,7 +69,7 @@ export function ArticleActions({ post }: { post: PostSummary | Post }) {
         // accepted — and say why, because silently snapping back is
         // indistinguishable from the feature being broken.
         toggleLiked(post.slug);
-        setStoredLikes(likes);
+        rememberLikes(likes);
         setLikeNotice(
           result.limited
             ? "That is plenty of likes from here today."
@@ -78,7 +79,7 @@ export function ArticleActions({ post }: { post: PostSummary | Post }) {
         return;
       }
 
-      if (typeof result.likes === "number") setStoredLikes(result.likes);
+      if (typeof result.likes === "number") rememberLikes(result.likes);
     });
   };
 
