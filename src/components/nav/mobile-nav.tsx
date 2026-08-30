@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Menu, X } from "lucide-react";
 
 import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { primaryNav, routes } from "@/lib/content";
+import { primaryNav } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
 /**
