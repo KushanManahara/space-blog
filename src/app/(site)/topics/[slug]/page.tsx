@@ -22,6 +22,17 @@ export function generateStaticParams() {
   return topics.map((topic) => ({ slug: topic.slug }));
 }
 
+/**
+ * No `loading.tsx` in this segment, deliberately.
+ *
+ * This route renders dynamically (it reads `searchParams` for the sort order),
+ * so `dynamicParams` cannot gate it the way it does for articles. A
+ * `loading.tsx` here opened a Suspense boundary, which flushed 200 headers
+ * before `notFound()` could run — every unknown topic answered 200 with
+ * not-found content. The page only reads in-memory content, so there was
+ * little for the loading state to cover.
+ */
+
 export async function generateMetadata({ params }: PageProps<"/topics/[slug]">): Promise<Metadata> {
   const { slug } = await params;
   const topic = getTopicBySlug(slug);
