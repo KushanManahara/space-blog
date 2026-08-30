@@ -9,6 +9,13 @@ import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button
 import { getPostsByTag, listTags, routes, toSummaries } from "@/lib/content";
 import { getAllLivePostStatsMap } from "@/lib/db/queries";
 
+/**
+ * These pages are prerendered but read live engagement counts, so without a
+ * revalidate they would keep their build-time numbers forever while the same
+ * post showed live ones on its own page.
+ */
+export const revalidate = 300;
+
 export function generateStaticParams() {
   return listTags().map((tag) => ({ tag: tag.slug }));
 }

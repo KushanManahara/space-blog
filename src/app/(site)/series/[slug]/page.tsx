@@ -13,6 +13,13 @@ import { getSeriesSummary, routes, seriesList } from "@/lib/content";
 import { getAllLivePostStatsMap } from "@/lib/db/queries";
 import { formatCount, formatDate } from "@/lib/format";
 
+/**
+ * These pages are prerendered but read live engagement counts, so without a
+ * revalidate they would keep their build-time numbers forever while the same
+ * post showed live ones on its own page.
+ */
+export const revalidate = 300;
+
 export function generateStaticParams() {
   return seriesList.map((series) => ({ slug: series.slug }));
 }
