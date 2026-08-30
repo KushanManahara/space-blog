@@ -5,6 +5,7 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
+import { HoneypotField } from "@/components/ui/honeypot-field";
 import { MagicCard } from "@/components/ui/magic-card";
 import { Check } from "lucide-react";
 
@@ -39,8 +40,9 @@ export function ContactForm() {
       <form
         ref={formRef}
         action={formAction}
-        className="rounded-[inherit] p-5 sm:p-[clamp(24px,3vw,34px)]"
+        className="relative rounded-[inherit] p-5 sm:p-[clamp(24px,3vw,34px)]"
       >
+        <HoneypotField id="contact-company-website" />
         <div className="flex flex-col gap-5">
           <Field label="Your name" htmlFor="contact-name">
             <Input id="contact-name" name="name" required placeholder="Ada Rehman" />

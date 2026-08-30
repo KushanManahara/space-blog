@@ -10,6 +10,7 @@ import { Check, Loader2 } from "lucide-react";
 import { subscribeAction } from "@/app/actions";
 import { Reveal } from "@/components/motion/reveal";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
+import { HoneypotField } from "@/components/ui/honeypot-field";
 import { MagicCard } from "@/components/ui/magic-card";
 import { ShineBorder } from "@/components/ui/shine-border";
 import { newsletterBenefits } from "@/lib/content";
@@ -66,7 +67,8 @@ export function NewsletterBlock() {
                 ))}
               </ul>
 
-              <form ref={formRef} action={formAction} className="mt-6.5 max-w-[400px]">
+              <form ref={formRef} action={formAction} className="relative mt-6.5 max-w-[400px]">
+                <HoneypotField id="newsletter-company-website" />
                 <div className="relative flex items-center gap-2 rounded-full border border-line-1 bg-bg-2 p-1.5 pl-4 sm:pl-5">
                   <ShineBorder borderWidth={1} duration={12} />
                   <label htmlFor="newsletter-email" className="sr-only">
