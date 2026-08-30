@@ -1,4 +1,4 @@
-import type { Post, ArticleBlock } from "@/lib/content";
+import type { Post } from "@/lib/content";
 
 export interface AudioSegment {
   id: number;
