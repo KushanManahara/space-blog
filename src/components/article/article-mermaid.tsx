@@ -215,7 +215,60 @@ export function ArticleMermaid({
   const [isFullscreen, setIsFullscreen] = React.useState(false);
   const reactId = React.useId();
 
+  /**
+   * Nothing is converted until the figure is near the viewport.
+   *
+   * Excalidraw and Mermaid together are about 4.4 MB of JavaScript. Loading
+   * them on mount meant every reader of a diagram article paid for them whether
+   * or not they ever scrolled far enough to see one — on an article whose
+   * visible content is text.
+   */
+  const [container, setContainer] = React.useState<HTMLElement | null>(null);
+  const [visible, setVisible] = React.useState(false);
+
   React.useEffect(() => {
+    if (!container || visible) return;
+
+    // Without IntersectionObserver, just convert — better a heavy page than no
+    // diagram. Scheduled rather than set inline: a synchronous setState in an
+    // effect body cascades an extra render.
+    if (typeof IntersectionObserver === "undefined") {
+      const timer = setTimeout(() => setVisible(true), 0);
+      return () => clearTimeout(timer);
+    }
+
+    const MARGIN = 600;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) setVisible(true);
+      },
+      // Start early enough that the diagram is usually ready by the time it is
+      // scrolled to.
+      { rootMargin: `${MARGIN}px 0px` },
+    );
+
+    observer.observe(container);
+
+    // One deterministic check alongside the observer. A diagram already on
+    // screen at mount should not wait for a callback, and this means a browser
+    // that delivers no intersection at all still renders anything visible
+    // rather than leaving an empty frame.
+    const box = container.getBoundingClientRect();
+    if (box.top < window.innerHeight + MARGIN && box.bottom > -MARGIN) {
+      const timer = setTimeout(() => setVisible(true), 0);
+      return () => {
+        clearTimeout(timer);
+        observer.disconnect();
+      };
+    }
+
+    return () => observer.disconnect();
+  }, [container, visible]);
+
+  React.useEffect(() => {
+    if (!visible) return;
+
     let cancelled = false;
 
     const render = () =>
@@ -253,6 +306,7 @@ export function ArticleMermaid({
                 viewBackgroundColor: "transparent",
               },
               files: parsed.files ?? null,
+              skipInliningFonts: true,
             });
 
             if (!cancelled && el) {
@@ -305,7 +359,7 @@ export function ArticleMermaid({
       cancelled = true;
       observer.disconnect();
     };
-  }, [code, reactId]);
+  }, [code, reactId, visible]);
 
   const handleCopySvg = async () => {
     if (!svg) return;
@@ -359,7 +413,7 @@ export function ArticleMermaid({
             </button>
           </div>
 
-          <div className="overflow-x-auto p-4 sm:p-6 md:p-8">
+          <div ref={setContainer} className="overflow-x-auto p-4 sm:p-6 md:p-8">
             {svg ? (
               <div
                 className={cn(
@@ -371,7 +425,9 @@ export function ArticleMermaid({
               />
             ) : (
               <div className="flex h-[200px] items-center justify-center text-[13.5px] text-fg-3">
-                <span className="animate-pulse font-medium">Drawing diagram…</span>
+                <span className={visible ? "animate-pulse font-medium" : "font-medium"}>
+                  {visible ? "Drawing diagram…" : "Diagram"}
+                </span>
               </div>
             )}
           </div>

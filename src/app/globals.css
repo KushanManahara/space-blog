@@ -1177,3 +1177,16 @@ html[data-magicui-theme-vt="active"]::view-transition-new(root) {
     letter-spacing: 0.15em;
   }
 }
+
+/* Excalidraw Sketch Fonts */
+@font-face {
+  font-family: "Virgil";
+  src: url("https://unpkg.com/@excalidraw/excalidraw@0.18.1/dist/excalidraw-assets/Virgil.woff2") format("woff2");
+  font-display: swap;
+}
+@font-face {
+  font-family: "Cascadia";
+  src: url("https://unpkg.com/@excalidraw/excalidraw@0.18.1/dist/excalidraw-assets/Cascadia.woff2") format("woff2");
+  font-display: swap;
+}
+
