@@ -196,9 +196,16 @@ export async function contactAction(_previous: FormState, formData: FormData): P
 export async function likePostAction(slug: string, increment: boolean = true) {
   // The client also tracks this in localStorage, but that is a UI convenience,
   // not a guard — clearing it must not let the counter be driven up.
-  const caller = await callerFingerprint();
-  if (!(await underLimit(`like:${slug}`, caller, 4, 86_400))) {
-    return { success: false as const, likes: null };
+  //
+  // Only likes are limited. An unlike can only lower the number, so it is not
+  // an inflation vector, and counting it meant a reader who changed their mind
+  // twice burned the whole daily budget and then silently could not like the
+  // article at all. The ceiling is per article per caller per day.
+  if (increment) {
+    const caller = await callerFingerprint();
+    if (!(await underLimit(`like:${slug}`, caller, 50, 86_400))) {
+      return { success: false as const, likes: null, limited: true as const };
+    }
   }
 
   try {
@@ -226,10 +233,10 @@ export async function likePostAction(slug: string, increment: boolean = true) {
 
     revalidatePath(`/articles/${slug}`);
     revalidatePath("/");
-    return { success: true as const, likes: row?.likes ?? null };
+    return { success: true as const, likes: row?.likes ?? null, limited: false as const };
   } catch (error) {
     console.error("Like post error:", error);
-    return { success: false as const, likes: null };
+    return { success: false as const, likes: null, limited: false as const };
   }
 }
 

@@ -14,7 +14,9 @@ import { db, rateLimits } from "@/lib/db";
  */
 
 /** Field name shared by every protected form. Real users never fill it in. */
-export const HONEYPOT_FIELD = "company_website";
+// Re-exported so existing server-side imports keep working.
+export { HONEYPOT_FIELD } from "./honeypot";
+import { HONEYPOT_FIELD } from "./honeypot";
 
 /**
  * A bot that fills every input trips this; a human never sees it. Cheap, and
@@ -30,17 +32,21 @@ export function isHoneypotTripped(formData: FormData): boolean {
  * turned back into a list of who read what.
  */
 export async function callerFingerprint(): Promise<string> {
-  const headerList = await headers();
-  // x-forwarded-for is a client-supplied header and can be spoofed; it is the
-  // best signal available behind a proxy, which is why this is a speed bump
-  // rather than a security boundary.
-  const ip =
-    headerList.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    headerList.get("x-real-ip") ||
-    "unknown";
-  const agent = headerList.get("user-agent") ?? "";
+  try {
+    const headerList = await headers();
+    // x-forwarded-for is a client-supplied header and can be spoofed; it is the
+    // best signal available behind a proxy, which is why this is a speed bump
+    // rather than a security boundary.
+    const ip =
+      headerList.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      headerList.get("x-real-ip") ||
+      "unknown";
+    const agent = headerList.get("user-agent") ?? "";
 
-  return createHash("sha256").update(`${ip}|${agent}`).digest("hex").slice(0, 32);
+    return createHash("sha256").update(`${ip}|${agent}`).digest("hex").slice(0, 32);
+  } catch {
+    return "anonymous";
+  }
 }
 
 /**
