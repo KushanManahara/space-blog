@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 import { author, getPostBySlug, posts, site } from "@/lib/content";
-import { formatDate } from "@/lib/format";
+import { formatDate, truncate } from "@/lib/format";
 import {
   loadOgFonts,
   loadOgLogo,
@@ -9,7 +9,6 @@ import {
   OG_SIZE,
   OG_TOPIC_GRADIENT,
   titleSize,
-  truncate,
 } from "@/lib/og";
 
 export const alt = "Article on Space";

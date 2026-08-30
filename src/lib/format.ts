@@ -23,3 +23,16 @@ export function formatCount(value: number): string {
   const thousands = value / 1000;
   return `${thousands % 1 === 0 ? thousands : thousands.toFixed(1)}k`;
 }
+
+/**
+ * Trims to a word boundary and adds an ellipsis.
+ *
+ * A hard slice cuts mid-word, which in a share card or a search result reads as
+ * a rendering fault rather than an intentional summary.
+ */
+export function truncate(text: string, max: number): string {
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max);
+  const lastSpace = cut.lastIndexOf(" ");
+  return `${(lastSpace > max * 0.6 ? cut.slice(0, lastSpace) : cut).replace(/[,;:.\s]+$/, "")}…`;
+}

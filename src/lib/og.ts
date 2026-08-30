@@ -57,16 +57,3 @@ export async function loadOgLogo(): Promise<string> {
   const file = await readFile(join(process.cwd(), "public/logo.png"));
   return `data:image/png;base64,${file.toString("base64")}`;
 }
-
-/**
- * Trims to a word boundary and adds an ellipsis.
- *
- * Clipping with `overflow: hidden` cuts mid-word, which on a share card reads
- * as a rendering fault rather than an intentional summary.
- */
-export function truncate(text: string, max: number): string {
-  if (text.length <= max) return text;
-  const cut = text.slice(0, max);
-  const lastSpace = cut.lastIndexOf(" ");
-  return `${(lastSpace > max * 0.6 ? cut.slice(0, lastSpace) : cut).replace(/[,;:.\s]+$/, "")}…`;
-}
