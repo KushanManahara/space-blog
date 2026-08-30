@@ -128,7 +128,7 @@ export function SemanticResults({
               <Link href={ragHref} className="font-semibold text-brand hover:text-brand-strong">
                 the pipeline this post describes
               </Link>
-              . Downloads a model the first time.
+              . Downloads a ~30 MB model the first time.
             </>
           )}
         </p>
