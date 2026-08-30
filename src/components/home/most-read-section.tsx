@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { Reveal } from "@/components/motion/reveal";
 import { RankedPostRow } from "@/components/post/post-row";
 import { GlareHover } from "@/components/ui/glare-hover";
@@ -36,9 +38,19 @@ export function MostReadSection({ posts }: { posts: Post[] }) {
               <h3 className="mt-4 text-[24px] leading-[1.15] font-light tracking-[-0.02em] text-white sm:text-[28px]">
                 {site.issue} posts, four years, no reposts.
               </h3>
+              {/* The claim links to the page that backs it. This was the only
+                  place on the homepage that states the corrections policy, and
+                  it pointed nowhere — leaving /corrections reachable from the
+                  footer alone. */}
               <p className="mt-3.5 text-[14px] leading-[1.65] text-white/65 sm:text-[15px]">
-                Everything is dated and versioned. When a finding turns out to be wrong, the
-                correction sits on top of the original, not in place of it.
+                Everything is dated and versioned. When a finding turns out to be wrong, the{" "}
+                <Link
+                  href={routes.corrections}
+                  className="font-medium text-white underline decoration-white/35 underline-offset-4 transition-colors duration-300 ease-expo hover:decoration-white"
+                >
+                  correction sits on top of the original
+                </Link>
+                , not in place of it.
               </p>
 
               <div className="mt-6.5 grid grid-cols-2 gap-3">
