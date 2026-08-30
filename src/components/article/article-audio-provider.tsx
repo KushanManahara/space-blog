@@ -72,18 +72,32 @@ export function ArticleAudioProvider({
   const currentSegmentIndexRef = React.useRef(0);
   const rateRef = React.useRef(1.0);
   const voicesRef = React.useRef<SpeechSynthesisVoice[]>([]);
+  /**
+   * Lets `speakSegment` queue the next segment from an utterance's `onend`.
+   * The callback genuinely has to reach itself across an async boundary, and
+   * naming it directly inside its own definition would capture the first
+   * version of it forever.
+   */
+  const speakSegmentRef = React.useRef<(index: number) => void>(() => {});
 
-  isPlayingRef.current = isPlaying;
-  currentSegmentIndexRef.current = currentSegmentIndex;
-  rateRef.current = rate;
-  voicesRef.current = voices;
+  // Mirrored after render, not during it. Speech callbacks fire long after the
+  // render that scheduled them, so they only need the values to be current by
+  // the time they run — and writing refs while rendering is what makes a
+  // component read differently on two passes of the same render.
+  React.useEffect(() => {
+    isPlayingRef.current = isPlaying;
+    currentSegmentIndexRef.current = currentSegmentIndex;
+    rateRef.current = rate;
+    voicesRef.current = voices;
+  });
 
   // Load word highlight preference from localStorage
   React.useEffect(() => {
     try {
       const saved = localStorage.getItem("space_audio_highlight_word");
       if (saved !== null) {
-        setIsWordHighlightEnabled(saved === "true");
+        // Queued so the state change is not synchronous inside the effect.
+        queueMicrotask(() => setIsWordHighlightEnabled(saved === "true"));
       }
     } catch {
       // Ignore storage errors
@@ -103,11 +117,11 @@ export function ArticleAudioProvider({
   // Initialize SpeechSynthesis and load voices
   React.useEffect(() => {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) {
-      setIsSupported(false);
+      queueMicrotask(() => setIsSupported(false));
       return;
     }
 
-    setIsSupported(true);
+    queueMicrotask(() => setIsSupported(true));
 
     const updateVoices = () => {
       const available = window.speechSynthesis.getVoices();
@@ -157,7 +171,14 @@ export function ArticleAudioProvider({
       const synth = window.speechSynthesis;
       synth.cancel();
 
-      if (index >= audioData.segments.length) {
+      // Skip past any empty segments. This was recursion into `speakSegment`,
+      // which referenced the callback inside its own definition.
+      let next = index;
+      while (next < audioData.segments.length && !audioData.segments[next]?.text) {
+        next += 1;
+      }
+
+      if (next >= audioData.segments.length) {
         // Finished entire article
         setIsPlaying(false);
         setIsPaused(false);
@@ -166,14 +187,10 @@ export function ArticleAudioProvider({
         return;
       }
 
-      const segment = audioData.segments[index];
-      if (!segment || !segment.text) {
-        speakSegment(index + 1);
-        return;
-      }
+      const segment = audioData.segments[next];
 
-      setCurrentSegmentIndex(index);
-      currentSegmentIndexRef.current = index;
+      setCurrentSegmentIndex(next);
+      currentSegmentIndexRef.current = next;
       setCurrentCharRange(null);
 
       const utterance = new SpeechSynthesisUtterance(segment.text);
@@ -211,7 +228,7 @@ export function ArticleAudioProvider({
         // Only advance if still actively playing (not manually cancelled)
         if (isPlayingRef.current) {
           const nextIndex = currentSegmentIndexRef.current + 1;
-          speakSegment(nextIndex);
+          speakSegmentRef.current(nextIndex);
         }
       };
 
@@ -219,7 +236,7 @@ export function ArticleAudioProvider({
         if (e.error !== "canceled" && e.error !== "interrupted") {
           // If a segment fails, try continuing to next segment
           if (isPlayingRef.current) {
-            speakSegment(currentSegmentIndexRef.current + 1);
+            speakSegmentRef.current(currentSegmentIndexRef.current + 1);
           }
         }
       };
@@ -240,6 +257,11 @@ export function ArticleAudioProvider({
     },
     [speakSegment],
   );
+
+  // Keep the self-reference above pointing at the current callback.
+  React.useEffect(() => {
+    speakSegmentRef.current = speakSegment;
+  }, [speakSegment]);
 
   const pause = React.useCallback(() => {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
