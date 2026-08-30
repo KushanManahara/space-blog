@@ -27,6 +27,13 @@ export const metadata: Metadata = {
   title: "Search",
   description: `Search across all ${site.issue} posts, topics and tags.`,
   alternates: { canonical: "/search" },
+  /**
+   * Results pages are not content. Every query is a distinct URL whose heading
+   * is whatever the visitor typed, so leaving them indexable invites an
+   * unbounded set of thin, near-duplicate pages to compete with the articles
+   * they are pointing at.
+   */
+  robots: { index: false, follow: true },
 };
 
 const TABS = ["Articles", "Topics", "Tags"] as const;
