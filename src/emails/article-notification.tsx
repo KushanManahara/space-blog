@@ -188,13 +188,15 @@ const imageContainer = {
   borderRadius: "14px",
   overflow: "hidden" as const,
   border: "1px solid #e2e8f0",
+  backgroundColor: "#f1f5f9",
 };
 
 const coverImg = {
   width: "100%",
-  maxHeight: "260px",
-  objectFit: "cover" as const,
+  height: "auto",
+  maxWidth: "100%",
   display: "block",
+  borderRadius: "13px",
 };
 
 const metaText = {

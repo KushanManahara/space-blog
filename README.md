@@ -76,14 +76,10 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 TURSO_DATABASE_URL=libsql://[your-database-name].turso.io
 TURSO_AUTH_TOKEN=your-turso-auth-token
 
-# Resend Email Delivery
+# Resend Email Delivery & Newsletter Cryptographic HMAC Secret
 RESEND_API_KEY=re_your_api_key
-RESEND_AUDIENCE_ID=your-resend-audience-id
-RESEND_FROM_EMAIL=newsletter.space@gimhara.com
-
-# Studio Security & Unsubscribe Secret
-STUDIO_SECRET=your-studio-passphrase
-UNSUBSCRIBE_SECRET=your-unsubscribe-token-secret
+NEWSLETTER_SECRET=your-newsletter-hmac-secret
+NEWSLETTER_FROM_EMAIL="Space <newsletter.space@gimhara.com>"
 ```
 
 ### 3. Initialize the Database
@@ -109,7 +105,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to view the 
 
 ```bash
 # Quality Assurance
-pnpm build           # Production build (compiles all 65 pre-rendered routes)
+pnpm build           # Production build (compiles all pre-rendered routes)
 pnpm typecheck       # TypeScript type checking
 pnpm lint            # Run ESLint checks
 pnpm format          # Format codebase with Prettier
@@ -120,9 +116,15 @@ pnpm db:sync         # Safe sync local articles & baseline metrics to database
 pnpm db:sync:force   # Reset and overwrite database baselines from local content
 pnpm db:studio       # Launch visual Drizzle database GUI
 
-# Newsletter Verification
-npx tsx scripts/verify-newsletter-pipeline.ts   # Comprehensive subscription & broadcast test
-npx tsx scripts/test-newsletter.ts              # Send test email to verify headers and inbox rendering
+# Article Newsletter Broadcasting
+pnpm broadcast                       # List available article slugs
+pnpm broadcast <slug>                # Dry-run (preview article details & subscriber count)
+pnpm broadcast <slug> --to=<email>   # Send article update to a single subscriber or test inbox
+pnpm broadcast <slug> --send         # Broadcast article update to ALL registered subscribers
+
+# Comments Moderation & Semantic Search
+pnpm comments        # Interactive CLI to review, approve, or delete reader comments
+pnpm embeddings      # Precompute semantic vector embeddings for instant search
 ```
 
 ---

@@ -15,7 +15,8 @@
     "db:sync": "tsx scripts/sync-db.ts",
     "db:sync:force": "tsx scripts/sync-db.ts --force",
     "comments": "tsx scripts/moderate-comments.ts",
-    "embeddings": "tsx scripts/build-embeddings.ts"
+    "embeddings": "tsx scripts/build-embeddings.ts",
+    "broadcast": "tsx scripts/broadcast.ts"
   },
   "dependencies": {
     "@excalidraw/excalidraw": "^0.18.1",

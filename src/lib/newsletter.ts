@@ -109,48 +109,27 @@ export async function sendWelcomeEmail(email: string) {
  * IMPLEMENTS INLINE CID IMAGE EMBEDDING (SO IMAGES DISPLAY EVEN BEFORE SITE DEPLOYMENT),
  * MULTIPART PLAIN TEXT, COMPLIANCE HEADERS, AND RESEND BATCHING
  */
-export async function broadcastArticleNotification(post: Post) {
+export async function broadcastArticleNotification(post: Post, recipients?: string[]) {
   if (!emailEnabled) return { success: false, error: "Email is not configured." };
 
   try {
-    // FETCH ALL ACTIVE REGISTERED SUBSCRIBERS FROM DATABASE
-    const subscribers = await db
-      .select({ email: newsletterSubscribers.email })
-      .from(newsletterSubscribers);
+    // FETCH ACTIVE REGISTERED SUBSCRIBERS FROM DATABASE OR USE CUSTOM RECIPIENTS
+    const subscribers =
+      recipients && recipients.length > 0
+        ? recipients.map((email) => ({ email }))
+        : await db.select({ email: newsletterSubscribers.email }).from(newsletterSubscribers);
 
     if (!subscribers.length) {
       return { success: true, count: 0, message: "NO SUBSCRIBERS FOUND IN DATABASE" };
     }
 
-    // RESOLVE IMAGE ATTACHMENT FOR INLINE CID EMBEDDING
-    // THIS GUARANTEES THE IMAGE SHOWS IN GMAIL/OUTLOOK REGARDLESS OF DEPLOYMENT STATUS
-    let emailCoverImage = post.coverImage;
-    let attachments:
-      Array<{ filename: string; content: Buffer; cid: string; contentType?: string }> | undefined =
-      undefined;
-
-    if (post.coverImage && !post.coverImage.startsWith("http")) {
-      const cleanPath = post.coverImage.startsWith("/")
-        ? post.coverImage.slice(1)
-        : post.coverImage;
-      const diskPath = path.join(process.cwd(), "public", cleanPath);
-
-      if (fs.existsSync(diskPath)) {
-        const buffer = fs.readFileSync(diskPath);
-        const filename = path.basename(diskPath);
-        emailCoverImage = "cid:post-cover";
-        attachments = [
-          {
-            filename,
-            content: buffer,
-            cid: "post-cover",
-            contentType: filename.endsWith(".png") ? "image/png" : "image/jpeg",
-          },
-        ];
-      } else {
-        emailCoverImage = `${SITE_URL}${post.coverImage.startsWith("/") ? "" : "/"}${post.coverImage}`;
-      }
-    }
+    // USE FULL PUBLIC HTTPS URL (e.g. https://space.gimhara.com/articles/slug.png)
+    // GUARANTEES GMAIL AND APPLE MAIL IMAGE PROXIES RENDER THE IMAGE DIRECTLY
+    const emailCoverImage = post.coverImage
+      ? post.coverImage.startsWith("http")
+        ? post.coverImage
+        : `${SITE_URL}${post.coverImage.startsWith("/") ? "" : "/"}${post.coverImage}`
+      : undefined;
 
     const emailPayloads = subscribers.map((sub) => {
       const unsubscribeUrl = unsubscribeLink(sub.email);
@@ -160,7 +139,6 @@ export async function broadcastArticleNotification(post: Post) {
         to: sub.email,
         subject: `New on Space: ${post.title}`,
         headers: getComplianceHeaders(sub.email),
-        attachments,
         text: getArticleNotificationText({
           title: post.title,
           dek: post.dek,
