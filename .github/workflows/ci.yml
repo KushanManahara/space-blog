@@ -28,12 +28,23 @@ jobs:
 
       - run: pnpm format:check
       - run: pnpm lint
+
+      # `typecheck` runs `next typegen` first: PageProps and LayoutProps are
+      # globals Next writes into .next/types, so a bare `tsc` on a fresh
+      # checkout cannot see them.
       - run: pnpm typecheck
 
       # The content layer parses every post through its zod schemas at module
       # load, so malformed content fails here rather than in production.
       - run: pnpm build
         env:
-          # No database in CI. The build tolerates that — live stats degrade to
-          # zero — which keeps real credentials out of the workflow.
           NEXT_PUBLIC_SITE_URL: https://space.gimhara.com
+
+          # A throwaway local file, set explicitly rather than left unset.
+          # `lib/db/index.ts` refuses to fall back to a file when NODE_ENV is
+          # production — that guard exists so a real deployment can never
+          # silently write to a disk that disappears, and it should stay strict.
+          # Naming a file here is a visible CI choice, not that silent fallback.
+          # The tables do not exist, every query fails, and the read paths catch
+          # it and render zeros, which is all this build needs.
+          TURSO_DATABASE_URL: file:ci-build.db
