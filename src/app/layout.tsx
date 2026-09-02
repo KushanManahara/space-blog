@@ -5,18 +5,20 @@ import Script from "next/script";
 import { ViewTransitionGuard } from "@/components/motion/view-transition-guard";
 import { CommandMenuProvider } from "@/components/nav/command-menu";
 import { SavedPostsProvider } from "@/components/providers/saved-posts-provider";
-import { author, posts, site, siteUrl, toSummaries } from "@/lib/content";
+import { author, site, siteUrl } from "@/lib/content";
 
 import "./globals.css";
 
 const louisGeorgeCafe = localFont({
   variable: "--font-louis-george-cafe",
   display: "swap",
+  // WOFF2, not TTF: the same four faces render-blocked 130KB as TrueType and
+  // 53KB compressed, for identical glyphs.
   src: [
-    { path: "./fonts/Louis_George_Cafe_Light.ttf", weight: "300", style: "normal" },
-    { path: "./fonts/Louis_George_Cafe.ttf", weight: "400", style: "normal" },
-    { path: "./fonts/Louis_George_Cafe_Italic.ttf", weight: "400", style: "italic" },
-    { path: "./fonts/Louis_George_Cafe_Bold.ttf", weight: "700", style: "normal" },
+    { path: "./fonts/Louis_George_Cafe_Light.woff2", weight: "300", style: "normal" },
+    { path: "./fonts/Louis_George_Cafe.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/Louis_George_Cafe_Italic.woff2", weight: "400", style: "italic" },
+    { path: "./fonts/Louis_George_Cafe_Bold.woff2", weight: "700", style: "normal" },
   ],
 });
 
@@ -96,17 +98,25 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           id="theme-init"
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
+            /*
+             * An explicit choice wins; otherwise follow the operating system.
+             *
+             * This used to fall through to light whenever `theme` was unset,
+             * so every first-time visitor with a dark OS got a light site —
+             * while `viewport.themeColor` below was already promising the
+             * browser a dark chrome for exactly that reader.
+             */
             __html: `
               try {
-                var theme = localStorage.getItem('theme');
-                if (theme === 'dark') {
-                  document.documentElement.classList.add('dark');
-                  document.documentElement.classList.remove('light');
-                } else {
-                  document.documentElement.classList.add('light');
-                  document.documentElement.classList.remove('dark');
-                }
-              } catch (_) {}
+                var stored = localStorage.getItem('theme');
+                var dark = stored
+                  ? stored === 'dark'
+                  : window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.classList.add(dark ? 'dark' : 'light');
+                document.documentElement.classList.remove(dark ? 'light' : 'dark');
+              } catch (_) {
+                document.documentElement.classList.add('light');
+              }
             `,
           }}
         />
@@ -134,7 +144,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                   name: author.name,
                   jobTitle: author.role,
                   description: author.bio,
-                  email: `mailto:${author.email}`,
+                  // No `email` here on purpose. schema.org does not require it,
+                  // and structured data is the easiest thing on the page for an
+                  // address harvester to parse. The contact page carries it for
+                  // people, which is who it is for.
                   url: `${siteUrl}/about`,
                   image: `${siteUrl}${author.avatar}`,
                   sameAs: [author.github, author.linkedin, author.twitter],
@@ -145,7 +158,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
         <ViewTransitionGuard />
         <SavedPostsProvider>
-          <CommandMenuProvider posts={toSummaries(posts)}>{children}</CommandMenuProvider>
+          <CommandMenuProvider>{children}</CommandMenuProvider>
         </SavedPostsProvider>
       </body>
     </html>
