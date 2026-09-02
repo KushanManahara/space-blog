@@ -22,12 +22,13 @@ import {
 import { formatCount, formatDate } from "@/lib/format";
 import { paginate } from "@/lib/pagination";
 import { buildHref } from "@/lib/url";
+import { alternates } from "@/lib/metadata";
 
 export const metadata: Metadata = {
   title: "Series",
   description:
     "Multi-part runs through one subject, in the order they were written. Filter by topic, sort by length or by what gets read.",
-  alternates: { canonical: "/series" },
+  alternates: alternates("/series"),
 };
 
 const PER_PAGE = 6;
@@ -137,7 +138,6 @@ export default async function SeriesPage({ searchParams }: PageProps<"/series">)
                       <PostCover
                         topic={series.coverTopic}
                         image={series.cover}
-                        alt={series.title}
                         zoom={false}
                         pattern={false}
                         className="size-[58px] shrink-0 rounded-md"

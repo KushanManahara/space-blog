@@ -22,11 +22,12 @@ import {
 } from "@/lib/content";
 import { buildHref } from "@/lib/url";
 import { paginate } from "@/lib/pagination";
+import { alternates } from "@/lib/metadata";
 
 export const metadata: Metadata = {
   title: "Search",
   description: `Search across all ${site.issue} posts, topics and tags.`,
-  alternates: { canonical: "/search" },
+  alternates: alternates("/search"),
   /**
    * Results pages are not content. Every query is a distinct URL whose heading
    * is whatever the visitor typed, so leaving them indexable invites an

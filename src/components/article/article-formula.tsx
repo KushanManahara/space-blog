@@ -43,6 +43,10 @@ export function ArticleFormula({
         // KaTeX sizes itself; the wrapper only needs to allow a long equation
         // to scroll rather than force the article sideways.
         <div
+          // A long equation scrolls sideways, so it needs to be focusable.
+          tabIndex={0}
+          role="region"
+          aria-label={caption ?? "Equation"}
           className="katex-figure overflow-x-auto overflow-y-hidden py-1 text-center text-fg-prose"
           dangerouslySetInnerHTML={{ __html: rendered }}
         />

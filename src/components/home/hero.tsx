@@ -108,7 +108,6 @@ function FeaturedCard({ post }: { post: Post }) {
           <PostCover
             topic={post.topic}
             image={post.coverImage}
-            alt={post.title}
             priority
             pattern={false}
             notch

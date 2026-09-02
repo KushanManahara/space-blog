@@ -9,11 +9,12 @@ import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { author, routes } from "@/lib/content";
+import { alternates } from "@/lib/metadata";
 
 export const metadata: Metadata = {
   title: "Contact",
   description: "Corrections get answered first. Everything else, within a week.",
-  alternates: { canonical: "/contact" },
+  alternates: alternates("/contact"),
 };
 
 const socials = [

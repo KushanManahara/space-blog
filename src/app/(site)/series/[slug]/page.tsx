@@ -12,6 +12,7 @@ import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button
 import { getSeriesSummary, routes, seriesList } from "@/lib/content";
 import { getAllLivePostStatsMap } from "@/lib/db/queries";
 import { formatCount, formatDate } from "@/lib/format";
+import { alternates, openGraph } from "@/lib/metadata";
 
 /**
  * These pages are prerendered but read live engagement counts, so without a
@@ -32,13 +33,13 @@ export async function generateMetadata({ params }: PageProps<"/series/[slug]">):
   return {
     title: series.title,
     description: series.dek,
-    alternates: { canonical: `/series/${series.slug}` },
-    openGraph: {
+    alternates: alternates(`/series/${series.slug}`),
+    openGraph: openGraph({
       type: "website",
       title: series.title,
       description: series.dek,
       url: `/series/${series.slug}`,
-    },
+    }),
   };
 }
 
@@ -74,7 +75,6 @@ export default async function SeriesDetailPage({ params }: PageProps<"/series/[s
               <PostCover
                 topic={series.coverTopic}
                 image={series.cover}
-                alt={series.title}
                 zoom={false}
                 priority
                 className="size-[96px] shrink-0 rounded-lg sm:size-[124px]"

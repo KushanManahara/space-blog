@@ -388,11 +388,18 @@ export function getSeriesParts(slug: string): Post[] {
     .sort((a, b) => (a.series?.part ?? 0) - (b.series?.part ?? 0));
 }
 
-/** Studio rows: the newest post is an unpublished draft, one older post carries a correction. */
+/**
+ * Studio rows, with a status derived from the post rather than invented.
+ *
+ * This used to label whatever sat at index 0 as "Draft" and index 3 as
+ * "Corrected" — leftovers from the mock data. Every post in `posts.ts` is
+ * published by definition (there is no draft state in the content layer), so
+ * the only real distinction is whether a post carries a correction.
+ */
 export function getStudioPosts(): Array<StudioPost & { post: Post }> {
-  return listPosts({ limit: 10 }).map((post, index) => ({
+  return listPosts({ limit: 10 }).map((post) => ({
     slug: post.slug,
-    status: index === 0 ? "Draft" : index === 3 ? "Corrected" : "Published",
+    status: lastCorrectedAt(post) ? "Corrected" : "Published",
     post,
   }));
 }

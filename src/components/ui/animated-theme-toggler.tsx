@@ -230,7 +230,19 @@ export const AnimatedThemeToggler = ({
       }
     };
 
-    if (typeof document.startViewTransition !== "function") {
+    /*
+     * The clip-path reveal below is driven by `element.animate()`, and a Web
+     * Animations API animation is not touched by the CSS
+     * `@media (prefers-reduced-motion: reduce)` rule in globals.css — that only
+     * neutralises CSS animation/transition durations. So the wipe ran at full
+     * length for readers who had asked for less motion. Swap the theme outright
+     * for them instead.
+     */
+    const prefersReducedMotion =
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (prefersReducedMotion || typeof document.startViewTransition !== "function") {
       applyTheme();
       return;
     }

@@ -6,11 +6,12 @@ import { MastheadBadge, PageMasthead } from "@/components/layout/page-masthead";
 import { Reveal } from "@/components/motion/reveal";
 import { TopicBadge } from "@/components/post/topic-badge";
 import { listReadingPaths, routes, site } from "@/lib/content";
+import { alternates } from "@/lib/metadata";
 
 export const metadata: Metadata = {
   title: "Where to start",
   description: `Curated routes through the ${site.issue} posts in this archive, for anyone who has not read any of it yet.`,
-  alternates: { canonical: "/paths" },
+  alternates: alternates("/paths"),
 };
 
 export default function PathsPage() {

@@ -7,11 +7,12 @@ import { markdownToHtml } from "@/components/article/markdown";
 import { Reveal } from "@/components/motion/reveal";
 import { listCorrections, routes, site } from "@/lib/content";
 import { formatDate } from "@/lib/format";
+import { alternates } from "@/lib/metadata";
 
 export const metadata: Metadata = {
   title: "Corrections",
   description: `Every correction made to the ${site.issue} posts in this archive, dated, with the article it belongs to.`,
-  alternates: { canonical: "/corrections" },
+  alternates: alternates("/corrections"),
 };
 
 export default function CorrectionsPage() {

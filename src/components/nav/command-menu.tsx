@@ -9,6 +9,16 @@ import { PostCover } from "@/components/post/post-cover";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { routes, type PostSummary } from "@/lib/content";
 
+/**
+ * The handful of fields the menu actually renders. Deliberately not
+ * `PostSummary`: the catalog is fetched over the wire now, and there is no
+ * reason to ship tags, deks and dates nobody reads here.
+ */
+export type CommandMenuPost = Pick<
+  PostSummary,
+  "slug" | "title" | "topic" | "coverImage" | "readingMinutes"
+>;
+
 const NAVIGATE_ITEMS = [
   { label: "Go to Articles", hint: "G A", href: routes.articles },
   { label: "Go to Topics", hint: "G T", href: routes.topics },
@@ -22,13 +32,7 @@ type CommandMenuValue = { open: () => void };
 const CommandMenuContext = React.createContext<CommandMenuValue | null>(null);
 
 /** Owns ⌘K state so the header, the 404 page and the shortcut share one menu. */
-export function CommandMenuProvider({
-  posts,
-  children,
-}: {
-  posts: PostSummary[];
-  children: React.ReactNode;
-}) {
+export function CommandMenuProvider({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = React.useState(false);
   const value = React.useMemo<CommandMenuValue>(() => ({ open: () => setIsOpen(true) }), []);
 
@@ -47,7 +51,7 @@ export function CommandMenuProvider({
   return (
     <CommandMenuContext value={value}>
       {children}
-      <CommandMenu posts={posts} open={isOpen} onOpenChange={setIsOpen} />
+      <CommandMenu open={isOpen} onOpenChange={setIsOpen} />
     </CommandMenuContext>
   );
 }
@@ -59,18 +63,37 @@ export function useCommandMenu(): CommandMenuValue {
 }
 
 function CommandMenu({
-  posts,
   open,
   onOpenChange,
 }: {
-  posts: PostSummary[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
   const router = useRouter();
   const [query, setQuery] = React.useState("");
+  const [posts, setPosts] = React.useState<CommandMenuPost[] | null>(null);
 
-  const results = posts
+  // Fetched once, the first time the menu is opened, rather than embedded in
+  // every page. The response is a static, cacheable route.
+  React.useEffect(() => {
+    if (!open || posts !== null) return;
+
+    let cancelled = false;
+    fetch("/api/search-index")
+      .then((response) => (response.ok ? response.json() : []))
+      .then((data: CommandMenuPost[]) => {
+        if (!cancelled) setPosts(data);
+      })
+      .catch(() => {
+        if (!cancelled) setPosts([]);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open, posts]);
+
+  const results = (posts ?? [])
     .filter((post) => `${post.title} ${post.topic}`.toLowerCase().includes(query.toLowerCase()))
     .slice(0, 5);
 
@@ -116,7 +139,9 @@ function CommandMenu({
           <p className="px-2.5 py-1.5 text-[11px] font-semibold tracking-[0.12em] text-fg-3 uppercase">
             Posts
           </p>
-          {results.length === 0 ? (
+          {posts === null ? (
+            <p className="px-2.5 py-4 text-[14px] text-fg-3">Loading posts…</p>
+          ) : results.length === 0 ? (
             <p className="px-2.5 py-4 text-[14px] text-fg-2">
               No posts match “{query}”. Try a topic name, or press esc to close.
             </p>
@@ -131,7 +156,6 @@ function CommandMenu({
                 <PostCover
                   topic={post.topic}
                   image={post.coverImage}
-                  alt={post.title}
                   zoom={false}
                   className="size-[38px] shrink-0 rounded-[10px]"
                 />

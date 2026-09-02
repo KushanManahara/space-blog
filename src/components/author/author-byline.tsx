@@ -46,7 +46,7 @@ export function AuthorAvatar({ className, priority }: { className?: string; prio
         alt={author.name}
         width={96}
         height={96}
-        priority={priority}
+        preload={priority}
         className="size-full object-cover"
       />
     </span>

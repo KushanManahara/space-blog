@@ -26,6 +26,22 @@ import { cn } from "@/lib/utils";
  *    throws and the diagram silently degrades to a flat bitmap. Mermaid is
  *    pinned to 11.13.0 (see the `pnpm.overrides` entry) until upstream catches
  *    up. `pnpm why mermaid` should report a single version.
+ *
+ * That pin holds back ten published Mermaid advisories, all fixed in 11.16.1,
+ * so it is a knowingly accepted risk rather than an oversight:
+ *
+ * - The exposure is HTML/CSS injection, prototype pollution and parser DoS, and
+ *   every one of them requires attacker-controlled diagram source. Mermaid here
+ *   only ever parses `kind: "mermaid"` blocks from `posts.ts` — committed to the
+ *   repo, schema-validated at module load, and never reachable from a comment,
+ *   a search query or any other reader input.
+ * - Taking the fix today means breaking a real diagram: one of the two Mermaid
+ *   blocks in the archive uses `subgraph`, which is precisely what 11.14 broke,
+ *   and `@excalidraw/mermaid-to-excalidraw@2.2.2` is still the newest release.
+ *
+ * Re-check on any new release of that library: if it handles the prefixed
+ * cluster ids, drop the override, run `pnpm audit`, and confirm both diagrams
+ * still render as vector rather than a flat bitmap.
  */
 
 type MermaidModule = typeof import("mermaid").default;
@@ -375,7 +391,12 @@ export function ArticleMermaid({
   if (failed && !svg) {
     return (
       <figure className={cn("mt-8", className)}>
-        <pre className="overflow-x-auto rounded-lg border border-line-1 bg-bg-2 p-4 font-mono text-[13px] text-fg-2">
+        <pre
+          tabIndex={0}
+          role="region"
+          aria-label="Diagram source"
+          className="overflow-x-auto rounded-lg border border-line-1 bg-bg-2 p-4 font-mono text-[13px] text-fg-2"
+        >
           {code}
         </pre>
         <figcaption className="mt-3 text-[13.5px] text-fg-3">
@@ -413,7 +434,13 @@ export function ArticleMermaid({
             </button>
           </div>
 
-          <div ref={setContainer} className="overflow-x-auto p-4 sm:p-6 md:p-8">
+          <div
+            ref={setContainer}
+            tabIndex={0}
+            role="region"
+            aria-label={caption ?? "Diagram"}
+            className="overflow-x-auto p-4 sm:p-6 md:p-8"
+          >
             {svg ? (
               <div
                 className={cn(

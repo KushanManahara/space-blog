@@ -43,57 +43,62 @@ export const author: Author = authorSchema.parse({
   twitter: "https://x.com/Kushan_Manahara",
 });
 
-export const topics: Topic[] = topicSchema.array().parse([
+/**
+ * Topic blurbs. Everything countable is derived below, not written here — this
+ * was the only hand-maintained count left in the file, and a count that has to
+ * be remembered is a count that eventually disagrees with the archive.
+ */
+const topicBlurbs: Array<Omit<Topic, "postCount">> = [
   {
     name: "Systems",
     slug: "systems",
     description:
       "Kernels, schedulers, operating systems, and protocols: deep dives into how systems operate under the hood.",
-    postCount: 9,
   },
   {
     name: "Engineering",
     slug: "engineering",
     description:
       "The practical craftsmanship of shipping software: backend frameworks, package managers, container tooling, and the plumbing that agents run on.",
-    postCount: 12,
   },
   {
     name: "Findings",
     slug: "findings",
     description:
       "Personal engineering journeys, certifications, career milestones, and unexpected lessons learned along the way.",
-    postCount: 6,
   },
   {
     name: "Research",
     slug: "research",
     description:
       "Explorations into LLM reasoning, explainable AI, Apple Intelligence, and machine learning foundations.",
-    postCount: 6,
   },
   {
     name: "Inference",
     slug: "inference",
     description:
       "Latency, throughput, and hardware acceleration: LPUs, GPUs, and high-performance inference microservices.",
-    postCount: 3,
   },
   {
     name: "Evaluation",
     slug: "evaluation",
     description:
       "Retrieval architectures, caching strategies, and what happens when real-time crisis data meets a language model.",
-    postCount: 2,
   },
   {
     name: "Experiments",
     slug: "experiments",
     description:
       "Hands-on experiments in LLM fine-tuning, rocket recovery physics, and performance benchmarking.",
-    postCount: 2,
   },
-]);
+];
+
+export const topics: Topic[] = topicSchema.array().parse(
+  topicBlurbs.map((topic) => ({
+    ...topic,
+    postCount: posts.filter((post) => post.topic === topic.name).length,
+  })),
+);
 
 /**
  * The blurb for each series. Everything countable — how many parts there are,
@@ -289,6 +294,7 @@ export const routes = {
   series: "/series",
   paths: "/paths",
   corrections: "/corrections",
+  privacy: "/privacy",
   saved: "/saved",
   unsubscribe: "/unsubscribe",
   // Not routed while Studio is parked in `src/app/_studio/`; kept so that code
@@ -338,6 +344,7 @@ export const footerColumns = [
       { label: "Saved", href: routes.saved },
       { label: "About", href: routes.about },
       { label: "Contact", href: routes.contact },
+      { label: "Privacy", href: routes.privacy },
     ],
   },
   {

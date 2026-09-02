@@ -16,6 +16,13 @@ import { getTopicVisual } from "./topic-visuals";
 export function PostCover({
   topic,
   image,
+  /**
+   * Empty by default, and it should stay that way almost everywhere: every
+   * caller renders the post title as text inside the same link, so giving the
+   * artwork the title as alt text made screen readers announce it twice per
+   * card. Pass a real description only for a cover that carries information the
+   * surrounding text does not.
+   */
   alt = "",
   priority = false,
   className,
@@ -58,8 +65,16 @@ export function PostCover({
             src={image}
             alt={alt}
             fill
-            priority={priority}
-            loading="eager"
+            /*
+             * Loading follows `priority` rather than being forced eager.
+             * Unconditional `loading="eager"` meant every cover on a listing
+             * page — plus the sidebar and the related rail — raced the actual
+             * LCP element for bandwidth, and a tag page emitted eight image
+             * preloads and not one lazy image. Only the caller that owns the
+             * hero cover passes `priority`.
+             */
+            preload={priority}
+            loading={priority ? "eager" : "lazy"}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover object-center"
           />

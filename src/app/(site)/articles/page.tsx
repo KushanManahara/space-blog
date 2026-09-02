@@ -20,19 +20,19 @@ import {
   isSortOrder,
   isTopicFilter,
   listPosts,
-  posts,
   routes,
   site,
   topicFilters,
 } from "@/lib/content";
-import { getAllLivePostStatsMap } from "@/lib/db/queries";
+import { getLivePosts } from "@/lib/db/queries";
 import { paginate } from "@/lib/pagination";
 import { buildHref } from "@/lib/url";
+import { alternates } from "@/lib/metadata";
 
 export const metadata: Metadata = {
   title: "Archive",
   description: `All ${site.issue} posts, newest first. Corrections are appended, never silently edited.`,
-  alternates: { canonical: "/articles" },
+  alternates: alternates("/articles"),
 };
 
 const PER_PAGE = 6;
@@ -50,11 +50,10 @@ export default async function ArticlesPage({ searchParams }: PageProps<"/article
   const page = Number.isFinite(pageParam) && pageParam > 0 ? pageParam : 1;
   const year = isArchiveYear(yearParam) ? yearParam : undefined;
 
-  const liveStatsMap = await getAllLivePostStatsMap();
-  const livePosts = posts.map((p) => {
-    const live = liveStatsMap.get(p.slug);
-    return live ? { ...p, likes: live.likes, views: live.views, commentCount: live.comments } : p;
-  });
+  // Cached archive-wide stats: this used to issue two Turso queries on every
+  // request to this route, which is filtered and paginated and therefore never
+  // static.
+  const livePosts = await getLivePosts();
 
   const matching = listPosts({ topic, series, year, sort }, livePosts);
   const { items: visible, page: currentPage, pageCount } = paginate(matching, page, PER_PAGE);

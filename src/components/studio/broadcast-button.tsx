@@ -25,11 +25,18 @@ export function BroadcastButton({ postSlug, postTitle }: BroadcastButtonProps) {
     );
     if (!confirmed) return;
 
+    // The action refuses without STUDIO_SECRET, so it is asked for here rather
+    // than embedded anywhere a client bundle could carry it. Studio is not
+    // routed today; when it comes back this stays the last gate in front of a
+    // send to the whole list.
+    const secret = window.prompt("Studio secret");
+    if (!secret) return;
+
     setLoading(true);
     setStatus("idle");
 
     try {
-      const res = await broadcastArticleAction(postSlug);
+      const res = await broadcastArticleAction(postSlug, secret);
       if (res.success) {
         setStatus("success");
         setCount(res.count ?? 0);

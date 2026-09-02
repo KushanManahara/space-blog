@@ -5,11 +5,12 @@ import { MastheadBadge, PageMasthead } from "@/components/layout/page-masthead";
 import { Reveal } from "@/components/motion/reveal";
 import { SavedList } from "@/components/saved/saved-list";
 import { listPosts, toSummaries } from "@/lib/content";
+import { alternates } from "@/lib/metadata";
 
 export const metadata: Metadata = {
   title: "Saved",
   description: "Articles you have bookmarked to read later.",
-  alternates: { canonical: "/saved" },
+  alternates: alternates("/saved"),
   // The list only exists in the reader's browser; there is nothing here to index.
   robots: { index: false, follow: true },
 };

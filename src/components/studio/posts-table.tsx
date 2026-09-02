@@ -37,7 +37,6 @@ export function PostsTable({ rows }: { rows: Array<StudioPost & { post: Post }> 
               <PostCover
                 topic={post.topic}
                 image={post.coverImage}
-                alt={post.title}
                 zoom={false}
                 className="size-11 shrink-0 rounded-full"
               />

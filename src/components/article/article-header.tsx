@@ -98,7 +98,6 @@ export function ArticleHeader({
           <PostCover
             topic={post.topic}
             image={post.coverImage}
-            alt={post.title}
             priority
             pattern={false}
             zoom={false}

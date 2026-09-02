@@ -50,7 +50,6 @@ export function PostCard({
           <PostCover
             topic={post.topic}
             image={post.coverImage}
-            alt={post.title}
             notch
             className={cn(
               coverRatio.grid,
@@ -102,7 +101,6 @@ export function PostCard({
       <PostCover
         topic={post.topic}
         image={post.coverImage}
-        alt={post.title}
         notch={variant === "search"}
         className={coverRatio[variant]}
       >

@@ -1,20 +1,43 @@
 "use client";
 
 import * as React from "react";
+import dynamic from "next/dynamic";
 import { Info, PencilLine } from "lucide-react";
 
 import { useArticleAudio } from "@/components/article/article-audio-provider";
-import { ArticleFormula } from "@/components/article/article-formula";
-import { ArticleGraph } from "@/components/article/article-graph";
 import { ArticleImage } from "@/components/article/article-image";
 import { ArticleMermaid } from "@/components/article/article-mermaid";
 import { ArticleTable } from "@/components/article/article-table";
-import { CodeBlock } from "@/components/article/code-block";
 import { markdownToHtml } from "@/components/article/markdown";
-import { RunnableCode } from "@/components/article/runnable-code";
 import type { ArticleBlock } from "@/lib/content";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
+
+/**
+ * The three heavy renderers, split out of the shared article bundle.
+ *
+ * Statically imported, recharts, KaTeX and Prism landed in one 780 kB chunk
+ * that every article page downloaded — measured against the archive, charts
+ * appear in 2 posts of 40, formulae in 3, and 15 posts contain none of the
+ * three and were paying for all of it. Splitting them means a post pays only
+ * for the block kinds it actually contains.
+ *
+ * Server rendering stays on (no `ssr: false`): code, tables and equations are
+ * article content and have to be in the HTML for readers without JavaScript
+ * and for crawlers.
+ */
+const ArticleGraph = dynamic(() =>
+  import("@/components/article/article-graph").then((mod) => mod.ArticleGraph),
+);
+const ArticleFormula = dynamic(() =>
+  import("@/components/article/article-formula").then((mod) => mod.ArticleFormula),
+);
+const CodeBlock = dynamic(() =>
+  import("@/components/article/code-block").then((mod) => mod.CodeBlock),
+);
+const RunnableCode = dynamic(() =>
+  import("@/components/article/runnable-code").then((mod) => mod.RunnableCode),
+);
 
 /** Renders the clean, unboxed markdown article content. */
 export function ArticleBody({ blocks, id }: { blocks: ArticleBlock[]; id: string }) {
@@ -40,7 +63,7 @@ export function ArticleBody({ blocks, id }: { blocks: ArticleBlock[]; id: string
                 "-mx-3 bg-brand/[0.04] p-3 ring-2 ring-brand/40 dark:bg-brand/[0.08] dark:ring-brand/35",
             )}
           >
-            <ArticleBlockView block={block} isFirst={index === 0} />
+            <ArticleBlockView block={block} isFirst={index === 0} index={index} blocks={blocks} />
           </div>
         );
       })}
@@ -48,7 +71,17 @@ export function ArticleBody({ blocks, id }: { blocks: ArticleBlock[]; id: string
   );
 }
 
-function ArticleBlockView({ block, isFirst }: { block: ArticleBlock; isFirst: boolean }) {
+function ArticleBlockView({
+  block,
+  isFirst,
+  index,
+  blocks,
+}: {
+  block: ArticleBlock;
+  isFirst: boolean;
+  index: number;
+  blocks: ArticleBlock[];
+}) {
   switch (block.kind) {
     case "paragraph":
       return (
@@ -161,6 +194,9 @@ function ArticleBlockView({ block, isFirst }: { block: ArticleBlock; isFirst: bo
           width={block.width}
           height={block.height}
           wide={block.wide}
+          // Only the article's first figure is a candidate for the LCP, so it
+          // is the only one worth a preload hint.
+          priority={blocks.findIndex((entry) => entry.kind === "image") === index}
         />
       );
 
@@ -199,7 +235,13 @@ const bodyText =
 
 function ChartFigure({ block }: { block: Extract<ArticleBlock, { kind: "chart" }> }) {
   return (
-    <figure className="mt-8 w-full max-w-full min-w-0 overflow-x-auto rounded-lg border border-line-1 bg-bg-2 p-4 sm:px-6.5 sm:pt-6.5 sm:pb-5">
+    <figure
+      // Scrollable, so it has to be keyboard-focusable (WCAG 2.1.1).
+      tabIndex={0}
+      role="region"
+      aria-label={block.title}
+      className="mt-8 w-full max-w-full min-w-0 overflow-x-auto rounded-lg border border-line-1 bg-bg-2 p-4 sm:px-6.5 sm:pt-6.5 sm:pb-5"
+    >
       <div className="flex flex-wrap items-baseline justify-between gap-4">
         <figcaption className="text-[14.5px] font-bold text-fg-1">{block.title}</figcaption>
         <p className="text-[12.5px] text-fg-3">{block.note}</p>

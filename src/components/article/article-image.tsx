@@ -16,6 +16,7 @@ export function ArticleImage({
   width,
   height,
   wide,
+  priority = false,
   className,
 }: {
   src: string;
@@ -24,6 +25,13 @@ export function ArticleImage({
   width?: number;
   height?: number;
   wide?: boolean;
+  /**
+   * Opts one figure into eager loading and a preload hint. Reserved for the
+   * first figure in an article, which is the only one that can plausibly be
+   * the LCP element. Every figure used to set this, so an article's images all
+   * announced themselves as highest priority and none of them actually was.
+   */
+  priority?: boolean;
   className?: string;
 }) {
   const isSvg = src.toLowerCase().endsWith(".svg");
@@ -50,8 +58,8 @@ export function ArticleImage({
             alt={alt}
             width={width}
             height={height}
-            loading="eager"
-            priority
+            preload={priority}
+            loading={priority ? "eager" : "lazy"}
             unoptimized={isSvg}
             sizes="(max-width: 768px) 100vw, 780px"
             className="h-auto w-full"
@@ -64,8 +72,8 @@ export function ArticleImage({
               src={src}
               alt={alt}
               fill
-              loading="eager"
-              priority
+              preload={priority}
+              loading={priority ? "eager" : "lazy"}
               unoptimized={isSvg}
               sizes="(max-width: 768px) 100vw, 780px"
               className="object-contain"

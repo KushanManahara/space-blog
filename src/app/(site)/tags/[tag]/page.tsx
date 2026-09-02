@@ -9,6 +9,7 @@ import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button
 import { getPostsByTag, listTags, routes, toSummaries } from "@/lib/content";
 import { truncate } from "@/lib/format";
 import { getAllLivePostStatsMap } from "@/lib/db/queries";
+import { alternates, openGraph } from "@/lib/metadata";
 
 /**
  * These pages are prerendered but read live engagement counts, so without a
@@ -45,8 +46,8 @@ export async function generateMetadata({ params }: PageProps<"/tags/[tag]">): Pr
   return {
     title: `#${tag}`,
     description,
-    alternates: { canonical: `/tags/${tag}` },
-    openGraph: { type: "website", title: `#${tag}`, description, url: `/tags/${tag}` },
+    alternates: alternates(`/tags/${tag}`),
+    openGraph: openGraph({ type: "website", title: `#${tag}`, description, url: `/tags/${tag}` }),
   };
 }
 

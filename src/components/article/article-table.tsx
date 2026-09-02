@@ -22,7 +22,13 @@ export function ArticleTable({
 
   return (
     <figure className={cn("mt-8", className)}>
-      <div className="overflow-x-auto rounded-lg border border-line-1">
+      <div
+        // Scrollable, so it has to be keyboard-focusable (WCAG 2.1.1).
+        tabIndex={0}
+        role="region"
+        aria-label={caption ?? "Data table"}
+        className="overflow-x-auto rounded-lg border border-line-1"
+      >
         <table className="w-full border-collapse text-left text-[14.5px]">
           <thead>
             <tr className="bg-bg-3">

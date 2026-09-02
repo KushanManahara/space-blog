@@ -102,7 +102,6 @@ export function PostRow({
       <PostCover
         topic={post.topic}
         image={post.coverImage}
-        alt={post.title}
         pattern={false}
         className={cn(
           variant === "list" && "aspect-[4/3] rounded-md",

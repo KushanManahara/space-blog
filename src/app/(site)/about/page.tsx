@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { GlareHover } from "@/components/ui/glare-hover";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { aboutSetup, author, listTags, routes, timeline } from "@/lib/content";
+import { alternates, openGraph } from "@/lib/metadata";
 
 export const metadata: Metadata = {
   title: "About",
@@ -15,12 +16,12 @@ export const metadata: Metadata = {
   // 246 does not. The longer one still carries the link preview below, where
   // there is room for it.
   description: author.bio,
-  alternates: { canonical: "/about" },
-  openGraph: {
+  alternates: alternates("/about"),
+  openGraph: openGraph({
     title: `About ${author.name} · Space`,
     description: author.longBio,
     images: [{ url: author.avatar, width: 1200, height: 1200, alt: author.name }],
-  },
+  }),
 };
 
 export default function AboutPage() {
@@ -40,7 +41,7 @@ export default function AboutPage() {
             alt={author.name}
             width={120}
             height={120}
-            priority
+            preload
             className="size-full object-cover"
           />
         }

@@ -116,7 +116,7 @@ export function RunnableCode({
         <div className="overflow-hidden rounded-lg bg-n-900">
           <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-2.5">
             <span className="font-mono text-[12.5px] text-white/55">{filename}</span>
-            <span className="text-[12px] text-white/40">Editing</span>
+            <span className="text-[12px] text-white/65">Editing</span>
           </div>
           <textarea
             value={source}

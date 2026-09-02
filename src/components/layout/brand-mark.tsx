@@ -22,12 +22,19 @@ export function BrandMark({
       )}
       style={{ width: size, height: size }}
     >
+      {/*
+        Eager, but deliberately not `priority`. The brandmark renders several
+        times per page (header, footer, cards), and `priority` on each emitted a
+        separate preload hint for a decorative 28px logo — four of them on an
+        article page, competing with the images that actually matter. Eager
+        still loads it straight away, without the preload.
+      */}
       <Image
         src="/logo.png"
         alt="Space logo"
         width={size * 2}
         height={size * 2}
-        priority
+        loading="eager"
         className="size-full object-contain"
       />
     </span>

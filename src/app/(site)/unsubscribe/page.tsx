@@ -1,24 +1,42 @@
 // src/app/(site)/unsubscribe/page.tsx
-"use client";
-
-import * as React from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { ArrowLeft, Check, MailX } from "lucide-react";
+import { MailX } from "lucide-react";
 
-import { unsubscribeAction } from "@/app/actions";
 import { BrandMark } from "@/components/layout/brand-mark";
 import { Reveal } from "@/components/motion/reveal";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { initialFormState } from "@/lib/form-state";
+import { verifyUnsubscribe } from "@/lib/newsletter-token";
 import { routes } from "@/lib/content";
+import { alternates } from "@/lib/metadata";
 
-function UnsubscribeContent() {
-  const searchParams = useSearchParams();
-  const emailParam = searchParams.get("email") || "";
-  const [state, formAction, isPending] = React.useActionState(unsubscribeAction, initialFormState);
-  const [email, setEmail] = React.useState(emailParam);
+/**
+ * Unsubscribe confirmation.
+ *
+ * This page never removes anybody. It only renders the confirmation for a
+ * signed link and hands the actual removal to `/api/newsletter/unsubscribe`,
+ * which verifies the token again and only mutates on POST.
+ *
+ * It used to post a bare address to a server action that deleted the row
+ * outright, which meant anyone could unsubscribe anyone by typing their
+ * address — the exact hole `newsletter-token.ts` exists to close. There is now
+ * one code path to removal, and it is signed.
+ */
+export const metadata: Metadata = {
+  title: "Unsubscribe",
+  description: "Stop receiving Space post notifications.",
+  alternates: alternates("/unsubscribe"),
+  // A utility page with no reason to be in an index, and previously the only
+  // page inheriting the site's root canonical — which pointed search engines
+  // at the homepage.
+  robots: { index: false, follow: false },
+};
+
+export default async function UnsubscribePage({ searchParams }: PageProps<"/unsubscribe">) {
+  const params = await searchParams;
+  const rawEmail = typeof params.email === "string" ? params.email : undefined;
+  const token = typeof params.t === "string" ? params.t : null;
+  const email = rawEmail?.trim().toLowerCase();
+  const isSigned = Boolean(email) && verifyUnsubscribe(email!, token);
 
   return (
     <div className="relative mx-auto flex min-h-[calc(100dvh-180px)] max-w-[540px] items-center justify-center px-gutter py-12 sm:py-16">
@@ -31,86 +49,62 @@ function UnsubscribeContent() {
           <h1 className="text-[24px] font-bold tracking-[-0.02em] text-fg-1 sm:text-[26px]">
             Unsubscribe from Space
           </h1>
-          <p className="mt-2 text-[14px] leading-relaxed text-fg-3 sm:text-[14.5px]">
-            Enter your email address below to unsubscribe from our newsletter, article releases, and
-            email dispatches.
-          </p>
 
-          {state.status === "success" ? (
-            <div className="mt-8 flex w-full flex-col items-center rounded-xl border border-line-brand/40 bg-tint-violet p-6 text-center">
-              <div className="mb-3 inline-flex size-10 items-center justify-center rounded-full bg-brand text-white shadow-sm">
-                <Check className="size-5" strokeWidth={2.5} />
-              </div>
-              <h2 className="text-[17px] font-bold text-fg-1">You’ve Been Unsubscribed</h2>
-              <p className="mt-1.5 text-[14px] leading-relaxed text-fg-2">{state.message}</p>
-              <Link
-                href={routes.articles}
-                className="mt-5 inline-flex items-center gap-2 rounded-full bg-brand px-5 py-2.5 text-[13.5px] font-semibold text-white transition-opacity hover:opacity-90"
+          {isSigned ? (
+            <>
+              <p className="mt-2 text-[14px] leading-relaxed text-fg-3 sm:text-[14.5px]">
+                <span className="font-semibold text-fg-2">{email}</span> will stop receiving post
+                notifications. You can resubscribe at any time.
+              </p>
+
+              {/* A plain POST to the signed route. Mail scanners issue GETs and
+                  so cannot trip this, which is what RFC 8058 assumes. */}
+              <form
+                method="post"
+                action={`/api/newsletter/unsubscribe?email=${encodeURIComponent(email!)}&t=${encodeURIComponent(token!)}`}
+                className="mt-7 flex w-full flex-col gap-3"
               >
-                Back to Articles
-              </Link>
-            </div>
-          ) : (
-            <form action={formAction} className="mt-7 w-full text-left">
-              <label htmlFor="unsub-email" className="block text-[13px] font-semibold text-fg-2">
-                Email address
-              </label>
-              <div className="mt-2">
-                <Input
-                  id="unsub-email"
-                  name="email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="reader@example.com"
-                  autoComplete="email"
-                  className="h-11 rounded-lg border-line-1 bg-bg-1 px-3.5 text-[16px] text-fg-1 focus-visible:ring-brand sm:text-[14px]"
-                />
-              </div>
-
-              {state.status === "error" ? (
-                <p className="mt-2.5 text-[13px] font-medium text-accent-orchid">{state.message}</p>
-              ) : null}
-
-              <div className="mt-6 flex flex-col gap-3">
-                <Button
+                <button
                   type="submit"
-                  variant="dark"
-                  size="lg"
-                  disabled={isPending || email.trim().length === 0}
-                  className="w-full gap-2 text-[14px]"
+                  className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-ink px-6 py-3 text-[14px] font-semibold text-on-ink transition-opacity hover:opacity-90"
                 >
                   <MailX className="size-4" />
-                  {isPending ? "Unsubscribing..." : "Unsubscribe"}
-                </Button>
-
+                  Confirm unsubscribe
+                </button>
                 <Link
                   href={routes.home}
-                  className="inline-flex items-center justify-center gap-1.5 py-2 text-[13.5px] font-medium text-fg-3 transition-colors hover:text-fg-1"
+                  className="inline-flex items-center justify-center py-2 text-[13.5px] font-medium text-fg-3 transition-colors hover:text-fg-1"
                 >
-                  <ArrowLeft className="size-3.5" />
-                  Return to Home
+                  No, keep me subscribed
+                </Link>
+              </form>
+            </>
+          ) : (
+            <>
+              <p className="mt-2 text-[14px] leading-relaxed text-fg-3 sm:text-[14.5px]">
+                Unsubscribe links are tied to one address, so this page needs the link from an email
+                rather than a typed address. Open any Space email and use the unsubscribe link at
+                the bottom — or reply to it and it will be handled by hand.
+              </p>
+
+              <div className="mt-7 flex w-full flex-col gap-3">
+                <Link
+                  href={routes.articles}
+                  className="inline-flex w-full items-center justify-center rounded-full bg-ink px-6 py-3 text-[14px] font-semibold text-on-ink transition-opacity hover:opacity-90"
+                >
+                  Back to articles
+                </Link>
+                <Link
+                  href={routes.contact}
+                  className="inline-flex items-center justify-center py-2 text-[13.5px] font-medium text-fg-3 transition-colors hover:text-fg-1"
+                >
+                  Get in touch
                 </Link>
               </div>
-            </form>
+            </>
           )}
         </div>
       </Reveal>
     </div>
-  );
-}
-
-export default function UnsubscribePage() {
-  return (
-    <React.Suspense
-      fallback={
-        <div className="mx-auto flex min-h-[50vh] max-w-[540px] items-center justify-center p-8">
-          <p className="text-[14px] text-fg-3">Loading...</p>
-        </div>
-      }
-    >
-      <UnsubscribeContent />
-    </React.Suspense>
   );
 }

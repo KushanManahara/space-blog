@@ -8,11 +8,12 @@ import { TopicCard } from "@/components/topic/topic-tile";
 import { Button } from "@/components/ui/button";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { routes, site, topics } from "@/lib/content";
+import { alternates } from "@/lib/metadata";
 
 export const metadata: Metadata = {
   title: "Topics",
   description: `The subjects the ${site.issue} posts in this archive keep returning to.`,
-  alternates: { canonical: "/topics" },
+  alternates: alternates("/topics"),
 };
 
 export default function TopicsPage() {

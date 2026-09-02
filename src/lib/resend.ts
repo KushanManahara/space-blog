@@ -14,7 +14,14 @@ import { Resend } from "resend";
  */
 export const emailEnabled = Boolean(process.env.RESEND_API_KEY && process.env.NEWSLETTER_SECRET);
 
-if (!emailEnabled) {
+/*
+ * Announce the misconfiguration once, in development only.
+ *
+ * This ran at module scope on every cold start, so in production it added a
+ * warning line to the logs of every serverless instance that happened to import
+ * the module — noise that says nothing a deploy-time check would not.
+ */
+if (!emailEnabled && process.env.NODE_ENV !== "production") {
   const missing = [
     process.env.RESEND_API_KEY ? null : "RESEND_API_KEY",
     process.env.NEWSLETTER_SECRET ? null : "NEWSLETTER_SECRET",

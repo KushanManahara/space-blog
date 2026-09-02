@@ -11,7 +11,14 @@ import {
   titleSize,
 } from "@/lib/og";
 
-export const alt = "Article on Space";
+/*
+ * `alt` has to be a static export here. Deriving it per article needs
+ * `generateImageMetadata`, which moves the route behind a `[__metadata_id__]`
+ * segment and stops all forty cards being prerendered — a real cost for a
+ * cosmetic gain. The per-article description is set in the page's
+ * `generateMetadata` instead, which is where the post is already in scope.
+ */
+export const alt = `An article on ${site.name}`;
 export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;
 

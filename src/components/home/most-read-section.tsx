@@ -10,12 +10,20 @@ import { getPopularPosts, routes, site, topics, type Post } from "@/lib/content"
 export function MostReadSection({ posts }: { posts: Post[] }) {
   const popular = getPopularPosts(5, posts);
 
+  /*
+   * Views start at 0 for every post, and `byViews` tie-breaks on recency — so
+   * on a fresh deployment this section ranks by date while claiming to rank by
+   * readership. Until there is at least one view, say what the list actually
+   * is.
+   */
+  const hasViewData = posts.some((post) => post.views > 0);
+
   return (
     <section className="mx-auto max-w-page px-gutter pb-tail">
       <div className="grid items-start gap-[clamp(28px,4vw,56px)] lg:grid-cols-[1fr_380px]">
         <Reveal>
           <h2 className="mb-1.5 text-[clamp(26px,3vw,34px)] font-bold tracking-[-0.02em] text-fg-1">
-            Most read this year
+            {hasViewData ? "Most read this year" : "Recent highlights"}
           </h2>
           <div className="mt-5.5 border-t border-line-1">
             {popular.map((post, index) => (

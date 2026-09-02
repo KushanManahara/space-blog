@@ -17,6 +17,7 @@ import {
   topics,
 } from "@/lib/content";
 import { buildHref } from "@/lib/url";
+import { alternates, openGraph } from "@/lib/metadata";
 
 export function generateStaticParams() {
   return topics.map((topic) => ({ slug: topic.slug }));
@@ -41,13 +42,13 @@ export async function generateMetadata({ params }: PageProps<"/topics/[slug]">):
   return {
     title: topic.name,
     description: topic.description,
-    alternates: { canonical: `/topics/${topic.slug}` },
-    openGraph: {
+    alternates: alternates(`/topics/${topic.slug}`),
+    openGraph: openGraph({
       type: "website",
       title: topic.name,
       description: topic.description,
       url: `/topics/${topic.slug}`,
-    },
+    }),
   };
 }
 

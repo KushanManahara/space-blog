@@ -2,11 +2,12 @@
 "use server";
 
 import { eq, sql } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 
 import { callerFingerprint, firstTimeInWindow, isHoneypotTripped, underLimit } from "@/lib/abuse";
 import { contactMessages, comments, db, newsletterSubscribers, postStats } from "@/lib/db";
+import { POST_STATS_TAG } from "@/lib/db/queries";
 import type { FormState } from "@/lib/form-state";
 import { getPostBySlug } from "@/lib/content";
 import {
@@ -15,27 +16,49 @@ import {
   sendWelcomeEmail,
   syncResendContact,
 } from "@/lib/newsletter";
-import { getResend } from "@/lib/resend";
+
+/**
+ * Every public write path is unauthenticated, so each field carries a ceiling
+ * as well as a floor. Without one a single request can write a multi-megabyte
+ * row, and the rate limiter deliberately fails open during a database outage
+ * (see `underLimit`) — so the schema is the only thing bounding what lands.
+ * 254 is the RFC 5321 maximum length of an email address.
+ */
+const EMAIL_MAX = 254;
 
 const subscribeSchema = z.object({
-  email: z.string().email("Enter an email address we can actually reach."),
+  email: z.string().email("Enter an email address we can actually reach.").max(EMAIL_MAX),
 });
 
 const contactSchema = z.object({
-  name: z.string().min(1, "Tell me who you are."),
-  email: z.string().email("Enter an email address we can actually reach."),
-  subject: z.string().min(1, "Subject is required."),
-  message: z.string().min(10, "A little more detail helps: ten characters at least."),
+  name: z.string().min(1, "Tell me who you are.").max(80, "That name is too long."),
+  email: z.string().email("Enter an email address we can actually reach.").max(EMAIL_MAX),
+  subject: z.string().min(1, "Subject is required.").max(200, "That subject is too long."),
+  message: z
+    .string()
+    .min(10, "A little more detail helps: ten characters at least.")
+    .max(5000, "That message is too long. Five thousand characters at most."),
 });
 
 const commentSchema = z.object({
-  postSlug: z.string().min(1),
-  name: z.string().min(1, "Name is required."),
-  role: z.string().min(1, "Role / headline is required (e.g. Software Engineer)."),
-  email: z.string().email("A valid email address is required."),
-  body: z.string().min(2, "Comment must be at least 2 characters."),
+  // Checked against the archive, not just non-empty: an unknown slug can never
+  // render, so accepting one only fills the table with comments nobody sees.
+  postSlug: z
+    .string()
+    .min(1)
+    .refine((slug) => Boolean(getPostBySlug(slug)), "That article does not exist."),
+  name: z.string().min(1, "Name is required.").max(80, "That name is too long."),
+  role: z
+    .string()
+    .min(1, "Role / headline is required (e.g. Software Engineer).")
+    .max(120, "That role is too long."),
+  email: z.string().email("A valid email address is required.").max(EMAIL_MAX),
+  body: z
+    .string()
+    .min(2, "Comment must be at least 2 characters.")
+    .max(4000, "Responses are capped at 4000 characters."),
   /** Set when answering an existing comment. */
-  parentId: z.string().min(1).optional(),
+  parentId: z.string().min(1).max(64).optional(),
 });
 
 /**
@@ -93,45 +116,16 @@ export async function subscribeAction(
   }
 }
 
-/**
- * NEWSLETTER UNSUBSCRIBE SERVER ACTION
- * REMOVES SUBSCRIBER FROM TURSO DATABASE AND SYNCS UNSUBSCRIBED STATUS TO RESEND
+/*
+ * There is deliberately no unsubscribe action here.
+ *
+ * One used to exist and took a bare address, so anyone could unsubscribe
+ * anyone by typing their email — the precise hole `newsletter-token.ts` was
+ * written to close, reopened by a second door. Removal now happens only in
+ * `app/api/newsletter/unsubscribe/route.ts`, which verifies an HMAC tied to
+ * the address and mutates only on POST. `/unsubscribe` renders the
+ * confirmation for a signed link and posts to that route.
  */
-export async function unsubscribeAction(
-  _previous: FormState,
-  formData: FormData,
-): Promise<FormState> {
-  const parsed = subscribeSchema.safeParse({ email: formData.get("email") });
-
-  if (!parsed.success) {
-    return { status: "error", message: parsed.error.issues[0].message };
-  }
-
-  const email = parsed.data.email.trim().toLowerCase();
-
-  try {
-    // 1. REMOVE FROM LOCAL TURSO DATABASE
-    await db.delete(newsletterSubscribers).where(eq(newsletterSubscribers.email, email));
-
-    // 2. UPDATE RESEND CONTACT STATUS
-    await getResend().contacts.update({
-      email,
-      unsubscribed: true,
-    });
-
-    return {
-      status: "success",
-      message: `You have been successfully unsubscribed (${email}). You will not receive future emails.`,
-    };
-  } catch (error) {
-    console.error("NEWSLETTER UNSUBSCRIBE ERROR:", error);
-    // If contact update fails (e.g. contact did not exist in Resend), confirmation is still returned
-    return {
-      status: "success",
-      message: `You have been successfully unsubscribed (${email}).`,
-    };
-  }
-}
 
 /**
  * Contact form. Saves the inquiry to Turso, then emails it to the site owner.
@@ -231,6 +225,12 @@ export async function likePostAction(slug: string, increment: boolean = true) {
       .where(eq(postStats.slug, slug))
       .limit(1);
 
+    // The listing surfaces read a cached snapshot of the whole archive, so
+    // the path revalidations alone would leave the old count on the cards.
+    // "max" marks it stale rather than expiring it, so the next reader is
+    // served instantly and the refresh happens behind them — the liker already
+    // has their own number from the row returned below.
+    revalidateTag(POST_STATS_TAG, "max");
     revalidatePath(`/articles/${slug}`);
     revalidatePath("/");
     return { success: true as const, likes: row?.likes ?? null, limited: false as const };
@@ -337,11 +337,30 @@ export async function addCommentAction(data: {
 }
 
 /**
- * SERVER ACTION TO BROADCAST AN ARTICLE NOTIFICATION EMAIL TO ALL ACTIVE SUBSCRIBERS
+ * Broadcasts a new-article notification to every subscriber.
+ *
+ * This is the single most dangerous thing in the codebase: one call mails the
+ * entire list, and a server action is a public HTTP endpoint the moment
+ * anything in the route tree imports it. It is only reachable from Studio,
+ * which is currently parked in `src/app/_studio/` and therefore unrouted — but
+ * "unrouted" is a folder rename away from "public", so the shared secret is
+ * checked here rather than left to the middleware that would have to be
+ * re-enabled alongside it.
+ *
+ * Set STUDIO_SECRET in the environment to enable broadcasting at all. With it
+ * unset the action refuses everything, which is the right default for a site
+ * whose editor is out of service.
  */
 export async function broadcastArticleAction(
   postSlug: string,
+  secret: string,
 ): Promise<{ success: boolean; count?: number; error?: string }> {
+  const expected = process.env.STUDIO_SECRET;
+  if (!expected || secret !== expected) {
+    // Deliberately does not say which of the two it was.
+    return { success: false, error: "Not authorised to broadcast." };
+  }
+
   const post = getPostBySlug(postSlug);
   if (!post) {
     return { success: false, error: `ARTICLE WITH SLUG "${postSlug}" NOT FOUND` };

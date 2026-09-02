@@ -1,6 +1,6 @@
 import { createHash } from "crypto";
 import { headers } from "next/headers";
-import { eq, sql } from "drizzle-orm";
+import { eq, lt, sql } from "drizzle-orm";
 
 import { db, rateLimits } from "@/lib/db";
 
@@ -90,6 +90,32 @@ export async function underLimit(
   } catch (error) {
     console.error("RATE LIMIT CHECK FAILED, ALLOWING REQUEST:", error);
     return true;
+  }
+}
+
+/**
+ * Delete counter rows whose window closed more than `olderThanSeconds` ago.
+ *
+ * Nothing removed these, so the table grew forever: `recordViewAction` writes a
+ * `view:<slug>` row per reader per post per day, which is 40 rows per daily
+ * reader accumulating with no ceiling. A closed window is dead weight — the
+ * next request for that key overwrites it anyway — so dropping old rows cannot
+ * affect any live limit.
+ *
+ * The default keeps two days, comfortably past the longest window in use (the
+ * 24h like/view budget).
+ *
+ * Returns the number of rows removed, or null if the delete failed.
+ */
+export async function pruneRateLimits(olderThanSeconds = 172_800): Promise<number | null> {
+  const cutoff = Math.floor(Date.now() / 1000) - olderThanSeconds;
+
+  try {
+    const result = await db.delete(rateLimits).where(lt(rateLimits.windowStart, cutoff));
+    return result.rowsAffected ?? 0;
+  } catch (error) {
+    console.error("RATE LIMIT PRUNE FAILED:", error);
+    return null;
   }
 }
 

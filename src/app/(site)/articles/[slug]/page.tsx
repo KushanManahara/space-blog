@@ -26,6 +26,7 @@ import {
   getRelatedPosts,
   getSeriesBySlug,
   getSeriesParts,
+  lastCorrectedAt,
   posts,
   siteUrl,
   tagSlug,
@@ -33,6 +34,7 @@ import {
   toSummary,
 } from "@/lib/content";
 import { getLiveComments, getLivePostStats } from "@/lib/db/queries";
+import { alternates, openGraph } from "@/lib/metadata";
 
 const BODY_ID = "article-body";
 
@@ -64,8 +66,8 @@ export async function generateMetadata({
   return {
     title: post.title,
     description: post.dek,
-    alternates: { canonical: `/articles/${post.slug}` },
-    openGraph: {
+    alternates: alternates(`/articles/${post.slug}`),
+    openGraph: openGraph({
       type: "article",
       title: post.title,
       description: post.dek,
@@ -73,7 +75,7 @@ export async function generateMetadata({
       publishedTime: post.publishedAt,
       authors: [author.name],
       tags: post.tags,
-    },
+    }),
     twitter: { card: "summary_large_image", title: post.title, description: post.dek },
   };
 }
@@ -101,6 +103,14 @@ export default async function ArticlePage({ params }: PageProps<"/articles/[slug
   const related = getRelatedPosts(livePost, 3);
   const keepReading = getRelatedPosts(livePost, 4);
   const series = post.series ? getSeriesBySlug(post.series.slug) : undefined;
+
+  // The real neighbouring posts, in reading order, so prev/next can link to
+  // articles rather than to a filtered listing.
+  const seriesParts = post.series ? getSeriesParts(post.series.slug) : [];
+  const partIndex = seriesParts.findIndex((entry) => entry.slug === post.slug);
+  const seriesPrev = partIndex > 0 ? seriesParts[partIndex - 1] : undefined;
+  const seriesNext = partIndex >= 0 ? seriesParts[partIndex + 1] : undefined;
+
   const headings = post.body.flatMap((block) =>
     block.kind === "heading" ? [{ id: block.id, text: block.text }] : [],
   );
@@ -127,6 +137,13 @@ export default async function ArticlePage({ params }: PageProps<"/articles/[slug
                 headline: post.title,
                 description: post.dek,
                 datePublished: post.publishedAt,
+                // A correction is the only thing that edits a published post
+                // here, so it is exactly what `dateModified` means. Falls back
+                // to the publication date for a post never corrected.
+                dateModified: lastCorrectedAt(post) ?? post.publishedAt,
+                // Google treats `image` as recommended for Article types, and
+                // every post already has a generated 1200x630 card.
+                image: [`${siteUrl}/articles/${post.slug}/opengraph-image`],
                 keywords: post.tags,
                 articleSection: post.topic,
                 wordCount: post.readingMinutes * 200,
@@ -157,23 +174,30 @@ export default async function ArticlePage({ params }: PageProps<"/articles/[slug
                   ))}
                 </div>
 
-                {series && post.series ? (
+                {/*
+                  Both of these used to point at `/articles?series=…`, so
+                  "← Part 1" and "Part 3 →" were the same URL and neither went
+                  to an article — the reader got a filtered archive listing
+                  whichever way they went. The parts are resolved to real posts
+                  here, the way the sidebar's SeriesNav already does it.
+                */}
+                {seriesPrev || seriesNext ? (
                   <nav
                     aria-label="Series navigation"
                     className="mt-9 grid gap-3.5 sm:grid-cols-2 print:hidden"
                   >
-                    {series.parts[post.series.part - 2] ? (
+                    {seriesPrev ? (
                       <SeriesStep
-                        href={`/articles?series=${series.slug}`}
-                        label={`← Part ${post.series.part - 1}`}
-                        title={series.parts[post.series.part - 2]}
+                        href={`/articles/${seriesPrev.slug}`}
+                        label={`← Part ${seriesPrev.series?.part ?? ""}`.trim()}
+                        title={seriesPrev.title}
                       />
                     ) : null}
-                    {series.parts[post.series.part] ? (
+                    {seriesNext ? (
                       <SeriesStep
-                        href={`/articles?series=${series.slug}`}
-                        label={`Part ${post.series.part + 1} →`}
-                        title={series.parts[post.series.part]}
+                        href={`/articles/${seriesNext.slug}`}
+                        label={`Part ${seriesNext.series?.part ?? ""} →`.trim()}
+                        title={seriesNext.title}
                         align="right"
                       />
                     ) : null}

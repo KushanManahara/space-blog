@@ -1178,16 +1178,10 @@ html[data-magicui-theme-vt="active"]::view-transition-new(root) {
   }
 }
 
-/* Excalidraw Sketch Fonts */
-@font-face {
-  font-family: "Virgil";
-  src: url("https://unpkg.com/@excalidraw/excalidraw@0.18.1/dist/excalidraw-assets/Virgil.woff2")
-    format("woff2");
-  font-display: swap;
-}
-@font-face {
-  font-family: "Cascadia";
-  src: url("https://unpkg.com/@excalidraw/excalidraw@0.18.1/dist/excalidraw-assets/Cascadia.woff2")
-    format("woff2");
-  font-display: swap;
-}
+/*
+ * The Virgil and Cascadia @font-face rules that used to sit here were dead:
+ * both URLs 404 (Excalidraw restructured its assets before 0.18.1) and no rule
+ * in this stylesheet ever named either family. Diagrams get their hand-drawn
+ * type from Excalidraw itself at render time, which is why they still look
+ * right. Removing them also drops unpkg.com from the CSP.
+ */

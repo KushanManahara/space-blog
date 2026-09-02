@@ -9,12 +9,10 @@ import {
   Play,
   Rewind,
   Sparkles,
-  Volume2,
   X,
 } from "lucide-react";
 
 import { useArticleAudio, type CharRange } from "@/components/article/article-audio-provider";
-import { formatAudioTime } from "@/lib/audio/article-narrator";
 import { cn } from "@/lib/utils";
 
 const PLAYBACK_RATES = [0.75, 1.0, 1.25, 1.5, 2.0];
@@ -75,8 +73,6 @@ export function ArticleAudioPlayer() {
     isWordHighlightEnabled,
     rate,
     progress,
-    elapsedSec,
-    totalSec,
     audioData,
     togglePlayPause,
     skipForward,

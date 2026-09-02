@@ -61,7 +61,7 @@ export function CodeBlock({
         </span>
         <div className="flex shrink-0 items-center gap-2">
           {language !== "plain" ? (
-            <span className="hidden font-mono text-[11px] tracking-[0.08em] text-white/35 uppercase sm:inline print:inline print:text-neutral-600">
+            <span className="hidden font-mono text-[11px] tracking-[0.08em] text-white/60 uppercase sm:inline print:inline print:text-neutral-600">
               {language}
             </span>
           ) : null}
@@ -78,6 +78,10 @@ export function CodeBlock({
       <Highlight prism={Prism} theme={theme} code={code} language={language}>
         {({ className: preClass, style, tokens, getLineProps, getTokenProps }) => (
           <pre
+            // Scrollable, so it has to be keyboard-focusable (WCAG 2.1.1).
+            tabIndex={0}
+            role="region"
+            aria-label={`${filename} code`}
             className={cn(
               "w-full max-w-full min-w-0 overflow-x-auto bg-n-900 p-3.5 font-mono text-[12.5px] leading-[1.8] sm:p-5.5 sm:text-[13.5px] sm:leading-[1.85]",
               preClass,
