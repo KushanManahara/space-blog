@@ -1,7 +1,5 @@
 // src/lib/newsletter.ts
 
-import fs from "fs";
-import path from "path";
 import { emailEnabled, getResend, SENDER_EMAIL } from "@/lib/resend";
 import { db, newsletterSubscribers } from "@/lib/db";
 import { WelcomeEmail, getWelcomeEmailText } from "@/emails/welcome";

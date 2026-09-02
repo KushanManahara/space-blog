@@ -39,7 +39,9 @@ async function main() {
   const { getPostBySlug, posts } = await import("@/lib/content");
 
   if (!slug) {
-    console.error("Usage:\n  pnpm broadcast <slug>               # Dry run preview\n  pnpm broadcast <slug> --to=<email>  # Send to one specific subscriber\n  pnpm broadcast <slug> --send        # Broadcast to all subscribers in DB\n");
+    console.error(
+      "Usage:\n  pnpm broadcast <slug>               # Dry run preview\n  pnpm broadcast <slug> --to=<email>  # Send to one specific subscriber\n  pnpm broadcast <slug> --send        # Broadcast to all subscribers in DB\n",
+    );
     console.error("Available article slugs (newest first):");
     for (const post of posts.slice(0, 15)) console.error(`  ${post.slug}`);
     process.exit(1);
@@ -87,11 +89,18 @@ async function main() {
   } catch (error) {
     console.error("\nDatabase Connection Error (Turso):");
     if (error && typeof error === "object" && "cause" in error) {
-      console.error((error as any).cause?.message || error);
+      const cause = (error as { cause?: unknown }).cause;
+      const message =
+        cause && typeof cause === "object" && "message" in cause
+          ? (cause as { message?: unknown }).message
+          : undefined;
+      console.error(typeof message === "string" ? message : error);
     } else {
       console.error(error);
     }
-    console.error("\nTip: Check that TURSO_DATABASE_URL and TURSO_AUTH_TOKEN in .env.local are valid.");
+    console.error(
+      "\nTip: Check that TURSO_DATABASE_URL and TURSO_AUTH_TOKEN in .env.local are valid.",
+    );
     process.exit(1);
   }
 

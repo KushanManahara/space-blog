@@ -16,7 +16,9 @@
     "db:sync:force": "tsx scripts/sync-db.ts --force",
     "comments": "tsx scripts/moderate-comments.ts",
     "embeddings": "tsx scripts/build-embeddings.ts",
-    "broadcast": "tsx scripts/broadcast.ts"
+    "broadcast": "tsx scripts/broadcast.ts",
+    "prune:limits": "tsx scripts/prune-rate-limits.ts",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm build"
   },
   "dependencies": {
     "@excalidraw/excalidraw": "^0.18.1",

@@ -50,7 +50,8 @@ async function runHealthCheck() {
 
   // TEST 4: SIMULATE ARTICLE BROADCAST ACTION
   console.log("\nTEST 4: TESTING ARTICLE BROADCAST ACTION (POST: 'fyp')...");
-  const broadcastResult = await broadcastArticleAction("fyp");
+  // The action refuses without the shared secret, so the check needs it too.
+  const broadcastResult = await broadcastArticleAction("fyp", process.env.STUDIO_SECRET ?? "");
   console.log("BROADCAST ACTION RESULT:", broadcastResult);
 
   if (!broadcastResult.success) {
