@@ -29,6 +29,12 @@ export const OG_TOPIC_GRADIENT: Record<TopicName, string> = {
 /**
  * The site's display face, loaded from disk so cards use real Space typography
  * rather than a generic fallback. Read once per module instance.
+ *
+ * These are the only two `.ttf` files left in the repo, and they are here for
+ * this function alone: satori (behind `ImageResponse`) cannot parse WOFF2, so
+ * the browser faces were converted to WOFF2 for the render-blocking download
+ * while the card renderer keeps TrueType. Nothing ships these to a reader —
+ * they are read at build time and never served.
  */
 export async function loadOgFonts() {
   const [regular, bold] = await Promise.all([
