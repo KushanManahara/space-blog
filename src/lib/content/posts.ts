@@ -4,6 +4,189 @@ import { postSchema, type Post } from "./schemas";
 
 const parsedPosts = postSchema.array().parse([
   {
+    slug: "pytorch-tensor-to-neural-network",
+    title: "PyTorch: From Tensor to Neural Network",
+    dek: "The tensor is the only data structure PyTorch really has. Everything else — layers, models, training loops — is built from it. This is the ground floor.",
+    topic: "Engineering",
+    publishedAt: "2026-09-08",
+    likes: 0,
+    views: 0,
+    commentCount: 0,
+    tags: ["#pytorch", "#deep-learning", "#tensors", "#python"],
+    series: { slug: "pytorch", title: "PyTorch", part: 1 },
+    body: [
+      {
+        kind: "paragraph",
+        html: "PyTorch is a numerical computing library that happens to be good at deep learning. Strip away the training utilities and the pretrained models and what is left is one data structure — the tensor — and a large set of operations on it. Understanding the tensor well is most of understanding PyTorch, so that is where this series starts.",
+      },
+      {
+        kind: "heading",
+        id: "the-tensor",
+        text: "The tensor",
+      },
+      {
+        kind: "paragraph",
+        html: "A tensor is an n-dimensional array with a uniform data type. A scalar is a 0-D tensor, a vector is 1-D, a matrix is 2-D, and a batch of RGB images is 4-D (batch, channels, height, width). The API is close enough to NumPy that most NumPy code translates directly.",
+      },
+      {
+        kind: "code",
+        filename: "tensors.py",
+        runnable: true,
+        code: "import torch\n\nx = torch.tensor([[1.0, 2.0], [3.0, 4.0]])\nprint(x.shape)   # torch.Size([2, 2])\nprint(x.dtype)   # torch.float32\nprint(x @ x)     # matrix multiply\nprint(x.sum(dim=0))  # column sums: tensor([4., 6.])",
+      },
+      {
+        kind: "paragraph",
+        html: 'Two attributes separate a tensor from a NumPy array and both matter later. `device` says whether the data lives in host RAM or on a GPU, and moving a tensor with `.to("cuda")` is what makes computation run on the accelerator. `requires_grad` marks a tensor as something the autograd engine should track — the subject of part 2.',
+      },
+      {
+        kind: "heading",
+        id: "broadcasting",
+        text: "Broadcasting and shape",
+      },
+      {
+        kind: "paragraph",
+        html: "Most bugs in early PyTorch code are shape bugs. Operations between tensors of different shapes are resolved by broadcasting: dimensions are aligned from the right, and a dimension of size 1 is stretched to match. A `(32, 10)` batch minus a `(10,)` vector works; a `(32, 10)` batch minus a `(32,)` vector does not, and the error message is worth learning to read.",
+      },
+      {
+        kind: "heading",
+        id: "a-linear-layer-by-hand",
+        text: "A linear layer, by hand",
+      },
+      {
+        kind: "paragraph",
+        html: "A neural network layer is a function from tensors to tensors with learnable parameters. The simplest is the linear (fully connected) layer, which applies a weight matrix and a bias:",
+      },
+      {
+        kind: "formula",
+        tex: "y = xW^\\top + b",
+        caption:
+          "x is (batch, in_features); W is (out_features, in_features); b is (out_features,).",
+      },
+      {
+        kind: "code",
+        filename: "linear_by_hand.py",
+        runnable: true,
+        code: "import torch\n\nbatch, in_features, out_features = 4, 3, 2\nx = torch.randn(batch, in_features)\nW = torch.randn(out_features, in_features)\nb = torch.randn(out_features)\n\ny = x @ W.T + b\nprint(y.shape)  # torch.Size([4, 2])",
+      },
+      {
+        kind: "heading",
+        id: "nn-module",
+        text: "The same layer, as nn.Module",
+      },
+      {
+        kind: "paragraph",
+        html: "`torch.nn` packages that pattern. `nn.Linear` holds the weight and bias as `nn.Parameter` tensors (which set `requires_grad=True` automatically), and `nn.Module` gives you `.parameters()`, `.to(device)`, `.train()` / `.eval()`, and state-dict saving for free. Composing modules builds a network.",
+      },
+      {
+        kind: "code",
+        filename: "mlp.py",
+        code: "import torch.nn as nn\n\nclass MLP(nn.Module):\n    def __init__(self, in_dim, hidden, out_dim):\n        super().__init__()\n        self.net = nn.Sequential(\n            nn.Linear(in_dim, hidden),\n            nn.ReLU(),\n            nn.Linear(hidden, out_dim),\n        )\n\n    def forward(self, x):\n        return self.net(x)\n\nmodel = MLP(784, 128, 10)\nprint(sum(p.numel() for p in model.parameters()))  # 101770",
+      },
+      {
+        kind: "list",
+        items: [
+          "**Tensors** carry the data, a dtype, a device, and an optional gradient-tracking flag.",
+          "**Operations** on tensors are the arithmetic — matmul, activation functions, reductions.",
+          "**nn.Module** bundles parameters and a `forward` method into a reusable, composable unit.",
+          "**A model** is just a Module made of other Modules.",
+        ],
+      },
+      {
+        kind: "paragraph",
+        html: "That is the whole object graph. What is still missing is how the parameters get good values — how `model` goes from random weights to something that classifies digits. That is training, and it runs on autograd. Part 2 takes it apart.",
+      },
+    ],
+  },
+  {
+    slug: "pytorch-autograd-how-pytorch-learns",
+    title: "Autograd: How PyTorch Learns",
+    dek: "Every training loop is the same four lines. Autograd is the machinery underneath them — a graph built as your code runs, then walked backwards to get gradients.",
+    topic: "Engineering",
+    publishedAt: "2026-09-09",
+    likes: 0,
+    views: 0,
+    commentCount: 0,
+    tags: ["#pytorch", "#autograd", "#backpropagation", "#deep-learning"],
+    series: { slug: "pytorch", title: "PyTorch", part: 2 },
+    body: [
+      {
+        kind: "paragraph",
+        html: "Part 1 ended with a model full of random weights. Training is the process of nudging those weights to reduce a loss, and every nudge needs a gradient — the derivative of the loss with respect to each parameter. Autograd is the subsystem that computes those gradients without you writing a single derivative by hand.",
+      },
+      {
+        kind: "heading",
+        id: "the-dynamic-graph",
+        text: "The graph is built as the code runs",
+      },
+      {
+        kind: "paragraph",
+        html: "When a tensor has `requires_grad=True`, every operation involving it records a node in a directed acyclic graph: the output tensor, the operation that produced it, and references to its inputs. This graph is constructed on the fly during the forward pass — there is no separate compile step — which is why arbitrary Python control flow works inside a model.",
+      },
+      {
+        kind: "code",
+        filename: "grad_fn.py",
+        runnable: true,
+        code: "import torch\n\nx = torch.tensor(2.0, requires_grad=True)\ny = x ** 3 + 2 * x\nprint(y)          # tensor(12., grad_fn=<AddBackward0>)\nprint(y.grad_fn)  # the node that will run in the backward pass",
+      },
+      {
+        kind: "heading",
+        id: "backward",
+        text: "backward() walks it in reverse",
+      },
+      {
+        kind: "paragraph",
+        html: "Calling `y.backward()` traverses the graph from `y` back to every leaf tensor with `requires_grad=True`, applying the chain rule at each node and accumulating the result into that leaf's `.grad` attribute. For the example above the analytic derivative is 3x² + 2, which at x = 2 is 14.",
+      },
+      {
+        kind: "formula",
+        tex: "\\frac{\\partial L}{\\partial \\theta_i} = \\sum_j \\frac{\\partial L}{\\partial z_j}\\,\\frac{\\partial z_j}{\\partial \\theta_i}",
+        caption: "The chain rule, applied node by node from the loss back to each parameter.",
+      },
+      {
+        kind: "code",
+        filename: "backward.py",
+        runnable: true,
+        code: "import torch\n\nx = torch.tensor(2.0, requires_grad=True)\ny = x ** 3 + 2 * x\ny.backward()\nprint(x.grad)  # tensor(14.)  == 3*x**2 + 2",
+      },
+      {
+        kind: "heading",
+        id: "the-training-loop",
+        text: "The training loop",
+      },
+      {
+        kind: "paragraph",
+        html: "Every supervised training loop in PyTorch is a variation on the same five steps. The optimizer holds a reference to the model's parameters and knows how to apply an update rule (SGD, Adam) given their `.grad` values.",
+      },
+      {
+        kind: "code",
+        filename: "train.py",
+        code: "import torch.nn as nn\nfrom torch.optim import Adam\n\nmodel = MLP(784, 128, 10)\nopt = Adam(model.parameters(), lr=1e-3)\nloss_fn = nn.CrossEntropyLoss()\n\nfor images, labels in loader:\n    opt.zero_grad()             # 1. clear last step's gradients\n    logits = model(images)      # 2. forward pass, builds the graph\n    loss = loss_fn(logits, labels)\n    loss.backward()             # 3. backward pass, fills .grad\n    opt.step()                  # 4. update parameters from .grad",
+      },
+      {
+        kind: "list",
+        items: [
+          "**zero_grad** is not optional. Gradients accumulate by default, so skipping it sums this batch's gradient onto the last one's.",
+          "**loss.backward()** frees the graph as it goes; call it twice without a new forward pass and PyTorch raises an error unless you pass `retain_graph=True`.",
+          "**opt.step()** reads `.grad` and mutates the parameters in place. It never touches the graph.",
+          "**torch.no_grad()** disables graph construction — use it for evaluation and inference to save memory and time.",
+        ],
+      },
+      {
+        kind: "heading",
+        id: "detach-and-no-grad",
+        text: "Turning tracking off",
+      },
+      {
+        kind: "paragraph",
+        html: "Two tools stop autograd from following a tensor. `tensor.detach()` returns a view that shares storage but sits outside the graph, useful when you want a value but not its history. The `with torch.no_grad():` context disables recording entirely for everything inside it, which is the standard wrapper around a validation loop.",
+      },
+      {
+        kind: "paragraph",
+        html: "That is the core of it. A forward pass builds a graph, `backward()` walks it to produce gradients, and an optimizer turns gradients into parameter updates. Everything higher up the stack — learning-rate schedules, mixed precision, distributed training — is an optimization of this loop, not a replacement for it.",
+      },
+    ],
+  },
+  {
     slug: "engineering-council-sri-lanka",
     title: "Registered as an Associate Engineer with the Engineering Council of Sri Lanka",
     dek: "Receiving official registration under the ECSL Act No. 4 of 2017. What statutory engineering recognition means for software and systems practitioners.",

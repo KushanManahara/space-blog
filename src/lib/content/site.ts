@@ -119,6 +119,10 @@ const seriesBlurbs: Record<string, { title: string; dek: string }> = {
     title: "The Model Context Protocol",
     dek: "What MCP solves, what happens to the context window at scale, and where it sits next to A2A.",
   },
+  pytorch: {
+    title: "PyTorch",
+    dek: "Building the framework up from its one real primitive — the tensor — through autograd and the training loop.",
+  },
 };
 
 /**
