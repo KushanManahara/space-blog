@@ -24,13 +24,15 @@ import type { NextConfig } from "next";
  * Set CSP_REPORT_ONLY=1 to ship it as a report-only header instead, which is
  * the safe way to re-test after adding anything that loads from a new origin.
  */
+const isDev = process.env.NODE_ENV !== "production";
+
 const csp = [
   "default-src 'self'",
   // `blob:` is required, not decorative: ONNX Runtime (under transformers.js)
   // builds its WASM backend by dynamically importing a blob: module, and
   // Pyodide does the same for its workers. Without it semantic search fails
   // with "no available backend found".
-  "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' blob: https://cdn.jsdelivr.net",
+  `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval' " : ""}'wasm-unsafe-eval' blob: https://cdn.jsdelivr.net`,
   "worker-src 'self' blob:",
   "child-src 'self' blob:",
   "connect-src 'self' https://cdn.jsdelivr.net https://esm.sh https://huggingface.co https://*.huggingface.co https://*.hf.co",
