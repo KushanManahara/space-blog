@@ -78,6 +78,16 @@ function blockToMarkdown(block: ArticleBlock): string {
     case "footnotes":
       return `\n---\n**Footnotes:**\n${block.items.map((item, i) => `[${i + 1}] ${htmlToMarkdown(item)}`).join("\n")}`;
 
+    case "references":
+      return `\n---\n**${block.title ?? "References"}:**\n${block.items
+        .map(
+          (item, i) =>
+            `[${i + 1}] [${item.label}](${item.href})${item.source ? ` — ${item.source}` : ""}${
+              item.note ? `. ${item.note}` : ""
+            }`,
+        )
+        .join("\n")}`;
+
     default:
       return "";
   }

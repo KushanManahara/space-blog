@@ -10,6 +10,11 @@ export function blockText(block: ArticleBlock): string {
     case "list":
     case "footnotes":
       return block.items.join(" ");
+    case "references":
+      return [
+        block.title ?? "References",
+        ...block.items.map((item) => `${item.label} ${item.source ?? ""} ${item.note ?? ""}`),
+      ].join(" ");
     case "code":
       return `${block.filename} ${block.code}`;
     case "correction":

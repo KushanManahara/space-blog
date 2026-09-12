@@ -73,6 +73,27 @@ export const articleBlockSchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("footnotes"), items: z.array(z.string().min(1)).min(1) }),
 
   /**
+   * A sources list — external documentation, papers, and specs the article
+   * leans on. Rendered as a titled block of outbound links at the foot of the
+   * body. `source` is the publisher shown alongside the link ("PyTorch docs",
+   * "arXiv"); `note` is an optional one-line gloss on why it is here.
+   */
+  z.object({
+    kind: z.literal("references"),
+    title: z.string().min(1).optional(),
+    items: z
+      .array(
+        z.object({
+          label: z.string().min(1),
+          href: z.string().url(),
+          source: z.string().min(1).optional(),
+          note: z.string().min(1).optional(),
+        }),
+      )
+      .min(1),
+  }),
+
+  /**
    * A dated correction, sitting at the point in the article it applies to.
    *
    * The publication's stated policy is that corrections are appended and dated,

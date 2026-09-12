@@ -7,6 +7,7 @@ import { Info, PencilLine } from "lucide-react";
 import { useArticleAudio } from "@/components/article/article-audio-provider";
 import { ArticleImage } from "@/components/article/article-image";
 import { ArticleMermaid } from "@/components/article/article-mermaid";
+import { ArticleReferences } from "@/components/article/article-references";
 import { ArticleTable } from "@/components/article/article-table";
 import { markdownToHtml } from "@/components/article/markdown";
 import type { ArticleBlock } from "@/lib/content";
@@ -227,6 +228,9 @@ function ArticleBlockView({
           </ol>
         </div>
       );
+
+    case "references":
+      return <ArticleReferences title={block.title} items={block.items} />;
   }
 }
 

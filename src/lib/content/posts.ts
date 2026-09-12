@@ -6,7 +6,7 @@ const parsedPosts = postSchema.array().parse([
   {
     slug: "pytorch-tensor-to-neural-network",
     title: "PyTorch: From Tensor to Neural Network",
-    dek: "The tensor is the only data structure PyTorch really has. Everything else — layers, models, training loops — is built from it. This is the ground floor.",
+    dek: "People think PyTorch is enormous. It isn't. It's one data structure and a pile of operations on it — and once that clicks, every model you'll ever read looks obvious. Here's the ground floor.",
     topic: "Engineering",
     publishedAt: "2026-09-08",
     likes: 0,
@@ -14,93 +14,267 @@ const parsedPosts = postSchema.array().parse([
     commentCount: 0,
     tags: ["#pytorch", "#deep-learning", "#tensors", "#python"],
     series: { slug: "pytorch", title: "PyTorch", part: 1 },
+    coverImage: "/articles/pytorch-series-cover.svg",
     body: [
       {
         kind: "paragraph",
-        html: "PyTorch is a numerical computing library that happens to be good at deep learning. Strip away the training utilities and the pretrained models and what is left is one data structure — the tensor — and a large set of operations on it. Understanding the tensor well is most of understanding PyTorch, so that is where this series starts.",
-      },
-      {
-        kind: "heading",
-        id: "the-tensor",
-        text: "The tensor",
+        html: "The first time you open a real PyTorch codebase, it looks like a lot. Modules importing modules, `forward` methods, `.cuda()` sprinkled everywhere, a training loop with cryptic four-letter calls. It feels like there must be a hundred concepts to learn before any of it makes sense.",
       },
       {
         kind: "paragraph",
-        html: "A tensor is an n-dimensional array with a uniform data type. A scalar is a 0-D tensor, a vector is 1-D, a matrix is 2-D, and a batch of RGB images is 4-D (batch, channels, height, width). The API is close enough to NumPy that most NumPy code translates directly.",
+        html: "There aren't. PyTorch is a numerical computing library that turned out to be very good at deep learning. Take away the pretrained models and the training helpers and what's left is a single data structure — the **tensor** — and a large, well-organised set of operations on it. A neural network is just a function built from those operations. Training is just calculus on that function. Get comfortable with the tensor and the rest of the library stops being intimidating and starts being predictable.",
+      },
+      {
+        kind: "paragraph",
+        html: "This series builds the whole picture from that starting point. This first part is the tensor itself and how a network is assembled from it.",
+      },
+      {
+        kind: "heading",
+        id: "everything-is-a-tensor",
+        text: "Everything is a tensor",
+      },
+      {
+        kind: "paragraph",
+        html: "A tensor is an n-dimensional array where every element has the same type. That's the entire definition. The dimensionality is the only thing that changes as you go up:",
+      },
+      {
+        kind: "list",
+        items: [
+          "A **scalar** — a single loss value — is a 0-D tensor.",
+          "A **vector** — the 10 class scores for one image — is 1-D, shape `(10,)`.",
+          "A **matrix** — a batch of those score vectors — is 2-D, shape `(32, 10)`.",
+          "A **batch of RGB images** is 4-D, shape `(32, 3, 224, 224)`: batch, channels, height, width.",
+          "A **batch of token embeddings** is 3-D: batch, sequence length, embedding dimension.",
+        ],
+      },
+      {
+        kind: "paragraph",
+        html: "If you've used NumPy, this is familiar ground — the API was deliberately kept close, and most `np.` code has a one-to-one `torch.` translation. Try the snippet below; every line runs.",
       },
       {
         kind: "code",
         filename: "tensors.py",
         runnable: true,
-        code: "import torch\n\nx = torch.tensor([[1.0, 2.0], [3.0, 4.0]])\nprint(x.shape)   # torch.Size([2, 2])\nprint(x.dtype)   # torch.float32\nprint(x @ x)     # matrix multiply\nprint(x.sum(dim=0))  # column sums: tensor([4., 6.])",
+        code: "import torch\n\nx = torch.tensor([[1.0, 2.0], [3.0, 4.0]])\n\nprint(x.shape)        # torch.Size([2, 2])\nprint(x.dtype)        # torch.float32\nprint(x.mean())       # tensor(2.5000)\nprint(x @ x)          # matrix multiply\nprint(x.sum(dim=0))   # column sums -> tensor([4., 6.])\nprint(x.reshape(4))   # tensor([1., 2., 3., 4.])\nprint(x.T)            # transpose",
       },
       {
-        kind: "paragraph",
-        html: 'Two attributes separate a tensor from a NumPy array and both matter later. `device` says whether the data lives in host RAM or on a GPU, and moving a tensor with `.to("cuda")` is what makes computation run on the accelerator. `requires_grad` marks a tensor as something the autograd engine should track — the subject of part 2.',
-      },
-      {
-        kind: "heading",
-        id: "broadcasting",
-        text: "Broadcasting and shape",
-      },
-      {
-        kind: "paragraph",
-        html: "Most bugs in early PyTorch code are shape bugs. Operations between tensors of different shapes are resolved by broadcasting: dimensions are aligned from the right, and a dimension of size 1 is stretched to match. A `(32, 10)` batch minus a `(10,)` vector works; a `(32, 10)` batch minus a `(32,)` vector does not, and the error message is worth learning to read.",
+        kind: "callout",
+        title: "Coming from NumPy?",
+        body: "`torch.from_numpy(arr)` and `tensor.numpy()` convert both ways and *share memory* — change one, the other changes. That's a feature for zero-copy interop and a trap if you forget it. Use `.clone()` when you want an independent copy.",
       },
       {
         kind: "heading",
-        id: "a-linear-layer-by-hand",
-        text: "A linear layer, by hand",
+        id: "two-attributes",
+        text: "The two attributes that make it deep learning",
       },
       {
         kind: "paragraph",
-        html: "A neural network layer is a function from tensors to tensors with learnable parameters. The simplest is the linear (fully connected) layer, which applies a weight matrix and a bias:",
+        html: "A NumPy array has a shape and a dtype. A PyTorch tensor has two more attributes, and they are the entire reason the library exists.",
+      },
+      {
+        kind: "paragraph",
+        html: '**`device`** says where the data physically lives: `cpu` (your RAM) or `cuda:0` (the first GPU\'s memory). Operations run wherever their inputs live, so moving a tensor to the GPU with `.to("cuda")` is literally what makes the maths run on the accelerator. Mix devices in one operation and PyTorch stops you with an error — a rite of passage covered properly in part 5.',
+      },
+      {
+        kind: "paragraph",
+        html: "**`requires_grad`** is a boolean flag that says \"track every operation you do to me, because I'm going to want gradients later.\" Set it on a tensor and PyTorch quietly starts recording a graph of everything that happens downstream. That graph is how a network learns, and it's the whole subject of part 2.",
+      },
+      {
+        kind: "code",
+        filename: "attributes.py",
+        runnable: true,
+        code: "import torch\n\nw = torch.randn(3, 3, requires_grad=True)\nprint(w.device)        # cpu\nprint(w.requires_grad)  # True\n\n# A parameter you'll optimise: float, on the right device, tracked.\n# A batch of input data: float, same device, NOT tracked.\nbatch = torch.randn(16, 3)\nprint(batch.requires_grad)  # False",
+      },
+      {
+        kind: "paragraph",
+        html: "The `device` attribute isn't a formality. The same operation — a matrix multiply — runs orders of magnitude faster on a GPU once the matrices are big enough to hide the cost of shipping them there. Below is `A @ B` for square matrices of growing size; hover the lines. For small tensors the CPU wins (no transfer overhead); the GPU pulls ahead fast and then runs away.",
+      },
+      {
+        kind: "figure",
+        variant: "line",
+        title: "Time for one N×N matrix multiply",
+        xKey: "n",
+        xLabel: "matrix size N",
+        yLabel: "milliseconds (log-ish)",
+        note: "Illustrative — exact numbers depend on hardware",
+        caption:
+          "Below ~256, the GPU's transfer and launch overhead makes it slower. Past ~1024 it isn't close. This gap is the entire reason `.to(\"cuda\")` exists.",
+        series: [
+          { key: "cpu", label: "CPU" },
+          { key: "gpu", label: "GPU (cuda)" },
+        ],
+        data: [
+          { n: 128, cpu: 0.2, gpu: 0.35 },
+          { n: 256, cpu: 1.4, gpu: 0.4 },
+          { n: 512, cpu: 9.8, gpu: 0.7 },
+          { n: 1024, cpu: 78, gpu: 2.1 },
+          { n: 2048, cpu: 620, gpu: 9.5 },
+          { n: 4096, cpu: 4900, gpu: 62 },
+        ],
+      },
+      {
+        kind: "heading",
+        id: "shapes",
+        text: "Shapes are where you'll actually spend your time",
+      },
+      {
+        kind: "paragraph",
+        html: "Here's the honest truth about writing models: the maths is rarely the hard part. The hard part is getting a `(32, 3, 224, 224)` tensor to line up with a layer that expected `(32, 150528)`. Shape errors are the mosquitoes of deep learning — not dangerous, endlessly annoying, and you will get bitten daily until you learn the patterns.",
+      },
+      {
+        kind: "paragraph",
+        html: "The key rule is **broadcasting**: when two tensors have different shapes, PyTorch tries to make them compatible by aligning dimensions from the right and stretching any dimension of size 1 to match its partner. It never copies data to do this — it's a view trick — so it's free.",
+      },
+      {
+        kind: "table",
+        headers: ["Operation", "Result", "What happened"],
+        rows: [
+          ["`(32, 10)` + `(10,)`", "`(32, 10)`", "the vector is added to every row"],
+          ["`(32, 10)` * `(32, 1)`", "`(32, 10)`", "each row scaled by its own value"],
+          ["`(8, 1, 6)` + `(1, 5, 6)`", "`(8, 5, 6)`", "both size-1 dims stretch"],
+          ["`(32, 10)` + `(32,)`", "error", "trailing dims 10 and 32 don't match"],
+        ],
+        caption:
+          "Broadcasting aligns from the right. When it fails, the error names the exact dimension index that didn't match — read it, don't guess.",
+      },
+      {
+        kind: "callout",
+        title: "The debugging move that saves hours",
+        body: "When a model breaks, print `.shape` at every step of `forward`. Nine times out of ten the bug is visible immediately: a dimension you forgot to squeeze, a batch axis in the wrong place, a transpose you owe.",
+      },
+      {
+        kind: "heading",
+        id: "layer-by-hand",
+        text: "Building a layer from scratch",
+      },
+      {
+        kind: "paragraph",
+        html: "A neural network layer is nothing more exotic than a function from tensors to tensors that carries some learnable numbers of its own. The workhorse is the **linear** (or fully-connected, or dense) layer, which multiplies its input by a weight matrix and adds a bias:",
       },
       {
         kind: "formula",
         tex: "y = xW^\\top + b",
         caption:
-          "x is (batch, in_features); W is (out_features, in_features); b is (out_features,).",
+          "x is (batch, in_features), W is (out_features, in_features), b is (out_features,). The output is (batch, out_features).",
+      },
+      {
+        kind: "paragraph",
+        html: "That's it. You can write the whole thing with the operators you already have:",
       },
       {
         kind: "code",
         filename: "linear_by_hand.py",
         runnable: true,
-        code: "import torch\n\nbatch, in_features, out_features = 4, 3, 2\nx = torch.randn(batch, in_features)\nW = torch.randn(out_features, in_features)\nb = torch.randn(out_features)\n\ny = x @ W.T + b\nprint(y.shape)  # torch.Size([4, 2])",
+        code: "import torch\n\nbatch, in_features, out_features = 4, 3, 2\n\nx = torch.randn(batch, in_features)\nW = torch.randn(out_features, in_features)\nb = torch.randn(out_features)\n\ny = x @ W.T + b            # broadcasting adds b to every row\nprint(y.shape)             # torch.Size([4, 2])\n\n# A non-linearity turns a stack of linear layers into something\n# more expressive than one big linear layer.\nh = torch.relu(y)\nprint(h.min() >= 0)        # tensor(True)",
+      },
+      {
+        kind: "paragraph",
+        html: "Stack two of these with a non-linearity between them and you have a multi-layer perceptron — a universal function approximator, in principle. The only missing ingredient is a way to choose good values for `W` and `b` instead of random ones.",
       },
       {
         kind: "heading",
         id: "nn-module",
-        text: "The same layer, as nn.Module",
+        text: "The same thing, the grown-up way",
       },
       {
         kind: "paragraph",
-        html: "`torch.nn` packages that pattern. `nn.Linear` holds the weight and bias as `nn.Parameter` tensors (which set `requires_grad=True` automatically), and `nn.Module` gives you `.parameters()`, `.to(device)`, `.train()` / `.eval()`, and state-dict saving for free. Composing modules builds a network.",
+        html: "Writing layers by hand gets old fast: you'd be tracking every weight tensor manually, moving each one to the GPU, remembering which ones to save. `torch.nn` does the bookkeeping. `nn.Linear` holds its `weight` and `bias` as `nn.Parameter` tensors (which flip `requires_grad=True` for you), and wrapping your model in `nn.Module` gets you `.parameters()`, `.to(device)`, `.train()` / `.eval()`, and checkpoint saving for free.",
       },
       {
         kind: "code",
         filename: "mlp.py",
-        code: "import torch.nn as nn\n\nclass MLP(nn.Module):\n    def __init__(self, in_dim, hidden, out_dim):\n        super().__init__()\n        self.net = nn.Sequential(\n            nn.Linear(in_dim, hidden),\n            nn.ReLU(),\n            nn.Linear(hidden, out_dim),\n        )\n\n    def forward(self, x):\n        return self.net(x)\n\nmodel = MLP(784, 128, 10)\nprint(sum(p.numel() for p in model.parameters()))  # 101770",
+        code: 'import torch.nn as nn\n\nclass MLP(nn.Module):\n    def __init__(self, in_dim, hidden, out_dim):\n        super().__init__()\n        self.net = nn.Sequential(\n            nn.Linear(in_dim, hidden),\n            nn.ReLU(),\n            nn.Linear(hidden, out_dim),\n        )\n\n    def forward(self, x):\n        return self.net(x)\n\nmodel = MLP(784, 128, 10)                 # 28x28 image in, 10 classes out\nn_params = sum(p.numel() for p in model.parameters())\nprint(f"{n_params:,} parameters")         # 101,770 parameters',
+      },
+      {
+        kind: "paragraph",
+        html: "Every serious model — a ResNet, a Transformer, Stable Diffusion's U-Net — is this same idea scaled up: `nn.Module` objects holding other `nn.Module` objects, with a `forward` method that says how tensors flow through them. The object graph is small:",
+      },
+      {
+        kind: "mermaid",
+        caption:
+          "The entire PyTorch object model. A model is Modules all the way down; at the leaves are Parameters, which are Tensors that autograd tracks.",
+        code: `flowchart TD
+    MODEL["<b>model</b> — nn.Module"]
+    L1["nn.Linear(784, 128)"]
+    ACT["nn.ReLU()"]
+    L2["nn.Linear(128, 10)"]
+    W1["weight — nn.Parameter (128, 784)"]
+    B1["bias — nn.Parameter (128,)"]
+    W2["weight — nn.Parameter (10, 128)"]
+    B2["bias — nn.Parameter (10,)"]
+    T["torch.Tensor + requires_grad = True"]
+
+    MODEL --> L1
+    MODEL --> ACT
+    MODEL --> L2
+    L1 --> W1
+    L1 --> B1
+    L2 --> W2
+    L2 --> B2
+    W1 -. "is a" .-> T
+    B1 -. "is a" .-> T
+    W2 -. "is a" .-> T
+    B2 -. "is a" .-> T`,
+      },
+      {
+        kind: "heading",
+        id: "recap",
+        text: "What you actually built",
       },
       {
         kind: "list",
         items: [
-          "**Tensors** carry the data, a dtype, a device, and an optional gradient-tracking flag.",
-          "**Operations** on tensors are the arithmetic — matmul, activation functions, reductions.",
-          "**nn.Module** bundles parameters and a `forward` method into a reusable, composable unit.",
-          "**A model** is just a Module made of other Modules.",
+          "**Tensors** hold the numbers, plus a shape, a dtype, a device, and a gradient-tracking flag.",
+          "**Operations** on tensors — matmul, `relu`, `sum` — are the arithmetic a network is made of.",
+          "**Broadcasting** is how tensors of different shapes combine without copying; shape errors name the dimension that failed.",
+          "**`nn.Parameter`** is a tensor a layer owns and wants gradients for.",
+          "**`nn.Module`** bundles parameters with a `forward` method into a reusable unit — and a model is just Modules nested inside Modules.",
         ],
       },
       {
-        kind: "paragraph",
-        html: "That is the whole object graph. What is still missing is how the parameters get good values — how `model` goes from random weights to something that classifies digits. That is training, and it runs on autograd. Part 2 takes it apart.",
+        kind: "callout",
+        title: "Next in the series",
+        body: "You have a model full of random weights and no idea how it becomes a model that works. That transformation is `loss.backward()`, and the machinery behind it — a graph PyTorch builds while your code runs, then walks in reverse — is **Part 2: Autograd**.",
+      },
+      {
+        kind: "references",
+        title: "References",
+        items: [
+          {
+            label: "torch.Tensor — API reference",
+            href: "https://pytorch.org/docs/stable/tensors.html",
+            source: "PyTorch documentation",
+          },
+          {
+            label: "Tensors — Learn the Basics",
+            href: "https://pytorch.org/tutorials/beginner/basics/tensorqs_tutorial.html",
+            source: "PyTorch tutorials",
+          },
+          {
+            label: "Broadcasting semantics",
+            href: "https://pytorch.org/docs/stable/notes/broadcasting.html",
+            source: "PyTorch documentation",
+            note: "The exact rules for how mismatched shapes are reconciled.",
+          },
+          {
+            label: "Building models with nn.Module — Introduction to PyTorch",
+            href: "https://pytorch.org/tutorials/beginner/introyt/modelsyt_tutorial.html",
+            source: "PyTorch tutorials",
+          },
+          {
+            label: "PyTorch: An Imperative Style, High-Performance Deep Learning Library",
+            href: "https://arxiv.org/abs/1912.01703",
+            source: "Paszke et al., NeurIPS 2019",
+            note: "The design paper — why PyTorch is built the way it is.",
+          },
+        ],
       },
     ],
   },
   {
     slug: "pytorch-autograd-how-pytorch-learns",
     title: "Autograd: How PyTorch Learns",
-    dek: "Every training loop is the same four lines. Autograd is the machinery underneath them — a graph built as your code runs, then walked backwards to get gradients.",
+    dek: "Every training loop on Earth is basically the same four lines. The one that does the real work — loss.backward() — is a graph PyTorch builds while your code runs and then walks backwards. Let's take it apart.",
     topic: "Engineering",
     publishedAt: "2026-09-09",
     likes: 0,
@@ -108,25 +282,72 @@ const parsedPosts = postSchema.array().parse([
     commentCount: 0,
     tags: ["#pytorch", "#autograd", "#backpropagation", "#deep-learning"],
     series: { slug: "pytorch", title: "PyTorch", part: 2 },
+    coverImage: "/articles/pytorch-series-cover.svg",
     body: [
       {
         kind: "paragraph",
-        html: "Part 1 ended with a model full of random weights. Training is the process of nudging those weights to reduce a loss, and every nudge needs a gradient — the derivative of the loss with respect to each parameter. Autograd is the subsystem that computes those gradients without you writing a single derivative by hand.",
-      },
-      {
-        kind: "heading",
-        id: "the-dynamic-graph",
-        text: "The graph is built as the code runs",
+        html: "Part 1 left you with a model full of random numbers. It can take an image and confidently tell you it's the digit 4 when it's a 9. Training is the process of dragging those random numbers towards ones that are usually right — and every single step of that process needs a **gradient**: a number for each parameter that says \"increase me to make the loss worse, decrease me to make it better, and by roughly this much.\"",
       },
       {
         kind: "paragraph",
-        html: "When a tensor has `requires_grad=True`, every operation involving it records a node in a directed acyclic graph: the output tensor, the operation that produced it, and references to its inputs. This graph is constructed on the fly during the forward pass — there is no separate compile step — which is why arbitrary Python control flow works inside a model.",
+        html: "For a model with a hundred million parameters, computing those gradients by hand is not on the table. Autograd is the part of PyTorch that does it for you — automatically, exactly, and fast enough that you never think about it. Understanding how it works is the difference between training models and debugging them by superstition.",
+      },
+      {
+        kind: "heading",
+        id: "downhill",
+        text: "The calculus you were promised you'd never need",
+      },
+      {
+        kind: "paragraph",
+        html: "Picture the loss as a landscape. Every parameter is an axis; the height at any point is how wrong the model is with those parameter values. Training is walking downhill. The **gradient** is the arrow pointing in the steepest uphill direction, so you step the opposite way:",
+      },
+      {
+        kind: "formula",
+        tex: "\\theta \\leftarrow \\theta - \\eta\\, \\nabla_\\theta L(\\theta)",
+        caption:
+          "The parameters θ move against the gradient of the loss. η, the learning rate, is how big a step you take.",
+      },
+      {
+        kind: "paragraph",
+        html: "Do that a few hundred thousand times and, if the landscape is kind and the step size is sane, you end up somewhere low. The entire job of autograd is to hand you ∇L — the gradient of the loss with respect to every parameter — after each forward pass.",
+      },
+      {
+        kind: "heading",
+        id: "the-graph-builds-itself",
+        text: "The graph builds itself as your code runs",
+      },
+      {
+        kind: "paragraph",
+        html: "The moment a tensor has `requires_grad=True`, PyTorch starts watching. Every operation you perform on it creates a new node in a **computational graph**: the result tensor, a reference to the function that produced it (its `grad_fn`), and pointers back to the inputs. There is no compile step and no graph definition phase — the graph is a side effect of running your forward pass, which is exactly why you can put `if` statements, loops, and print calls inside a model and it all just works.",
       },
       {
         kind: "code",
         filename: "grad_fn.py",
         runnable: true,
-        code: "import torch\n\nx = torch.tensor(2.0, requires_grad=True)\ny = x ** 3 + 2 * x\nprint(y)          # tensor(12., grad_fn=<AddBackward0>)\nprint(y.grad_fn)  # the node that will run in the backward pass",
+        code: "import torch\n\nx = torch.tensor(2.0, requires_grad=True)\ny = x ** 3 + 2 * x\n\nprint(y)           # tensor(12., grad_fn=<AddBackward0>)\nprint(y.grad_fn)    # <AddBackward0 object ...>\n\n# Walk one step back into the graph by hand:\nprint(y.grad_fn.next_functions)  # the pow and mul nodes feeding the add",
+      },
+      {
+        kind: "paragraph",
+        html: "For `y = x³ + 2x`, the graph PyTorch just recorded looks like this — a small pipeline of operations, each remembering what it needs to compute its own local derivative later:",
+      },
+      {
+        kind: "mermaid",
+        caption:
+          "The computational graph for y = x³ + 2x. The forward pass (solid, downward) computes values; backward() flows gradients up the same edges in reverse.",
+        code: `flowchart TD
+    X["x = 2.0  (leaf, requires_grad)"]
+    P["pow:  x³ = 8"]
+    M["mul:  2·x = 4"]
+    A["add:  y = 12"]
+
+    X --> P
+    X --> M
+    P --> A
+    M --> A
+    A -. "∂y/∂y = 1" .-> P
+    A -. "∂y/∂y = 1" .-> M
+    P -. "·3x² = 12" .-> X
+    M -. "·2" .-> X`,
       },
       {
         kind: "heading",
@@ -135,54 +356,772 @@ const parsedPosts = postSchema.array().parse([
       },
       {
         kind: "paragraph",
-        html: "Calling `y.backward()` traverses the graph from `y` back to every leaf tensor with `requires_grad=True`, applying the chain rule at each node and accumulating the result into that leaf's `.grad` attribute. For the example above the analytic derivative is 3x² + 2, which at x = 2 is 14.",
+        html: "Calling `y.backward()` starts at `y` with a seed gradient of 1 and traverses the graph towards the leaves. At each node it multiplies the incoming gradient by that operation's local derivative — the **chain rule**, applied mechanically — and when two paths reach the same tensor, their contributions add. The final number lands in each leaf tensor's `.grad`.",
       },
       {
         kind: "formula",
         tex: "\\frac{\\partial L}{\\partial \\theta_i} = \\sum_j \\frac{\\partial L}{\\partial z_j}\\,\\frac{\\partial z_j}{\\partial \\theta_i}",
-        caption: "The chain rule, applied node by node from the loss back to each parameter.",
+        caption:
+          "Sum over every path from the parameter θᵢ to the loss. This is all backpropagation is.",
       },
       {
         kind: "code",
         filename: "backward.py",
         runnable: true,
-        code: "import torch\n\nx = torch.tensor(2.0, requires_grad=True)\ny = x ** 3 + 2 * x\ny.backward()\nprint(x.grad)  # tensor(14.)  == 3*x**2 + 2",
-      },
-      {
-        kind: "heading",
-        id: "the-training-loop",
-        text: "The training loop",
+        code: "import torch\n\nx = torch.tensor(2.0, requires_grad=True)\ny = x ** 3 + 2 * x\ny.backward()\n\nprint(x.grad)   # tensor(14.)\n\n# Check it: d/dx (x³ + 2x) = 3x² + 2  ->  3·4 + 2 = 14\nprint(3 * x.item() ** 2 + 2)   # 14.0",
       },
       {
         kind: "paragraph",
-        html: "Every supervised training loop in PyTorch is a variation on the same five steps. The optimizer holds a reference to the model's parameters and knows how to apply an update rule (SGD, Adam) given their `.grad` values.",
+        html: "That's the trick in full. It scales from this three-node graph to a Transformer with billions of parameters without any change in principle — just more nodes, and the arithmetic running on a GPU.",
       },
       {
-        kind: "code",
-        filename: "train.py",
-        code: "import torch.nn as nn\nfrom torch.optim import Adam\n\nmodel = MLP(784, 128, 10)\nopt = Adam(model.parameters(), lr=1e-3)\nloss_fn = nn.CrossEntropyLoss()\n\nfor images, labels in loader:\n    opt.zero_grad()             # 1. clear last step's gradients\n    logits = model(images)      # 2. forward pass, builds the graph\n    loss = loss_fn(logits, labels)\n    loss.backward()             # 3. backward pass, fills .grad\n    opt.step()                  # 4. update parameters from .grad",
+        kind: "heading",
+        id: "gradient-descent-in-motion",
+        text: "Gradient descent, in motion",
       },
       {
-        kind: "list",
-        items: [
-          "**zero_grad** is not optional. Gradients accumulate by default, so skipping it sums this batch's gradient onto the last one's.",
-          "**loss.backward()** frees the graph as it goes; call it twice without a new forward pass and PyTorch raises an error unless you pass `retain_graph=True`.",
-          "**opt.step()** reads `.grad` and mutates the parameters in place. It never touches the graph.",
-          "**torch.no_grad()** disables graph construction — use it for evaluation and inference to save memory and time.",
+        kind: "paragraph",
+        html: "Below is the simplest possible optimisation — minimising `L(θ) = θ²` starting from θ = 10 — run with a sensible learning rate and with one that's slightly too large. Hover the lines. The takeaway that will save you the most time: a diverging loss is almost never a broken model, it's a learning rate that's too high.",
+      },
+      {
+        kind: "figure",
+        variant: "line",
+        title: "Loss over optimisation steps",
+        xKey: "step",
+        xLabel: "step",
+        yLabel: "loss  L(θ) = θ²",
+        note: "Minimising θ² from θ₀ = 10",
+        caption:
+          "η = 0.1 slides smoothly to zero. η = 1.1 overshoots the minimum by more each step and explodes. Same model, same code — only the step size changed.",
+        series: [
+          { key: "good", label: "η = 0.1 (stable)" },
+          { key: "toobig", label: "η = 1.1 (diverges)" },
+        ],
+        data: [
+          { step: 0, good: 100, toobig: 100 },
+          { step: 1, good: 64, toobig: 144 },
+          { step: 2, good: 40.96, toobig: 207.4 },
+          { step: 3, good: 26.2, toobig: 298.6 },
+          { step: 4, good: 16.8, toobig: 430 },
+          { step: 5, good: 10.7, toobig: 619.2 },
+          { step: 6, good: 6.87, toobig: 891.6 },
+          { step: 7, good: 4.4, toobig: 1284 },
         ],
       },
       {
         kind: "heading",
-        id: "detach-and-no-grad",
-        text: "Turning tracking off",
+        id: "the-training-loop",
+        text: "The training loop, line by line",
       },
       {
         kind: "paragraph",
-        html: "Two tools stop autograd from following a tensor. `tensor.detach()` returns a view that shares storage but sits outside the graph, useful when you want a value but not its history. The `with torch.no_grad():` context disables recording entirely for everything inside it, which is the standard wrapper around a validation loop.",
+        html: "Every supervised training loop in PyTorch — from a tutorial notebook to a foundation-model run — is a variation on these five lines. The **optimizer** holds a reference to the model's parameters and knows one update rule (SGD, Adam, …); you hand it gradients, it takes the step.",
+      },
+      {
+        kind: "code",
+        filename: "train.py",
+        code: "import torch.nn as nn\nfrom torch.optim import Adam\n\nmodel = MLP(784, 128, 10)\nopt = Adam(model.parameters(), lr=1e-3)\nloss_fn = nn.CrossEntropyLoss()\n\nfor images, labels in loader:\n    opt.zero_grad()              # 1. clear last step's gradients\n    logits = model(images)       # 2. forward pass — builds the graph\n    loss = loss_fn(logits, labels)\n    loss.backward()              # 3. backward pass — fills every .grad\n    opt.step()                   # 4. update parameters using .grad\n    # 5. repeat a few hundred thousand times",
+      },
+      {
+        kind: "list",
+        items: [
+          "**`opt.zero_grad()`** — gradients *accumulate* by default. Skip this and step N's gradient is added on top of step N−1's, and your training quietly falls apart.",
+          "**`loss.backward()`** — frees the graph as it walks it. Call it twice on one forward pass and PyTorch raises an error unless you asked for `retain_graph=True`.",
+          "**`opt.step()`** — reads `.grad`, mutates the parameters in place, never touches the graph.",
+          "**`with torch.no_grad():`** — switch graph-building off entirely for evaluation and inference. Saves memory and time, and you weren't going to call `backward()` anyway.",
+        ],
+      },
+      {
+        kind: "callout",
+        title: "The bug everyone ships once",
+        body: "Forgetting `opt.zero_grad()`. The loss doesn't crash — it just stops improving, or improves and then wanders off. If training looks haunted, check that line first.",
+      },
+      {
+        kind: "heading",
+        id: "turning-it-off",
+        text: "Turning tracking off on purpose",
       },
       {
         kind: "paragraph",
-        html: "That is the core of it. A forward pass builds a graph, `backward()` walks it to produce gradients, and an optimizer turns gradients into parameter updates. Everything higher up the stack — learning-rate schedules, mixed precision, distributed training — is an optimization of this loop, not a replacement for it.",
+        html: "Two tools stop autograd following a tensor. `tensor.detach()` returns a view that shares the same storage but sits outside the graph — reach for it when you want a value for logging or a metric but not its history. `with torch.no_grad():` disables recording for its whole block, which is the standard wrapper around a validation loop and any inference code.",
+      },
+      {
+        kind: "paragraph",
+        html: "And that's the core of how PyTorch learns: a forward pass quietly records a graph, `backward()` walks it in reverse to produce an exact gradient for every parameter, and the optimizer turns those gradients into a step downhill. Everything above this in the stack — schedulers, mixed precision, distributed training, `torch.compile` — is an optimisation of this loop, never a replacement for it. Part 3 goes up a level: how to structure the model itself so it survives contact with a real project.",
+      },
+      {
+        kind: "references",
+        title: "References",
+        items: [
+          {
+            label: "Autograd mechanics",
+            href: "https://pytorch.org/docs/stable/notes/autograd.html",
+            source: "PyTorch documentation",
+            note: "How the graph is recorded, when it's freed, and the in-place-operation rules.",
+          },
+          {
+            label: "A Gentle Introduction to torch.autograd",
+            href: "https://pytorch.org/tutorials/beginner/blitz/autograd_tutorial.html",
+            source: "PyTorch tutorials",
+          },
+          {
+            label: "torch.autograd.backward",
+            href: "https://pytorch.org/docs/stable/generated/torch.autograd.backward.html",
+            source: "PyTorch documentation",
+          },
+          {
+            label: "torch.optim — optimizers and the update step",
+            href: "https://pytorch.org/docs/stable/optim.html",
+            source: "PyTorch documentation",
+          },
+          {
+            label: "Learning representations by back-propagating errors",
+            href: "https://www.nature.com/articles/323533a0",
+            source: "Rumelhart, Hinton & Williams, Nature 1986",
+            note: "The original backpropagation paper.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    slug: "pytorch-nn-module-building-networks",
+    title: "nn.Module: Building Networks That Hold Together",
+    dek: "nn.Sequential is training wheels. Real models are custom Modules — with skip connections, shared weights, and branches. Here's how nn.Module actually works, and every footgun it hides.",
+    topic: "Engineering",
+    publishedAt: "2026-09-10",
+    likes: 0,
+    views: 0,
+    commentCount: 0,
+    tags: ["#pytorch", "#nn-module", "#neural-networks", "#deep-learning"],
+    series: { slug: "pytorch", title: "PyTorch", part: 3 },
+    coverImage: "/articles/pytorch-series-cover.svg",
+    body: [
+      {
+        kind: "paragraph",
+        html: "`nn.Sequential` is wonderful for about a week. Then you need a skip connection, or two heads sharing a backbone, or a branch that only runs at inference, and a straight pipe of layers can't express any of it. That's when you write your own `nn.Module` — and it turns out the base class you've been leaning on this whole time has a few sharp edges worth knowing about before you cut yourself.",
+      },
+      {
+        kind: "paragraph",
+        html: "This part is `nn.Module` in full: what it tracks, what it doesn't, and the handful of bugs that account for most lost afternoons.",
+      },
+      {
+        kind: "heading",
+        id: "anatomy",
+        text: "Anatomy of a Module",
+      },
+      {
+        kind: "paragraph",
+        html: "A Module is two methods. `__init__` **declares** the pieces — layers, parameters, constants — and assigns them to `self`. `forward` **describes** how a tensor flows through those pieces. You never call `forward` directly; you call the module (`model(x)`), which runs hooks and then `forward`. Here's a residual block, the pattern at the heart of every ResNet and Transformer:",
+      },
+      {
+        kind: "code",
+        filename: "residual_block.py",
+        code: "import torch.nn as nn\n\nclass ResidualBlock(nn.Module):\n    def __init__(self, dim):\n        super().__init__()                 # never skip this line\n        self.fc1 = nn.Linear(dim, dim)\n        self.fc2 = nn.Linear(dim, dim)\n        self.norm = nn.LayerNorm(dim)\n        self.act = nn.GELU()\n\n    def forward(self, x):\n        h = self.act(self.fc1(x))\n        h = self.fc2(h)\n        return self.norm(x + h)            # the '+ x' is the skip connection\n",
+      },
+      {
+        kind: "callout",
+        title: "Why assign layers to self?",
+        body: "`nn.Module.__setattr__` is overridden. When you write `self.fc1 = nn.Linear(...)`, the Module notices it's a submodule and registers it, so its parameters show up in `model.parameters()` and move with `model.to(device)`. Store a layer in a plain Python list and it becomes invisible — the optimizer never sees it, and it silently doesn't train.",
+      },
+      {
+        kind: "heading",
+        id: "parameters-buffers-state",
+        text: "Parameters, buffers, and the state dict",
+      },
+      {
+        kind: "paragraph",
+        html: "A Module holds three kinds of tensor, and knowing which is which explains a lot of otherwise-baffling behaviour.",
+      },
+      {
+        kind: "table",
+        headers: ["Kind", "Trained by the optimizer?", "In state_dict?", "Example"],
+        rows: [
+          ["`nn.Parameter`", "Yes", "Yes", "a Linear layer's `weight`"],
+          ["Registered buffer", "No", "Yes", "BatchNorm's `running_mean`"],
+          ["Plain attribute tensor", "No", "No", "a constant you forgot to register"],
+        ],
+        caption:
+          "Buffers are state that must persist and move devices but isn't learned. Register them with `self.register_buffer(\"name\", tensor)` — a plain `self.name = tensor` won't follow `.to(device)` and won't be saved.",
+      },
+      {
+        kind: "code",
+        filename: "inspect.py",
+        code: "model = ResidualBlock(64)\n\nfor name, p in model.named_parameters():\n    print(name, tuple(p.shape), p.requires_grad)\n# fc1.weight (64, 64) True\n# fc1.bias   (64,)    True\n# ...\n\nprint(model.state_dict().keys())\n# odict_keys(['fc1.weight', 'fc1.bias', 'fc2.weight', 'fc2.bias',\n#             'norm.weight', 'norm.bias'])",
+      },
+      {
+        kind: "heading",
+        id: "composing",
+        text: "Composing modules: the three containers",
+      },
+      {
+        kind: "list",
+        items: [
+          "**`nn.Sequential`** — a fixed chain, output of each feeds the next. Use it for genuinely linear sub-parts.",
+          "**`nn.ModuleList`** — a list that *does* register its contents. Use it when depth is a hyperparameter and you loop over layers in `forward`.",
+          "**`nn.ModuleDict`** — the same, keyed by name, for branches you select at runtime.",
+        ],
+      },
+      {
+        kind: "code",
+        filename: "deep_mlp.py",
+        code: "import torch.nn as nn\n\nclass DeepMLP(nn.Module):\n    def __init__(self, dim, depth):\n        super().__init__()\n        # A plain [ResidualBlock(dim) for _ in range(depth)] would NOT register.\n        self.blocks = nn.ModuleList(ResidualBlock(dim) for _ in range(depth))\n        self.head = nn.Linear(dim, 10)\n\n    def forward(self, x):\n        for block in self.blocks:\n            x = block(x)\n        return self.head(x)\n",
+      },
+      {
+        kind: "paragraph",
+        html: "Because it's residual, you can stack these deep without the gradient vanishing. Parameter count grows linearly with depth and quadratically with width — worth having a feel for when you're choosing a model size against a memory budget:",
+      },
+      {
+        kind: "figure",
+        variant: "bar",
+        title: "Parameters in a 1-hidden-layer MLP (784 → h → 10)",
+        xKey: "width",
+        yLabel: "parameters",
+        note: "params ≈ 795·h + 10",
+        caption:
+          "Doubling the hidden width roughly doubles the parameter count here. In a Transformer, where width appears in several matrices at once, the same doubling costs closer to 4×.",
+        series: [{ key: "params", label: "trainable parameters" }],
+        data: [
+          { width: "h = 32", params: 25450 },
+          { width: "h = 64", params: 50890 },
+          { width: "h = 128", params: 101770 },
+          { width: "h = 256", params: 203530 },
+          { width: "h = 512", params: 407050 },
+        ],
+      },
+      {
+        kind: "heading",
+        id: "init",
+        text: "Weight initialization is not a detail",
+      },
+      {
+        kind: "paragraph",
+        html: "`nn.Linear` initialises its weights with a reasonable default (Kaiming uniform). For most work that's fine. When it isn't — a custom layer, a paper that specifies an init, a training run that won't get moving — you override it with `model.apply()`, which walks every submodule:",
+      },
+      {
+        kind: "code",
+        filename: "init.py",
+        code: 'import torch.nn as nn\n\ndef init_weights(m):\n    if isinstance(m, nn.Linear):\n        nn.init.kaiming_normal_(m.weight, nonlinearity="relu")\n        if m.bias is not None:\n            nn.init.zeros_(m.bias)\n\nmodel = DeepMLP(64, depth=6)\nmodel.apply(init_weights)   # applied recursively to every submodule\n',
+      },
+      {
+        kind: "heading",
+        id: "train-eval",
+        text: "train() vs eval(): the mode switch that bites",
+      },
+      {
+        kind: "paragraph",
+        html: "Some layers behave differently during training and inference. Dropout is active in `train()` mode and a no-op in `eval()`. BatchNorm uses the current batch's statistics in `train()` and its accumulated running statistics in `eval()`. The flag is a single boolean on every submodule, flipped recursively by `model.train()` / `model.eval()`.",
+      },
+      {
+        kind: "callout",
+        title: "Two symmetrical bugs",
+        body: "Forget `model.eval()` before validating and your metrics are noisy and pessimistic — dropout is still firing. Forget `model.train()` when you resume training and BatchNorm stops updating its statistics. Set the mode explicitly at the top of every epoch's train and eval sections.",
+      },
+      {
+        kind: "heading",
+        id: "saving",
+        text: "Saving and loading — the state dict, not the object",
+      },
+      {
+        kind: "paragraph",
+        html: "Save `model.state_dict()` — an ordered dictionary of tensors — not the model object itself. Pickling the object ties the file to your exact class definition and directory layout, and it breaks the first time you refactor. The state dict is just data.",
+      },
+      {
+        kind: "code",
+        filename: "save_load.py",
+        code: 'import torch\n\ntorch.save(model.state_dict(), "model.pt")\n\n# Later — reconstruct the architecture first, then load the weights.\nmodel = DeepMLP(64, depth=6)\nmodel.load_state_dict(torch.load("model.pt", map_location="cpu", weights_only=True))\nmodel.eval()\n',
+      },
+      {
+        kind: "mermaid",
+        caption:
+          "model.named_parameters() and state_dict() flatten this tree into dotted keys: blocks.0.fc1.weight, blocks.0.norm.bias, head.weight, and so on.",
+        code: `flowchart TD
+    M["DeepMLP"]
+    BL["blocks — nn.ModuleList"]
+    B0["blocks.0 — ResidualBlock"]
+    B1["blocks.1 — ResidualBlock"]
+    BN["blocks.N ..."]
+    H["head — nn.Linear"]
+    F1["fc1 · fc2 · norm"]
+
+    M --> BL
+    M --> H
+    BL --> B0
+    BL --> B1
+    BL --> BN
+    B0 --> F1`,
+      },
+      {
+        kind: "list",
+        items: [
+          "`__init__` declares, `forward` connects, and you call the module — never `forward` directly.",
+          "Layers must be attributes (or live in a `ModuleList` / `ModuleDict`) to be registered and trained.",
+          "Parameters are learned; buffers persist but aren't; register buffers explicitly.",
+          "`model.train()` / `model.eval()` change what Dropout and BatchNorm do — set them deliberately.",
+          "Save the `state_dict`, rebuild the architecture, then `load_state_dict`.",
+        ],
+      },
+      {
+        kind: "references",
+        title: "References",
+        items: [
+          {
+            label: "nn.Module — API reference",
+            href: "https://pytorch.org/docs/stable/generated/torch.nn.Module.html",
+            source: "PyTorch documentation",
+          },
+          {
+            label: "Modules — design and behaviour notes",
+            href: "https://pytorch.org/docs/stable/notes/modules.html",
+            source: "PyTorch documentation",
+            note: "Registration, hooks, train/eval, and buffers explained in depth.",
+          },
+          {
+            label: "Saving and Loading Models",
+            href: "https://pytorch.org/tutorials/beginner/saving_loading_models.html",
+            source: "PyTorch tutorials",
+          },
+          {
+            label: "torch.nn.init — initialization functions",
+            href: "https://pytorch.org/docs/stable/nn.init.html",
+            source: "PyTorch documentation",
+          },
+          {
+            label: "Delving Deep into Rectifiers (Kaiming initialization)",
+            href: "https://arxiv.org/abs/1502.01852",
+            source: "He et al., ICCV 2015",
+          },
+          {
+            label: "Deep Residual Learning for Image Recognition",
+            href: "https://arxiv.org/abs/1512.03385",
+            source: "He et al., CVPR 2016",
+            note: "Where the skip connection in the block above comes from.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    slug: "pytorch-datasets-and-dataloaders",
+    title: "Datasets and DataLoaders: Keeping the GPU Fed",
+    dek: "You bought a fast GPU and it's sitting at 30% utilisation. The model isn't the bottleneck — the input pipeline is. Here's how Dataset and DataLoader work, and how to stop starving the accelerator.",
+    topic: "Engineering",
+    publishedAt: "2026-09-11",
+    likes: 0,
+    views: 0,
+    commentCount: 0,
+    tags: ["#pytorch", "#dataloader", "#data-pipeline", "#deep-learning"],
+    series: { slug: "pytorch", title: "PyTorch", part: 4 },
+    coverImage: "/articles/pytorch-series-cover.svg",
+    body: [
+      {
+        kind: "paragraph",
+        html: "Here's a scene that plays out in every ML team. Someone profiles a training run that feels slow, expecting to find a fat matrix multiply. Instead they find the GPU idle 60% of the time, waiting. The bottleneck isn't the model — it's everything that has to happen before a batch of data reaches the model: reading files off disk, decoding JPEGs, resizing, augmenting, stacking into a tensor, copying to the GPU.",
+      },
+      {
+        kind: "paragraph",
+        html: "PyTorch splits that work across two abstractions. **`Dataset`** knows how to produce one example. **`DataLoader`** turns a Dataset into a stream of batches, and — crucially — does the slow parts in parallel worker processes while the GPU is busy with the previous batch.",
+      },
+      {
+        kind: "mermaid",
+        caption:
+          "The input pipeline. The dashed box runs in num_workers separate processes, overlapped with the GPU's work on the previous batch.",
+        code: `flowchart LR
+    DISK[("disk / storage")]
+    subgraph W["worker processes (num_workers)"]
+        GET["Dataset.__getitem__<br/>read · decode · transform"]
+        COL["collate_fn<br/>stack into a batch tensor"]
+    end
+    PIN["pinned memory<br/>(pin_memory=True)"]
+    GPU["model.forward()<br/>on cuda"]
+
+    DISK --> GET --> COL --> PIN -->|"non_blocking copy"| GPU`,
+      },
+      {
+        kind: "heading",
+        id: "dataset",
+        text: "Dataset: one example at a time",
+      },
+      {
+        kind: "paragraph",
+        html: "The common kind is a **map-style** Dataset: implement `__len__` and `__getitem__(i)`, and you have something that behaves like a list of `(input, target)` pairs. Where the data lives — memory, a folder of images, a database, a set of shards — is entirely your business; the DataLoader only ever asks for item `i`.",
+      },
+      {
+        kind: "code",
+        filename: "dataset.py",
+        code: 'from torch.utils.data import Dataset\nfrom PIL import Image\n\nclass ImageFolderDataset(Dataset):\n    def __init__(self, paths, labels, transform):\n        self.paths = paths\n        self.labels = labels\n        self.transform = transform      # applied here, so it runs in the worker\n\n    def __len__(self):\n        return len(self.paths)\n\n    def __getitem__(self, i):\n        img = Image.open(self.paths[i]).convert("RGB")\n        return self.transform(img), self.labels[i]\n',
+      },
+      {
+        kind: "callout",
+        title: "Do the heavy work in __getitem__",
+        body: "Decoding and augmentation belong inside `__getitem__` precisely because that's what runs in the parallel workers. Pre-resize on the main process and you've moved the cost back onto the critical path.",
+      },
+      {
+        kind: "heading",
+        id: "dataloader",
+        text: "DataLoader: batching, shuffling, parallelism",
+      },
+      {
+        kind: "code",
+        filename: "loader.py",
+        code: 'from torch.utils.data import DataLoader\n\nloader = DataLoader(\n    dataset,\n    batch_size=64,\n    shuffle=True,           # reshuffle every epoch (train only)\n    num_workers=8,          # worker processes decoding in parallel\n    pin_memory=True,        # page-locked memory -> faster host->GPU copy\n    persistent_workers=True,# don\'t tear workers down between epochs\n    prefetch_factor=2,      # batches each worker prepares ahead\n    drop_last=True,         # drop the ragged final batch (stable shapes)\n)\n\nfor images, labels in loader:\n    images = images.to("cuda", non_blocking=True)\n    labels = labels.to("cuda", non_blocking=True)\n    ...\n',
+      },
+      {
+        kind: "paragraph",
+        html: "`num_workers` is the dial that matters most, and more is not always better. Each worker is a process with its own Python interpreter and memory; past the point where workers can keep the GPU fed, you're just paying RAM and startup cost. The curve almost always looks like this:",
+      },
+      {
+        kind: "figure",
+        variant: "line",
+        title: "Training throughput vs. num_workers",
+        xKey: "workers",
+        xLabel: "num_workers",
+        yLabel: "images / second",
+        note: "Illustrative — the plateau point depends on your CPU, storage, and transform cost",
+        caption:
+          "Throughput climbs steeply, then flattens once the workers can supply batches as fast as the GPU consumes them. Adding more after the knee costs memory and buys nothing. Measure it for your own pipeline.",
+        series: [{ key: "throughput", label: "images / sec" }],
+        data: [
+          { workers: 0, throughput: 850 },
+          { workers: 1, throughput: 1600 },
+          { workers: 2, throughput: 2900 },
+          { workers: 4, throughput: 5200 },
+          { workers: 6, throughput: 6100 },
+          { workers: 8, throughput: 6300 },
+          { workers: 12, throughput: 6250 },
+        ],
+      },
+      {
+        kind: "heading",
+        id: "collate",
+        text: "collate_fn: assembling the batch",
+      },
+      {
+        kind: "paragraph",
+        html: "The default `collate_fn` takes a list of samples and `torch.stack`s the tensors — which only works if every sample has the same shape. Images resized to a fixed size are fine. Variable-length sequences are not, and you supply your own:",
+      },
+      {
+        kind: "code",
+        filename: "collate.py",
+        code: "import torch\nfrom torch.nn.utils.rnn import pad_sequence\n\ndef pad_collate(batch):\n    seqs, labels = zip(*batch)\n    lengths = torch.tensor([len(s) for s in seqs])\n    padded = pad_sequence(seqs, batch_first=True, padding_value=0)\n    return padded, lengths, torch.tensor(labels)\n\nloader = DataLoader(dataset, batch_size=32, collate_fn=pad_collate)\n",
+      },
+      {
+        kind: "heading",
+        id: "transforms",
+        text: "Transforms and augmentation",
+      },
+      {
+        kind: "paragraph",
+        html: "`torchvision.transforms.v2` is the current API — it transforms images, bounding boxes, and masks together, and runs on tensors (so it can go on the GPU) as well as PIL images. Compose the pipeline once, hand it to the Dataset, and let it execute in the workers.",
+      },
+      {
+        kind: "code",
+        filename: "transforms.py",
+        code: "from torchvision.transforms import v2\n\ntrain_tf = v2.Compose([\n    v2.RandomResizedCrop(224, antialias=True),\n    v2.RandomHorizontalFlip(),\n    v2.ToDtype(torch.float32, scale=True),\n    v2.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),\n])\n\n# Validation: deterministic — resize + center crop, no randomness.\nval_tf = v2.Compose([\n    v2.Resize(256, antialias=True),\n    v2.CenterCrop(224),\n    v2.ToDtype(torch.float32, scale=True),\n    v2.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),\n])\n",
+      },
+      {
+        kind: "heading",
+        id: "samplers",
+        text: "Samplers: controlling the order",
+      },
+      {
+        kind: "paragraph",
+        html: "`shuffle=True` is shorthand for a `RandomSampler`. When you need something other than uniform random order — an imbalanced dataset, or one shard per GPU in distributed training — you pass a `sampler` explicitly. For class imbalance, `WeightedRandomSampler` oversamples the rare classes:",
+      },
+      {
+        kind: "code",
+        filename: "sampler.py",
+        code: "import torch\nfrom torch.utils.data import WeightedRandomSampler, DataLoader\n\nclass_count = torch.bincount(torch.tensor(labels))\nweight_per_class = 1.0 / class_count.float()\nsample_weights = weight_per_class[torch.tensor(labels)]\n\nsampler = WeightedRandomSampler(sample_weights, num_samples=len(labels),\n                                replacement=True)\n\n# Note: pass a sampler OR shuffle=True, never both.\nloader = DataLoader(dataset, batch_size=64, sampler=sampler, num_workers=8)\n",
+      },
+      {
+        kind: "table",
+        headers: ["Knob", "Set it to", "Why"],
+        rows: [
+          [
+            "`num_workers`",
+            "the knee of your throughput curve",
+            "parallel decode; measure, don't guess",
+          ],
+          [
+            "`pin_memory`",
+            "`True` when training on GPU",
+            "enables faster async host→device copies",
+          ],
+          [
+            "`persistent_workers`",
+            "`True` with `num_workers > 0`",
+            "skip worker re-spawn every epoch",
+          ],
+          [
+            "`drop_last`",
+            "`True` for training",
+            "keeps batch shape constant; avoids a tiny final batch",
+          ],
+          ["`prefetch_factor`", "`2`–`4`", "buffer batches ahead without hoarding RAM"],
+        ],
+        caption: "Sensible defaults for a single-GPU image-classification run.",
+      },
+      {
+        kind: "list",
+        items: [
+          "`Dataset` yields one example; `DataLoader` yields batches and parallelises the slow work.",
+          "Put decoding and augmentation in `__getitem__` so the workers do it off the critical path.",
+          "Tune `num_workers` to where throughput plateaus — then stop.",
+          "`pin_memory=True` + `.to(device, non_blocking=True)` overlaps the copy with compute.",
+          "Custom `collate_fn` for variable-length data; `WeightedRandomSampler` for imbalance.",
+        ],
+      },
+      {
+        kind: "references",
+        title: "References",
+        items: [
+          {
+            label: "torch.utils.data — Dataset, DataLoader, samplers",
+            href: "https://pytorch.org/docs/stable/data.html",
+            source: "PyTorch documentation",
+            note: "Map- vs iterable-style, multiprocessing behaviour, memory pinning.",
+          },
+          {
+            label: "Datasets & DataLoaders — Learn the Basics",
+            href: "https://pytorch.org/tutorials/beginner/basics/data_tutorial.html",
+            source: "PyTorch tutorials",
+          },
+          {
+            label: "Transforming and augmenting images (transforms v2)",
+            href: "https://pytorch.org/vision/stable/transforms.html",
+            source: "torchvision documentation",
+          },
+          {
+            label: "A performance guide for PyTorch data loading",
+            href: "https://pytorch.org/tutorials/recipes/recipes/tuning_guide.html",
+            source: "PyTorch tutorials",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    slug: "pytorch-training-for-real-gpu-amp-schedules",
+    title: "Training for Real: GPUs, Mixed Precision, and Schedules",
+    dek: "The five-line loop from Part 2 trains a toy. A real run adds a device, mixed precision for a near-free 2×, a learning-rate schedule, gradient clipping, and checkpoints you can actually resume from. Here's the whole thing.",
+    topic: "Engineering",
+    publishedAt: "2026-09-11",
+    likes: 0,
+    views: 0,
+    commentCount: 0,
+    tags: ["#pytorch", "#training", "#mixed-precision", "#gpu"],
+    series: { slug: "pytorch", title: "PyTorch", part: 5 },
+    coverImage: "/articles/pytorch-series-cover.svg",
+    body: [
+      {
+        kind: "paragraph",
+        html: "The training loop in Part 2 is correct and it's also a toy. It runs on the CPU in full precision, at a fixed learning rate, with no way to stop and resume. A real run — one that takes hours and costs money — wraps that same five-line core in a few layers of machinery. None of it is complicated. All of it is standard. This part assembles the loop you'll actually copy into projects.",
+      },
+      {
+        kind: "heading",
+        id: "gpu",
+        text: "Get on the GPU",
+      },
+      {
+        kind: "paragraph",
+        html: "Pick a device once, at the top, and move the model and every batch onto it. The model moves in place; tensors don't, so you reassign. `non_blocking=True` lets the host→device copy overlap with compute when the source is pinned memory (which your DataLoader is providing, from Part 4).",
+      },
+      {
+        kind: "code",
+        filename: "device.py",
+        code: 'import torch\n\ndevice = "cuda" if torch.cuda.is_available() else "cpu"\nmodel = model.to(device)\n\nfor images, labels in loader:\n    images = images.to(device, non_blocking=True)\n    labels = labels.to(device, non_blocking=True)\n    ...\n',
+      },
+      {
+        kind: "callout",
+        title: '"Expected all tensors to be on the same device"',
+        body: "The most common first-GPU error. Something — a metric tensor, a manually created constant, a loss weight — is still on the CPU while everything else is on `cuda`. Trace back to the tensor you built with `torch.tensor(...)` and never moved.",
+      },
+      {
+        kind: "heading",
+        id: "amp",
+        text: "Mixed precision: a nearly free 2×",
+      },
+      {
+        kind: "paragraph",
+        html: "Modern GPUs run half-precision matrix multiplies far faster than full precision, and use half the memory doing it. **Automatic Mixed Precision** runs the forward pass in `bfloat16` or `float16` where it's safe and keeps a `float32` copy of the weights for the update. With `float16` you also need a `GradScaler`, which multiplies the loss up before `backward()` so small gradients don't flush to zero, then unscales before the step.",
+      },
+      {
+        kind: "code",
+        filename: "amp.py",
+        code: 'import torch\n\nscaler = torch.amp.GradScaler("cuda")\n\nfor images, labels in loader:\n    images = images.to(device, non_blocking=True)\n    labels = labels.to(device, non_blocking=True)\n\n    opt.zero_grad()\n    with torch.amp.autocast("cuda", dtype=torch.bfloat16):\n        logits = model(images)\n        loss = loss_fn(logits, labels)\n\n    scaler.scale(loss).backward()\n    scaler.step(opt)\n    scaler.update()\n',
+      },
+      {
+        kind: "figure",
+        variant: "bar",
+        title: "Relative training throughput: fp32 vs. AMP",
+        xKey: "batch",
+        yLabel: "steps / second (normalised)",
+        note: "Illustrative, ResNet-50-scale model on a recent GPU",
+        caption:
+          "AMP's advantage grows with batch size, because larger matmuls spend proportionally more time in the tensor cores that half precision unlocks. The memory saving also lets you fit the larger batch in the first place.",
+        series: [
+          { key: "fp32", label: "float32" },
+          { key: "amp", label: "AMP (bf16)" },
+        ],
+        data: [
+          { batch: "bs 32", fp32: 1.0, amp: 1.6 },
+          { batch: "bs 64", fp32: 1.0, amp: 1.9 },
+          { batch: "bs 128", fp32: 1.0, amp: 2.1 },
+          { batch: "bs 256", fp32: 1.0, amp: 2.3 },
+        ],
+      },
+      {
+        kind: "heading",
+        id: "schedules",
+        text: "Learning-rate schedules",
+      },
+      {
+        kind: "paragraph",
+        html: "A fixed learning rate is a compromise: large enough to make early progress, small enough not to bounce around the minimum later. A **schedule** removes the compromise — start with a short linear **warmup** (so the first steps don't wreck freshly-initialised weights), then **decay**, usually along a cosine curve, toward zero.",
+      },
+      {
+        kind: "formula",
+        tex: "\\eta_t = \\eta_{\\min} + \\tfrac{1}{2}\\,(\\eta_{\\max} - \\eta_{\\min})\\left(1 + \\cos\\frac{\\pi t}{T}\\right)",
+        caption:
+          "Cosine annealing: η eases from its maximum to its minimum over T steps, slowly at both ends and fastest in the middle.",
+      },
+      {
+        kind: "code",
+        filename: "schedule.py",
+        code: "from torch.optim.lr_scheduler import LinearLR, CosineAnnealingLR, SequentialLR\n\nwarmup = LinearLR(opt, start_factor=0.01, total_iters=500)\ncosine = CosineAnnealingLR(opt, T_max=total_steps - 500)\nscheduler = SequentialLR(opt, [warmup, cosine], milestones=[500])\n\nfor step, (images, labels) in enumerate(loader):\n    ...\n    scaler.step(opt)\n    scaler.update()\n    scheduler.step()   # once per optimizer step\n",
+      },
+      {
+        kind: "figure",
+        variant: "line",
+        title: "Learning rate over a training run",
+        xKey: "step",
+        xLabel: "step",
+        yLabel: "learning rate (fraction of base)",
+        note: "1,000-step run, 100-step warmup",
+        caption:
+          "Cosine + warmup (smooth) vs. step decay (drop 10× at the halfway mark). Warmup is the short ramp at the start; both end far below where they began. Hover to compare.",
+        series: [
+          { key: "cosine", label: "cosine + warmup" },
+          { key: "stepdecay", label: "step decay" },
+        ],
+        data: [
+          { step: 0, cosine: 0.01, stepdecay: 1.0 },
+          { step: 100, cosine: 1.0, stepdecay: 1.0 },
+          { step: 200, cosine: 0.97, stepdecay: 1.0 },
+          { step: 300, cosine: 0.88, stepdecay: 1.0 },
+          { step: 400, cosine: 0.75, stepdecay: 1.0 },
+          { step: 500, cosine: 0.59, stepdecay: 0.1 },
+          { step: 600, cosine: 0.42, stepdecay: 0.1 },
+          { step: 700, cosine: 0.25, stepdecay: 0.1 },
+          { step: 800, cosine: 0.12, stepdecay: 0.1 },
+          { step: 900, cosine: 0.03, stepdecay: 0.1 },
+          { step: 1000, cosine: 0.0, stepdecay: 0.1 },
+        ],
+      },
+      {
+        kind: "heading",
+        id: "clip-accum",
+        text: "Gradient clipping and accumulation",
+      },
+      {
+        kind: "paragraph",
+        html: "**Clipping** caps the global norm of the gradient before the step, which stops a single bad batch from throwing the weights off a cliff — standard practice for Transformers and RNNs. **Accumulation** runs several forward/backward passes before one optimizer step, so you get the training dynamics of a large batch on a GPU that can't hold one.",
+      },
+      {
+        kind: "code",
+        filename: "clip_accum.py",
+        code: 'accum_steps = 4\n\nfor step, (images, labels) in enumerate(loader):\n    with torch.amp.autocast("cuda", dtype=torch.bfloat16):\n        loss = loss_fn(model(images.to(device)), labels.to(device))\n        loss = loss / accum_steps            # average, don\'t sum\n    scaler.scale(loss).backward()\n\n    if (step + 1) % accum_steps == 0:\n        scaler.unscale_(opt)                  # unscale before clipping\n        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)\n        scaler.step(opt)\n        scaler.update()\n        opt.zero_grad()\n        scheduler.step()\n',
+      },
+      {
+        kind: "heading",
+        id: "checkpoints",
+        text: "Checkpoints you can resume from",
+      },
+      {
+        kind: "paragraph",
+        html: "A checkpoint that only holds the model weights cannot resume a run — the optimizer's momentum buffers, the scheduler's step count, and the AMP scaler's state all matter. Save the lot in one dict.",
+      },
+      {
+        kind: "code",
+        filename: "checkpoint.py",
+        code: 'import torch\n\ndef save_ckpt(path, epoch):\n    torch.save({\n        "epoch": epoch,\n        "model": model.state_dict(),\n        "opt": opt.state_dict(),\n        "scheduler": scheduler.state_dict(),\n        "scaler": scaler.state_dict(),\n    }, path)\n\ndef load_ckpt(path):\n    ckpt = torch.load(path, map_location=device, weights_only=True)\n    model.load_state_dict(ckpt["model"])\n    opt.load_state_dict(ckpt["opt"])\n    scheduler.load_state_dict(ckpt["scheduler"])\n    scaler.load_state_dict(ckpt["scaler"])\n    return ckpt["epoch"] + 1        # resume from the next epoch\n',
+      },
+      {
+        kind: "callout",
+        title: "Reproducibility, roughly",
+        body: "Seed `random`, `numpy`, and `torch` (`torch.manual_seed`), and set a DataLoader `worker_init_fn`. For bit-exact runs also set `torch.use_deterministic_algorithms(True)` and `cudnn.deterministic = True` — but expect a speed cost, and know that some ops have no deterministic implementation.",
+      },
+      {
+        kind: "heading",
+        id: "validation",
+        text: "A validation pass",
+      },
+      {
+        kind: "code",
+        filename: "validate.py",
+        code: '@torch.no_grad()\ndef validate(model, loader):\n    model.eval()\n    correct = total = 0\n    for images, labels in loader:\n        images, labels = images.to(device), labels.to(device)\n        with torch.amp.autocast("cuda", dtype=torch.bfloat16):\n            preds = model(images).argmax(dim=1)\n        correct += (preds == labels).sum().item()\n        total += labels.numel()\n    model.train()\n    return correct / total\n',
+      },
+      {
+        kind: "heading",
+        id: "the-whole-thing",
+        text: "The whole thing",
+      },
+      {
+        kind: "code",
+        filename: "train_full.py",
+        code: 'import torch\n\ndevice = "cuda" if torch.cuda.is_available() else "cpu"\nmodel = model.to(device)\nopt = torch.optim.AdamW(model.parameters(), lr=3e-4, weight_decay=0.05)\nscaler = torch.amp.GradScaler("cuda")\nscheduler = build_scheduler(opt, total_steps)\nloss_fn = torch.nn.CrossEntropyLoss()\n\nstart_epoch = load_ckpt("last.pt") if resume else 0\nbest_acc = 0.0\n\nfor epoch in range(start_epoch, epochs):\n    model.train()\n    for images, labels in train_loader:\n        images = images.to(device, non_blocking=True)\n        labels = labels.to(device, non_blocking=True)\n\n        opt.zero_grad()\n        with torch.amp.autocast("cuda", dtype=torch.bfloat16):\n            loss = loss_fn(model(images), labels)\n        scaler.scale(loss).backward()\n        scaler.unscale_(opt)\n        torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)\n        scaler.step(opt)\n        scaler.update()\n        scheduler.step()\n\n    acc = validate(model, val_loader)\n    save_ckpt("last.pt", epoch)\n    if acc > best_acc:\n        best_acc = acc\n        save_ckpt("best.pt", epoch)\n    print(f"epoch {epoch}  val_acc {acc:.4f}  lr {scheduler.get_last_lr()[0]:.2e}")\n',
+      },
+      {
+        kind: "list",
+        items: [
+          "One device, chosen once; model moved in place, batches moved every step with `non_blocking=True`.",
+          "AMP with `autocast` + `GradScaler` — roughly 2× throughput and half the memory.",
+          "Warmup then cosine decay; `scheduler.step()` once per optimizer step.",
+          "Clip the gradient norm; accumulate when the batch you want won't fit.",
+          "Checkpoint model + optimizer + scheduler + scaler + epoch, or you can't truly resume.",
+          "`@torch.no_grad()` and `model.eval()` around validation; back to `model.train()` after.",
+        ],
+      },
+      {
+        kind: "paragraph",
+        html: "That's the series. Five parts ago this was a single data structure; now it's a training run you could put on a cluster. Everything past here — `torch.compile`, FSDP and multi-node, quantisation, custom kernels — is a refinement of these same pieces, and none of it will surprise you once this loop is muscle memory.",
+      },
+      {
+        kind: "references",
+        title: "References",
+        items: [
+          {
+            label: "Automatic Mixed Precision package — torch.amp",
+            href: "https://pytorch.org/docs/stable/amp.html",
+            source: "PyTorch documentation",
+          },
+          {
+            label: "Automatic Mixed Precision recipe",
+            href: "https://pytorch.org/tutorials/recipes/recipes/amp_recipe.html",
+            source: "PyTorch tutorials",
+          },
+          {
+            label: "How to adjust learning rate — torch.optim.lr_scheduler",
+            href: "https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate",
+            source: "PyTorch documentation",
+          },
+          {
+            label: "SGDR: Stochastic Gradient Descent with Warm Restarts",
+            href: "https://arxiv.org/abs/1608.03983",
+            source: "Loshchilov & Hutter, ICLR 2017",
+            note: "The cosine-annealing schedule.",
+          },
+          {
+            label: "Saving and loading a general checkpoint",
+            href: "https://pytorch.org/tutorials/recipes/recipes/saving_and_loading_a_general_checkpoint.html",
+            source: "PyTorch tutorials",
+          },
+          {
+            label: "Reproducibility",
+            href: "https://pytorch.org/docs/stable/notes/randomness.html",
+            source: "PyTorch documentation",
+          },
+        ],
       },
     ],
   },
