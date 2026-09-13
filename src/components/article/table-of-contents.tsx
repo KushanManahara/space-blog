@@ -4,7 +4,11 @@ import { useReadingProgress } from "@/components/article/reading-progress";
 import { cn } from "@/lib/utils";
 
 /** “On this page” with live progress and the active heading highlighted. */
-export function TableOfContents({ headings }: { headings: Array<{ id: string; text: string }> }) {
+export function TableOfContents({
+  headings,
+}: {
+  headings: Array<{ id: string; text: string; level?: number }>;
+}) {
   const { progress, activeHeadingId } = useReadingProgress();
   const percent = Math.round(progress * 100);
 
@@ -33,10 +37,15 @@ export function TableOfContents({ headings }: { headings: Array<{ id: string; te
             href={`#${heading.id}`}
             aria-current={heading.id === activeHeadingId ? "location" : undefined}
             className={cn(
-              "rounded-sm px-3 py-2 text-[14px] leading-[1.45] transition-[background-color,color] duration-300 ease-expo",
+              "rounded-sm transition-[background-color,color] duration-300 ease-expo",
+              heading.level === 3
+                ? "py-1.5 pr-3 pl-6 text-[13px] leading-[1.4]"
+                : "px-3 py-2 text-[14px] leading-[1.45]",
               heading.id === activeHeadingId
                 ? "bg-tint-violet font-semibold text-brand-strong"
-                : "text-fg-2 hover:text-fg-1",
+                : heading.level === 3
+                  ? "text-fg-3 hover:text-fg-1"
+                  : "text-fg-2 hover:text-fg-1",
             )}
           >
             {heading.text}
