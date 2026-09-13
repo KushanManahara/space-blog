@@ -7,7 +7,7 @@ export const topicNameSchema = z.enum([
   "Engineering",
   "Experiments",
   "Research",
-  "Findings",
+  "Career",
 ]);
 
 export const topicSchema = z.object({

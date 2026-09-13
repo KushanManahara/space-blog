@@ -1,9 +1,9 @@
 import {
+  Award,
   ClipboardCheck,
   Cpu,
   FlaskConical,
   Gauge,
-  Lightbulb,
   Microscope,
   Wrench,
   type LucideIcon,
@@ -103,7 +103,7 @@ export const topicVisuals: Record<TopicName, TopicVisual> = {
     dot: "bg-indigo-500",
     icon: Microscope,
   },
-  Findings: {
+  Career: {
     cover: "linear-gradient(150deg, #BFDBFE 0%, #3B82F6 50%, #1E40AF 100%)",
     image: "/topics/finding.png",
     pattern: "repeating-linear-gradient(rgba(255,255,255,.16) 0 1px, rgba(255,255,255,0) 1px 13px)",
@@ -112,7 +112,7 @@ export const topicVisuals: Record<TopicName, TopicVisual> = {
     ink: "text-cornflower-600",
     label: "text-fg-link",
     dot: "bg-cornflower-600",
-    icon: Lightbulb,
+    icon: Award,
   },
 };
 

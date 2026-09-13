@@ -64,7 +64,7 @@ function slugify(text: string): string {
 }
 
 type TopicName =
-  "Inference" | "Systems" | "Evaluation" | "Engineering" | "Experiments" | "Research" | "Findings";
+  "Inference" | "Systems" | "Evaluation" | "Engineering" | "Experiments" | "Research" | "Career";
 
 // Curated folder metadata to ensure perfect titles, topics, and deks
 const FOLDER_METADATA: Record<string, { title: string; topic: TopicName; tags: string[] }> = {
@@ -135,7 +135,7 @@ const FOLDER_METADATA: Record<string, { title: string; topic: TopicName; tags: s
   },
   "engineering council sri lanka": {
     title: "Milestone: Registration with the Engineering Council Sri Lanka",
-    topic: "Findings",
+    topic: "Career",
     tags: ["#engineering", "#career", "#milestones"],
   },
   "explaiable ai": {
@@ -145,7 +145,7 @@ const FOLDER_METADATA: Record<string, { title: string; topic: TopicName; tags: s
   },
   fyp: {
     title: "Final Year Project: Engineering Reflections & Architecture",
-    topic: "Findings",
+    topic: "Engineering",
     tags: ["#fyp", "#engineering", "#computer-engineering"],
   },
   "gamini api": {
@@ -170,7 +170,7 @@ const FOLDER_METADATA: Record<string, { title: string; topic: TopicName; tags: s
   },
   "industry visit": {
     title: "Industry Visit & Software Engineering Insights with Creative Software",
-    topic: "Findings",
+    topic: "Career",
     tags: ["#industry", "#software-engineering", "#insights"],
   },
   "la fires vs chatpgt": {
@@ -215,17 +215,17 @@ const FOLDER_METADATA: Record<string, { title: string; topic: TopicName; tags: s
   },
   "multi agentic course certification": {
     title: "Certified in Practical Multi AI Agents & Advanced Use Cases with CrewAI",
-    topic: "Findings",
+    topic: "Career",
     tags: ["#certification", "#deeplearningai", "#crewai", "#agents"],
   },
   "my journey": {
     title: "My Self-Learning Journey Starting with a Pentium III PC",
-    topic: "Findings",
+    topic: "Career",
     tags: ["#journey", "#self-learning", "#origins", "#tech"],
   },
   "my-graduate": {
     title: "Graduating with B.Sc (Hons) in Computer Engineering from University of Peradeniya",
-    topic: "Findings",
+    topic: "Career",
     tags: ["#graduation", "#university", "#computer-engineering"],
   },
   "my-mcp": {
@@ -255,7 +255,7 @@ const FOLDER_METADATA: Record<string, { title: string; topic: TopicName; tags: s
   },
   "sir don bradman": {
     title: "Sir Don Bradman's Strategy: Dominance and Consistency Without Sixes",
-    topic: "Findings",
+    topic: "Career",
     tags: ["#strategy", "#discipline", "#performance"],
   },
   "spacex-reverse rocket": {

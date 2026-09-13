@@ -62,10 +62,10 @@ const topicBlurbs: Array<Omit<Topic, "postCount">> = [
       "The practical craftsmanship of shipping software: backend frameworks, package managers, container tooling, and the plumbing that agents run on.",
   },
   {
-    name: "Findings",
-    slug: "findings",
+    name: "Career",
+    slug: "career",
     description:
-      "Personal engineering journeys, certifications, career milestones, and unexpected lessons learned along the way.",
+      "Not code: career milestones, certifications, industry visits, and the personal lessons — on-the-job and off it — that shaped how I work.",
   },
   {
     name: "Research",
@@ -357,7 +357,7 @@ export const footerColumns = [
       { label: "Engineering", href: "/topics/engineering" },
       { label: "Systems", href: "/topics/systems" },
       { label: "Research", href: "/topics/research" },
-      { label: "Findings", href: "/topics/findings" },
+      { label: "Career", href: "/topics/career" },
     ],
   },
   {
