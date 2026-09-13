@@ -4,9 +4,10 @@ import { postSchema, type Post } from "./schemas";
 
 const parsedPosts = postSchema.array().parse([
   {
-    slug: "rclone-dry-run-transferred-nothing",
-    title: "rclone Said Transferred: 100%. Nothing Had Moved.",
-    dek: "A --dry-run prints its summary in the past tense. I read it, skipped ahead to verification, and watched all 1,934 files come back missing. What rclone was actually telling me — and why the check that caught it still couldn't prove what I thought it proved.",
+    slug: "how-to-copy-files-between-two-cloud-drive-providers",
+    title:
+      "How to Copy Files Between Two Cloud Drive Providers: Pitfalls, What to Avoid, and the Right Setup",
+    dek: "I needed to transfer files from one cloud drive to another across different providers. What started as a simple migration revealed hidden bottlenecks, simulation traps, hash mismatches, and API limits. Here is the process I followed, the mistakes to avoid, and the exact playbook to test, run, and verify cross-cloud transfers.",
     topic: "Engineering",
     publishedAt: "2026-09-13",
     likes: 0,
@@ -17,60 +18,24 @@ const parsedPosts = postSchema.array().parse([
     body: [
       {
         kind: "paragraph",
-        html: "The check finished and told me that every one of the 1,934 files I had just spent the evening moving was missing from the destination. Not most of them. All of them.",
+        html: "I recently needed to transfer an archive of 1,934 photos and videos, about 9.4 GiB in total, from Microsoft OneDrive for Business over to Google Drive. The goal was to build an independent secondary backup in a folder named `Backup/Photos`.",
       },
       {
         kind: "paragraph",
-        html: "That part was true — nothing had been copied. What was not true was the line I had trusted twenty minutes earlier, which said the opposite in confident, percentage-terminated English:",
-      },
-      {
-        kind: "code",
-        filename: "the-lie.txt",
-        code: "Transferred:      9.406 GiB / 9.406 GiB, 100%\nTransferred:      1934 / 1934, 100%\nElapsed time:     5.5s",
+        html: "On paper, moving files between two major cloud providers sounds like a routine task. In practice, commercial cloud providers are closed ecosystems with no direct way to copy data between each other. The manual approach of downloading gigabytes of data to a local drive and re-uploading it wastes local disk space and takes twice as long. That led me to [rclone](https://rclone.org), an open-source command-line tool designed to connect cloud storage backends and stream data between them in memory without writing temporary files to disk.",
       },
       {
         kind: "paragraph",
-        html: "Nine and a half gigabytes in five and a half seconds should have been the tell. It wasn't, because I wasn't looking for one. This is the story of a mistake that takes one flag to make, costs you an evening, and is worth understanding properly — because the same misreading applied to a different rclone verb doesn't waste an evening, it deletes your data.",
+        html: "While rclone solved the local disk problem, the transfer itself had several hidden traps. Along the way, I ran into local upload bottlenecks, misleading simulation output, silent verification downgrades, and API limits. Here is how the process actually works, the mistakes to avoid, and the setup I now use to run and verify cross-cloud transfers reliably.",
       },
       {
         kind: "heading",
-        id: "what-i-was-doing",
-        text: "What I was actually trying to do",
+        id: "the-steps-followed",
+        text: "The Initial Attempt: Setup and First Steps",
       },
       {
         kind: "paragraph",
-        html: "The job was an ordinary one: years of photos and video sitting in a OneDrive Business account, and a growing unease about a single provider holding all of it. The plan was a mirror on Google Drive — same files, second vendor, no clever sync relationship between them.",
-      },
-      {
-        kind: "callout",
-        title: "Everything here is copy-pasteable",
-        body: "The commands below use two placeholder remotes, `onedrive:` and `gdrive:`, moving a folder called `Photos/Archive` into `Backup/Photos`. Substitute your own remote names and paths and every command runs as written — the trap described here has nothing to do with which providers you picked.",
-      },
-      {
-        kind: "paragraph",
-        html: "[rclone](https://rclone.org) is the tool for this. It speaks both providers' APIs natively and streams bytes from one to the other through the machine you run it on, without ever writing a local copy to disk. That last detail sounds like a pure win, and it is — right up until you notice what it implies about which network link is doing the work.",
-      },
-      {
-        kind: "mermaid",
-        caption:
-          "Every byte goes out through your own uplink. There is no provider-to-provider shortcut: rclone can do server-side copies inside a single remote, but a cross-provider transfer has to pass through you.",
-        code: `flowchart LR
-    OD[("OneDrive Business<br/>1,934 files · 9.4 GiB")]
-    ME["<b>your laptop</b><br/>rclone — streamed through RAM<br/>nothing written to disk"]
-    GD[("Google Drive<br/>Backup/Photos")]
-
-    OD -->|"download — fast"| ME
-    ME -->|"<b>upload — ~2 Mbps, the bottleneck</b>"| GD
-    OD -. "server-side copy: not available across providers" .-> GD`,
-      },
-      {
-        kind: "paragraph",
-        html: "Your download speed is irrelevant here. Your upload speed is the entire transfer. Hold that thought — it comes back eleven hours later.",
-      },
-      {
-        kind: "heading",
-        id: "wiring-up",
-        text: "Wiring up the two ends",
+        html: "To begin, I installed rclone and launched its interactive configuration tool:",
       },
       {
         kind: "code",
@@ -79,42 +44,24 @@ const parsedPosts = postSchema.array().parse([
       },
       {
         kind: "paragraph",
-        html: "`rclone config` is an interactive wizard that builds what rclone calls a **remote**: a named, saved connection to one cloud account. I needed two, `onedrive` and `gdrive`.",
+        html: "Through `rclone config`, I created two remotes. The first was `onedrive:`, authenticated through Microsoft Graph. The second was `gdrive:`, authenticated with Google Drive. In Microsoft 365 accounts, make sure to pick your real drive rather than any secondary document libraries that might show up in the list.",
       },
       {
         kind: "paragraph",
-        html: "The OneDrive half failed on the first attempt. Partway through the browser sign-in, Azure came back with `AADSTS650051`, complaining that a service principal already existed for my tenant. I killed rclone, started the configuration again from scratch, and the second run completed without a murmur. I still don't know what the first one tripped over. Azure's OAuth flow produces transient failures like this, and a clean retry is the correct first response rather than an afternoon of reading Microsoft identity documentation.",
-      },
-      {
-        kind: "callout",
-        title: "The prompt everyone hits enter through",
-        body: "Once the OneDrive sign-in succeeds, rclone asks **which drive** to attach. A single Microsoft 365 account often exposes more than one — mine offered the real OneDrive and something called `PersonalCacheLibrary`. Pick wrong and rclone will very faithfully, very efficiently sync the wrong data. Read that list.",
-      },
-      {
-        kind: "paragraph",
-        html: "The Google side raised a different flag. rclone ships with a shared OAuth client ID so you don't have to register your own app just to use the tool, and it warned that this shared ID is being retired during 2026. I continued with it, because this was a one-off job. If you are setting up anything that will still be running next quarter — a cron'd backup, a recurring sync — [register your own client ID](https://rclone.org/drive/#making-your-own-client-id) now. Discovering that warning was serious in the middle of a scheduled sync is a bad way to learn it.",
-      },
-      {
-        kind: "paragraph",
-        html: "One piece of housekeeping: I had a half-finished `gdrive` remote left over from an abandoned first attempt sitting on the name I wanted. `rclone config delete gdrive` removes a single remote by name and touches nothing else, which beats piling a second, awkwardly-named remote on top of the first.",
-      },
-      {
-        kind: "heading",
-        id: "the-dry-run",
-        text: "The dry run, and the sentence that lied",
-      },
-      {
-        kind: "paragraph",
-        html: "With both remotes configured I listed each side, which is the cheapest possible way to confirm you are pointing at the folders you think you are:",
+        html: "Before copying any files, I listed the top-level directories on both remotes to make sure the paths were valid:",
       },
       {
         kind: "code",
-        filename: "sanity-check.sh",
+        filename: "check-paths.sh",
         code: 'rclone lsd onedrive:"Photos/Archive"\nrclone lsd gdrive:',
       },
       {
         kind: "paragraph",
-        html: "Then the transfer, with two flags: `--dry-run` to simulate rather than perform, and `-P` for live progress. Previewing before you commit is the right instinct. It is genuinely good practice. It is also where this went wrong.",
+        html: "Both remotes responded cleanly, so the connection and folder names were working.",
+      },
+      {
+        kind: "paragraph",
+        html: "Next, I wanted to preview the transfer before moving gigabytes of data across the internet. I ran `rclone copy` with `--dry-run` to simulate the operation, paired with `-P` to view live progress:",
       },
       {
         kind: "code",
@@ -123,197 +70,73 @@ const parsedPosts = postSchema.array().parse([
       },
       {
         kind: "paragraph",
-        html: "1,934 files scrolled past, each one tagged `Skipped copy as --dry-run is set` — the honest, unambiguous truth, repeated 1,934 times. And then, at the bottom, the summary from the top of this article: **9.406 GiB, 100%, 1934 / 1934**.",
-      },
-      {
-        kind: "paragraph",
-        html: "Read that summary cold and it is a completed job. The word it uses is *Transferred*. There is no asterisk, no `(simulated)`, no colour change. rclone is reporting what the operation *would have done*, in the same template it uses for what it *did* do — and the 1,934 lines that would have corrected me had already scrolled off the top of the terminal.",
-      },
-      {
-        kind: "heading",
-        id: "1934-missing",
-        text: "1,934 files, all missing",
-      },
-      {
-        kind: "paragraph",
-        html: "Satisfied, I skipped straight to verification. `rclone check` compares two locations and reports the differences; `--one-way` tells it to only care that every source file exists at the destination, and to stay quiet about extra files on the far side.",
+        html: "The command ran in five and a half seconds, and the terminal output concluded with this summary:",
       },
       {
         kind: "code",
-        filename: "verify.sh",
+        filename: "dry-run-summary.txt",
+        code: "Transferred:      9.406 GiB / 9.406 GiB, 100%\nTransferred:      1934 / 1934, 100%\nElapsed time:     5.5s",
+      },
+      {
+        kind: "paragraph",
+        html: "Because the summary printed 100% transferred across all 1,934 files, I assumed the transfer had already finished. I then ran an immediate verification check to confirm that the files were on Google Drive:",
+      },
+      {
+        kind: "code",
+        filename: "verify-initial.sh",
         code: 'rclone check onedrive:"Photos/Archive" gdrive:"Backup/Photos" --one-way',
       },
       {
         kind: "paragraph",
-        html: "What came back was a wall of `file not in Google drive root`, one line per file, 1,934 times. For about thirty seconds I believed I had hit a serious rclone bug, or worse, a silent failure that had eaten an evening and a decade of photographs.",
+        html: "Instead of confirming a clean match, rclone flooded the terminal with 1,934 error lines. Every single file reported `file not in Google drive root`. Nothing had actually been transferred. That result prompted a deeper look into what was really happening behind the scenes.",
+      },
+      {
+        kind: "heading",
+        id: "the-issues-encountered",
+        text: "Five Realities of Cross-Cloud Transfers",
       },
       {
         kind: "paragraph",
-        html: "Neither command had malfunctioned. I had asked rclone to simulate copying nothing, and then asked it to confirm that nothing was there. Both answered correctly. The bug was entirely between the chair and the terminal.",
+        html: "Investigating the missing files revealed several technical details about how cross-cloud migrations operate.",
+      },
+      {
+        kind: "heading",
+        id: "reality-local-streaming",
+        text: "1. Data streams through your local machine",
+        level: 3,
+      },
+      {
+        kind: "paragraph",
+        html: "It is easy to assume that rclone triggers a server-to-server transfer between Microsoft and Google datacenters. In reality, server-side copies only work within the same cloud provider. Because Microsoft and Google do not provide a shared transfer bridge, every byte must travel through the machine running rclone. The tool downloads each file into RAM and immediately uploads it to Google Drive.",
       },
       {
         kind: "mermaid",
         caption:
-          "The mistake is the jump from step 1 to step 4. A dry run proves your command is correct. It proves nothing about your data.",
-        code: `flowchart TD
-    S1["<b>1 · Preview</b><br/>rclone copy … --dry-run -P<br/>every line: 'Skipped copy as --dry-run is set'<br/>summary still reads 'Transferred: 9.4 GiB, 100%'"]
-    S2["<b>2 · Copy for real</b><br/>rclone copy … -P<br/>bytes actually leave the machine"]
-    S3["<b>3 · Verify</b><br/>rclone check … --one-way<br/>0 differences"]
-    BAD["<b>What I did instead</b><br/>rclone check … --one-way<br/>1,934 × 'file not in Google drive root'"]
+          "Cross-provider streaming architecture. rclone streams objects through host RAM. Local upload bandwidth is the primary operational bottleneck.",
+        code: `flowchart LR
+    OD[("OneDrive Business<br/>Source: 1,934 files · 9.4 GiB")]
+    ME["<b>Local Machine (rclone)</b><br/>Streams through RAM<br/>No disk writes required"]
+    GD[("Google Drive<br/>Destination: Backup/Photos")]
 
-    S1 --> S2 --> S3
-    S1 -. "skipped step 2" .-> BAD
-    BAD -. "correct answer to the wrong question" .-> S1`,
-      },
-      {
-        kind: "heading",
-        id: "verbs-matter",
-        text: "The verb matters more than the flag",
+    OD -->|"Fast Download API"| ME
+    ME -->|"<b>Upload Link (~2 Mbps)</b><br/>The Physical Bottleneck"| GD
+    OD -. "Direct cloud-to-cloud: Not supported across providers" .-> GD`,
       },
       {
         kind: "paragraph",
-        html: "Here is why this is worth more than a laugh at my expense. I was running `copy`, which is the forgiving one — it only ever adds. Had I been running `sync`, the dry run I skimmed would have been previewing **deletions**, and walking away from it thinking \"good, I've seen what it's going to remove\" is a very different category of mistake.",
-      },
-      {
-        kind: "table",
-        headers: ["Command", "Writes to destination", "Deletes anything", "Interrupting it"],
-        rows: [
-          ["`rclone copy`", "New and changed files", "Never", "Safe — re-run the same command"],
-          [
-            "`rclone sync`",
-            "New and changed files",
-            "**Yes** — removes anything on the destination not on the source",
-            "Safe, but leaves the destination partly reconciled",
-          ],
-          [
-            "`rclone move`",
-            "New and changed files",
-            "**Yes** — deletes each source file once it lands",
-            "Safe, but the source is now split across both ends",
-          ],
-          ["`rclone check`", "Nothing", "Never", "Safe — it is read-only"],
-          [
-            "`rclone bisync`",
-            "Both directions",
-            "**Yes** — both directions",
-            "Needs `--resync` to recover a broken run",
-          ],
-        ],
-        caption:
-          "A dry run is a nicety on copy and a seatbelt on everything else. The rows marked in bold are the ones where misreading a preview costs you data rather than an evening.",
-      },
-      {
-        kind: "callout",
-        title: "The other way to get this wrong",
-        body: "`rclone copy src:A dst:B` copies the **contents** of `A` into `B`, not the folder `A` itself. If you expected `B/A/...` and got `B/...`, nothing failed — that is the documented behaviour, and a dry run would have shown it to you in the destination paths you didn't read.",
-      },
-      {
-        kind: "heading",
-        id: "the-real-run",
-        text: "The real run",
-      },
-      {
-        kind: "paragraph",
-        html: "The fix was to delete four characters. But 9.4 GiB over a domestic uplink is an overnight job, so I added flags to make the real run faster and more durable, and wrapped the whole thing in `caffeinate` so the Mac wouldn't quietly go to sleep three hours in and kill it.",
-      },
-      {
-        kind: "code",
-        filename: "migrate.sh",
-        code: 'caffeinate -i rclone copy onedrive:"Photos/Archive" gdrive:"Backup/Photos" \\\n  --transfers=8 \\\n  --checkers=16 \\\n  --drive-chunk-size=64M \\\n  --fast-list \\\n  --check-first \\\n  --log-file=migration.log \\\n  --log-level INFO \\\n  -P',
-      },
-      {
-        kind: "table",
-        headers: ["Flag", "Default", "What it does", "When to move it"],
-        rows: [
-          [
-            "`--transfers`",
-            "4",
-            "Files uploading concurrently",
-            "Up for thousands of small files; **down** the moment you see 403 rate-limit errors",
-          ],
-          [
-            "`--checkers`",
-            "8",
-            "Parallel existence/hash checks",
-            "Up on large trees — it is cheap next to the transfers",
-          ],
-          [
-            "`--drive-chunk-size`",
-            "8 MiB",
-            "Upload chunk size per Drive API request",
-            "Up for large files, to cut per-request overhead — costs RAM (see below)",
-          ],
-          [
-            "`--fast-list`",
-            "off",
-            "A few big directory listings instead of many small ones",
-            "On for big trees; it trades memory for far fewer API calls",
-          ],
-          [
-            "`--check-first`",
-            "off",
-            "Finish every check before starting any transfer",
-            "On when you want a true total and ETA up front instead of a moving target",
-          ],
-          [
-            "`--log-file` + `--log-level INFO`",
-            "off / NOTICE",
-            "Writes a durable record of every decision",
-            "Always, on anything that runs longer than you'll watch it",
-          ],
-          [
-            "`--tpslimit`",
-            "off",
-            "Caps HTTP transactions per second",
-            "Set around 10 if a provider starts throttling you",
-          ],
-        ],
-        caption:
-          "caffeinate -i is macOS, not rclone — it blocks idle sleep for as long as the command it wraps is running. On Linux, systemd-inhibit --what=idle:sleep does the same job, and on any platform tmux or nohup survives the terminal closing.",
-      },
-      {
-        kind: "paragraph",
-        html: "The chunk size deserves a warning that is easy to miss in the backend docs. Each in-flight upload holds its chunk in memory, so the two flags multiply:",
-      },
-      {
-        kind: "formula",
-        tex: "\\text{peak upload RAM} \\;\\approx\\; \\text{transfers} \\times \\text{chunk size} \\;=\\; 8 \\times 64\\,\\text{MiB} \\;=\\; 512\\,\\text{MiB}",
-        caption:
-          "Fine on a laptop. Push it to --transfers=16 --drive-chunk-size=256M on a small VPS and rclone gets killed by the OOM reaper about four gigabytes in.",
-      },
-      {
-        kind: "paragraph",
-        html: "A minute in, the same client-ID notice scrolled past — but this time with data actually moving behind it:",
-      },
-      {
-        kind: "code",
-        filename: "progress.txt",
-        code: "Transferred:   \t    4.156 MiB / 9.406 GiB, 0%, 243.930 KiB/s, ETA 11h13m36s\nChecks:                 0 / 0, -, Listed 1996\nTransferred:            0 / 1934, 0%\nElapsed time:        19.4s\nTransferring:\n *     Photos/2019/IMG_20190412_154533.jpg: 54% / 5.505 MiB, 191.750 KiB/s, 13s\n *     Photos/2019/IMG_20190412_154612.jpg:  2% / 5.780 MiB,   8.267 KiB/s, 11m40s\n *     Photos/2020/IMG_20200118_093021.jpg:  2% / 4.070 MiB,   8.873 KiB/s, 7m35s\n *     Photos/2020/IMG_20200118_093114.jpg:  1% / 3.688 MiB,   4.285 KiB/s, 14m27s",
-      },
-      {
-        kind: "paragraph",
-        html: "Note the difference from the dry run: `Transferred: 0 / 1934, 0%` and a real throughput figure. The dry run never showed a transfer rate at all, because there was nothing to rate.",
-      },
-      {
-        kind: "heading",
-        id: "why-flags-dont-help",
-        text: "Why none of those flags mattered much",
-      },
-      {
-        kind: "paragraph",
-        html: "243.9 KiB/s is about 2 Mbps. Every one of those tuning flags parallelises work; not one of them widens the pipe. Divide the payload by the uplink and the eleven hours falls out before you've opened a terminal:",
+        html: "Because of this architecture, your download speed is mostly irrelevant. Your local upload bandwidth dictates the entire duration. On a home connection with a 2 Mbps upload speed, transferring 9.4 GiB takes more than 11 hours. Concurrency flags can keep network queues full, but they cannot make your internet connection faster than its physical limit.",
       },
       {
         kind: "figure",
         variant: "line",
-        title: "Hours to move 9.4 GiB, by upload speed",
+        title: "Time Required to Transfer 9.406 GiB by Upload Speed",
         xKey: "speed",
-        xLabel: "sustained upload (Mbps)",
-        yLabel: "hours",
-        note: "Arithmetic, not a benchmark",
+        xLabel: "Sustained Upload Bandwidth (Mbps)",
+        yLabel: "Duration (Hours)",
+        note: "Physical limit: payload ÷ bandwidth",
         caption:
-          "9.406 GiB ÷ bandwidth, nothing else in the model. At the 2 Mbps I actually had it predicts 11h13m — which is, to the minute, the ETA rclone printed. The flags were never going to touch this curve; only moving the job to a fatter uplink does.",
-        series: [{ key: "hours", label: "hours to complete" }],
+          "At a residential upload speed of 2 Mbps, moving 9.4 GiB takes about 11.2 hours. Parallelization optimizes concurrency, but bandwidth determines total time.",
+        series: [{ key: "hours", label: "Transfer Time (Hours)" }],
         data: [
           { speed: "2", hours: 11.22 },
           { speed: "5", hours: 4.49 },
@@ -325,165 +148,361 @@ const parsedPosts = postSchema.array().parse([
         ],
       },
       {
+        kind: "heading",
+        id: "reality-dry-run-reports",
+        text: "2. A dry run reports what would happen, not what did happen",
+        level: 3,
+      },
+      {
         kind: "paragraph",
-        html: "Which points at the actual fix for anything genuinely large: don't run it at home. Spin up the cheapest VPS you can find, install rclone, copy your config across, and run the transfer from a machine that sits on a gigabit link next to both providers. Your laptop stops being on the critical path entirely.",
+        html: "When I tested the command with `--dry-run`, rclone simulated the planned operations. It traversed the source directory, queried destination metadata, and calculated what needed to move. As it processed each file, it output a notice:",
       },
       {
         kind: "code",
-        filename: "on-a-vps.sh",
-        code: '# Copy your existing remotes to the box rather than re-authenticating there\nrclone config file                      # prints the path to rclone.conf\nscp ~/.config/rclone/rclone.conf vps:~/.config/rclone/\n\n# Then run it detached, so closing your laptop is irrelevant\nssh vps\ntmux new -s migrate\nrclone copy onedrive:"Photos/Archive" gdrive:"Backup/Photos" \\\n  --transfers=8 --checkers=16 --fast-list \\\n  --log-file=migration.log --log-level INFO -P\n# Ctrl-b d to detach, \'tmux attach -t migrate\' to look in later',
+        filename: "notice-example.txt",
+        code: "NOTICE: Photos/2019/IMG_20190412.jpg: Skipped copy as --dry-run is set",
+      },
+      {
+        kind: "paragraph",
+        html: "Because 1,934 lines flashed past within five seconds, those notices scrolled off the screen immediately. What remained was the final statistics block. rclone formats that block using the same template it uses for real transfers, including the past-tense word *Transferred*. That wording made a rehearsal look like a completed job.",
       },
       {
         kind: "heading",
-        id: "what-check-cannot-tell-you",
-        text: "The part rclone check couldn't tell me",
+        id: "reality-hash-mismatches",
+        text: "3. Verification fell back to file size due to hash mismatches",
+        level: 3,
       },
       {
         kind: "paragraph",
-        html: "Here is the twist I only went looking for afterwards, and it is the most useful thing in this article. `rclone check` is the hero of the story — it caught my mistake. But in this specific pairing of providers, it is weaker than it looks, and it does not prove what I assumed it proved.",
+        html: "When verifying transfers between drives, we usually expect cryptographic checksums like MD5 or SHA-256 to confirm file contents. However, different cloud storage backends compute different hash algorithms.",
       },
       {
         kind: "paragraph",
-        html: "rclone verifies content by comparing checksums the two providers hand it. That only works if both ends can produce **the same kind** of hash. OneDrive for Business exposes QuickXorHash, a Microsoft-proprietary algorithm. Google Drive exposes MD5, plus SHA1 and SHA256 on many files. The intersection of those two sets is empty. With no shared algorithm, rclone cannot compare contents at all — it falls back to comparing file sizes.",
+        html: "OneDrive for Business computes QuickXorHash, an algorithm developed by Microsoft for fast multi-threaded hashing. Google Drive computes MD5, along with SHA-1 or SHA-256 on certain files. Because the two providers do not share any common hash algorithm, `rclone check` cannot compare checksums. Instead, it quietly falls back to comparing file names and file sizes. While matching file sizes is a strong practical indicator, it does not guarantee bit-for-bit integrity.",
+      },
+      {
+        kind: "heading",
+        id: "reality-sleep-mode",
+        text: "4. Sleep mode can kill an overnight transfer",
+        level: 3,
+      },
+      {
+        kind: "paragraph",
+        html: "When a transfer takes 11 hours on a laptop, leaving it running unattended introduces power management issues. The moment your computer enters idle sleep, the operating system drops active network sockets and the transfer terminates midway.",
+      },
+      {
+        kind: "heading",
+        id: "reality-provider-limits",
+        text: "5. Provider limits and memory spikes",
+        level: 3,
+      },
+      {
+        kind: "paragraph",
+        html: "Cloud providers enforce strict usage caps. Google Drive limits account uploads to roughly 750 GB in a rolling 24-hour window, after which uploads fail with API quota errors. Microsoft 365 throttles high-frequency requests with HTTP 429 status codes when too many calls occur at once. Furthermore, each concurrent upload thread buffers its active chunk in memory, so aggressive concurrency can consume enough RAM to crash rclone on smaller virtual machines.",
+      },
+      {
+        kind: "heading",
+        id: "what-not-to-do",
+        text: "What to Avoid When Copying Between Cloud Drives",
+      },
+      {
+        kind: "paragraph",
+        html: "Experiencing these issues highlighted several common mistakes that are easy to make during cross-cloud transfers:",
       },
       {
         kind: "table",
-        headers: ["Level", "How you get it", "What it actually proves", "What it costs"],
+        headers: ["Mistake", "Why it fails", "Consequence"],
         rows: [
           [
-            "Names and sizes",
-            "`rclone check` when the two ends share no hash — **including OneDrive ↔ Google Drive**",
-            "Every source file exists at the destination with an identical byte count",
-            "A handful of listing calls",
+            "Assuming direct cloud-to-cloud transfer",
+            "Cross-provider transfers route through your local machine.",
+            "Surprise multi-hour transfers saturating your domestic upload bandwidth.",
           ],
           [
-            "Checksums",
-            "`rclone check` when both ends expose a common hash",
-            "Contents are identical",
-            "Still just listings — the providers compute the hashes",
+            "Using rclone sync for initial transfers",
+            "sync deletes files on the destination that do not exist on the source.",
+            "Risk of accidental file deletion if destination paths are misconfigured.",
           ],
           [
-            "Byte-for-byte",
-            "`rclone check --download`",
-            "Contents are identical, verified on your machine",
-            "Downloads **both** copies in full",
+            "Relying only on the dry-run summary",
+            "dry-run displays 100% completion for its simulation.",
+            "Believing files were copied when the destination is still empty.",
           ],
           [
-            "Through encryption",
-            "`rclone cryptcheck`",
-            "Plaintext matches across a `crypt` remote",
-            "Listings plus hashing of the encrypted side",
+            "Assuming checksum verification across providers",
+            "OneDrive and Google Drive share no common hash algorithm.",
+            "rclone quietly falls back to comparing file sizes instead of hashes.",
+          ],
+          [
+            "Running long transfers without sleep management",
+            "The operating system drops network connections when idle.",
+            "The transfer dies halfway through the night.",
+          ],
+          [
+            "Over-allocating chunk size and concurrency",
+            "Each active transfer buffers its chunk in memory.",
+            "Out-of-memory crash killing rclone several gigabytes into the run.",
           ],
         ],
-        caption:
-          "A size match is a strong signal and a weak proof. Two files of identical length can still differ — a truncated-then-padded upload, or silent corruption mid-flight. For irreplaceable data, spot-check the top level with --download rather than assuming row one is row three.",
+        caption: "Summary of common pitfalls to avoid when migrating between cloud drives.",
+      },
+      {
+        kind: "heading",
+        id: "what-you-should-do",
+        text: "The Recommended Approach: How to Do It Right",
+      },
+      {
+        kind: "paragraph",
+        html: "To keep cross-cloud migrations fast, predictable, and safe, here is the approach I recommend.",
+      },
+      {
+        kind: "heading",
+        id: "choose-transfer-location-by-data-size",
+        text: "Choose where to run the transfer based on data size",
+        level: 3,
+      },
+      {
+        kind: "paragraph",
+        html: "If your dataset is moderate in size, such as under 20 to 50 GiB, running the transfer on your local machine is convenient. You simply need to keep your computer awake and save execution logs to disk.",
+      },
+      {
+        kind: "paragraph",
+        html: "If your transfer is larger than 50 or 100 GiB, offload the job to a cloud virtual private server (VPS). You can spin up a temporary virtual server on a provider like DigitalOcean, Hetzner, or AWS for a few cents. Because datacenter virtual machines sit on high-speed 1 Gbps connections, copying your `rclone.conf` file to a VPS and running the transfer there turns an 11-hour job into a 15-minute transfer. It also removes your personal computer from the process entirely.",
       },
       {
         kind: "code",
-        filename: "verify-properly.sh",
-        code: '# Real content verification — slow, because it pulls both copies down\nrclone check onedrive:"Photos/Archive" gdrive:"Backup/Photos" \\\n  --one-way --download\n\n# And stop reading 1,934 error lines in a terminal: write the answer to disk\nrclone check onedrive:"Photos/Archive" gdrive:"Backup/Photos" \\\n  --one-way \\\n  --missing-on-dst missing.txt \\\n  --differ differ.txt \\\n  --combined all-results.txt\n\nwc -l missing.txt differ.txt    # the only two numbers that matter',
+        filename: "vps-migration.sh",
+        code: '# Find your local configuration file\nrclone config file\n\n# Copy the configuration file to your VPS\nscp ~/.config/rclone/rclone.conf vps:~/.config/rclone/\n\n# Connect to the VPS and run rclone inside a tmux session\nssh vps\ntmux new -s cloud-migration\nrclone copy onedrive:"Photos/Archive" gdrive:"Backup/Photos" \\\n  --transfers=8 --checkers=16 --fast-list \\\n  --log-file=migration.log --log-level INFO -P',
+      },
+      {
+        kind: "heading",
+        id: "use-rclone-copy-for-safe-transfers",
+        text: "Use rclone copy for safe transfers",
+        level: 3,
+      },
+      {
+        kind: "paragraph",
+        html: "Always start migrations with `rclone copy`. Unlike `sync`, which deletes unmirrored files on the destination, or `move`, which removes source files, `copy` only adds new and modified files. It is idempotent and completely safe to re-run if interrupted.",
+      },
+      {
+        kind: "heading",
+        id: "the-tuned-local-configuration",
+        text: "The tuned local configuration",
+        level: 3,
+      },
+      {
+        kind: "paragraph",
+        html: "When running locally on macOS, I wrap rclone with `caffeinate -i` to prevent system sleep, and I use the following tuned flags:",
+      },
+      {
+        kind: "code",
+        filename: "production-transfer.sh",
+        code: 'caffeinate -i rclone copy onedrive:"Photos/Archive" gdrive:"Backup/Photos" \\\n  --transfers=8 \\\n  --checkers=16 \\\n  --drive-chunk-size=64M \\\n  --fast-list \\\n  --check-first \\\n  --log-file=migration.log \\\n  --log-level INFO \\\n  -P',
+      },
+      {
+        kind: "table",
+        headers: ["Flag", "Purpose", "Engineering Rationale"],
+        rows: [
+          [
+            "`--transfers=8`",
+            "Concurrent file transfers",
+            "Keeps the upload pipe saturated by transferring multiple files in parallel.",
+          ],
+          [
+            "`--checkers=16`",
+            "Concurrent metadata checks",
+            "Fast directory comparison threads to discover files ahead of transfers.",
+          ],
+          [
+            "`--drive-chunk-size=64M`",
+            "Multipart upload chunk size",
+            "Reduces Google Drive API HTTP round-trips for multi-megabyte photos and videos.",
+          ],
+          [
+            "`--fast-list`",
+            "Bulk directory listings",
+            "Fetches full directory trees in single API calls, cutting API quota usage.",
+          ],
+          [
+            "`--check-first`",
+            "Pre-transfer audit",
+            "Performs all file checks before starting transfers, providing accurate ETAs.",
+          ],
+          [
+            "`--log-file` / `--log-level`",
+            "Persistent audit log",
+            "Records all file operations to a file for post-run inspection.",
+          ],
+          [
+            "`caffeinate -i`",
+            "Power assertion (macOS)",
+            "Prevents system idle sleep until the command completes.",
+          ],
+        ],
+        caption: "Tuned configuration flags and their architectural purposes.",
+      },
+      {
+        kind: "paragraph",
+        html: "Make sure to budget memory carefully when increasing chunk sizes. Active buffer memory scales with concurrency:",
+      },
+      {
+        kind: "formula",
+        tex: "\\text{Peak Buffer RAM} \\;\\approx\\; \\text{transfers} \\times \\text{drive-chunk-size} \\;=\\; 8 \\times 64\\,\\text{MiB} \\;=\\; 512\\,\\text{MiB}",
+        caption:
+          "Memory allocation formula for Google Drive uploads. Keep chunk sizes reasonable to avoid out-of-memory errors on smaller machines.",
+      },
+      {
+        kind: "heading",
+        id: "provider-guardrails",
+        text: "Provider guardrails",
+        level: 3,
+      },
+      {
+        kind: "paragraph",
+        html: "To prevent transfers from failing silently against provider limits, add `--drive-stop-on-upload-limit` so rclone exits cleanly if you hit Google's 750 GB daily upload cap. If Microsoft Graph begins throttling requests with HTTP 429 status codes, adding `--tpslimit 10` limits transactions to 10 per second to keep traffic smooth.",
+      },
+      {
+        kind: "heading",
+        id: "testing-progress-validation",
+        text: "Testing, Reviewing Progress, and Validating Data",
+      },
+      {
+        kind: "paragraph",
+        html: "To ensure your files arrive without surprises, treat the migration as three distinct steps: testing beforehand, monitoring live progress, and verifying the destination afterward.",
+      },
+      {
+        kind: "heading",
+        id: "testing-before-the-transfer",
+        text: "Testing before the transfer",
+        level: 3,
+      },
+      {
+        kind: "paragraph",
+        html: "Before moving data, run a simulation with `--dry-run -P` to verify your syntax and directory structure.",
+      },
+      {
+        kind: "paragraph",
+        html: "Pay close attention to folder nesting. In rclone, running `rclone copy onedrive:Photos gdrive:Backup` copies the contents of the `Photos` directory into `gdrive:Backup/`, not into `gdrive:Backup/Photos/`. If you want to keep the parent folder name, specify `gdrive:Backup/Photos`. A dry run confirms where your files will land before anything is written.",
+      },
+      {
+        kind: "heading",
+        id: "monitoring-live-progress",
+        text: "Monitoring live progress",
+        level: 3,
+      },
+      {
+        kind: "paragraph",
+        html: "When running the real transfer with `-P`, check the progress output to confirm that data is moving:",
+      },
+      {
+        kind: "code",
+        filename: "live-progress.txt",
+        code: "Transferred:   \t    4.156 MiB / 9.406 GiB, 0%, 243.930 KiB/s, ETA 11h13m36s\nChecks:                 0 / 0, -, Listed 1996\nTransferred:            0 / 1934, 0%\nElapsed time:        19.4s\nTransferring:\n *     Photos/2019/IMG_20190412_154533.jpg: 54% / 5.505 MiB, 191.750 KiB/s, 13s\n *     Photos/2019/IMG_20190412_154612.jpg:  2% / 5.780 MiB,   8.267 KiB/s, 11m40s\n *     Photos/2020/IMG_20200118_093021.jpg:  2% / 4.070 MiB,   8.873 KiB/s, 7m35s\n *     Photos/2020/IMG_20200118_093114.jpg:  1% / 3.688 MiB,   4.285 KiB/s, 14m27s",
+      },
+      {
+        kind: "paragraph",
+        html: "A real transfer exhibits three clear signs: active file names with individual percentage bars, a non-zero transfer speed like `243.9 KiB/s`, and an estimated completion time based on your actual upload performance.",
+      },
+      {
+        kind: "heading",
+        id: "post-run-verification",
+        text: "Post-run verification",
+        level: 3,
+      },
+      {
+        kind: "paragraph",
+        html: "Never assume a transfer is complete without running verification. Instead of manually reading thousands of lines in the terminal, write differences directly to text files:",
+      },
+      {
+        kind: "code",
+        filename: "structured-verification.sh",
+        code: '# Run a one-way check and write missing or differing files to disk\nrclone check onedrive:"Photos/Archive" gdrive:"Backup/Photos" \\\n  --one-way \\\n  --missing-on-dst missing.txt \\\n  --differ differ.txt \\\n  --combined audit-results.txt\n\n# Count discrepancies. Zero lines means every file is verified\nwc -l missing.txt differ.txt',
       },
       {
         kind: "callout",
-        title: "The check you actually want at the end",
-        body: "`--missing-on-dst` and `--differ` turn a wall of scrolling red into two files you can count lines in. Empty both times means done. It is also the only form of this check that is pleasant to run at 2am.",
+        title: "Byte-for-byte verification for critical files",
+        body: "Because OneDrive and Google Drive do not share a common hash, standard `rclone check` verifies file existence and byte size. If you are migrating critical files and need cryptographic certainty, run `rclone check --download` on select folders. This downloads both copies into memory and compares their SHA-256 hashes locally.",
       },
       {
         kind: "heading",
-        id: "limits",
-        text: "Limits worth knowing before you start, not during",
+        id: "the-complete-playbook",
+        text: "The Complete Migration Playbook",
       },
       {
-        kind: "list",
-        items: [
-          "**Google Drive caps uploads at roughly 750 GB per day, per account.** Hit it and the API starts refusing writes. Add `--drive-stop-on-upload-limit` so rclone exits cleanly at that wall instead of retrying into it for hours, or `--max-transfer 700G --cutoff-mode=soft` to stop yourself just short and resume tomorrow.",
-          "**Microsoft throttles OneDrive aggressively**, especially on business tenants and especially with many small files. If throughput collapses and the log fills with retries, `--tpslimit 10` usually helps more than raising `--transfers` does.",
-          "**Resume is file-level, not byte-level.** A completed file is skipped on the next run, which is what makes interrupting safe. A file that was 80% uploaded when you pressed Ctrl+C generally starts again from zero — irritating on a 4 GB video, irrelevant on a photo library.",
-          "**`rclone copy` never deletes at the destination**, which is why it is the correct verb for a mirror you are building for the first time. Reach for `sync` only once you actually want the destination to lose things.",
-          '**Check your quota before, not after**: `rclone about gdrive:` prints free space, and `rclone size onedrive:"Photos/Archive"` prints exactly what you are about to send. Two commands, zero surprises.',
-        ],
-      },
-      {
-        kind: "heading",
-        id: "correct-sequence",
-        text: "The correct sequence, end to end",
+        kind: "paragraph",
+        html: "Here is the complete script incorporating pre-flight checks, simulation, tuned execution, and automated verification:",
       },
       {
         kind: "code",
-        filename: "the-whole-thing.sh",
-        code: '# 0. Know what you are moving, and that it will fit\nrclone size   onedrive:"Photos/Archive"\nrclone about  gdrive:\n\n# 1. Preview. Writes NOTHING. Read the per-file lines, not the summary.\nrclone copy onedrive:"Photos/Archive" gdrive:"Backup/Photos" --dry-run -P\n\n# 2. Run it for real — the only difference is the absence of --dry-run\ncaffeinate -i rclone copy onedrive:"Photos/Archive" gdrive:"Backup/Photos" \\\n  --transfers=8 --checkers=16 --drive-chunk-size=64M \\\n  --fast-list --check-first \\\n  --log-file=migration.log --log-level INFO -P\n\n# 3. Verify, and write the result somewhere you can count it\nrclone check onedrive:"Photos/Archive" gdrive:"Backup/Photos" \\\n  --one-way --missing-on-dst missing.txt\n\n# 4. Not finished until this prints 0\nwc -l < missing.txt',
-      },
-      {
-        kind: "paragraph",
-        html: "Steps 1 and 3 are the same commands I ran on the night this went wrong. The entire error was the missing step 2 between them.",
+        filename: "complete-migration-workflow.sh",
+        code: '# 1. Pre-flight check: measure source size and verify destination quota\nrclone size  onedrive:"Photos/Archive"\nrclone about gdrive:\n\n# 2. Rehearsal: test paths and folder nesting with a dry run\nrclone copy onedrive:"Photos/Archive" gdrive:"Backup/Photos" --dry-run -P\n\n# 3. Production transfer: run with tuned concurrency, logging, and sleep prevention\ncaffeinate -i rclone copy onedrive:"Photos/Archive" gdrive:"Backup/Photos" \\\n  --transfers=8 \\\n  --checkers=16 \\\n  --drive-chunk-size=64M \\\n  --fast-list \\\n  --check-first \\\n  --log-file=migration.log \\\n  --log-level INFO \\\n  -P\n\n# 4. Verification: check that all files exist at the destination\nrclone check onedrive:"Photos/Archive" gdrive:"Backup/Photos" \\\n  --one-way \\\n  --missing-on-dst missing.txt \\\n  --differ differ.txt\n\n# Verification passes when both files output 0\nwc -l missing.txt differ.txt',
       },
       {
         kind: "heading",
-        id: "lessons",
-        text: "What I'd tell myself before starting again",
-      },
-      {
-        kind: "list",
-        items: [
-          "**A dry run validates your command, not your data.** A clean preview means the syntax and the paths are right. It is evidence about the future, phrased in the past tense.",
-          "**Read the scrolling lines, not the closing summary.** `Skipped copy as --dry-run is set`, printed once per file, is the only part of that output that was telling the truth.",
-          "**Always finish with `rclone check`, and know which rung of the verification ladder you're standing on.** Between providers with no shared hash, you are comparing sizes — useful, but not proof of content.",
-          "**Treat `--dry-run` as mandatory on `sync`, `move`, and `bisync`.** On `copy` the worst case is a wasted evening. On the others it is deleted files.",
-          "**Register your own Google client ID** if this is anything but a one-off. The shared one is on a retirement clock.",
-          "**An Azure `AADSTS650051` during OneDrive setup is usually transient.** Restart `rclone config` from the top before assuming anything is genuinely broken.",
-          "**If the payload is large, move the job, not the bytes.** A $5 VPS on a gigabit link turns an eleven-hour overnight run into a coffee break, and takes your laptop off the critical path.",
-        ],
+        id: "key-takeaways",
+        text: "Key Takeaways for Cloud Migrations",
       },
       {
         kind: "paragraph",
-        html: "None of this is a criticism of rclone. Every command did precisely what I asked, and told me so in plain text at every step. The tool was never wrong; it was just answering a question I had stopped paying attention to.",
+        html: "Moving files between different cloud storage providers comes down to a few practical principles:",
       },
       {
         kind: "paragraph",
-        html: "That is the part worth carrying elsewhere. Infrastructure tooling reports success in a house style, and that style rarely distinguishes between *the work is done* and *the work would have gone fine*. A rehearsal and a performance produce identical closing credits. The difference is always further up the log — in the part that scrolled past while you were waiting for the number at the bottom.",
+        html: "Cross-cloud transfers always flow through the host machine running the command. If your dataset is large, running rclone on a cloud VPS with a fast datacenter connection will save hours of transfer time.",
+      },
+      {
+        kind: "paragraph",
+        html: "Start with `rclone copy` rather than `sync` to avoid accidental file deletions. Test your folder structures with a dry run beforehand, and watch live transfer rates rather than summary percentages to confirm that data is moving.",
+      },
+      {
+        kind: "paragraph",
+        html: "Finally, keep in mind how verification works when services do not share a common hash algorithm. Directing check results into text files gives you an instant, dependable way to confirm that your files arrived safely.",
       },
       {
         kind: "references",
         title: "References",
         items: [
           {
-            label: "rclone copy",
+            label: "rclone copy Documentation",
             href: "https://rclone.org/commands/rclone_copy/",
             source: "rclone documentation",
-            note: "Including the contents-not-the-folder path semantics.",
+            note: "Path semantics and non-destructive file copying.",
           },
           {
-            label: "rclone check",
+            label: "rclone check Documentation",
             href: "https://rclone.org/commands/rclone_check/",
             source: "rclone documentation",
-            note: "--one-way, --download, and the --combined / --missing-on-dst report files.",
+            note: "--one-way, --download, and structured error reporting (--missing-on-dst).",
           },
           {
-            label: "Global flags — including --dry-run, --transfers, --checkers, --tpslimit",
+            label: "rclone Global Flags",
             href: "https://rclone.org/docs/",
             source: "rclone documentation",
+            note: "Details on --dry-run, --transfers, --checkers, --fast-list, and --tpslimit.",
           },
           {
-            label: "Google Drive backend — chunk size, client IDs, and upload limits",
+            label: "Google Drive Backend",
             href: "https://rclone.org/drive/",
             source: "rclone documentation",
-            note: "Documents that chunk size × transfers is held in memory.",
+            note: "Chunk size configuration, upload quotas, and OAuth client registration.",
           },
           {
-            label: "Microsoft OneDrive backend — hashes and throttling",
+            label: "Microsoft OneDrive Backend",
             href: "https://rclone.org/onedrive/",
             source: "rclone documentation",
-            note: "Where QuickXorHash on Business accounts is spelled out.",
+            note: "QuickXorHash support, drive selection, and API throttling.",
           },
           {
-            label: "QuickXorHash algorithm",
+            label: "Microsoft QuickXorHash Specification",
             href: "https://learn.microsoft.com/en-us/onedrive/developer/code-snippets/quickxorhash",
             source: "Microsoft Learn",
+            note: "Technical explanation of Microsoft's non-cryptographic checksum algorithm.",
           },
           {
-            label: "Files you can store in Google Drive — size and upload limits",
+            label: "Google Drive Upload Limits",
             href: "https://support.google.com/drive/answer/37603",
             source: "Google Drive Help",
+            note: "Daily upload quotas and file size limits.",
           },
         ],
       },
