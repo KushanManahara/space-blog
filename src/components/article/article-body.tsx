@@ -92,14 +92,20 @@ function ArticleBlockView({
         />
       );
 
-    case "heading":
+    case "heading": {
+      const Tag = block.level === 3 ? "h3" : "h2";
       return (
-        <h2
+        <Tag
           id={block.id}
-          className="mt-12 mb-4 scroll-mt-28 text-[24px] font-bold tracking-[-0.02em] break-words text-fg-1 sm:text-[28px] md:text-[32px]"
+          className={
+            block.level === 3
+              ? "mt-8 mb-3 scroll-mt-28 text-[20px] font-bold tracking-[-0.01em] break-words text-fg-1 sm:text-[22px] md:text-[24px]"
+              : "mt-12 mb-4 scroll-mt-28 text-[24px] font-bold tracking-[-0.02em] break-words text-fg-1 sm:text-[28px] md:text-[32px]"
+          }
           dangerouslySetInnerHTML={{ __html: markdownToHtml(block.text) }}
         />
       );
+    }
 
     case "list":
       return (
