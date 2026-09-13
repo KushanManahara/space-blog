@@ -112,6 +112,16 @@ export function ReadingBar({ post, next }: { post: PostSummary; next: PostSummar
 
   const isPastArticle = progress >= 0.95 || commentsEntered;
 
+  /*
+   * "Next in series" only when the reader is actually continuing the series
+   * they are already in. Keyed on `next.series` alone, any article whose up-next
+   * happened to be part of a series announced itself as the next instalment of
+   * a series the reader had not been reading.
+   */
+  const continuesSeries = Boolean(
+    post.series && next.series && post.series.slug === next.series.slug,
+  );
+
   // Don't show reading dock if audio player is actively open (to avoid overlapping floating bars)
   if (audio?.isAudioActive) return null;
 
@@ -225,10 +235,10 @@ export function ReadingBar({ post, next }: { post: PostSummary; next: PostSummar
               {isPastArticle ? <Sparkles className="size-3 shrink-0 text-brand" /> : null}
               <p className="text-[10px] leading-tight font-bold tracking-[0.14em] text-brand uppercase">
                 {isPastArticle
-                  ? next.series
+                  ? continuesSeries
                     ? "Completed · Next in series"
                     : "Finished reading · Up next"
-                  : next.series
+                  : continuesSeries
                     ? "Next in series"
                     : "Up next"}
               </p>
