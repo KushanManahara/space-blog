@@ -26,7 +26,7 @@ function blockToMarkdown(block: ArticleBlock): string {
       return htmlToMarkdown(block.html);
 
     case "heading":
-      return `\n## ${block.text}\n`;
+      return `\n${block.level === 3 ? "###" : "##"} ${block.text}\n`;
 
     case "list":
       return block.items.map((item) => `* ${htmlToMarkdown(item)}`).join("\n");
