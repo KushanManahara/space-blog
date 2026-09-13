@@ -20,7 +20,12 @@ export const topicSchema = z.object({
 /** Long-form body content. Blocks keep the article renderer declarative. */
 export const articleBlockSchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("paragraph"), html: z.string().min(1) }),
-  z.object({ kind: z.literal("heading"), id: z.string().min(1), text: z.string().min(1) }),
+  z.object({
+    kind: z.literal("heading"),
+    id: z.string().min(1),
+    text: z.string().min(1),
+    level: z.union([z.literal(2), z.literal(3)]).optional(),
+  }),
   z.object({ kind: z.literal("list"), items: z.array(z.string().min(1)).min(1) }),
   z.object({
     kind: z.literal("chart"),
