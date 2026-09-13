@@ -13,6 +13,7 @@ const parsedPosts = postSchema.array().parse([
     views: 0,
     commentCount: 0,
     tags: ["#rclone", "#cloud-storage", "#migration", "#cli", "#backups"],
+    coverImage: "/articles/rclone-dry-run-cover.svg",
     body: [
       {
         kind: "paragraph",
@@ -38,7 +39,12 @@ const parsedPosts = postSchema.array().parse([
       },
       {
         kind: "paragraph",
-        html: "I had a decade of photos and video sitting in a OneDrive Business account and a growing unease about one provider holding all of it. The plan was a mirror on Google Drive: same files, second vendor, no clever sync relationship between them.",
+        html: "The job was an ordinary one: years of photos and video sitting in a OneDrive Business account, and a growing unease about a single provider holding all of it. The plan was a mirror on Google Drive — same files, second vendor, no clever sync relationship between them.",
+      },
+      {
+        kind: "callout",
+        title: "Everything here is copy-pasteable",
+        body: "The commands below use two placeholder remotes, `onedrive:` and `gdrive:`, moving a folder called `Photos/Archive` into `Backup/Photos`. Substitute your own remote names and paths and every command runs as written — the trap described here has nothing to do with which providers you picked.",
       },
       {
         kind: "paragraph",
@@ -51,7 +57,7 @@ const parsedPosts = postSchema.array().parse([
         code: `flowchart LR
     OD[("OneDrive Business<br/>1,934 files · 9.4 GiB")]
     ME["<b>your laptop</b><br/>rclone — streamed through RAM<br/>nothing written to disk"]
-    GD[("Google Drive<br/>Migrated_OneDrive")]
+    GD[("Google Drive<br/>Backup/Photos")]
 
     OD -->|"download — fast"| ME
     ME -->|"<b>upload — ~2 Mbps, the bottleneck</b>"| GD
@@ -73,7 +79,7 @@ const parsedPosts = postSchema.array().parse([
       },
       {
         kind: "paragraph",
-        html: "`rclone config` is an interactive wizard that builds what rclone calls a **remote**: a named, saved connection to one cloud account. I needed two, `onedrive_biz` and `gdrive`.",
+        html: "`rclone config` is an interactive wizard that builds what rclone calls a **remote**: a named, saved connection to one cloud account. I needed two, `onedrive` and `gdrive`.",
       },
       {
         kind: "paragraph",
@@ -104,7 +110,7 @@ const parsedPosts = postSchema.array().parse([
       {
         kind: "code",
         filename: "sanity-check.sh",
-        code: 'rclone lsd onedrive_biz:"My/Life"\nrclone lsd gdrive:',
+        code: 'rclone lsd onedrive:"Photos/Archive"\nrclone lsd gdrive:',
       },
       {
         kind: "paragraph",
@@ -113,7 +119,7 @@ const parsedPosts = postSchema.array().parse([
       {
         kind: "code",
         filename: "preview.sh",
-        code: 'rclone copy onedrive_biz:"My/Life" gdrive:"Migrated_OneDrive" --dry-run -P',
+        code: 'rclone copy onedrive:"Photos/Archive" gdrive:"Backup/Photos" --dry-run -P',
       },
       {
         kind: "paragraph",
@@ -135,7 +141,7 @@ const parsedPosts = postSchema.array().parse([
       {
         kind: "code",
         filename: "verify.sh",
-        code: 'rclone check onedrive_biz:"My/Life" gdrive:"Migrated_OneDrive" --one-way',
+        code: 'rclone check onedrive:"Photos/Archive" gdrive:"Backup/Photos" --one-way',
       },
       {
         kind: "paragraph",
@@ -213,7 +219,7 @@ const parsedPosts = postSchema.array().parse([
       {
         kind: "code",
         filename: "migrate.sh",
-        code: 'caffeinate -i rclone copy onedrive_biz:"My/Life" gdrive:"Migrated_OneDrive" \\\n  --transfers=8 \\\n  --checkers=16 \\\n  --drive-chunk-size=64M \\\n  --fast-list \\\n  --check-first \\\n  --log-file=migration.log \\\n  --log-level INFO \\\n  -P',
+        code: 'caffeinate -i rclone copy onedrive:"Photos/Archive" gdrive:"Backup/Photos" \\\n  --transfers=8 \\\n  --checkers=16 \\\n  --drive-chunk-size=64M \\\n  --fast-list \\\n  --check-first \\\n  --log-file=migration.log \\\n  --log-level INFO \\\n  -P',
       },
       {
         kind: "table",
@@ -282,7 +288,7 @@ const parsedPosts = postSchema.array().parse([
       {
         kind: "code",
         filename: "progress.txt",
-        code: "Transferred:   \t    4.156 MiB / 9.406 GiB, 0%, 243.930 KiB/s, ETA 11h13m36s\nChecks:                 0 / 0, -, Listed 1996\nTransferred:            0 / 1934, 0%\nElapsed time:        19.4s\nTransferring:\n *     We/RK HOME 2020-12-15/20201214_162926.jpg: 54% / 5.505 MiB, 191.750 KiB/s, 13s\n *     We/RK HOME 2020-12-15/20201214_162839.jpg:  2% / 5.780 MiB,   8.267 KiB/s, 11m40s\n *     We/2021-10-22 @R Home/20211022_113058.jpg:  2% / 4.070 MiB,   8.873 KiB/s, 7m35s\n *     We/2021-10-22 @R Home/20211022_113110.jpg:  1% / 3.688 MiB,   4.285 KiB/s, 14m27s",
+        code: "Transferred:   \t    4.156 MiB / 9.406 GiB, 0%, 243.930 KiB/s, ETA 11h13m36s\nChecks:                 0 / 0, -, Listed 1996\nTransferred:            0 / 1934, 0%\nElapsed time:        19.4s\nTransferring:\n *     Photos/2019/IMG_20190412_154533.jpg: 54% / 5.505 MiB, 191.750 KiB/s, 13s\n *     Photos/2019/IMG_20190412_154612.jpg:  2% / 5.780 MiB,   8.267 KiB/s, 11m40s\n *     Photos/2020/IMG_20200118_093021.jpg:  2% / 4.070 MiB,   8.873 KiB/s, 7m35s\n *     Photos/2020/IMG_20200118_093114.jpg:  1% / 3.688 MiB,   4.285 KiB/s, 14m27s",
       },
       {
         kind: "paragraph",
@@ -325,7 +331,7 @@ const parsedPosts = postSchema.array().parse([
       {
         kind: "code",
         filename: "on-a-vps.sh",
-        code: '# Copy your existing remotes to the box rather than re-authenticating there\nrclone config file                      # prints the path to rclone.conf\nscp ~/.config/rclone/rclone.conf vps:~/.config/rclone/\n\n# Then run it detached, so closing your laptop is irrelevant\nssh vps\ntmux new -s migrate\nrclone copy onedrive_biz:"My/Life" gdrive:"Migrated_OneDrive" \\\n  --transfers=8 --checkers=16 --fast-list \\\n  --log-file=migration.log --log-level INFO -P\n# Ctrl-b d to detach, \'tmux attach -t migrate\' to look in later',
+        code: '# Copy your existing remotes to the box rather than re-authenticating there\nrclone config file                      # prints the path to rclone.conf\nscp ~/.config/rclone/rclone.conf vps:~/.config/rclone/\n\n# Then run it detached, so closing your laptop is irrelevant\nssh vps\ntmux new -s migrate\nrclone copy onedrive:"Photos/Archive" gdrive:"Backup/Photos" \\\n  --transfers=8 --checkers=16 --fast-list \\\n  --log-file=migration.log --log-level INFO -P\n# Ctrl-b d to detach, \'tmux attach -t migrate\' to look in later',
       },
       {
         kind: "heading",
@@ -375,7 +381,7 @@ const parsedPosts = postSchema.array().parse([
       {
         kind: "code",
         filename: "verify-properly.sh",
-        code: '# Real content verification — slow, because it pulls both copies down\nrclone check onedrive_biz:"My/Life" gdrive:"Migrated_OneDrive" \\\n  --one-way --download\n\n# And stop reading 1,934 error lines in a terminal: write the answer to disk\nrclone check onedrive_biz:"My/Life" gdrive:"Migrated_OneDrive" \\\n  --one-way \\\n  --missing-on-dst missing.txt \\\n  --differ differ.txt \\\n  --combined all-results.txt\n\nwc -l missing.txt differ.txt    # the only two numbers that matter',
+        code: '# Real content verification — slow, because it pulls both copies down\nrclone check onedrive:"Photos/Archive" gdrive:"Backup/Photos" \\\n  --one-way --download\n\n# And stop reading 1,934 error lines in a terminal: write the answer to disk\nrclone check onedrive:"Photos/Archive" gdrive:"Backup/Photos" \\\n  --one-way \\\n  --missing-on-dst missing.txt \\\n  --differ differ.txt \\\n  --combined all-results.txt\n\nwc -l missing.txt differ.txt    # the only two numbers that matter',
       },
       {
         kind: "callout",
@@ -394,7 +400,7 @@ const parsedPosts = postSchema.array().parse([
           "**Microsoft throttles OneDrive aggressively**, especially on business tenants and especially with many small files. If throughput collapses and the log fills with retries, `--tpslimit 10` usually helps more than raising `--transfers` does.",
           "**Resume is file-level, not byte-level.** A completed file is skipped on the next run, which is what makes interrupting safe. A file that was 80% uploaded when you pressed Ctrl+C generally starts again from zero — irritating on a 4 GB video, irrelevant on a photo library.",
           "**`rclone copy` never deletes at the destination**, which is why it is the correct verb for a mirror you are building for the first time. Reach for `sync` only once you actually want the destination to lose things.",
-          '**Check your quota before, not after**: `rclone about gdrive:` prints free space, and `rclone size onedrive_biz:"My/Life"` prints exactly what you are about to send. Two commands, zero surprises.',
+          '**Check your quota before, not after**: `rclone about gdrive:` prints free space, and `rclone size onedrive:"Photos/Archive"` prints exactly what you are about to send. Two commands, zero surprises.',
         ],
       },
       {
@@ -405,7 +411,7 @@ const parsedPosts = postSchema.array().parse([
       {
         kind: "code",
         filename: "the-whole-thing.sh",
-        code: '# 0. Know what you are moving, and that it will fit\nrclone size   onedrive_biz:"My/Life"\nrclone about  gdrive:\n\n# 1. Preview. Writes NOTHING. Read the per-file lines, not the summary.\nrclone copy onedrive_biz:"My/Life" gdrive:"Migrated_OneDrive" --dry-run -P\n\n# 2. Run it for real — the only difference is the absence of --dry-run\ncaffeinate -i rclone copy onedrive_biz:"My/Life" gdrive:"Migrated_OneDrive" \\\n  --transfers=8 --checkers=16 --drive-chunk-size=64M \\\n  --fast-list --check-first \\\n  --log-file=migration.log --log-level INFO -P\n\n# 3. Verify, and write the result somewhere you can count it\nrclone check onedrive_biz:"My/Life" gdrive:"Migrated_OneDrive" \\\n  --one-way --missing-on-dst missing.txt\n\n# 4. Not finished until this prints 0\nwc -l < missing.txt',
+        code: '# 0. Know what you are moving, and that it will fit\nrclone size   onedrive:"Photos/Archive"\nrclone about  gdrive:\n\n# 1. Preview. Writes NOTHING. Read the per-file lines, not the summary.\nrclone copy onedrive:"Photos/Archive" gdrive:"Backup/Photos" --dry-run -P\n\n# 2. Run it for real — the only difference is the absence of --dry-run\ncaffeinate -i rclone copy onedrive:"Photos/Archive" gdrive:"Backup/Photos" \\\n  --transfers=8 --checkers=16 --drive-chunk-size=64M \\\n  --fast-list --check-first \\\n  --log-file=migration.log --log-level INFO -P\n\n# 3. Verify, and write the result somewhere you can count it\nrclone check onedrive:"Photos/Archive" gdrive:"Backup/Photos" \\\n  --one-way --missing-on-dst missing.txt\n\n# 4. Not finished until this prints 0\nwc -l < missing.txt',
       },
       {
         kind: "paragraph",
