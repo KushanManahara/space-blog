@@ -112,7 +112,7 @@ export default async function ArticlePage({ params }: PageProps<"/articles/[slug
   const seriesNext = partIndex >= 0 ? seriesParts[partIndex + 1] : undefined;
 
   const headings = post.body.flatMap((block) =>
-    block.kind === "heading" ? [{ id: block.id, text: block.text }] : [],
+    block.kind === "heading" ? [{ id: block.id, text: block.text, level: block.level ?? 2 }] : [],
   );
 
   return (
