@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 import { site } from "@/lib/content";
-import { loadOgFonts, OG_CONTENT_TYPE, OG_SIZE } from "@/lib/og";
+import { loadOgFonts, loadOgLogo, OG_CONTENT_TYPE, OG_SIZE } from "@/lib/og";
 
 export const alt = site.title;
 export const size = OG_SIZE;
@@ -9,7 +9,7 @@ export const contentType = OG_CONTENT_TYPE;
 
 /** Site-wide fallback card, used by any route without its own image. */
 export default async function Image() {
-  const fonts = await loadOgFonts();
+  const [fonts, logo] = await Promise.all([loadOgFonts(), loadOgLogo()]);
 
   return new ImageResponse(
     <div
@@ -21,15 +21,13 @@ export default async function Image() {
         justifyContent: "center",
         gap: 26,
         padding: 84,
-        background: "linear-gradient(150deg, #BAE6FD 0%, #0EA5E9 48%, #0062D2 100%)",
+        background: "linear-gradient(145deg, #080D1A 0%, #0A1B3F 55%, #0052CC 100%)",
         fontFamily: "Louis George Cafe",
         color: "#ffffff",
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-        <div
-          style={{ width: 46, height: 46, borderRadius: 999, background: "#fff", display: "flex" }}
-        />
+        <img src={logo} width={48} height={48} alt="" />
         <div style={{ fontSize: 40, fontWeight: 700, letterSpacing: -0.6 }}>{site.name}</div>
       </div>
 
