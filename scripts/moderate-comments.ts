@@ -18,6 +18,10 @@ config({ path: resolve(process.cwd(), ".env") });
 
 import { createClient } from "@libsql/client";
 
+import { authorConfig } from "../src/lib/content/config";
+
+const AUTHOR_EMAIL = authorConfig.email.toLowerCase();
+
 const url = process.env.TURSO_DATABASE_URL;
 if (!url) {
   console.error("TURSO_DATABASE_URL is not set. Check .env.local.");
@@ -68,6 +72,14 @@ async function list() {
     console.log(
       `  author   ${r.author_name} <${r.author_email ?? "no email"}> — ${r.author_role ?? "—"}`,
     );
+    // The public form trusts the typed address, and the site shows an "Author"
+    // badge for the author's own address — so anyone can claim it. Approving is
+    // the only check; make it impossible to miss.
+    if (String(r.author_email ?? "").toLowerCase() === AUTHOR_EMAIL) {
+      console.log(
+        "  !!       USES THE AUTHOR'S ADDRESS — will show the Author badge. Approve only if you wrote it.",
+      );
+    }
     console.log(`  posted   ${r.created_at}`);
     console.log();
     console.log(

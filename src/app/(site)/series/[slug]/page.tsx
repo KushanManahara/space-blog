@@ -12,7 +12,7 @@ import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button
 import { getSeriesSummary, routes, seriesList } from "@/lib/content";
 import { getAllLivePostStatsMap } from "@/lib/db/queries";
 import { formatCount, formatDate } from "@/lib/format";
-import { alternates, openGraph } from "@/lib/metadata";
+import { pageMetadata } from "@/lib/metadata";
 
 /**
  * These pages are prerendered but read live engagement counts, so without a
@@ -30,17 +30,11 @@ export async function generateMetadata({ params }: PageProps<"/series/[slug]">):
   const series = getSeriesSummary(slug);
   if (!series) return {};
 
-  return {
+  return pageMetadata({
     title: series.title,
     description: series.dek,
-    alternates: alternates(`/series/${series.slug}`),
-    openGraph: openGraph({
-      type: "website",
-      title: series.title,
-      description: series.dek,
-      url: `/series/${series.slug}`,
-    }),
-  };
+    path: `/series/${series.slug}`,
+  });
 }
 
 export default async function SeriesDetailPage({ params }: PageProps<"/series/[slug]">) {
@@ -99,7 +93,8 @@ export default async function SeriesDetailPage({ params }: PageProps<"/series/[s
 
                 <p className="mt-3.5 text-[13px] text-fg-3">
                   {formatDate(series.firstPublished)} – {formatDate(series.lastPublished)} ·{" "}
-                  {series.minutes} min to read the lot · {formatCount(series.views)} views
+                  {series.minutes} min to read the lot
+                  {series.views > 0 ? ` · ${formatCount(series.views)} views` : null}
                 </p>
 
                 <div className="mt-6 flex flex-wrap items-center gap-3">

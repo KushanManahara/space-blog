@@ -73,7 +73,7 @@ export function BroadcastButton({ postSlug, postTitle }: BroadcastButtonProps) {
       {loading ? (
         <>
           <Loader2 className="size-3 animate-spin text-brand" />
-          <span>Sending...</span>
+          <span>Sending…</span>
         </>
       ) : (
         <>

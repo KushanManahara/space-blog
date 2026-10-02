@@ -28,6 +28,19 @@ export function MetricRow({
   const { isLiked } = useSavedPosts();
   const liked = isLiked(post.slug);
 
+  /*
+   * Zero counts are left out rather than shown. A row of "♡ 0  💬 0  👁 0"
+   * chips reads as an empty, unloved post, and it is also exactly what every
+   * post shows when the live stats store is unreachable — so a zero here says
+   * nothing a reader can use. A post the reader has liked always keeps its
+   * heart, since that chip is also their own state.
+   */
+  const show = {
+    likes: metrics.includes("likes") && (post.likes > 0 || liked),
+    comments: metrics.includes("comments") && post.commentCount > 0,
+    views: metrics.includes("views") && post.views > 0,
+  };
+
   return (
     <div
       className={cn(
@@ -36,7 +49,7 @@ export function MetricRow({
         className,
       )}
     >
-      {metrics.includes("likes") ? (
+      {show.likes ? (
         <span
           className={cn(
             "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5",
@@ -48,14 +61,14 @@ export function MetricRow({
         </span>
       ) : null}
 
-      {metrics.includes("comments") ? (
+      {show.comments ? (
         <span className="inline-flex items-center gap-1.5 rounded-full bg-bg-3 px-2.5 py-1.5">
           <MessageSquare className="size-3.5" strokeWidth={1.75} />
           {post.commentCount}
         </span>
       ) : null}
 
-      {metrics.includes("views") ? (
+      {show.views ? (
         <span className="inline-flex items-center gap-1.5 rounded-full bg-bg-3 px-2.5 py-1.5">
           <Eye className="size-3.5" strokeWidth={1.75} />
           {formatCount(post.views)}

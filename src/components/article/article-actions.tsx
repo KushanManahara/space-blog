@@ -20,17 +20,22 @@ import { useReaderMode } from "@/components/article/reader-mode-provider";
 import { ShareSheet } from "@/components/article/share-sheet";
 import { useSavedPosts } from "@/components/providers/saved-posts-provider";
 import { IconToggle } from "@/components/ui/icon-toggle";
-import {
-  copyArticleToClipboard,
-  getPostBySlug,
-  siteUrl,
-  type Post,
-  type PostSummary,
-} from "@/lib/content";
+import type { Post, PostSummary } from "@/lib/content";
+import { siteUrl } from "@/lib/content/config";
+import { copyArticleToClipboard } from "@/lib/content/export-article";
 import { formatCount } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 /** Like, comment count, views, reader mode, print, copy and share — the rail under the article byline. */
+/**
+ * Fallback for callers that only had a summary. Imported on demand: a static
+ * import of the content queries ships every article body to the browser.
+ */
+async function loadFullPost(slug: string): Promise<Post | undefined> {
+  const { getPostBySlug } = await import("@/lib/content/queries");
+  return getPostBySlug(slug);
+}
+
 export function ArticleActions({ post }: { post: PostSummary | Post }) {
   const { toggleReaderMode } = useReaderMode();
   const audio = useArticleAudio();
@@ -84,7 +89,7 @@ export function ArticleActions({ post }: { post: PostSummary | Post }) {
   };
 
   const handleCopyPage = async () => {
-    const fullPost = "body" in post ? (post as Post) : getPostBySlug(post.slug);
+    const fullPost = "body" in post ? (post as Post) : await loadFullPost(post.slug);
     if (!fullPost) return;
 
     const ok = await copyArticleToClipboard(fullPost);
@@ -210,11 +215,14 @@ export function ArticleActions({ post }: { post: PostSummary | Post }) {
         {post.commentCount}
       </a>
 
-      {/* 6. View Count */}
-      <span className="inline-flex items-center gap-2 px-1.5 py-2.5 text-[13.5px] text-fg-3">
-        <Eye className="size-[15px]" strokeWidth={1.75} />
-        {formatCount(post.views)}
-      </span>
+      {/* 6. View Count — omitted at zero, which is also what an unreachable
+          stats store reports. */}
+      {post.views > 0 ? (
+        <span className="inline-flex items-center gap-2 px-1.5 py-2.5 text-[13.5px] text-fg-3">
+          <Eye className="size-[15px]" strokeWidth={1.75} />
+          {formatCount(post.views)}
+        </span>
+      ) : null}
 
       {/* 7. Share Modal */}
       <button
@@ -232,6 +240,7 @@ export function ArticleActions({ post }: { post: PostSummary | Post }) {
         title={post.title}
         url={`${siteUrl}/articles/${post.slug}`}
         slug={post.slug}
+        post={post}
       />
     </div>
   );

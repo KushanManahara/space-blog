@@ -8,7 +8,8 @@ import { PostCover } from "@/components/post/post-cover";
 import { getTopicVisual } from "@/components/post/topic-visuals";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { tagSlug, type Tag, type Topic } from "@/lib/content";
+import type { Tag, Topic } from "@/lib/content";
+import { tagSlug } from "@/lib/content/config";
 
 type DiscoverModalProps = { kind: "topics"; topics: Topic[] } | { kind: "tags"; tags: Tag[] };
 
@@ -56,7 +57,7 @@ export function DiscoverModal(props: DiscoverModalProps) {
                     image={visual.image}
                     alt={topic.name}
                     zoom={false}
-                    className="size-11 shrink-0 rounded-[12px] border border-line-1/80 shadow-2xs"
+                    className="size-11 shrink-0 rounded-sm border border-line-1/80 shadow-2xs"
                   />
                   <span>
                     <span className="block text-[14.5px] font-bold text-fg-1">{topic.name}</span>

@@ -28,25 +28,50 @@ export function isHoneypotTripped(formData: FormData): boolean {
 }
 
 /**
- * Caller identity, hashed. Only ever stored as a digest so the table cannot be
- * turned back into a list of who read what.
+ * The caller's address as the platform reports it.
+ *
+ * On Vercel these headers are set by the edge and a client-supplied value is
+ * overwritten, so they can be trusted there. Self-hosted behind a proxy that
+ * does not strip them, they are client-controlled — which is one reason these
+ * limits are a speed bump rather than a security boundary.
  */
-export async function callerFingerprint(): Promise<string> {
+async function callerAddress(): Promise<{ ip: string; agent: string } | null> {
   try {
     const headerList = await headers();
-    // x-forwarded-for is a client-supplied header and can be spoofed; it is the
-    // best signal available behind a proxy, which is why this is a speed bump
-    // rather than a security boundary.
     const ip =
-      headerList.get("x-forwarded-for")?.split(",")[0]?.trim() ||
       headerList.get("x-real-ip") ||
+      headerList.get("x-forwarded-for")?.split(",")[0]?.trim() ||
       "unknown";
-    const agent = headerList.get("user-agent") ?? "";
-
-    return createHash("sha256").update(`${ip}|${agent}`).digest("hex").slice(0, 32);
+    return { ip, agent: headerList.get("user-agent") ?? "" };
   } catch {
-    return "anonymous";
+    return null;
   }
+}
+
+const digest = (value: string) => createHash("sha256").update(value).digest("hex").slice(0, 32);
+
+/**
+ * Caller identity for *rate limits*: the address alone, hashed.
+ *
+ * The user agent used to be part of this key, which made every limit optional —
+ * a script that sent a different User-Agent per request got a fresh bucket each
+ * time, so the comment, contact, signup (and its outbound welcome email) and
+ * like ceilings did not hold against anything but a browser.
+ */
+export async function callerId(): Promise<string> {
+  const caller = await callerAddress();
+  return caller ? digest(caller.ip) : "anonymous";
+}
+
+/**
+ * Caller identity for *de-duplication*: address plus user agent, hashed, so two
+ * readers behind one office NAT still count as two views. Never use this as a
+ * limit key — it is trivially varied. Only ever stored as a digest so the table
+ * cannot be turned back into a list of who read what.
+ */
+export async function callerFingerprint(): Promise<string> {
+  const caller = await callerAddress();
+  return caller ? digest(`${caller.ip}|${caller.agent}`) : "anonymous";
 }
 
 /**
@@ -90,6 +115,25 @@ export async function underLimit(
   } catch (error) {
     console.error("RATE LIMIT CHECK FAILED, ALLOWING REQUEST:", error);
     return true;
+  }
+}
+
+/** How many times `action` was counted for `subject` in the current window. */
+export async function countInWindow(
+  action: string,
+  subject: string,
+  windowSeconds: number,
+): Promise<number> {
+  const now = Math.floor(Date.now() / 1000);
+  try {
+    const [row] = await db
+      .select()
+      .from(rateLimits)
+      .where(eq(rateLimits.key, `${action}:${subject}`));
+    return row && now - row.windowStart < windowSeconds ? row.count : 0;
+  } catch (error) {
+    console.error("RATE LIMIT READ FAILED:", error);
+    return 0;
   }
 }
 

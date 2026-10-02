@@ -22,12 +22,12 @@ import {
 } from "@/lib/content";
 import { buildHref } from "@/lib/url";
 import { paginate } from "@/lib/pagination";
-import { alternates } from "@/lib/metadata";
+import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Search",
   description: `Search across all ${site.issue} posts, topics and tags.`,
-  alternates: alternates("/search"),
+  path: "/search",
   /**
    * Results pages are not content. Every query is a distinct URL whose heading
    * is whatever the visitor typed, so leaving them indexable invites an
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
    * they are pointing at.
    */
   robots: { index: false, follow: true },
-};
+});
 
 const TABS = ["Articles", "Topics", "Tags"] as const;
 type Tab = (typeof TABS)[number];
@@ -67,6 +67,8 @@ export default async function SearchPage({ searchParams }: PageProps<"/search">)
       <SearchHero query={query} resultCount={results.length} />
 
       <section className="mx-auto max-w-page px-gutter pt-[clamp(40px,5vw,64px)] pb-tail">
+        {/* Keeps the outline h1 → h2 → h3; the result titles below are h3s. */}
+        <h2 className="sr-only">Results</h2>
         <Reveal className="mb-7 flex flex-wrap items-center justify-between gap-4">
           <FilterChips
             label="Search result type"
@@ -97,8 +99,10 @@ export default async function SearchPage({ searchParams }: PageProps<"/search">)
               </p>
             ) : (
               <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-                {visibleResults.map((post) => (
-                  <PostCard key={post.slug} post={post} variant="search" />
+                {visibleResults.map((post, index) => (
+                  // The first result's cover is the page's largest paint; lazy
+                  // loading it held LCP back ~0.7s on a throttled phone.
+                  <PostCard key={post.slug} post={post} variant="search" priority={index === 0} />
                 ))}
               </div>
             )

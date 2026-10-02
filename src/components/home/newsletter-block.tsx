@@ -13,7 +13,7 @@ import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button
 import { HoneypotField } from "@/components/ui/honeypot-field";
 import { MagicCard } from "@/components/ui/magic-card";
 import { ShineBorder } from "@/components/ui/shine-border";
-import { newsletterBenefits } from "@/lib/content";
+import { newsletterBenefits } from "@/lib/content/config";
 import { initialFormState } from "@/lib/form-state";
 import { cn } from "@/lib/utils";
 
@@ -36,10 +36,7 @@ export function NewsletterBlock() {
           carries padding — keeping the block's own border would double the
           outline against the card's. */}
       <Reveal>
-        <MagicCard
-          className="rounded-2xl shadow-lg md:rounded-3xl md:shadow-xl"
-          surfaceClassName="bg-bg-2"
-        >
+        <MagicCard className="rounded-lg shadow-lg md:shadow-xl" surfaceClassName="bg-bg-2">
           <div className="grid items-center gap-[clamp(28px,5vw,64px)] p-5 sm:p-[clamp(28px,4vw,56px)] lg:grid-cols-[1fr_0.9fr]">
             <div>
               <h2 className="text-[clamp(24px,3.2vw,38px)] font-bold tracking-[-0.025em] text-fg-1">
@@ -69,7 +66,7 @@ export function NewsletterBlock() {
 
               <form ref={formRef} action={formAction} className="relative mt-6.5 max-w-[400px]">
                 <HoneypotField id="newsletter-company-website" />
-                <div className="relative flex items-center gap-2 rounded-full border border-line-1 bg-bg-2 p-1.5 pl-4 sm:pl-5">
+                <div className="relative flex items-center gap-2 rounded-full border border-line-1 bg-bg-2 p-1.5 pl-4 transition-[border-color,box-shadow] duration-300 ease-expo has-[input:focus-visible]:border-cornflower-400 has-[input:focus-visible]:ring-4 has-[input:focus-visible]:ring-tint-cornflower sm:pl-5">
                   <ShineBorder borderWidth={1} duration={12} />
                   <label htmlFor="newsletter-email" className="sr-only">
                     Email address

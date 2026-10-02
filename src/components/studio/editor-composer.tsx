@@ -118,7 +118,7 @@ export function EditorComposer({ initialTitle = "" }: { initialTitle?: string })
                 type="button"
                 title={tool.label}
                 aria-label={tool.label}
-                className="inline-flex size-8.5 shrink-0 cursor-pointer items-center justify-center rounded-[9px] text-fg-2 transition-[background-color,color] duration-250 ease-expo hover:bg-bg-3 hover:text-fg-1"
+                className="inline-flex size-8.5 shrink-0 cursor-pointer items-center justify-center rounded-xs text-fg-2 transition-[background-color,color] duration-250 ease-expo hover:bg-bg-3 hover:text-fg-1"
               >
                 <Icon className="size-[17px]" strokeWidth={1.75} />
               </button>

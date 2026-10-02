@@ -15,12 +15,15 @@ const WORDS_PER_MINUTE = 200;
  * module load and cannot drift.
  */
 export function readingMinutes(body: ArticleBlock[]): number {
-  const words = body
+  return Math.max(1, Math.round(wordCount(body) / WORDS_PER_MINUTE));
+}
+
+/** Words in an article body, counted the same way reading time is. */
+export function wordCount(body: ArticleBlock[]): number {
+  return body
     .map(blockText)
     .join(" ")
     .replace(/<[^>]+>/g, " ")
     .split(/\s+/)
     .filter(Boolean).length;
-
-  return Math.max(1, Math.round(words / WORDS_PER_MINUTE));
 }

@@ -1,6 +1,8 @@
 // src/lib/newsletter.ts
 
 import { emailEnabled, getResend, SENDER_EMAIL } from "@/lib/resend";
+import { eq } from "drizzle-orm";
+
 import { db, newsletterSubscribers } from "@/lib/db";
 import { WelcomeEmail, getWelcomeEmailText } from "@/emails/welcome";
 import {
@@ -11,7 +13,11 @@ import {
   ContactNotificationEmail,
   getContactNotificationText,
 } from "@/emails/contact-notification";
-import { signUnsubscribe } from "@/lib/newsletter-token";
+import { signConfirm, signUnsubscribe } from "@/lib/newsletter-token";
+import {
+  ConfirmSubscriptionEmail,
+  getConfirmSubscriptionText,
+} from "@/emails/confirm-subscription";
 import type { Post } from "@/lib/content";
 
 // BASE PRODUCTION DOMAIN FOR LINK GENERATION
@@ -60,6 +66,38 @@ export async function syncResendContact(email: string) {
     return { success: true, data };
   } catch (error) {
     console.error("RESEND CONTACT SYNC EXCEPTION:", error);
+    return { success: false, error };
+  }
+}
+
+/**
+ * Sends the double opt-in email. Nothing else happens for a new signup until
+ * its link is followed — no Resend contact, no welcome email, no broadcasts.
+ */
+export async function sendConfirmationEmail(email: string) {
+  if (!emailEnabled) return { success: false, error: "Email is not configured." };
+
+  const address = email.trim().toLowerCase();
+  const issuedAt = Math.floor(Date.now() / 1000);
+  const token = signConfirm(address, issuedAt);
+  const confirmUrl = `${SITE_URL}/api/newsletter/confirm?email=${encodeURIComponent(address)}&at=${issuedAt}&t=${encodeURIComponent(token)}`;
+
+  try {
+    const { data, error } = await getResend().emails.send({
+      from: SENDER_EMAIL,
+      to: address,
+      subject: "Confirm your Space subscription",
+      text: getConfirmSubscriptionText({ subscriberEmail: address, confirmUrl }),
+      react: ConfirmSubscriptionEmail({ subscriberEmail: address, confirmUrl }),
+    });
+
+    if (error) {
+      console.error("RESEND CONFIRMATION EMAIL ERROR:", error);
+      return { success: false, error };
+    }
+    return { success: true, id: data?.id };
+  } catch (error) {
+    console.error("RESEND CONFIRMATION EMAIL EXCEPTION:", error);
     return { success: false, error };
   }
 }
@@ -115,7 +153,11 @@ export async function broadcastArticleNotification(post: Post, recipients?: stri
     const subscribers =
       recipients && recipients.length > 0
         ? recipients.map((email) => ({ email }))
-        : await db.select({ email: newsletterSubscribers.email }).from(newsletterSubscribers);
+        : // Confirmed subscribers only: an unconfirmed address never asked for this.
+          await db
+            .select({ email: newsletterSubscribers.email })
+            .from(newsletterSubscribers)
+            .where(eq(newsletterSubscribers.confirmed, 1));
 
     if (!subscribers.length) {
       return { success: true, count: 0, message: "NO SUBSCRIBERS FOUND IN DATABASE" };

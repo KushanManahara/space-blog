@@ -8,10 +8,10 @@ import { Button } from "@/components/ui/button";
 import { GlareHover } from "@/components/ui/glare-hover";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { aboutSetup, author, listTags, routes, timeline } from "@/lib/content";
-import { alternates, openGraph } from "@/lib/metadata";
+import { alternates, openGraph, twitter } from "@/lib/metadata";
 
 export const metadata: Metadata = {
-  title: "About",
+  title: `About ${author.name}`,
   // `bio` rather than `longBio`: 135 characters survives a search result,
   // 246 does not. The longer one still carries the link preview below, where
   // there is room for it.
@@ -20,7 +20,15 @@ export const metadata: Metadata = {
   openGraph: openGraph({
     title: `About ${author.name} · Space`,
     description: author.longBio,
+    url: "/about",
+    type: "profile",
     images: [{ url: author.avatar, width: 1200, height: 1200, alt: author.name }],
+  }),
+  twitter: twitter({
+    card: "summary",
+    title: `About ${author.name} · Space`,
+    description: author.bio,
+    images: [author.avatar],
   }),
 };
 

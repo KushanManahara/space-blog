@@ -2,7 +2,8 @@
 
 import * as React from "react";
 
-import { author, site, siteUrl, type Post } from "@/lib/content";
+import type { Post } from "@/lib/content";
+import { authorConfig as author, siteIdentity as site, siteUrl } from "@/lib/content/config";
 
 /**
  * Attaches an author & copyright attribution watermark whenever a reader

@@ -82,9 +82,12 @@ async function main() {
   let subscribers: { email: string }[] = [];
   try {
     const { db, newsletterSubscribers } = await import("@/lib/db");
+    const { eq } = await import("drizzle-orm");
+    // Confirmed (double opt-in) subscribers only.
     subscribers = await db
       .select({ email: newsletterSubscribers.email })
-      .from(newsletterSubscribers);
+      .from(newsletterSubscribers)
+      .where(eq(newsletterSubscribers.confirmed, 1));
     console.log(`Subscribers: ${subscribers.length}`);
   } catch (error) {
     console.error("\nDatabase Connection Error (Turso):");

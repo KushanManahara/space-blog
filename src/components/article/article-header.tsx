@@ -43,7 +43,9 @@ export function ArticleHeader({
                 href={`/tags/${tagSlug(secondaryTag)}`}
                 className="rounded-full bg-tint-cornflower px-3.5 py-1.5 text-[12px] font-semibold text-fg-link"
               >
-                {secondaryTag.replace("#", "").replace(/^./, (char) => char.toUpperCase())}
+                {/* Written as the tag it links to: title-casing it turned
+                    acronyms into words ("#mcp" read as "Mcp"). */}
+                {secondaryTag}
               </Link>
             ) : null}
             {summary.correctedAt ? (
@@ -82,18 +84,21 @@ export function ArticleHeader({
               </div>
             </div>
             <div className="print:hidden">
-              <ArticleActions post={summary} />
+              {/* The full post, not the summary: copy-as-markdown needs the body,
+                  and it is the same object reader mode already receives, so
+                  the RSC payload carries it once. */}
+              <ArticleActions post={post} />
             </div>
           </div>
         </Reveal>
       </div>
 
       <Reveal className="mt-8.5 md:mt-10">
-        <div className="relative rounded-2xl shadow-[0_24px_54px_-12px_rgba(0,0,0,0.16),0_12px_24px_-8px_rgba(0,0,0,0.1),0_0_0_1px_rgba(0,0,0,0.05)] transition-shadow duration-500 md:rounded-3xl dark:shadow-[0_28px_70px_-15px_rgba(0,0,0,0.88),0_12px_28px_-8px_rgba(0,0,0,0.75),0_0_0_1px_rgba(255,255,255,0.09)]">
+        <div className="relative rounded-lg shadow-[0_24px_54px_-12px_rgba(0,0,0,0.16),0_12px_24px_-8px_rgba(0,0,0,0.1),0_0_0_1px_rgba(0,0,0,0.05)] transition-shadow duration-500 dark:shadow-[0_28px_70px_-15px_rgba(0,0,0,0.88),0_12px_28px_-8px_rgba(0,0,0,0.75),0_0_0_1px_rgba(255,255,255,0.09)]">
           {/* Soft ambient underglow */}
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 -z-10 rounded-2xl bg-gradient-to-b from-brand/20 via-brand/5 to-transparent opacity-70 blur-xl md:rounded-3xl dark:opacity-50 print:hidden"
+            className="pointer-events-none absolute inset-0 -z-10 rounded-lg bg-gradient-to-b from-brand/20 via-brand/5 to-transparent opacity-70 blur-xl dark:opacity-50 print:hidden"
           />
           <PostCover
             topic={post.topic}
@@ -102,7 +107,7 @@ export function ArticleHeader({
             pattern={false}
             zoom={false}
             notch
-            className="aspect-[16/9] rounded-2xl [--notch-surface:var(--color-bg-1)] sm:aspect-[21/9] md:rounded-3xl"
+            className="aspect-[16/9] rounded-lg [--notch-surface:var(--color-bg-1)] sm:aspect-[21/9]"
           >
             {!post.coverImage ? (
               <CoverRings sizes={[900, 620, 340]} className="[&>div]:top-[72%]" />

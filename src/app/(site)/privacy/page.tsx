@@ -5,13 +5,13 @@ import { ShieldCheck } from "lucide-react";
 import { MastheadBadge, PageMasthead } from "@/components/layout/page-masthead";
 import { Reveal } from "@/components/motion/reveal";
 import { author, routes, site } from "@/lib/content";
-import { alternates } from "@/lib/metadata";
+import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Privacy",
   description: `What ${site.name} collects, why, who it is shared with, and how to have it removed.`,
-  alternates: alternates("/privacy"),
-};
+  path: "/privacy",
+});
 
 /**
  * Written from what the code actually does, not from a template.
@@ -52,10 +52,12 @@ export default function PrivacyPage() {
         <Section title="What is collected, and when">
           <SubHeading>If you subscribe to the newsletter</SubHeading>
           <P>
-            Your email address is stored, and a matching contact is created at Resend, the service
-            that sends the mail. Nothing else is recorded. Every email carries a one-click
-            unsubscribe link tied to your address; using it deletes the stored row and marks the
-            Resend contact unsubscribed.
+            Your email address is stored as unconfirmed and sent a link to confirm it. Until that
+            link is followed nothing else is sent; if it never is, the address stays unconfirmed and
+            receives no posts. Confirming creates a matching contact at Resend, the service that
+            sends the mail. Nothing else is recorded. Every email carries a one-click unsubscribe
+            link tied to your address; using it deletes the stored row and marks the Resend contact
+            unsubscribed.
           </P>
 
           <SubHeading>If you post a response</SubHeading>
@@ -165,7 +167,7 @@ export default function PrivacyPage() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <Reveal className="mt-11">
-      <h2 className="text-[22px] font-bold tracking-[-0.02em] text-fg-1 sm:text-[25px]">{title}</h2>
+      <h2 className="text-[22px] font-bold tracking-[-0.02em] text-fg-1 sm:text-[24px]">{title}</h2>
       <div className="mt-3.5">{children}</div>
     </Reveal>
   );

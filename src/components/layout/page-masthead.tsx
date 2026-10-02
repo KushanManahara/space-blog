@@ -39,7 +39,7 @@ export function MastheadBadge({
  * Standardized horizontal hero / masthead card across routes.
  *
  * Layout:
- * - Container: Wide horizontal card with rounded-2xl / rounded-3xl, shadow, border, and backdrop-blur.
+ * - Container: Wide horizontal card with rounded-2xl / rounded-lg, shadow, border, and backdrop-blur.
  * - Left: Fixed-size square container (rounded-2xl) for avatar, initials, or icon graphic.
  * - Center: Pill badge, bold headline, and 1-2 lines of descriptive text.
  * - Right: Action button group (Primary solid pill CTA + Secondary outline pill CTA).

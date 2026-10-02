@@ -43,3 +43,38 @@ export function verifyUnsubscribe(email: string, token: string | null): boolean 
     return false;
   }
 }
+
+/** How long a confirmation link stays valid. */
+export const CONFIRM_TTL_SECONDS = 7 * 24 * 60 * 60;
+
+/**
+ * Signed confirmation links for double opt-in.
+ *
+ * Without confirmation anyone could put anyone's address on the list, and the
+ * signup itself mailed them. The token binds the address and the time the link
+ * was issued, under a different purpose prefix than unsubscribe tokens so one
+ * can never stand in for the other.
+ */
+export function signConfirm(email: string, issuedAt: number): string {
+  if (!NEWSLETTER_SECRET) {
+    throw new Error("NEWSLETTER_SECRET is not set — confirmation links cannot be signed.");
+  }
+  return createHmac("sha256", NEWSLETTER_SECRET)
+    .update(`confirm:${normalize(email)}:${issuedAt}`)
+    .digest("base64url");
+}
+
+/** Constant-time check of a confirmation link, including its age. */
+export function verifyConfirm(email: string, issuedAt: number, token: string | null): boolean {
+  if (!NEWSLETTER_SECRET || !token || !Number.isInteger(issuedAt)) return false;
+  const age = Math.floor(Date.now() / 1000) - issuedAt;
+  if (age < 0 || age > CONFIRM_TTL_SECONDS) return false;
+
+  try {
+    const expected = Buffer.from(signConfirm(email, issuedAt));
+    const given = Buffer.from(token);
+    return expected.length === given.length && timingSafeEqual(expected, given);
+  } catch {
+    return false;
+  }
+}

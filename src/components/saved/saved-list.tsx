@@ -7,7 +7,8 @@ import { Bookmark } from "lucide-react";
 import { PostRow } from "@/components/post/post-row";
 import { useSavedPosts } from "@/components/providers/saved-posts-provider";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
-import { routes, type PostSummary } from "@/lib/content";
+import type { PostSummary } from "@/lib/content";
+import { routes } from "@/lib/content/config";
 
 /**
  * Saved articles live in localStorage, so the list can only be built in the

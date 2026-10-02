@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
@@ -5,6 +6,16 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SearchShortcutButton } from "@/components/nav/search-shortcut-button";
 import { getPopularPosts, routes } from "@/lib/content";
+
+/**
+ * Without this the 404 inherited the root's homepage title and its canonical,
+ * which asked search engines to treat every missing URL as the homepage. Next
+ * adds `noindex` to the 404 response itself.
+ */
+export const metadata: Metadata = {
+  title: "Page not found",
+  alternates: null,
+};
 
 export default function NotFound() {
   const popular = getPopularPosts(3);

@@ -8,13 +8,13 @@ import { TopicCard } from "@/components/topic/topic-tile";
 import { Button } from "@/components/ui/button";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { routes, site, topics } from "@/lib/content";
-import { alternates } from "@/lib/metadata";
+import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Topics",
   description: `The subjects the ${site.issue} posts in this archive keep returning to.`,
-  alternates: alternates("/topics"),
-};
+  path: "/topics",
+});
 
 export default function TopicsPage() {
   return (
@@ -37,7 +37,7 @@ export default function TopicsPage() {
               Browse archive
             </InteractiveHoverButton>
             <Button asChild variant="subtle" size="md">
-              <Link href={routes.about}>About author</Link>
+              <Link href={routes.about}>About me</Link>
             </Button>
           </>
         }

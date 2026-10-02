@@ -1,3 +1,14 @@
+import {
+  authorConfig,
+  contactTopics,
+  newsletterBenefits,
+  primaryNav,
+  routes,
+  searchSuggestions,
+  siteIdentity,
+  siteUrl,
+  topicNames,
+} from "./config";
 import { posts } from "./posts";
 import {
   authorSchema,
@@ -13,35 +24,13 @@ import {
   type Topic,
 } from "./schemas";
 
-/** Absolute origin, used for canonicals, OG tags, the feed and the sitemap. */
-export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://space.gimhara.com";
-
 export const site = {
-  name: "Space",
-  tagline: "AI Systems & Software Engineering by Kushan Manahara",
+  ...siteIdentity,
   /** Derived, so it cannot disagree with the archive it describes. */
   issue: posts.length,
-  description:
-    "An engineering publication by Kushan Manahara exploring AI systems, machine learning, agents, and software architecture.",
-  subscriberCount: 0,
 } as const;
 
-export const author: Author = authorSchema.parse({
-  name: "Kushan Manahara",
-  initials: "KM",
-  avatar: "/images/kushan.png",
-  role: "Machine Learning Engineer",
-  bio: "Machine learning engineer at H2O.ai working on production AI/ML systems, agentic architectures, and the infrastructure underneath them.",
-  longBio:
-    "Machine Learning Engineer working across production AI/ML systems, LLMs, AI agents, and software engineering. I write here to take things apart, follow the reasoning all the way down, and understand what's really happening under the abstractions.",
-  email: "hi@gimhara.com",
-  handle: "@kushanmanahara",
-  location: "Colombo, Sri Lanka",
-  timezoneNote: "GMT+5:30. Replies land overnight for the US",
-  github: "https://github.com/KushanManahara",
-  linkedin: "https://www.linkedin.com/in/kushan-manahara",
-  twitter: "https://x.com/Kushan_Manahara",
-});
+export const author: Author = authorSchema.parse(authorConfig);
 
 /**
  * Topic blurbs. Everything countable is derived below, not written here — this
@@ -92,6 +81,10 @@ const topicBlurbs: Array<Omit<Topic, "postCount">> = [
       "Hands-on experiments in LLM fine-tuning, rocket recovery physics, and performance benchmarking.",
   },
 ];
+
+if (topicBlurbs.map((topic) => topic.name).join() !== topicNames.join()) {
+  throw new Error("Topic names in site.ts and config.ts (topicNames) have drifted apart.");
+}
 
 export const topics: Topic[] = topicSchema.array().parse(
   topicBlurbs.map((topic) => ({
@@ -287,43 +280,7 @@ export const timeline: TimelineEntry[] = timelineEntrySchema.array().parse([
   },
 ]);
 
-export const routes = {
-  home: "/",
-  articles: "/articles",
-  topics: "/topics",
-  search: "/search",
-  about: "/about",
-  contact: "/contact",
-  tags: "/tags",
-  series: "/series",
-  paths: "/paths",
-  corrections: "/corrections",
-  privacy: "/privacy",
-  saved: "/saved",
-  unsubscribe: "/unsubscribe",
-  // Not routed while Studio is parked in `src/app/_studio/`; kept so that code
-  // still typechecks and the paths are in one place when it comes back.
-  studio: "/studio",
-  editor: "/studio/editor",
-} as const;
-
-export const primaryNav = [
-  { label: "Home", href: routes.home },
-  { label: "Articles", href: routes.articles },
-  { label: "Series", href: routes.series },
-  { label: "Topics", href: routes.topics },
-  { label: "About", href: routes.about },
-  { label: "Contact", href: routes.contact },
-] as const;
-
-export const newsletterBenefits = [
-  "New posts, and corrections to old ones",
-  "The occasional note on something I got wrong",
-] as const;
-
-export const searchSuggestions = ["linux", "python", "ai agents", "rag", "docker"] as const;
-
-export const contactTopics = ["A correction", "A question", "Consulting"] as const;
+export { contactTopics, newsletterBenefits, primaryNav, routes, searchSuggestions, siteUrl };
 
 export const aboutSetup = [
   { label: "OS", value: "Linux & macOS" },
@@ -353,12 +310,9 @@ export const footerColumns = [
   },
   {
     title: "Topics",
-    links: [
-      { label: "Engineering", href: "/topics/engineering" },
-      { label: "Systems", href: "/topics/systems" },
-      { label: "Research", href: "/topics/research" },
-      { label: "Career", href: "/topics/career" },
-    ],
+    // Every topic, in the same order as the rest of the site, rather than a
+    // hand-picked four that left Inference, Evaluation and Experiments out.
+    links: topics.map((topic) => ({ label: topic.name, href: `/topics/${topic.slug}` })),
   },
   {
     title: "Elsewhere",

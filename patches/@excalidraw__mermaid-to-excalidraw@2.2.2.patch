@@ -1,0 +1,17 @@
+diff --git a/dist/parser/flowchart.js b/dist/parser/flowchart.js
+index 57130011f5378a55b7d5e7d23383ee69959ba8fd..dd287231cf38f2a5451c0e533336268dfe33acc7 100644
+--- a/dist/parser/flowchart.js
++++ b/dist/parser/flowchart.js	
+@@ -104,7 +104,11 @@ const parseSubGraph = (data, containerEl, classes) => {
+         return n;
+     });
+     // Get position
+-    const el = containerEl.querySelector(`[id='${data.id}']`);
++    // mermaid >= 11.16 prefixes cluster ids with the render id ("mermaid-x-LAYER"),
++    // so look up both the bare id and the prefixed one.
++    const svgId = containerEl.querySelector("svg")?.id;
++    const el = containerEl.querySelector(`[id='${data.id}']`) ??
++        (svgId ? containerEl.querySelector(`[id='${svgId}-${data.id}']`) : null);
+     if (!el) {
+         throw new Error("SubGraph element not found");
+     }

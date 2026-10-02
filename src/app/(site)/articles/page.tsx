@@ -27,15 +27,34 @@ import {
 import { getLivePosts } from "@/lib/db/queries";
 import { paginate } from "@/lib/pagination";
 import { buildHref } from "@/lib/url";
-import { alternates } from "@/lib/metadata";
-
-export const metadata: Metadata = {
-  title: "Archive",
-  description: `All ${site.issue} posts, newest first. Corrections are appended, never silently edited.`,
-  alternates: alternates("/articles"),
-};
+import { pageMetadata } from "@/lib/metadata";
 
 const PER_PAGE = 6;
+
+/**
+ * Unfiltered pages of the archive each list different posts, so each is its
+ * own canonical; pointing page 4 at page 1 would tell crawlers they are
+ * duplicates. Filtered and re-sorted views are the same posts again and
+ * canonicalise to the plain archive.
+ */
+export async function generateMetadata({
+  searchParams,
+}: PageProps<"/articles">): Promise<Metadata> {
+  const params = await searchParams;
+  const pageParam = typeof params.page === "string" ? Number.parseInt(params.page, 10) : 1;
+  const filtered = ["topic", "sort", "series", "year"].some((key) => params[key] !== undefined);
+  const pageCount = Math.ceil(site.issue / PER_PAGE);
+  const page =
+    !filtered && Number.isInteger(pageParam) && pageParam > 1 && pageParam <= pageCount
+      ? pageParam
+      : 1;
+
+  return pageMetadata({
+    title: page > 1 ? `Article archive, page ${page}` : "Article archive",
+    description: `All ${site.issue} posts, newest first. Corrections are appended, never silently edited.`,
+    path: page > 1 ? `/articles?page=${page}` : "/articles",
+  });
+}
 
 export default async function ArticlesPage({ searchParams }: PageProps<"/articles">) {
   const params = await searchParams;
@@ -104,6 +123,8 @@ export default async function ArticlesPage({ searchParams }: PageProps<"/article
       </PageMasthead>
 
       <section className="mx-auto max-w-page px-gutter pt-[clamp(28px,4vw,44px)] pb-[clamp(84px,10vw,150px)]">
+        {/* Keeps the outline h1 → h2 → h3; the post titles below are h3s. */}
+        <h2 className="sr-only">Posts</h2>
         <div className="grid items-start gap-[clamp(28px,4vw,56px)] lg:grid-cols-[1fr_344px]">
           <div>
             <Reveal className="flex flex-wrap items-center gap-4">

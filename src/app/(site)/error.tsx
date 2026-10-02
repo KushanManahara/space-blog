@@ -5,7 +5,7 @@ import Link from "next/link";
 import { RotateCw } from "lucide-react";
 
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
-import { routes } from "@/lib/content";
+import { routes } from "@/lib/content/config";
 
 /**
  * Catches render and data errors inside the public site so a failure still

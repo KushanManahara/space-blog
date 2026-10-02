@@ -9,7 +9,8 @@ import { useReadingProgress } from "@/components/article/reading-progress";
 import { ShareSheet } from "@/components/article/share-sheet";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { PostCover } from "@/components/post/post-cover";
-import { siteUrl, type PostSummary } from "@/lib/content";
+import type { Post, PostSummary } from "@/lib/content";
+import { siteUrl } from "@/lib/content/config";
 import { cn } from "@/lib/utils";
 
 /**
@@ -96,13 +97,95 @@ function ProgressRing({ progress }: { progress: number }) {
   );
 }
 
+const MORPH_MS = 500;
+const MORPH_EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
+
+/**
+ * Animates the dock's reading → up-next change without moving layout frame by
+ * frame.
+ *
+ * It used to transition `max-width` and padding, so for half a second every
+ * frame re-laid-out the bar and the "Up next" pill slid across by layout: a
+ * fixed element moving under the reader, scored as layout shift (~0.03 CLS per
+ * article, the largest single source on the site). Now the layout changes in
+ * one step and is animated back from where it was with transforms (FLIP): the
+ * pill's contents translate, its background — a separate layer pinned to the
+ * pill's top-left — resizes, and the reading controls exit and enter on
+ * opacity and transform. Same motion, nothing scored.
+ */
+function useDockMorph(isPastArticle: boolean) {
+  const controlsRef = React.useRef<HTMLDivElement>(null);
+  const pillRef = React.useRef<HTMLDivElement>(null);
+  const pillBgRef = React.useRef<HTMLSpanElement>(null);
+  const lastRects = React.useRef<{ controls?: DOMRect; pill?: DOMRect }>({});
+  const previousState = React.useRef(isPastArticle);
+
+  React.useLayoutEffect(() => {
+    if (previousState.current === isPastArticle) return;
+    previousState.current = isPastArticle;
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const { controls: oldControls, pill: oldPill } = lastRects.current;
+    const pill = pillRef.current;
+    const pillBg = pillBgRef.current;
+    const controls = controlsRef.current;
+    if (reduced || !pill || !pillBg || !controls || !oldPill) return;
+
+    const timing = { duration: MORPH_MS, easing: MORPH_EASE };
+    const newPill = pill.getBoundingClientRect();
+    const dx = oldPill.left - newPill.left;
+    const dy = oldPill.top - newPill.top;
+    pill.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "none" }], timing);
+    pillBg.animate(
+      [
+        { width: `${oldPill.width}px`, height: `${oldPill.height}px` },
+        { width: `${newPill.width}px`, height: `${newPill.height}px` },
+      ],
+      timing,
+    );
+
+    if (isPastArticle && oldControls) {
+      // Leaving: out of flow now, so start it where it was and slide it away.
+      const now = controls.getBoundingClientRect();
+      const cx = oldControls.left - now.left;
+      const cy = oldControls.top - now.top;
+      controls.animate(
+        [
+          { opacity: 1, transform: `translate(${cx}px, ${cy}px)` },
+          { opacity: 0, transform: `translate(${cx - 32}px, ${cy}px) scale(0.9)` },
+        ],
+        timing,
+      );
+    } else if (!isPastArticle) {
+      controls.animate(
+        [
+          { opacity: 0, transform: "translateX(-32px) scale(0.9)" },
+          { opacity: 1, transform: "none" },
+        ],
+        timing,
+      );
+    }
+  }, [isPastArticle]);
+
+  // Remember where both pods sit after every commit, so a state change can be
+  // animated from the layout the reader was actually looking at.
+  React.useLayoutEffect(() => {
+    lastRects.current = {
+      controls: controlsRef.current?.getBoundingClientRect(),
+      pill: pillRef.current?.getBoundingClientRect(),
+    };
+  });
+
+  return { controlsRef, pillRef, pillBgRef };
+}
+
 /**
  * High-visibility, dynamic floating reading dock.
  * When reading the article: shows both Active Reading Controls & Up Next pill.
  * When entering the comments area: current reading tools smoothly fade away, and
  * the Up Next recommendation cleanly centers in the page.
  */
-export function ReadingBar({ post, next }: { post: PostSummary; next: PostSummary }) {
+export function ReadingBar({ post, next }: { post: PostSummary | Post; next: PostSummary }) {
   const { toggleReaderMode } = useReaderMode();
   const audio = useArticleAudio();
   const { progress } = useReadingProgress();
@@ -111,6 +194,7 @@ export function ReadingBar({ post, next }: { post: PostSummary; next: PostSummar
   const commentsEntered = useCommentsEntered();
 
   const isPastArticle = progress >= 0.95 || commentsEntered;
+  const { controlsRef, pillRef, pillBgRef } = useDockMorph(isPastArticle);
 
   /*
    * "Next in series" only when the reader is actually continuing the series
@@ -139,23 +223,28 @@ export function ReadingBar({ post, next }: { post: PostSummary; next: PostSummar
           : "translate-y-0 [animation:bar-up_.4s_var(--ease-expo)] opacity-100",
       )}
     >
-      <div className="flex w-full max-w-[840px] items-center justify-center transition-all duration-500 ease-expo">
+      <div className="relative flex w-full max-w-[840px] items-center justify-center">
         {/* POD 1: Current Reading Controls (Fades and slides away when reaching comments) */}
         <div
+          ref={controlsRef}
+          inert={isPastArticle}
           className={cn(
-            "flex items-center rounded-full border border-line-2/80 bg-bg-1/95 backdrop-blur-2xl transition-all duration-500 ease-expo dark:bg-bg-2/95",
+            "flex items-center rounded-full border border-line-2/80 bg-bg-1/95 backdrop-blur-2xl dark:bg-bg-2/95",
             "shadow-[0_16px_36px_-6px_rgba(0,0,0,0.16),0_6px_16px_-4px_rgba(0,0,0,0.1),0_0_0_1px_rgba(0,0,0,0.06)]",
             "dark:shadow-[0_20px_50px_-10px_rgba(0,0,0,0.9),0_8px_20px_-6px_rgba(0,0,0,0.8),0_0_0_1px_rgba(255,255,255,0.12)]",
             isPastArticle
-              ? "pointer-events-none mr-0 max-w-0 -translate-x-8 scale-90 overflow-hidden border-transparent px-0 py-0 opacity-0"
-              : "pointer-events-auto mr-2.5 max-w-[380px] translate-x-0 scale-100 px-3 py-1.5 opacity-100 sm:mr-3 sm:px-3.5 sm:py-2",
+              ? // Out of flow, so the up-next pill re-centres in one step (see useDockMorph).
+                "pointer-events-none absolute px-3 py-1.5 opacity-0 sm:px-3.5 sm:py-2"
+              : "pointer-events-auto mr-2.5 max-w-[380px] px-3 py-1.5 sm:mr-3 sm:px-3.5 sm:py-2",
           )}
         >
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             {/* Progress Indicator */}
             <div className="flex items-center gap-2 pr-1">
               <ProgressRing progress={progress} />
-              <span className="font-mono text-[12px] font-bold tracking-tight text-fg-1">
+              {/* Fixed width: "5%" → "50%" → "100%" otherwise re-centres the
+                  whole dock as the digit count changes. */}
+              <span className="inline-block min-w-[4ch] font-mono text-[12px] font-bold tracking-tight text-fg-1">
                 {Math.round(progress * 100)}%
               </span>
             </div>
@@ -211,15 +300,26 @@ export function ReadingBar({ post, next }: { post: PostSummary; next: PostSummar
 
         {/* POD 2: Up Next Recommendation (Expands and centers when Pod 1 disappears) */}
         <div
+          ref={pillRef}
           className={cn(
-            "pointer-events-auto flex min-w-0 items-center gap-2.5 rounded-full border border-line-2/80 bg-bg-1/95 backdrop-blur-2xl transition-all duration-500 ease-expo sm:gap-3 dark:bg-bg-2/95",
-            "shadow-[0_16px_36px_-6px_rgba(0,0,0,0.16),0_6px_16px_-4px_rgba(0,0,0,0.1),0_0_0_1px_rgba(0,0,0,0.06)]",
-            "dark:shadow-[0_20px_50px_-10px_rgba(0,0,0,0.9),0_8px_20px_-6px_rgba(0,0,0,0.8),0_0_0_1px_rgba(255,255,255,0.12)]",
+            "pointer-events-auto relative isolate flex min-w-0 items-center gap-2.5 sm:gap-3",
             isPastArticle
-              ? "w-full max-w-[560px] py-2 pr-2 pl-4.5 shadow-2xl ring-2 ring-brand/20 sm:py-2.5 sm:pr-2.5 sm:pl-5"
+              ? "w-full max-w-[560px] py-2 pr-2 pl-4.5 sm:py-2.5 sm:pr-2.5 sm:pl-5"
               : "max-w-[440px] flex-1 py-1.5 pr-1.5 pl-3.5 sm:py-2 sm:pr-2 sm:pl-4",
           )}
         >
+          {/* The pill's surface, separate from its contents so it can resize
+              while they translate (see useDockMorph). */}
+          <span
+            ref={pillBgRef}
+            aria-hidden
+            className={cn(
+              "absolute top-0 left-0 -z-10 size-full rounded-full border border-line-2/80 bg-bg-1/95 backdrop-blur-2xl transition-[box-shadow] duration-500 ease-expo dark:bg-bg-2/95",
+              "shadow-[0_16px_36px_-6px_rgba(0,0,0,0.16),0_6px_16px_-4px_rgba(0,0,0,0.1),0_0_0_1px_rgba(0,0,0,0.06)]",
+              "dark:shadow-[0_20px_50px_-10px_rgba(0,0,0,0.9),0_8px_20px_-6px_rgba(0,0,0,0.8),0_0_0_1px_rgba(255,255,255,0.12)]",
+              isPastArticle && "shadow-2xl ring-2 ring-brand/20",
+            )}
+          />
           <PostCover
             topic={next.topic}
             image={next.coverImage}
@@ -274,6 +374,7 @@ export function ReadingBar({ post, next }: { post: PostSummary; next: PostSummar
         title={post.title}
         url={`${siteUrl}/articles/${post.slug}`}
         slug={post.slug}
+        post={post}
       />
     </aside>
   );

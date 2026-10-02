@@ -25,7 +25,10 @@ import {
   type ReaderTheme,
 } from "@/components/article/reader-mode-provider";
 import { AuthorAvatar } from "@/components/author/author-byline";
-import { author, copyArticleToClipboard, type Post } from "@/lib/content";
+import type { CodeLine } from "@/components/article/code-highlight";
+import type { Post } from "@/lib/content";
+import { authorConfig as author } from "@/lib/content/config";
+import { copyArticleToClipboard } from "@/lib/content/export-article";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -99,7 +102,13 @@ const COLUMN_WIDTH_CLASSES: Record<ReaderColumnWidth, string> = {
   wide: "max-w-[880px]",
 };
 
-export function ReaderModeView({ post }: { post: Post }) {
+export function ReaderModeView({
+  post,
+  highlighted,
+}: {
+  post: Post;
+  highlighted: Record<number, CodeLine[]>;
+}) {
   const {
     isReaderMode,
     setIsReaderMode,
@@ -503,7 +512,7 @@ export function ReaderModeView({ post }: { post: Post }) {
 
         {/* Unboxed Markdown Body Content */}
         <div className={cn("reader-mode-body", currentSizes.body, currentTheme.prose)}>
-          <ArticleBody id="reader-article-body" blocks={post.body} />
+          <ArticleBody id="reader-article-body" blocks={post.body} highlighted={highlighted} />
         </div>
 
         {/* Footer Completion Banner */}

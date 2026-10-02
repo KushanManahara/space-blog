@@ -354,24 +354,30 @@ const TextAnimateBase = ({
         exit="exit"
         className={cn("whitespace-pre-wrap", className)}
         viewport={{ once }}
-        aria-label={accessible ? children : undefined}
         {...props}
       >
         {accessible && <span className="sr-only">{children}</span>}
-        {segments.map((segment, i) => (
-          <motion.span
-            key={`${by}-${segment}-${i}`}
-            variants={finalVariants.item}
-            custom={i * (staggerTimings[by] ?? 0.04)}
-            className={cn(
-              by === "line" ? "block" : "inline-block whitespace-pre",
-              segmentClassName,
-            )}
-            aria-hidden={accessible ? true : undefined}
-          >
-            {segment}
-          </motion.span>
-        ))}
+        {segments.map((segment, i) =>
+          // Spaces between words stay plain text. As inline-block
+          // `whitespace-pre` boxes they could not collapse at a line break, so
+          // every wrapped line began with a visible space.
+          by === "word" && /^\s+$/.test(segment) ? (
+            segment
+          ) : (
+            <motion.span
+              key={`${by}-${segment}-${i}`}
+              variants={finalVariants.item}
+              custom={i * (staggerTimings[by] ?? 0.04)}
+              className={cn(
+                by === "line" ? "block" : "inline-block whitespace-pre",
+                segmentClassName,
+              )}
+              aria-hidden={accessible ? true : undefined}
+            >
+              {segment}
+            </motion.span>
+          ),
+        )}
       </MotionComponent>
     </AnimatePresence>
   );

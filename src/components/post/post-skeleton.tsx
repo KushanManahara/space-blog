@@ -56,7 +56,7 @@ export function ArticleSkeleton() {
         <Skeleton className="mt-2 h-5 w-[80%]" />
         <Skeleton className="mt-5 h-[64px] w-full rounded-lg" />
       </div>
-      <Skeleton className="mt-9 aspect-[21/9] w-full rounded-2xl md:rounded-3xl" />
+      <Skeleton className="mt-9 aspect-[21/9] w-full rounded-lg" />
     </div>
   );
 }

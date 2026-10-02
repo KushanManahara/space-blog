@@ -35,6 +35,10 @@ export function BrandMark({
         width={size * 2}
         height={size * 2}
         loading="eager"
+        // React's server renderer emits a preload for every non-lazy <img>,
+        // so "eager" alone still put this 24px mark in the head competing with
+        // the LCP image. Low priority keeps it eager but behind the cover.
+        fetchPriority="low"
         className="size-full object-contain"
       />
     </span>

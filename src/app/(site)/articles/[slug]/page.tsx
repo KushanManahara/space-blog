@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { ArticleAudioPlayer } from "@/components/article/article-audio-player";
 import { ArticleAudioProvider } from "@/components/article/article-audio-provider";
 import { ArticleBody } from "@/components/article/article-body";
+import { highlightBlocks } from "@/components/article/code-highlight";
 import { ArticleHeader } from "@/components/article/article-header";
 import { CommentThread } from "@/components/article/comment-thread";
 import { CopySelectionWatermark } from "@/components/article/copy-selection-watermark";
@@ -30,11 +31,13 @@ import {
   posts,
   siteUrl,
   tagSlug,
+  topics,
   toSummaries,
   toSummary,
+  wordCount,
 } from "@/lib/content";
 import { getLiveComments, getLivePostStats } from "@/lib/db/queries";
-import { alternates, openGraph } from "@/lib/metadata";
+import { alternates, openGraph, xHandle } from "@/lib/metadata";
 
 const BODY_ID = "article-body";
 
@@ -64,7 +67,10 @@ export async function generateMetadata({
   if (!post) return {};
 
   return {
-    title: post.title,
+    // Search results cut titles off around 60 characters. For headlines that
+    // already fill that, the " · Space" suffix only pushes the end of the
+    // headline out of view, so it is dropped.
+    title: post.title.length > 52 ? { absolute: post.title } : post.title,
     description: post.dek,
     alternates: alternates(`/articles/${post.slug}`),
     openGraph: openGraph({
@@ -76,7 +82,13 @@ export async function generateMetadata({
       authors: [author.name],
       tags: post.tags,
     }),
-    twitter: { card: "summary_large_image", title: post.title, description: post.dek },
+    // No `images`: the article's own opengraph-image file fills twitter:image.
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.dek,
+      creator: xHandle,
+    },
   };
 }
 
@@ -111,6 +123,12 @@ export default async function ArticlePage({ params }: PageProps<"/articles/[slug
   const seriesPrev = partIndex > 0 ? seriesParts[partIndex - 1] : undefined;
   const seriesNext = partIndex >= 0 ? seriesParts[partIndex + 1] : undefined;
 
+  // Highlighted here, on the server, so the article ships no tokenizer. One
+  // object shared by the article and reader mode, so it is serialised once.
+  const highlighted = highlightBlocks(post.body);
+
+  const topicSlug = topics.find((entry) => entry.name === post.topic)?.slug;
+
   const headings = post.body.flatMap((block) =>
     block.kind === "heading" ? [{ id: block.id, text: block.text, level: block.level ?? 2 }] : [],
   );
@@ -125,7 +143,7 @@ export default async function ArticlePage({ params }: PageProps<"/articles/[slug
           <ViewTracker slug={post.slug} />
           <CopySelectionWatermark post={livePost} />
           <ReadingProgressBar />
-          <ReaderModeView post={livePost} />
+          <ReaderModeView post={livePost} highlighted={highlighted} />
           <ArticleAudioPlayer />
           <script
             type="application/ld+json"
@@ -143,13 +161,43 @@ export default async function ArticlePage({ params }: PageProps<"/articles/[slug
                 dateModified: lastCorrectedAt(post) ?? post.publishedAt,
                 // Google treats `image` as recommended for Article types, and
                 // every post already has a generated 1200x630 card.
-                image: [`${siteUrl}/articles/${post.slug}/opengraph-image`],
-                keywords: post.tags,
+                image: [`${siteUrl}/articles/${post.slug}/card.png`],
+                keywords: post.tags.map((tag) => tag.replace(/^#/, "")),
                 articleSection: post.topic,
-                wordCount: post.readingMinutes * 200,
+                wordCount: wordCount(post.body),
                 mainEntityOfPage: `${siteUrl}/articles/${post.slug}`,
-                author: { "@id": `${siteUrl}/#person` },
-                publisher: { "@id": `${siteUrl}/#person` },
+                // Named inline as well as by @id: Google requires an author
+                // name on the Article itself and does not reliably follow a
+                // reference into the separate site-wide graph block.
+                author: {
+                  "@type": "Person",
+                  "@id": `${siteUrl}/#person`,
+                  name: author.name,
+                  url: `${siteUrl}/about`,
+                },
+                publisher: {
+                  "@type": "Person",
+                  "@id": `${siteUrl}/#person`,
+                  name: author.name,
+                  url: `${siteUrl}/about`,
+                },
+              }),
+            }}
+          />
+          <script
+            type="application/ld+json"
+            // The same trail the archive is organised by: home, topic, article.
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "BreadcrumbList",
+                itemListElement: [
+                  { name: "Home", item: siteUrl },
+                  ...(topicSlug
+                    ? [{ name: post.topic, item: `${siteUrl}/topics/${topicSlug}` }]
+                    : []),
+                  { name: post.title, item: `${siteUrl}/articles/${post.slug}` },
+                ].map((crumb, index) => ({ "@type": "ListItem", position: index + 1, ...crumb })),
               }),
             }}
           />
@@ -160,7 +208,7 @@ export default async function ArticlePage({ params }: PageProps<"/articles/[slug
 
             <div className="mt-[clamp(36px,4vw,56px)] grid w-full min-w-0 grid-cols-1 items-start gap-[clamp(32px,4.5vw,72px)] pb-[clamp(84px,10vw,150px)] lg:grid-cols-[minmax(0,1fr)_320px]">
               <div className="w-full max-w-full min-w-0">
-                <ArticleBody id={BODY_ID} blocks={post.body} />
+                <ArticleBody id={BODY_ID} blocks={post.body} highlighted={highlighted} />
 
                 <div className="mt-8.5 flex flex-wrap gap-2 print:hidden">
                   {post.tags.map((tag) => (
@@ -253,7 +301,9 @@ export default async function ArticlePage({ params }: PageProps<"/articles/[slug
             </div>
           </section>
 
-          <ReadingBar post={summary} next={toSummary(keepReading[0])} />
+          {/* Full post (same object as reader mode, so serialised once) so the
+              share sheet can copy the article without a client-side lookup. */}
+          <ReadingBar post={livePost} next={toSummary(keepReading[0])} />
         </ReadingProgressProvider>
       </ReaderModeProvider>
     </ArticleAudioProvider>

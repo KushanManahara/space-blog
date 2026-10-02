@@ -18,7 +18,7 @@ export function TopicTile({ topic, rank }: { topic: Topic; rank?: number }) {
         topic={topic.name}
         image={visual.image}
         alt={topic.name}
-        className="aspect-square rounded-2xl border border-line-1/80 shadow-xs md:rounded-3xl"
+        className="aspect-square rounded-lg border border-line-1/80 shadow-xs"
       >
         {rank ? (
           <span

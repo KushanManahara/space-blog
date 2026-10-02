@@ -32,8 +32,8 @@ export function MostReadSection({ posts }: { posts: Post[] }) {
           </div>
         </Reveal>
 
-        <GlareHover className="rounded-2xl md:rounded-3xl">
-          <Reveal className="relative overflow-hidden rounded-2xl border border-white/10 bg-bg-inverse p-5 shadow-xl sm:p-8.5 md:rounded-3xl md:shadow-2xl">
+        <GlareHover className="rounded-lg">
+          <Reveal className="relative overflow-hidden rounded-lg border border-white/10 bg-bg-inverse p-5 shadow-xl sm:p-8.5 md:shadow-2xl">
             <div
               aria-hidden
               className="pointer-events-none absolute top-[-160px] right-[-180px] size-[420px]"

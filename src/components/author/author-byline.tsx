@@ -1,6 +1,8 @@
 import Image from "next/image";
 
-import { author } from "@/lib/content";
+// From config, not the content index: this renders inside client components,
+// and the index pulls every article body into the browser bundle.
+import { authorConfig as author } from "@/lib/content/config";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 

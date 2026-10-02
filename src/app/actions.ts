@@ -5,16 +5,26 @@ import { eq, sql } from "drizzle-orm";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 
-import { callerFingerprint, firstTimeInWindow, isHoneypotTripped, underLimit } from "@/lib/abuse";
+import { timingSafeEqual } from "node:crypto";
+
+import {
+  callerFingerprint,
+  callerId,
+  countInWindow,
+  firstTimeInWindow,
+  isHoneypotTripped,
+  underLimit,
+} from "@/lib/abuse";
 import { contactMessages, comments, db, newsletterSubscribers, postStats } from "@/lib/db";
 import { POST_STATS_TAG } from "@/lib/db/queries";
 import type { FormState } from "@/lib/form-state";
 import { getPostBySlug } from "@/lib/content";
+import { createHash } from "node:crypto";
+
 import {
   broadcastArticleNotification,
+  sendConfirmationEmail,
   sendContactNotification,
-  sendWelcomeEmail,
-  syncResendContact,
 } from "@/lib/newsletter";
 
 /**
@@ -39,6 +49,16 @@ const contactSchema = z.object({
     .min(10, "A little more detail helps: ten characters at least.")
     .max(5000, "That message is too long. Five thousand characters at most."),
 });
+
+/**
+ * Likes and views arrive from the client as bare arguments, so they are checked
+ * like any other input: a slug that is not an article would otherwise create a
+ * `post_stats` row (and a rate-limit row) per invented slug, of any length.
+ */
+const knownSlug = z
+  .string()
+  .max(200)
+  .refine((slug) => Boolean(getPostBySlug(slug)));
 
 const commentSchema = z.object({
   // Checked against the archive, not just non-empty: an unknown slug can never
@@ -83,30 +103,47 @@ export async function subscribeAction(
 
   const email = parsed.data.email.trim().toLowerCase();
 
-  if (!(await underLimit("subscribe", await callerFingerprint(), 5, 3600))) {
+  if (!(await underLimit("subscribe", await callerId(), 5, 3600))) {
     return {
       status: "error",
       message: "That is a lot of signups from one place. Try again in an hour.",
     };
   }
 
+  /*
+   * Double opt-in. The address is stored unconfirmed and sent a link; it gets
+   * the welcome email, a Resend contact and broadcasts only after the link is
+   * followed (`app/api/newsletter/confirm`). Before this, any visitor could
+   * subscribe any address and the signup itself mailed it.
+   *
+   * The reply is the same whether the address is new, waiting or already
+   * subscribed, so the form cannot be used to test who is on the list.
+   */
+  const pending = {
+    status: "success" as const,
+    message: `Almost there — check ${email} for a link to confirm.`,
+  };
+
   try {
-    // 1. SAVE SUBSCRIBER TO DATABASE
     await db
       .insert(newsletterSubscribers)
-      .values({ email })
+      .values({ email, confirmed: 0 })
       .onConflictDoNothing({ target: newsletterSubscribers.email });
 
-    // 2. SYNC SUBSCRIBER TO RESEND CONTACTS (UNIFIED API)
-    await syncResendContact(email);
+    const [row] = await db
+      .select({ confirmed: newsletterSubscribers.confirmed })
+      .from(newsletterSubscribers)
+      .where(eq(newsletterSubscribers.email, email))
+      .limit(1);
+    if (row?.confirmed === 1) return pending;
 
-    // 3. DISPATCH BRANDED WELCOME EMAIL VIA RESEND
-    await sendWelcomeEmail(email);
+    // Per address as well as per caller: rotating IPs must not turn the form
+    // into a way to flood one inbox with confirmation mail.
+    const addressKey = createHash("sha256").update(email).digest("hex").slice(0, 32);
+    if (!(await underLimit("confirm-mail", addressKey, 3, 86_400))) return pending;
 
-    return {
-      status: "success",
-      message: `You're on the list. Confirmation sent to ${email}.`,
-    };
+    await sendConfirmationEmail(email);
+    return pending;
   } catch (error) {
     console.error("NEWSLETTER SUBSCRIPTION ACTION ERROR:", error);
     return {
@@ -148,7 +185,7 @@ export async function contactAction(_previous: FormState, formData: FormData): P
     return { status: "error", message: parsed.error.issues[0].message };
   }
 
-  if (!(await underLimit("contact", await callerFingerprint(), 3, 3600))) {
+  if (!(await underLimit("contact", await callerId(), 3, 3600))) {
     return {
       status: "error",
       message: "You have sent a few messages already. Try again in an hour.",
@@ -187,18 +224,35 @@ export async function contactAction(_previous: FormState, formData: FormData): P
  * long after the write lands, and a purely optimistic count snaps back to the
  * old one the moment the transition settles.
  */
-export async function likePostAction(slug: string, increment: boolean = true) {
+export async function likePostAction(slugInput: unknown, incrementInput: unknown = true) {
+  const parsedSlug = knownSlug.safeParse(slugInput);
+  if (!parsedSlug.success || typeof incrementInput !== "boolean") {
+    return { success: false as const, likes: null, limited: false as const };
+  }
+  const slug = parsedSlug.data;
+  const increment = incrementInput;
+
   // The client also tracks this in localStorage, but that is a UI convenience,
-  // not a guard — clearing it must not let the counter be driven up.
-  //
-  // Only likes are limited. An unlike can only lower the number, so it is not
-  // an inflation vector, and counting it meant a reader who changed their mind
-  // twice burned the whole daily budget and then silently could not like the
-  // article at all. The ceiling is per article per caller per day.
+  // not a guard — clearing it must not let the counter be driven up, or down.
+  // The ceiling is per article per caller per day.
+  const caller = await callerId();
   if (increment) {
-    const caller = await callerFingerprint();
     if (!(await underLimit(`like:${slug}`, caller, 50, 86_400))) {
       return { success: false as const, likes: null, limited: true as const };
+    }
+  } else {
+    // An unlike has to undo a like this caller made. Unlimited unlikes let
+    // anyone drive any article's count to zero. Refused unlikes are a quiet
+    // no-op that returns the real count, so the reader's button still settles.
+    const liked = await countInWindow(`like:${slug}`, caller, 86_400);
+    if (liked === 0 || !(await underLimit(`unlike:${slug}`, caller, liked, 86_400))) {
+      const [row] = await db
+        .select({ likes: postStats.likes })
+        .from(postStats)
+        .where(eq(postStats.slug, slug))
+        .limit(1)
+        .catch(() => []);
+      return { success: true as const, likes: row?.likes ?? null, limited: false as const };
     }
   }
 
@@ -243,9 +297,18 @@ export async function likePostAction(slug: string, increment: boolean = true) {
 /**
  * Increment view count for a post in Turso.
  */
-export async function recordViewAction(slug: string) {
+export async function recordViewAction(slugInput: unknown) {
+  const parsedSlug = knownSlug.safeParse(slugInput);
+  if (!parsedSlug.success) return { success: false };
+  const slug = parsedSlug.data;
+
   // Session storage de-duplicates in the browser; this makes the count mean
-  // something even when that is bypassed.
+  // something even when that is bypassed. De-duplication is per reader (address
+  // + agent), and the address-only ceiling stops a rotating agent from turning
+  // that into an unlimited view counter.
+  if (!(await underLimit("views", await callerId(), 300, 86_400))) {
+    return { success: true };
+  }
   if (!(await firstTimeInWindow(`view:${slug}`, await callerFingerprint(), 86_400))) {
     return { success: true };
   }
@@ -296,7 +359,7 @@ export async function addCommentAction(data: {
     return { success: true, id: "held" };
   }
 
-  if (!(await underLimit("comment", await callerFingerprint(), 3, 3600))) {
+  if (!(await underLimit("comment", await callerId(), 3, 3600))) {
     return { success: false, error: "Too many responses from here. Try again in an hour." };
   }
 
@@ -356,7 +419,10 @@ export async function broadcastArticleAction(
   secret: string,
 ): Promise<{ success: boolean; count?: number; error?: string }> {
   const expected = process.env.STUDIO_SECRET;
-  if (!expected || secret !== expected) {
+  const given = Buffer.from(typeof secret === "string" ? secret : "");
+  const wanted = Buffer.from(expected ?? "");
+  // Constant-time, so response timing cannot be used to guess it a byte at a time.
+  if (!expected || given.length !== wanted.length || !timingSafeEqual(given, wanted)) {
     // Deliberately does not say which of the two it was.
     return { success: false, error: "Not authorised to broadcast." };
   }
