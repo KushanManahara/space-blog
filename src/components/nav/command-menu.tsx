@@ -7,7 +7,8 @@ import { ArrowRight, Search } from "lucide-react";
 
 import { PostCover } from "@/components/post/post-cover";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { routes, type PostSummary } from "@/lib/content";
+import type { PostSummary } from "@/lib/content";
+import { routes } from "@/lib/content/config";
 
 /**
  * The handful of fields the menu actually renders. Deliberately not
@@ -129,7 +130,7 @@ function CommandMenu({
           <button
             type="button"
             onClick={() => onOpenChange(false)}
-            className="cursor-pointer rounded-[7px] border border-line-1 bg-bg-3 px-2 py-1.5 text-[11.5px] font-semibold text-fg-3"
+            className="cursor-pointer rounded-xs border border-line-1 bg-bg-3 px-2 py-1.5 text-[11.5px] font-semibold text-fg-3"
           >
             esc
           </button>
@@ -157,7 +158,7 @@ function CommandMenu({
                   topic={post.topic}
                   image={post.coverImage}
                   zoom={false}
-                  className="size-[38px] shrink-0 rounded-[10px]"
+                  className="size-[38px] shrink-0 rounded-xs"
                 />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[14.5px] leading-[1.35] font-semibold text-fg-1">

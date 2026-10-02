@@ -1,41 +1,26 @@
 "use client";
 
 import * as React from "react";
-import { Highlight, type PrismTheme } from "prism-react-renderer";
 
+import type { CodeLine } from "@/components/article/code-highlight";
 import { languageFromFilename } from "@/components/article/code-language";
-import { Prism } from "@/components/article/prism-languages";
+import { plainCodeStyle, tokenStyle } from "@/components/article/code-theme";
 import { cn } from "@/lib/utils";
-
-/**
- * Panel colours are fixed rather than token-driven: the code surface is dark in
- * both themes, so the syntax palette only has to work against one background.
- */
-const theme: PrismTheme = {
-  plain: { color: "#e2e8f0", backgroundColor: "transparent" },
-  styles: [
-    { types: ["comment", "prolog", "cdata"], style: { color: "#64748b", fontStyle: "italic" } },
-    { types: ["punctuation"], style: { color: "#94a3b8" } },
-    { types: ["keyword", "selector", "changed"], style: { color: "#c4b5fd" } },
-    { types: ["operator"], style: { color: "#93c5fd" } },
-    { types: ["string", "char", "attr-value", "inserted"], style: { color: "#86efac" } },
-    { types: ["number", "boolean", "constant", "symbol"], style: { color: "#fdba74" } },
-    { types: ["function", "class-name", "builtin"], style: { color: "#7dd3fc" } },
-    { types: ["variable", "parameter"], style: { color: "#f9a8d4" } },
-    { types: ["tag", "deleted"], style: { color: "#fca5a5" } },
-    { types: ["attr-name", "property"], style: { color: "#a5b4fc" } },
-    { types: ["namespace"], style: { opacity: 0.7 } },
-  ],
-};
 
 /** Dark code panel with syntax highlighting and a copy affordance. */
 export function CodeBlock({
   filename,
   code,
+  lines,
+  label,
   className,
 }: {
   filename: string;
   code: string;
+  /** Pre-highlighted tokens (`highlightCode`); the block itself never tokenises. */
+  lines: CodeLine[];
+  /** Accessible name for the scrollable region; defaults to the filename. */
+  label?: string;
   className?: string;
 }) {
   const [copied, setCopied] = React.useState(false);
@@ -75,32 +60,27 @@ export function CodeBlock({
         </div>
       </div>
 
-      <Highlight prism={Prism} theme={theme} code={code} language={language}>
-        {({ className: preClass, style, tokens, getLineProps, getTokenProps }) => (
-          <pre
-            // Scrollable, so it has to be keyboard-focusable (WCAG 2.1.1).
-            tabIndex={0}
-            role="region"
-            aria-label={`${filename} code`}
-            className={cn(
-              "w-full max-w-full min-w-0 overflow-x-auto bg-n-900 p-3.5 font-mono text-[12.5px] leading-[1.8] sm:p-5.5 sm:text-[13.5px] sm:leading-[1.85]",
-              preClass,
-            )}
-            // The theme carries `backgroundColor: transparent`, and an inline
-            // style beats the utility class — which left light text on the page
-            // background in light mode. Drop it so `bg-n-900` wins.
-            style={{ ...style, backgroundColor: undefined }}
-          >
-            {tokens.map((line, i) => (
-              <div key={i} {...getLineProps({ line })}>
-                {line.map((token, key) => (
-                  <span key={key} {...getTokenProps({ token })} />
-                ))}
-              </div>
-            ))}
-          </pre>
+      <pre
+        // Scrollable, so it has to be keyboard-focusable (WCAG 2.1.1).
+        tabIndex={0}
+        role="region"
+        aria-label={label ?? `${filename} code`}
+        className={cn(
+          "w-full max-w-full min-w-0 overflow-x-auto bg-n-900 p-3.5 font-mono text-[12.5px] leading-[1.8] sm:p-5.5 sm:text-[13.5px] sm:leading-[1.85]",
+          `language-${language}`,
         )}
-      </Highlight>
+        style={plainCodeStyle}
+      >
+        {lines.map((line, i) => (
+          <div key={i} className="token-line">
+            {line.map(([content, ...types], key) => (
+              <span key={key} style={tokenStyle(types)}>
+                {content}
+              </span>
+            ))}
+          </div>
+        ))}
+      </pre>
     </div>
   );
 }

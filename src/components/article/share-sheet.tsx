@@ -4,15 +4,20 @@ import * as React from "react";
 import { Check, Copy, Link2, Mail, Printer, Share, X } from "lucide-react";
 
 import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import {
-  author,
-  copyArticleToClipboard,
-  getPostBySlug,
-  type Post,
-  type PostSummary,
-} from "@/lib/content";
+import type { Post, PostSummary } from "@/lib/content";
+import { authorConfig as author } from "@/lib/content/config";
+import { copyArticleToClipboard } from "@/lib/content/export-article";
 
 /** Share targets, including Copy Link, Copy Article (with watermark), and Print. */
+/**
+ * Fallback for callers that only had a summary. Imported on demand: a static
+ * import of the content queries ships every article body to the browser.
+ */
+async function loadFullPost(slug: string): Promise<Post | undefined> {
+  const { getPostBySlug } = await import("@/lib/content/queries");
+  return getPostBySlug(slug);
+}
+
 export function ShareSheet({
   open,
   onOpenChange,
@@ -45,7 +50,11 @@ export function ShareSheet({
   const handleCopyArticle = async () => {
     const targetSlug = slug ?? (post ? post.slug : undefined);
     const fullPost =
-      post && "body" in post ? (post as Post) : targetSlug ? getPostBySlug(targetSlug) : undefined;
+      post && "body" in post
+        ? (post as Post)
+        : targetSlug
+          ? await loadFullPost(targetSlug)
+          : undefined;
     if (!fullPost) return;
 
     if (await copyArticleToClipboard(fullPost)) {

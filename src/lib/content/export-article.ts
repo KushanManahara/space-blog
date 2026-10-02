@@ -1,4 +1,5 @@
-import { author, site, siteUrl, type ArticleBlock, type Post } from "@/lib/content";
+import { authorConfig as author, siteIdentity as site, siteUrl } from "./config";
+import type { ArticleBlock, Post } from "./schemas";
 import { formatDate } from "@/lib/format";
 
 /**

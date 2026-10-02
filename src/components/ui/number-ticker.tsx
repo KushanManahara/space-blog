@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, type ComponentPropsWithoutRef } from "react";
-import { useInView, useMotionValue, useSpring } from "motion/react";
+import { useInView, useMotionValue, useReducedMotion, useSpring } from "motion/react";
 
 import { cn } from "@/lib/utils";
 
@@ -38,7 +38,9 @@ export function NumberTicker({
     damping: 60,
     stiffness: 100,
   });
-  const isInView = useInView(ref, { once: true, margin: "0px" });
+  // Reduced motion keeps the server-rendered final number and never counts.
+  const reduceMotion = useReducedMotion();
+  const isInView = useInView(ref, { once: true, margin: "0px" }) && !reduceMotion;
 
   const format = useCallback(
     (input: number) =>

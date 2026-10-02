@@ -10,6 +10,7 @@ import type {
   Topic,
   TopicName,
 } from "./schemas";
+import { tagSlug } from "./config";
 import { readingPaths, seriesList, topics } from "./site";
 
 export type SortOrder = "recent" | "views";
@@ -220,10 +221,7 @@ export function getPostsByTopic(topic: Topic, sort: SortOrder = "recent"): Post[
     .sort(sort === "views" ? byViews : byRecency);
 }
 
-/** `#machine-learning` and `machine-learning` both address the same tag. */
-export function tagSlug(tag: string): string {
-  return tag.replace(/^#/, "").toLowerCase();
-}
+export { tagSlug } from "./config";
 
 /**
  * Every tag across the archive with its post count, busiest first.

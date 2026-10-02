@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 
 import { addCommentAction } from "@/app/actions";
-import { author } from "@/lib/content";
+import { authorConfig as author } from "@/lib/content/config";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -210,7 +210,7 @@ export function CommentThread({
           required
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
-          placeholder="Share your perspective, benchmarks, corrections, or follow-up questions..."
+          placeholder="Share your perspective, benchmarks, corrections, or follow-up questions…"
           className="mt-2.5 min-h-24 resize-y rounded-md border-line-1 bg-bg-1 p-3 text-[16px] text-fg-1 focus-visible:ring-brand sm:text-[14px]"
         />
 
@@ -357,7 +357,7 @@ export function CommentThread({
                 className="w-full gap-2 text-[13.5px] sm:w-auto"
               >
                 <Send className="size-3.5" />
-                {isSubmitting ? "Publishing..." : "Confirm & Post"}
+                {isSubmitting ? "Publishing…" : "Confirm & Post"}
               </Button>
             </div>
           </form>

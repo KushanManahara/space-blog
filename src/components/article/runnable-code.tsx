@@ -4,6 +4,7 @@ import * as React from "react";
 import { Play, RotateCcw, Square } from "lucide-react";
 
 import { CodeBlock } from "@/components/article/code-block";
+import { highlightCode } from "@/components/article/code-highlight";
 import { cn } from "@/lib/utils";
 
 type RunState = "idle" | "running";
@@ -127,7 +128,13 @@ export function RunnableCode({
           />
         </div>
       ) : (
-        <CodeBlock filename={filename} code={source} />
+        <CodeBlock
+          filename={filename}
+          code={source}
+          // Editable, so it highlights in the browser. This component is loaded
+          // on demand, which keeps Prism off every page without a runnable block.
+          lines={highlightCode(source, filename)}
+        />
       )}
 
       <div className="mt-2.5 flex flex-wrap items-center gap-2 print:hidden">

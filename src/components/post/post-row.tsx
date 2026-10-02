@@ -77,7 +77,7 @@ export function PostRow({
           <AuthorByline date={post.publishedAt} size="xs" className="mt-3" />
         ) : null}
 
-        {variant === "mini" ? (
+        {variant === "mini" && post.views > 0 ? (
           <p className="mt-1 text-[12px] text-fg-3">{formatCount(post.views)} views</p>
         ) : null}
 
@@ -128,7 +128,8 @@ export function RankedPostRow({ post, rank }: { post: PostSummary; rank: number 
           {post.title}
         </span>
         <span className="mt-[5px] block text-[13px] text-fg-3">
-          {post.topic} · {formatCount(post.views)} views
+          {post.topic}
+          {post.views > 0 ? ` · ${formatCount(post.views)} views` : null}
         </span>
       </span>
       <ArrowRight className="size-[17px] text-fg-faint" strokeWidth={1.75} />

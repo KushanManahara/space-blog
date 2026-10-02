@@ -11,7 +11,8 @@ import { MetricRow } from "@/components/post/metric-row";
 import { CoverRings, PostCover } from "@/components/post/post-cover";
 import { PostRow } from "@/components/post/post-row";
 import { TopicBadge } from "@/components/post/topic-badge";
-import { routes, type PostSummary, type TopicName } from "@/lib/content";
+import type { PostSummary, TopicName } from "@/lib/content";
+import { routes } from "@/lib/content/config";
 import { cn } from "@/lib/utils";
 
 /**
@@ -163,18 +164,18 @@ function MostViewedHero({ post }: { post: PostSummary }) {
           image={post.coverImage}
           pattern={false}
           notch
-          className="aspect-[16/11] rounded-2xl [mask-image:linear-gradient(to_bottom,black_75%,transparent_98%)] md:rounded-3xl"
+          className="aspect-[16/11] rounded-lg [mask-image:linear-gradient(to_bottom,black_75%,transparent_98%)]"
         >
           {!post.coverImage ? (
             <CoverRings sizes={[560, 340]} className="[&>div]:top-[74%] [&>div]:left-[58%]" />
           ) : null}
-          <TopicBadge topic={post.topic} tone="dark" icon className="absolute top-4 right-4" />
+          <TopicBadge topic={post.topic} tone="dark" className="absolute top-4 right-4" />
         </PostCover>
 
         <div className="relative z-10 mx-2 -mt-[36px] sm:mx-4 sm:-mt-[44px]">
-          <div className="rounded-2xl border border-line-1 bg-bg-2 p-4.5 shadow-lg transition-[box-shadow,border-color] duration-500 ease-expo group-hover:border-line-2 group-hover:shadow-card-hover-xl sm:p-6 md:rounded-[24px] md:p-6.5 md:shadow-xl">
+          <div className="rounded-lg border border-line-1 bg-bg-2 p-4.5 shadow-lg transition-[box-shadow,border-color] duration-500 ease-expo group-hover:border-line-2 group-hover:shadow-card-hover-xl sm:p-6 md:p-6.5 md:shadow-xl">
             <AuthorByline date={post.publishedAt} />
-            <h3 className="mt-3.5 text-[21px] leading-[1.2] font-bold tracking-[-0.02em] text-fg-1 transition-colors duration-300 ease-expo group-hover:text-brand-strong sm:text-[24px]">
+            <h3 className="mt-3.5 text-[22px] leading-[1.2] font-bold tracking-[-0.02em] text-fg-1 transition-colors duration-300 ease-expo group-hover:text-brand-strong sm:text-[24px]">
               {post.title}
             </h3>
             <p className="mt-2.5 text-[14.5px] leading-[1.6] text-fg-2 sm:text-[15.5px]">

@@ -7,7 +7,7 @@ import { BrandMark } from "@/components/layout/brand-mark";
 import { Reveal } from "@/components/motion/reveal";
 import { verifyUnsubscribe } from "@/lib/newsletter-token";
 import { routes } from "@/lib/content";
-import { alternates } from "@/lib/metadata";
+import { pageMetadata } from "@/lib/metadata";
 
 /**
  * Unsubscribe confirmation.
@@ -21,15 +21,15 @@ import { alternates } from "@/lib/metadata";
  * address — the exact hole `newsletter-token.ts` exists to close. There is now
  * one code path to removal, and it is signed.
  */
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Unsubscribe",
   description: "Stop receiving Space post notifications.",
-  alternates: alternates("/unsubscribe"),
+  path: "/unsubscribe",
   // A utility page with no reason to be in an index, and previously the only
   // page inheriting the site's root canonical — which pointed search engines
   // at the homepage.
   robots: { index: false, follow: false },
-};
+});
 
 export default async function UnsubscribePage({ searchParams }: PageProps<"/unsubscribe">) {
   const params = await searchParams;
@@ -40,7 +40,7 @@ export default async function UnsubscribePage({ searchParams }: PageProps<"/unsu
 
   return (
     <div className="relative mx-auto flex min-h-[calc(100dvh-180px)] max-w-[540px] items-center justify-center px-gutter py-12 sm:py-16">
-      <Reveal className="w-full rounded-2xl border border-line-1 bg-bg-2 p-5 shadow-xl sm:p-7 md:rounded-3xl md:p-10">
+      <Reveal className="w-full rounded-lg border border-line-1 bg-bg-2 p-5 shadow-xl sm:p-7 md:p-10">
         <div className="flex flex-col items-center text-center">
           <div className="mb-4 inline-flex size-12 items-center justify-center rounded-2xl bg-tint-cornflower text-fg-link">
             <BrandMark size={28} />

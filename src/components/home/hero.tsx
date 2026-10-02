@@ -69,9 +69,11 @@ export function Hero({ featured }: { featured: Post }) {
             </InteractiveHoverButton>
             <Button asChild variant="secondary" size="lg">
               <Link href={routes.articles} className="justify-center">
-                Browse all&nbsp;
-                <NumberTicker value={site.issue} className="font-semibold" />
-                &nbsp;posts
+                {/* One inline run: as separate flex items the button's gap was
+                    added on top of each space, so the count floated apart. */}
+                <span>
+                  Browse all <NumberTicker value={site.issue} className="font-semibold" /> posts
+                </span>
               </Link>
             </Button>
             {/* Forty posts in reverse-chronological order serves a returning
@@ -104,19 +106,19 @@ function FeaturedCard({ post }: { post: Post }) {
       className="group block transition-transform duration-550 ease-bounce active:scale-[0.98] active:duration-150 active:ease-out"
     >
       <div className="transition-transform duration-550 ease-bounce group-hover:-translate-y-1.5">
-        <GlareHover className="rounded-2xl md:rounded-3xl">
+        <GlareHover className="rounded-lg">
           <PostCover
             topic={post.topic}
             image={post.coverImage}
             priority
             pattern={false}
             notch
-            className="aspect-[16/10] rounded-2xl [mask-image:linear-gradient(to_bottom,black_75%,transparent_98%)] md:rounded-3xl"
+            className="aspect-[16/10] rounded-lg [mask-image:linear-gradient(to_bottom,black_75%,transparent_98%)]"
           >
             {!post.coverImage ? <CoverRings sizes={[520, 340, 180]} /> : null}
             {/* One cluster rather than two absolutes fighting for the same corner. */}
             <div className="absolute top-4 right-4 flex items-center gap-2">
-              <TopicBadge topic={post.topic} tone="dark" icon />
+              <TopicBadge topic={post.topic} tone="dark" />
               <span className="glass-on-cover rounded-full px-3.5 py-[7px] text-[12px] font-semibold">
                 Featured
               </span>
@@ -125,10 +127,8 @@ function FeaturedCard({ post }: { post: Post }) {
         </GlareHover>
 
         <div className="relative z-10 mx-2 -mt-[36px] sm:mx-4 sm:-mt-[44px]">
-          <div className="rounded-2xl border border-line-1 bg-bg-2 p-4.5 shadow-lg transition-[box-shadow,border-color] duration-500 ease-expo group-hover:border-line-2 group-hover:shadow-card-hover-xl sm:p-6 md:rounded-[24px] md:p-6.5 md:shadow-xl">
-            <p className="text-[13px] text-fg-3">
-              {formatDate(post.publishedAt)} · {post.readingMinutes} min read
-            </p>
+          <div className="rounded-lg border border-line-1 bg-bg-2 p-4.5 shadow-lg transition-[box-shadow,border-color] duration-500 ease-expo group-hover:border-line-2 group-hover:shadow-card-hover-xl sm:p-6 md:p-6.5 md:shadow-xl">
+            <p className="text-[13px] text-fg-3">{formatDate(post.publishedAt)}</p>
 
             {post.series && partCount ? (
               <p className="mt-1.5 inline-flex items-center gap-1.5 text-[13px] font-semibold text-brand-strong">

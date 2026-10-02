@@ -12,7 +12,7 @@ import { Check } from "lucide-react";
 import { contactAction } from "@/app/actions";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { contactTopics } from "@/lib/content";
+import { contactTopics } from "@/lib/content/config";
 import { initialFormState } from "@/lib/form-state";
 import { cn } from "@/lib/utils";
 

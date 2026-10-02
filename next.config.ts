@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+import { topicNames } from "./src/lib/content/config";
+
 /**
  * Content-Security-Policy.
  *
@@ -74,11 +76,48 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // No `X-Powered-By: Next.js` — it advertises the framework to scanners
+  // matching published advisories and tells a reader nothing.
+  poweredByHeader: false,
+
+  /**
+   * `/?topic=<Topic>` filters the home page's latest writing. Rewritten (not
+   * redirected — the address bar keeps `/?topic=`) to a prerendered page per
+   * topic, so `/` itself no longer has to read `searchParams` and render on
+   * every request. Only real topic names match; anything else falls through to
+   * the plain home page, which is how an unknown `?topic=` behaved before.
+   */
+  async rewrites() {
+    return {
+      beforeFiles: [
+        {
+          source: "/",
+          has: [
+            {
+              type: "query",
+              key: "topic",
+              value: `(?<topic>${topicNames.join("|")})`,
+            },
+          ],
+          destination: "/latest/:topic",
+        },
+      ],
+      afterFiles: [],
+      fallback: [],
+    };
+  },
+
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
 
   images: {
+    /**
+     * AVIF first: covers are large illustrated PNGs, and AVIF comes in well
+     * under WebP for them. Browsers without it still negotiate WebP. Encoded
+     * once per size and cached, so the slower encode is not a per-view cost.
+     */
+    formats: ["image/avif", "image/webp"],
     /**
      * Hosts allowed for `image` blocks in article bodies. Next refuses to
      * optimise anything not listed here, so a new external source needs an

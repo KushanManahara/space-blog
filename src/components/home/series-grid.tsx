@@ -55,17 +55,21 @@ function SeriesRow({ series, tone, index }: { series: Series; tone: string; inde
   return (
     <Reveal index={index}>
       <Link
-        href={`/articles?series=${series.slug}`}
+        href={`/series/${series.slug}`}
         className="group grid gap-x-8 gap-y-5 border-b border-line-1 py-7 transition-colors duration-300 ease-expo hover:border-line-2 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)]"
       >
         <div className="flex items-start gap-4">
           <span
             className={cn(
-              "inline-flex size-[46px] shrink-0 items-center justify-center rounded-md text-[15px] font-bold",
+              "inline-flex size-[46px] shrink-0 flex-col items-center justify-center rounded-md text-[15px] leading-none font-bold",
               tone,
             )}
           >
+            {/* A bare number read as a ranking; it is the length of the run. */}
             {series.partCount}
+            <span className="mt-0.5 text-[10px] font-semibold tracking-[0.04em] uppercase">
+              {series.partCount === 1 ? "part" : "parts"}
+            </span>
           </span>
           <div>
             <h3 className="text-[20px] leading-[1.25] font-bold tracking-[-0.015em] text-fg-1 transition-colors duration-300 ease-expo group-hover:text-brand-strong">
@@ -87,7 +91,7 @@ function SeriesRow({ series, tone, index }: { series: Series; tone: string; inde
                 <span
                   aria-hidden
                   className={cn(
-                    "inline-flex size-[19px] shrink-0 items-center justify-center rounded-full text-[10.5px] font-bold",
+                    "inline-flex size-[19px] shrink-0 items-center justify-center rounded-full text-[10px] font-bold",
                     done ? "bg-brand text-on-brand" : "border border-line-2 text-fg-faint",
                   )}
                 >

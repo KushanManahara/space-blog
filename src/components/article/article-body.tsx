@@ -4,6 +4,8 @@ import * as React from "react";
 import dynamic from "next/dynamic";
 import { Info, PencilLine } from "lucide-react";
 
+import type { CodeLine } from "@/components/article/code-highlight";
+
 import { useArticleAudio } from "@/components/article/article-audio-provider";
 import { ArticleImage } from "@/components/article/article-image";
 import { ArticleMermaid } from "@/components/article/article-mermaid";
@@ -41,7 +43,16 @@ const RunnableCode = dynamic(() =>
 );
 
 /** Renders the clean, unboxed markdown article content. */
-export function ArticleBody({ blocks, id }: { blocks: ArticleBlock[]; id: string }) {
+export function ArticleBody({
+  blocks,
+  highlighted,
+  id,
+}: {
+  blocks: ArticleBlock[];
+  /** Server-highlighted code, keyed by block index (`highlightBlocks`). */
+  highlighted: Record<number, CodeLine[]>;
+  id: string;
+}) {
   const audio = useArticleAudio();
   const activeBlockIndex = audio?.currentSegment?.blockIndex;
   const isAudioActive = audio?.isAudioActive ?? false;
@@ -64,7 +75,13 @@ export function ArticleBody({ blocks, id }: { blocks: ArticleBlock[]; id: string
                 "-mx-3 bg-brand/[0.04] p-3 ring-2 ring-brand/40 dark:bg-brand/[0.08] dark:ring-brand/35",
             )}
           >
-            <ArticleBlockView block={block} isFirst={index === 0} index={index} blocks={blocks} />
+            <ArticleBlockView
+              block={block}
+              isFirst={index === 0}
+              index={index}
+              blocks={blocks}
+              lines={highlighted[index]}
+            />
           </div>
         );
       })}
@@ -77,11 +94,13 @@ function ArticleBlockView({
   isFirst,
   index,
   blocks,
+  lines,
 }: {
   block: ArticleBlock;
   isFirst: boolean;
   index: number;
   blocks: ArticleBlock[];
+  lines?: CodeLine[];
 }) {
   switch (block.kind) {
     case "paragraph":
@@ -171,7 +190,15 @@ function ArticleBlockView({
       return block.runnable ? (
         <RunnableCode filename={block.filename} code={block.code} className="mt-6" />
       ) : (
-        <CodeBlock filename={block.filename} code={block.code} className="mt-6" />
+        <CodeBlock
+          filename={block.filename}
+          code={block.code}
+          lines={lines ?? [[[block.code]]]}
+          // Numbered so each scrollable region has its own name: two blocks
+          // both called "json code" are indistinguishable in a landmark list.
+          label={`Code sample ${blocks.slice(0, index + 1).filter((entry) => entry.kind === "code").length}: ${block.filename}`}
+          className="mt-6"
+        />
       );
 
     case "figure":
@@ -269,7 +296,7 @@ function ChartFigure({ block }: { block: Extract<ArticleBlock, { kind: "chart" }
           >
             <p className="text-center text-[12px] font-semibold text-fg-2">{bar.value}</p>
             <div
-              className="h-full rounded-[8px_8px_3px_3px]"
+              className="h-full rounded-t-xs rounded-b-[3px]"
               style={{ background: `linear-gradient(180deg, ${bar.from}, ${bar.to})` }}
             />
           </div>

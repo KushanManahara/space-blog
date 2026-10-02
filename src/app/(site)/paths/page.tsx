@@ -6,13 +6,13 @@ import { MastheadBadge, PageMasthead } from "@/components/layout/page-masthead";
 import { Reveal } from "@/components/motion/reveal";
 import { TopicBadge } from "@/components/post/topic-badge";
 import { listReadingPaths, routes, site } from "@/lib/content";
-import { alternates } from "@/lib/metadata";
+import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Where to start",
   description: `Curated routes through the ${site.issue} posts in this archive, for anyone who has not read any of it yet.`,
-  alternates: alternates("/paths"),
-};
+  path: "/paths",
+});
 
 export default function PathsPage() {
   const paths = listReadingPaths();
@@ -46,7 +46,7 @@ export default function PathsPage() {
                     <span className="font-mono text-[13px] font-bold text-fg-faint">
                       {String(index + 1).padStart(2, "0")}
                     </span>
-                    <h2 className="text-[21px] leading-[1.2] font-bold tracking-[-0.02em] text-fg-1">
+                    <h2 className="text-[22px] leading-[1.2] font-bold tracking-[-0.02em] text-fg-1">
                       {path.title}
                     </h2>
                   </div>

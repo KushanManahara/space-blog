@@ -6,6 +6,7 @@ import { ViewTransitionGuard } from "@/components/motion/view-transition-guard";
 import { CommandMenuProvider } from "@/components/nav/command-menu";
 import { SavedPostsProvider } from "@/components/providers/saved-posts-provider";
 import { author, site, siteUrl } from "@/lib/content";
+import { openGraph, twitter } from "@/lib/metadata";
 
 import "./globals.css";
 
@@ -36,7 +37,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: `${site.name} - ${site.tagline}`,
+    default: `${site.name} — ${site.tagline}`,
     template: `%s · ${site.name}`,
   },
   description: site.description,
@@ -45,35 +46,22 @@ export const metadata: Metadata = {
     types: { "application/rss+xml": "/rss.xml" },
   },
   manifest: "/site.webmanifest",
-  openGraph: {
-    type: "website",
-    siteName: site.name,
+  openGraph: openGraph({
     title: `${site.name} — ${site.tagline}`,
     description: site.description,
     url: "/",
-    locale: "en_US",
-    images: [
-      {
-        url: `${siteUrl}/logo.png`,
-        width: 512,
-        height: 512,
-        alt: `${site.name} — ${author.name}`,
-      },
-    ],
-  },
-  twitter: {
-    card: "summary",
+  }),
+  twitter: twitter({
     title: `${site.name} — ${site.tagline}`,
     description: site.description,
-    creator: author.handle,
-    images: [`${siteUrl}/logo.png`],
-  },
+  }),
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
       { url: "/icon.png", type: "image/png", sizes: "512x512" },
       { url: "/favicon-32x32.png", type: "image/png", sizes: "32x32" },
-      { url: "/logo.png", type: "image/png" },
+      // No `/logo.png` here: an icon link with no size is a candidate browsers
+      // fetch, and that file is the full brandmark — 741 KB on every page view.
     ],
     shortcut: "/favicon.ico",
     apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],

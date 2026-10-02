@@ -5,13 +5,13 @@ import { Hash } from "lucide-react";
 import { MastheadBadge, PageMasthead } from "@/components/layout/page-masthead";
 import { Reveal } from "@/components/motion/reveal";
 import { listTags, site } from "@/lib/content";
-import { alternates } from "@/lib/metadata";
+import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Tags",
   description: `Every subject tag across the ${site.issue} posts in this archive.`,
-  alternates: alternates("/tags"),
-};
+  path: "/tags",
+});
 
 export default function TagsPage() {
   const tags = listTags();

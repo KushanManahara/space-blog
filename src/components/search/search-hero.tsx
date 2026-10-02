@@ -19,7 +19,7 @@ export function SearchHero({ query, resultCount }: { query: string; resultCount:
       <form
         action={routes.search}
         method="get"
-        className="mt-6.5 flex items-center gap-2.5 rounded-full border border-line-1 bg-bg-1 p-1.5 pl-5"
+        className="mt-6.5 flex items-center gap-2.5 rounded-full border border-line-1 bg-bg-1 p-1.5 pl-5 transition-[border-color,box-shadow] duration-300 ease-expo has-[input:focus-visible]:border-cornflower-400 has-[input:focus-visible]:ring-4 has-[input:focus-visible]:ring-tint-cornflower"
       >
         <Search className="size-4.5 shrink-0 text-fg-3" strokeWidth={1.75} />
         <label htmlFor="search-query" className="sr-only">

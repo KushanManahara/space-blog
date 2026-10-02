@@ -9,7 +9,7 @@ import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button
 import { getPostsByTag, listTags, routes, toSummaries } from "@/lib/content";
 import { truncate } from "@/lib/format";
 import { getAllLivePostStatsMap } from "@/lib/db/queries";
-import { alternates, openGraph } from "@/lib/metadata";
+import { pageMetadata } from "@/lib/metadata";
 
 /**
  * These pages are prerendered but read live engagement counts, so without a
@@ -43,12 +43,7 @@ export async function generateMetadata({ params }: PageProps<"/tags/[tag]">): Pr
   const description =
     titles.length > 0 ? truncate(`${count}, newest first: ${titles}.`, 158) : `${count}.`;
 
-  return {
-    title: `#${tag}`,
-    description,
-    alternates: alternates(`/tags/${tag}`),
-    openGraph: openGraph({ type: "website", title: `#${tag}`, description, url: `/tags/${tag}` }),
-  };
+  return pageMetadata({ title: `Articles tagged #${tag}`, description, path: `/tags/${tag}` });
 }
 
 export default async function TagPage({ params }: PageProps<"/tags/[tag]">) {
@@ -90,6 +85,8 @@ export default async function TagPage({ params }: PageProps<"/tags/[tag]">) {
       />
 
       <section className="mx-auto max-w-page px-gutter pt-[clamp(20px,3vw,32px)] pb-tail">
+        {/* Keeps the outline h1 → h2 → h3; the post titles below are h3s. */}
+        <h2 className="sr-only">Articles tagged #{tag}</h2>
         <Reveal>
           {summaries.map((post) => (
             <PostRow key={post.slug} post={post} />

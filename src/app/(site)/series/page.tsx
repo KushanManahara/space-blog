@@ -22,14 +22,14 @@ import {
 import { formatCount, formatDate } from "@/lib/format";
 import { paginate } from "@/lib/pagination";
 import { buildHref } from "@/lib/url";
-import { alternates } from "@/lib/metadata";
+import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Series",
   description:
     "Multi-part runs through one subject, in the order they were written. Filter by topic, sort by length or by what gets read.",
-  alternates: alternates("/series"),
-};
+  path: "/series",
+});
 
 const PER_PAGE = 6;
 
@@ -163,8 +163,8 @@ export default async function SeriesPage({ searchParams }: PageProps<"/series">)
 
                     <p className="mt-3 text-[12.5px] text-fg-3">
                       {series.partCount} parts · {formatDate(series.firstPublished)} –{" "}
-                      {formatDate(series.lastPublished)} · {series.minutes} min ·{" "}
-                      {formatCount(series.views)} views
+                      {formatDate(series.lastPublished)} · {series.minutes} min
+                      {series.views > 0 ? ` · ${formatCount(series.views)} views` : null}
                     </p>
                   </div>
 

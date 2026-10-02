@@ -17,7 +17,7 @@ import {
   topics,
 } from "@/lib/content";
 import { buildHref } from "@/lib/url";
-import { alternates, openGraph } from "@/lib/metadata";
+import { pageMetadata } from "@/lib/metadata";
 
 export function generateStaticParams() {
   return topics.map((topic) => ({ slug: topic.slug }));
@@ -39,17 +39,11 @@ export async function generateMetadata({ params }: PageProps<"/topics/[slug]">):
   const topic = getTopicBySlug(slug);
   if (!topic) return {};
 
-  return {
-    title: topic.name,
+  return pageMetadata({
+    title: `${topic.name} articles`,
     description: topic.description,
-    alternates: alternates(`/topics/${topic.slug}`),
-    openGraph: openGraph({
-      type: "website",
-      title: topic.name,
-      description: topic.description,
-      url: `/topics/${topic.slug}`,
-    }),
-  };
+    path: `/topics/${topic.slug}`,
+  });
 }
 
 export default async function TopicPage({ params, searchParams }: PageProps<"/topics/[slug]">) {
@@ -69,6 +63,8 @@ export default async function TopicPage({ params, searchParams }: PageProps<"/to
       <TopicHeader topic={topic} />
 
       <section className="mx-auto max-w-page px-gutter pt-[clamp(36px,4.5vw,56px)] pb-tail">
+        {/* Keeps the outline h1 → h2 → h3; the post titles below are h3s. */}
+        <h2 className="sr-only">{topic.name} articles</h2>
         <Reveal className="mb-5 flex flex-wrap items-center gap-2.5">
           <DiscoverModal kind="topics" topics={topics} />
           <DiscoverModal kind="tags" tags={listTags().slice(0, 24)} />

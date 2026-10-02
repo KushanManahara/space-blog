@@ -9,13 +9,13 @@ import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { author, routes } from "@/lib/content";
-import { alternates } from "@/lib/metadata";
+import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Contact",
   description: "Corrections get answered first. Everything else, within a week.",
-  alternates: alternates("/contact"),
-};
+  path: "/contact",
+});
 
 const socials = [
   { label: "GitHub", href: author.github, icon: GitHubIcon },
@@ -45,7 +45,7 @@ export default function ContactPage() {
               Read the archive
             </InteractiveHoverButton>
             <Button asChild variant="subtle" size="md">
-              <Link href={routes.about}>About author</Link>
+              <Link href={routes.about}>About me</Link>
             </Button>
           </>
         }

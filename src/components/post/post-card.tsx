@@ -28,11 +28,14 @@ export function PostCard({
   post,
   variant = "grid",
   showMetrics = true,
+  priority = false,
   className,
 }: {
   post: PostSummary;
   variant?: PostCardVariant;
   showMetrics?: boolean;
+  /** For the one card whose cover is the page's LCP element. */
+  priority?: boolean;
   className?: string;
 }) {
   const visual = getTopicVisual(post.topic);
@@ -53,23 +56,21 @@ export function PostCard({
             notch
             className={cn(
               coverRatio.grid,
-              "shrink-0 rounded-2xl [mask-image:linear-gradient(to_bottom,black_75%,transparent_98%)] md:rounded-3xl",
+              "shrink-0 rounded-lg [mask-image:linear-gradient(to_bottom,black_75%,transparent_98%)]",
             )}
           >
-            <TopicBadge
-              topic={post.topic}
-              tone="dark"
-              icon
-              className="absolute top-3.5 right-3.5"
-            />
+            {/* No icon on the badge: the notch in the corner already shows it. */}
+            <TopicBadge topic={post.topic} tone="dark" className="absolute top-3.5 right-3.5" />
           </PostCover>
 
           <div className="relative z-10 mx-2.5 -mt-[36px] flex flex-1 flex-col sm:mx-3.5 sm:-mt-[44px]">
-            <div className="flex flex-1 flex-col rounded-2xl border border-line-1 bg-bg-2 p-4 shadow-xs transition-[box-shadow,border-color] duration-500 ease-expo group-hover:border-line-2 group-hover:shadow-card-hover-lg sm:p-5 md:rounded-[22px] md:p-5.5">
+            <div className="flex flex-1 flex-col rounded-lg border border-line-1 bg-bg-2 p-4 shadow-xs transition-[box-shadow,border-color] duration-500 ease-expo group-hover:border-line-2 group-hover:shadow-card-hover-lg sm:p-5 md:p-5.5">
               <p className="text-[12.5px] text-fg-3">
-                {formatDate(post.publishedAt)} · {post.readingMinutes} min read
+                {formatDate(post.publishedAt)}
+                {/* The metric row below already carries the reading time. */}
+                {showMetrics ? null : ` · ${post.readingMinutes} min read`}
               </p>
-              <h3 className="mt-2 line-clamp-2 min-h-[2.6em] text-[17px] leading-[1.3] font-bold tracking-[-0.015em] text-fg-1 transition-colors duration-300 ease-expo group-hover:text-brand-strong sm:text-[17.5px]">
+              <h3 className="mt-2 line-clamp-2 min-h-[2.6em] text-[17px] leading-[1.3] font-bold tracking-[-0.015em] text-fg-1 transition-colors duration-300 ease-expo group-hover:text-brand-strong">
                 {post.title}
               </h3>
               <p className="mt-2.5 line-clamp-2 min-h-[3.1em] text-[14px] leading-[1.55] text-fg-2">
@@ -102,6 +103,7 @@ export function PostCard({
         topic={post.topic}
         image={post.coverImage}
         notch={variant === "search"}
+        priority={priority}
         className={coverRatio[variant]}
       >
         {variant === "search" ? (
@@ -118,7 +120,8 @@ export function PostCard({
       >
         {variant === "search" ? (
           <p className="text-[12.5px] text-fg-3">
-            {formatDate(post.publishedAt)} · {post.readingMinutes} min
+            {formatDate(post.publishedAt)}
+            {showMetrics ? null : ` · ${post.readingMinutes} min read`}
           </p>
         ) : null}
 

@@ -45,6 +45,13 @@ export const newsletterSubscribers = sqliteTable("newsletter_subscribers", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   email: text("email").notNull().unique(),
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
+  /**
+   * 1 once the address has confirmed (double opt-in). New signups are written
+   * with 0; the default of 1 is what adding the column gives every row that
+   * existed before confirmation was required, so nobody already on the list
+   * is dropped from it.
+   */
+  confirmed: integer("confirmed").notNull().default(1),
 });
 
 /**

@@ -75,6 +75,9 @@ export function PostCover({
              */
             preload={priority}
             loading={priority ? "eager" : "lazy"}
+            // The cover that owns `priority` is the page's LCP element; tell
+            // the browser so it outranks fonts and scripts in the queue.
+            fetchPriority={priority ? "high" : undefined}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover object-center"
           />
