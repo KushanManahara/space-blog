@@ -37,7 +37,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: `${site.name} — ${site.tagline}`,
+    default: site.title,
     template: `%s · ${site.name}`,
   },
   description: site.description,
@@ -47,12 +47,12 @@ export const metadata: Metadata = {
   },
   manifest: "/site.webmanifest",
   openGraph: openGraph({
-    title: `${site.name} — ${site.tagline}`,
+    title: site.title,
     description: site.description,
     url: "/",
   }),
   twitter: twitter({
-    title: `${site.name} — ${site.tagline}`,
+    title: site.title,
     description: site.description,
   }),
   icons: {

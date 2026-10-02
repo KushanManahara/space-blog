@@ -25,7 +25,7 @@ export const defaultOgImage = {
   url: "/opengraph-image",
   width: 1200,
   height: 630,
-  alt: `${site.name} — ${site.tagline}`,
+  alt: site.title,
 };
 
 /** Canonical URL for a page, keeping feed autodiscovery attached. */

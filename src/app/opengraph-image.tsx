@@ -3,7 +3,7 @@ import { ImageResponse } from "next/og";
 import { site } from "@/lib/content";
 import { loadOgFonts, OG_CONTENT_TYPE, OG_SIZE } from "@/lib/og";
 
-export const alt = `${site.name} — ${site.tagline}`;
+export const alt = site.title;
 export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;
 
@@ -42,11 +42,18 @@ export default async function Image() {
           letterSpacing: -1.8,
         }}
       >
-        {site.tagline}
+        {site.title}
       </div>
 
-      <div style={{ display: "flex", fontSize: 27, color: "rgba(255,255,255,0.85)" }}>
-        {site.issue} posts on AI systems, agents and the software underneath.
+      <div
+        style={{
+          display: "flex",
+          fontSize: 27,
+          color: "rgba(255,255,255,0.85)",
+          lineHeight: 1.35,
+        }}
+      >
+        {site.description}
       </div>
     </div>,
     { ...size, fonts },

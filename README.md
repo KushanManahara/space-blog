@@ -1,6 +1,6 @@
-# Space — AI Systems & Software Engineering
+# My Writings | Kushan Manahara
 
-> An engineering publication by **Kushan Manahara** exploring AI systems, machine learning, autonomous agents, and production software engineering.
+> Ideas, lessons, and things I've learned while building with technology.
 >
 > 🌐 **Live Site**: [https://space.gimhara.com](https://space.gimhara.com)
 
