@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-label="Terminal setting Time Machine quota to 800 GB with APFS volume allocation visualizer">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090D16" />
+      <stop offset="55%" stop-color="#0E1424" />
+      <stop offset="100%" stop-color="#111B30" />
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="42%" r="50%">
+      <stop offset="0%" stop-color="#6366F1" stop-opacity="0.22" />
+      <stop offset="60%" stop-color="#38BDF8" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#0B0F1A" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="tmBar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366F1" />
+      <stop offset="100%" stop-color="#38BDF8" />
+    </linearGradient>
+    <linearGradient id="headroomBar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#38BDF8" stop-opacity="0.1" />
+    </linearGradient>
+    <filter id="cardShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="20" stdDeviation="28" flood-color="#02060E" flood-opacity="0.65" />
+    </filter>
+  </defs>
+
+  <rect width="1200" height="800" fill="url(#bg)" />
+  <rect width="1200" height="800" fill="url(#glow)" />
+
+  <!-- Terminal card -->
+  <g filter="url(#cardShadow)">
+    <rect x="200" y="170" width="800" height="460" rx="20" fill="#111827" stroke="#FFFFFF" stroke-opacity="0.1" />
+  </g>
+  
+  <!-- Terminal header bar -->
+  <path d="M200 216 H1000" stroke="#FFFFFF" stroke-opacity="0.07" stroke-width="1" />
+  <circle cx="236" cy="193" r="5.5" fill="#EF4444" />
+  <circle cx="258" cy="193" r="5.5" fill="#F59E0B" />
+  <circle cx="280" cy="193" r="5.5" fill="#10B981" />
+  <text x="600" y="198" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif" font-size="12" fill="#6B7280" text-anchor="middle" font-weight="500">tmutil — Full Disk Access</text>
+
+  <g font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace">
+    <!-- Command Line -->
+    <text x="248" y="266" font-size="18" fill="#9CA3AF">
+      <tspan fill="#4B5563">$ </tspan><tspan fill="#E5E7EB">sudo tmutil setquota </tspan><tspan fill="#818CF8">&lt;DESTINATION-ID&gt;</tspan><tspan fill="#38BDF8" font-weight="700"> 800</tspan>
+    </text>
+
+    <!-- Quota & Verification Output -->
+    <text x="248" y="318" font-size="12" letter-spacing="2" fill="#6B7280" font-weight="600">APFS CONTAINER VOLUME BUDGET</text>
+    
+    <!-- Outer quota bar container (800 GB target limit) -->
+    <rect x="248" y="334" width="704" height="24" rx="6" fill="#1F2937" stroke="#374151" stroke-width="1" />
+    
+    <!-- Time Machine used space: 719.6 / 800 GB (~89.9% of quota) -->
+    <rect x="250" y="336" width="633" height="20" rx="4" fill="url(#tmBar)" />
+    
+    <!-- Remaining headroom: 80.4 GB (dotted pattern / tint) -->
+    <rect x="885" y="336" width="65" height="20" rx="4" fill="url(#headroomBar)" />
+    
+    <!-- Quota boundary marker line -->
+    <line x1="952" y1="324" x2="952" y2="368" stroke="#F59E0B" stroke-width="2" stroke-dasharray="3 3" />
+    <text x="952" y="386" font-size="11" fill="#F59E0B" text-anchor="middle" font-weight="600">QUOTA CEILING: 800 GB</text>
+
+    <!-- Metrics labels -->
+    <text x="248" y="420" font-size="15" fill="#E5E7EB">
+      <tspan fill="#818CF8" font-weight="600">EX-Time Machine: </tspan>~719.6 GB used <tspan fill="#4B5563">·</tspan> <tspan fill="#38BDF8">~80.4 GB headroom</tspan>
+    </text>
+    
+    <text x="248" y="468" font-size="12" letter-spacing="2" fill="#6B7280" font-weight="600">UNCONSTRAINED SHARED POOL (SAMSUNG T7)</text>
+    <rect x="248" y="482" width="704" height="14" rx="4" fill="#1F2937" />
+    <rect x="248" y="482" width="704" height="14" rx="4" fill="none" stroke="#4B5563" stroke-dasharray="6 4" stroke-width="1.5" />
+    <text x="248" y="522" font-size="14" fill="#9CA3AF">
+      Projects &amp; Files: <tspan fill="#E5E7EB" font-weight="600">~1.2 TB dynamically preserved</tspan>
+    </text>
+
+    <text x="248" y="574" font-size="14" fill="#10B981">
+      ✓ Quota active on next backup <tspan fill="#4B5563">| Verified with tmutil destinationinfo</tspan>
+    </text>
+  </g>
+</svg>
