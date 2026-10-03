@@ -4,6 +4,446 @@ import { postSchema, type Post } from "./schemas";
 
 const parsedPosts = postSchema.array().parse([
   {
+    slug: "how-to-cap-time-machine-on-a-shared-ssd",
+    title: "Putting Time Machine on a Storage Budget",
+    dek: "I share a 2 TB external SSD between everyday project files and macOS backups. When Time Machine crossed 700 GB with no sign of slowing down, I needed a way to set a hard boundary. Here is how APFS containers, tmutil, and macOS permissions work together to cap it.",
+    topic: "Systems",
+    publishedAt: "2026-10-03",
+    likes: 0,
+    views: 0,
+    commentCount: 0,
+    tags: ["#macos", "#timemachine", "#apfs", "#storage", "#cli", "#systems"],
+    coverImage: "/articles/time-machine-quota-cover.svg",
+    body: [
+      {
+        kind: "paragraph",
+        html: "I plug a 2 TB Samsung T7 SSD into my MacBook every morning. Most of it holds active code repositories, datasets, and working files. The rest was supposed to quietly run Time Machine in the background.",
+      },
+      {
+        kind: "paragraph",
+        html: "One morning I opened Disk Utility and noticed the backup volume had grown past 719 GB. That is not an error. Time Machine is built to save hourly, daily, and weekly snapshots so you can roll back files whenever you need to.",
+      },
+      {
+        kind: "paragraph",
+        html: "The problem is that APFS volumes share all free space across their container. Without a quota, Time Machine treats every empty gigabyte as available room. If I left it unchecked, it would eventually squeeze out my projects. I wanted a clear boundary: give Time Machine at most 800 GB, and protect the remaining 1.2 TB for my daily work.",
+      },
+      {
+        kind: "heading",
+        id: "the-problem",
+        text: "The Problem with Shared Storage",
+      },
+      {
+        kind: "paragraph",
+        html: "My setup looked like this:",
+      },
+      {
+        kind: "mermaid",
+        caption:
+          "The shared SSD setup. Both Time Machine and my project files live inside the same APFS container.",
+        code: `flowchart TD
+    MAC["MacBook<br/>~500 GB internal SSD"]
+    SSD["Samsung T7 Shield<br/>2 TB external SSD"]
+    CONTAINER["APFS Container"]
+    TM["EX-Time Machine<br/>Time Machine volume"]
+    PROJECTS["SAMSUNG T7<br/>Projects & files"]
+
+    MAC --> SSD
+    SSD --> CONTAINER
+    CONTAINER --> TM
+    CONTAINER --> PROJECTS`,
+      },
+      {
+        kind: "paragraph",
+        html: "The drive was handling two jobs at once. My backup volume had reached 719.6 GB. While that still left room on a 2 TB drive, there was no upper limit to stop it from expanding further.",
+      },
+      {
+        kind: "code",
+        filename: "target-budget.txt",
+        code: `2 TB Samsung T7 Shield
+├── EX-Time Machine (Volume)
+│   └── Quota: 800 GB maximum
+└── SAMSUNG T7 (Volume)
+    └── Remaining space for projects and files (~1.2 TB)`,
+      },
+      {
+        kind: "paragraph",
+        html: "I did not want to disable Time Machine, and I did not want to delete old backups manually. I simply wanted to tell macOS: use this much space, and stop there.",
+      },
+      {
+        kind: "heading",
+        id: "backup-direction",
+        text: "First, What Is Time Machine Backing Up?",
+      },
+      {
+        kind: "paragraph",
+        html: "It is easy to get the direction reversed when planning this out. Time Machine copies data from the Mac onto the external drive. The laptop is the source, and the external SSD is the destination.",
+      },
+      {
+        kind: "mermaid",
+        caption:
+          "Backup direction. Data flows from the internal Mac drive to the external storage volume.",
+        code: `flowchart LR
+    MAC["Mac<br/>Apps, documents, system data"]
+    TM["External SSD<br/>Time Machine backup destination"]
+    MAC -->|"Backup"| TM`,
+      },
+      {
+        kind: "paragraph",
+        html: "Apple suggests using a backup drive with at least twice the storage capacity of the Mac. On a 500 GB Mac, that points to about 1 TB or more. But that recommendation is about keeping months of historical versions, not a requirement to run at all. Because I share the disk with my code, 800 GB gave me plenty of backup room while protecting space for my files.",
+      },
+      {
+        kind: "heading",
+        id: "why-apfs-matters",
+        text: "Why APFS Space Sharing Matters",
+      },
+      {
+        kind: "paragraph",
+        html: "Older filesystems forced you to divide a disk into rigid partitions. If you assigned 800 GB to Partition A and 1.2 TB to Partition B, Partition B could never use empty space sitting inside Partition A.",
+      },
+      {
+        kind: "paragraph",
+        html: "APFS changes this with space sharing. Multiple volumes sit inside one APFS container and share the same pool of free space dynamically. That means my project volume and backup volume can adapt without wasting storage.",
+      },
+      {
+        kind: "mermaid",
+        caption: "APFS container layout with an 800 GB quota on the backup volume.",
+        code: `flowchart TD
+    SSD["2 TB External SSD"] --> APFS["APFS Container"]
+    APFS --> TM["EX-Time Machine<br/>~719.6 GB used"]
+    APFS --> FILES["SAMSUNG T7<br/>Projects & files"]
+    TM --> QUOTA["Target Quota<br/>800 GB ceiling"]`,
+      },
+      {
+        kind: "callout",
+        title: "Reserve Size vs. Quota Size",
+        body: "Disk Utility provides two volume size controls. A reserve size guarantees a minimum amount of space that other volumes cannot touch. A quota size sets a hard ceiling on how much space a volume can claim. For Time Machine, a quota is what keeps it from eating the drive.",
+      },
+      {
+        kind: "paragraph",
+        html: "Apple supports keeping Time Machine and regular files on the same external drive, provided they live in separate APFS volumes inside the container rather than in the same folder.",
+      },
+      {
+        kind: "mermaid",
+        caption: "Separate APFS volumes for backups and project files inside one container.",
+        code: `flowchart TD
+    SSD["External SSD"] --> CONTAINER["Shared APFS Container"]
+    CONTAINER --> TM["Time Machine Volume"]
+    CONTAINER --> FILES["Projects Volume"]
+    TM --> BACKUPS["Time Machine backups"]
+    FILES --> PROJECTS["Projects and working files"]`,
+      },
+      {
+        kind: "heading",
+        id: "setting-the-quota",
+        text: "Setting the Quota on an Existing Backup",
+      },
+      {
+        kind: "paragraph",
+        html: "If you are setting up a fresh drive, macOS can ask you for size limits in System Settings when you first add the backup disk. But if your backup is already running and already holds hundreds of gigabytes, the graphical interface does not give you an option to add a quota later. For that, you need the Terminal tool <code>tmutil</code>.",
+      },
+      {
+        kind: "heading",
+        id: "step-1-find-destination",
+        text: "Step 1: Find Your Time Machine Destination ID",
+        level: 3,
+      },
+      {
+        kind: "paragraph",
+        html: "Open Terminal and run:",
+      },
+      {
+        kind: "code",
+        filename: "check-destination.sh",
+        code: "tmutil destinationinfo",
+      },
+      {
+        kind: "paragraph",
+        html: "The output looks like this:",
+      },
+      {
+        kind: "code",
+        filename: "destinationinfo.txt",
+        code: `Name          : EX-Time Machine
+Kind          : Local
+Mount Point   : /Volumes/EX-Time Machine
+ID            : <YOUR-TIME-MACHINE-DESTINATION-ID>
+Quota         : -`,
+      },
+      {
+        kind: "paragraph",
+        html: "The line <code>Quota : -</code> confirms that no limit is currently set. Copy the value under <code>ID</code>. It is a unique UUID that looks like <code>12345678-ABCD-1234-ABCD-123456789ABC</code>. You will need it in the next step.",
+      },
+      {
+        kind: "heading",
+        id: "step-2-full-disk-access",
+        text: "Step 2: Give Terminal Full Disk Access",
+        level: 3,
+      },
+      {
+        kind: "paragraph",
+        html: "When I first ran the quota command, macOS refused to execute it:",
+      },
+      {
+        kind: "code",
+        filename: "error.txt",
+        code: "tmutil: setquota: Operation not permitted",
+      },
+      {
+        kind: "paragraph",
+        html: "Even with <code>sudo</code>, macOS blocked the change. On modern macOS, root privileges give you standard UNIX permissions, but Apple guards disk management behind a separate privacy system called TCC (Transparency, Consent, and Control). To run disk management commands like <code>setquota</code>, Terminal needs Full Disk Access.",
+      },
+      {
+        kind: "callout",
+        title: "Sudo Does Not Bypass TCC",
+        body: "Root privileges elevate your process ID, but macOS privacy controls check the host application itself. If Terminal does not have Full Disk Access, the operating system blocks the command regardless of sudo.",
+      },
+      {
+        kind: "paragraph",
+        html: "Here is how to enable it:",
+      },
+      {
+        kind: "list",
+        items: [
+          "Open <strong>System Settings → Privacy & Security → Full Disk Access</strong>.",
+          "Find <strong>Terminal</strong> (or iTerm2 / Ghostty if you use an alternative) and switch the toggle on.",
+          "Quit Terminal completely with <code>Cmd + Q</code> and reopen it so the new permission takes effect.",
+        ],
+      },
+      {
+        kind: "heading",
+        id: "step-3-apply-quota",
+        text: "Step 3: Set the Quota",
+        level: 3,
+      },
+      {
+        kind: "paragraph",
+        html: "Run the command with your destination ID and your chosen limit in gigabytes:",
+      },
+      {
+        kind: "code",
+        filename: "set-quota.sh",
+        code: "sudo tmutil setquota <YOUR-TIME-MACHINE-DESTINATION-ID> 800",
+      },
+      {
+        kind: "paragraph",
+        html: "The command finishes without extra output. The new limit takes effect on the next backup pass.",
+      },
+      {
+        kind: "heading",
+        id: "step-4-verify",
+        text: "Step 4: Verify the New Limit",
+        level: 3,
+      },
+      {
+        kind: "paragraph",
+        html: "Run <code>destinationinfo</code> again to make sure the change applied:",
+      },
+      {
+        kind: "code",
+        filename: "verify-quota.sh",
+        code: "tmutil destinationinfo",
+      },
+      {
+        kind: "paragraph",
+        html: "The quota line will now display your value:",
+      },
+      {
+        kind: "code",
+        filename: "verified.txt",
+        code: `Name          : EX-Time Machine
+Kind          : Local
+Mount Point   : /Volumes/EX-Time Machine
+ID            : <YOUR-TIME-MACHINE-DESTINATION-ID>
+Quota         : 800 GB`,
+      },
+      {
+        kind: "paragraph",
+        html: "You can also check Disk Utility. The volume summary should show a capacity of 800 GB, about 719.6 GB used, and roughly 80.4 GB of available headroom.",
+      },
+      {
+        kind: "heading",
+        id: "step-5-run-backup",
+        text: "Step 5: Run an Actual Backup",
+        level: 3,
+      },
+      {
+        kind: "paragraph",
+        html: "Do not stop at the terminal output. Start a real backup to confirm everything still works:",
+      },
+      {
+        kind: "code",
+        filename: "run-backup.sh",
+        code: "tmutil startbackup --auto",
+      },
+      {
+        kind: "paragraph",
+        html: "The backup completed cleanly. The drive now operates with predictable boundaries:",
+      },
+      {
+        kind: "mermaid",
+        caption:
+          "Verified setup. Time Machine is limited to 800 GB, leaving the rest of the drive for project files.",
+        code: `flowchart LR
+    MAC["MacBook<br/>~500 GB internal storage"]
+    SSD["2 TB External SSD"]
+    TM["Time Machine<br/>~719.6 GB used<br/>800 GB quota"]
+    FILES["Projects / Files<br/>Remaining shared capacity"]
+
+    MAC -->|"Time Machine backup"| TM
+    SSD --> TM
+    SSD --> FILES`,
+      },
+      {
+        kind: "heading",
+        id: "what-happens-at-the-limit",
+        text: "What Happens When Time Machine Hits the Limit?",
+      },
+      {
+        kind: "paragraph",
+        html: "A common concern is whether Time Machine will stop working or crash when it reaches 800 GB. It will not. Time Machine manages its own history. When disk space runs low, it automatically removes the oldest daily and weekly snapshots to make room for newer ones.",
+      },
+      {
+        kind: "paragraph",
+        html: "It never deletes your most recent backup. A quota simply determines how far back in time you can go. A generous quota preserves months of snapshots, while a tighter quota keeps fewer older versions.",
+      },
+      {
+        kind: "heading",
+        id: "edge-cases",
+        text: "Important Edge Cases",
+      },
+      {
+        kind: "heading",
+        id: "existing-backup-too-large",
+        text: "What If Your Backup Is Already Bigger Than the Target Quota?",
+        level: 3,
+      },
+      {
+        kind: "paragraph",
+        html: "In my case, I was using about 719.6 GB and set the quota to 800 GB, so I had some breathing room. But if your backup is already sitting at 950 GB, trying to force an 800 GB quota right away can cause issues.",
+      },
+      {
+        kind: "list",
+        items: [
+          "<strong>Start with a quota above current usage</strong>: Set it to something like 1 TB first, and let older snapshots age out naturally.",
+          "<strong>Add exclusions for throwaway files</strong>: In System Settings, exclude heavy development directories like <code>node_modules</code>, Python virtual environments, and build caches so future backups stay compact.",
+          "<strong>Recreate the volume only if history is not needed</strong>: If you do not care about past versions, you can erase the APFS volume and start fresh with a quota. Deleting an APFS volume permanently removes all historical backups.",
+        ],
+      },
+      {
+        kind: "heading",
+        id: "local-snapshots",
+        text: "External Backups vs. Local APFS Snapshots",
+        level: 3,
+      },
+      {
+        kind: "paragraph",
+        html: "Setting a quota on your external SSD does not stop macOS from creating local snapshots on your Mac when the external drive is unplugged. Those are separate. macOS keeps them on the internal disk and purges them automatically whenever internal space is needed.",
+      },
+      {
+        kind: "mermaid",
+        caption: "Local snapshots on the Mac vs. longer-term history on the external drive.",
+        code: `flowchart TD
+    MAC["Mac Internal SSD"] --> LOCAL["Local APFS Snapshots<br/>Pruned automatically by macOS"]
+    MAC -->|"Backup"| EXTERNAL["External Time Machine Volume"]
+    EXTERNAL --> HISTORY["Longer-term Backup History<br/>Capped at 800 GB quota"]`,
+      },
+      {
+        kind: "heading",
+        id: "things-to-avoid",
+        text: "Things I Would Avoid",
+      },
+      {
+        kind: "list",
+        items: [
+          "<strong>Do not publish your real destination ID</strong>: Use placeholders like <code>&lt;YOUR-DESTINATION-ID&gt;</code> if you share your terminal output.",
+          "<strong>Do not copy my 800 GB number blindly</strong>: Choose a size that matches your Mac storage, file change frequency, and project needs.",
+          "<strong>Do not assume sudo solves every permission problem</strong>: Modern macOS security requires Full Disk Access for disk operations.",
+          "<strong>Do not treat this as a complete backup strategy</strong>: A quota limits space, but it does not protect against drive failure.",
+        ],
+      },
+      {
+        kind: "heading",
+        id: "the-bigger-lesson",
+        text: "The Bigger Lesson: This Is Not a Full Backup Strategy",
+      },
+      {
+        kind: "paragraph",
+        html: "Using <code>tmutil setquota</code> solved my immediate storage headache. My Samsung T7 SSD now has predictable room for both active projects and system backups without running out of space.",
+      },
+      {
+        kind: "paragraph",
+        html: "Still, keeping your working files and your backup on the exact same physical drive means that if the drive fails, gets lost, or suffers hardware damage, you lose both copies at once.",
+      },
+      {
+        kind: "paragraph",
+        html: "The classic 3-2-1 backup rule suggests three copies of important data on two different types of media, with one copy kept off-site. A storage quota makes local backups manageable, but an encrypted off-site backup is still essential.",
+      },
+      {
+        kind: "heading",
+        id: "quick-reference",
+        text: "Quick Reference",
+      },
+      {
+        kind: "list",
+        items: [
+          "<strong>Find destination ID</strong>: <code>tmutil destinationinfo</code>",
+          "<strong>Enable Full Disk Access</strong>: System Settings → Privacy & Security → Full Disk Access → Terminal, then restart Terminal.",
+          "<strong>Set the quota</strong>: <code>sudo tmutil setquota &lt;YOUR-DESTINATION-ID&gt; 800</code>",
+          "<strong>Verify</strong>: Check <code>Quota : 800 GB</code> in <code>tmutil destinationinfo</code> and Disk Utility.",
+          "<strong>Test</strong>: Run <code>tmutil startbackup --auto</code> to verify that the backup finishes cleanly.",
+        ],
+      },
+      {
+        kind: "references",
+        title: "References",
+        items: [
+          {
+            label: "Apple Support: Back up your Mac with Time Machine",
+            href: "https://support.apple.com/en-nz/104984",
+            source: "Apple Support",
+            note: "Official setup guide and hardware recommendations.",
+          },
+          {
+            label: "Apple Support: Connect a new backup disk to your Mac",
+            href: "https://support.apple.com/en-au/guide/mac-help/mh11430/mac",
+            source: "Apple macOS User Guide",
+            note: "Initial setup flow in System Settings and disk configuration.",
+          },
+          {
+            label: "Apple Support: Backup disks you can use with Time Machine",
+            href: "https://support.apple.com/en-au/102423",
+            source: "Apple Support",
+            note: "Supported storage formats and filesystem requirements.",
+          },
+          {
+            label: "Apple Support: Add, delete, or erase APFS volumes in Disk Utility",
+            href: "https://support.apple.com/en-mide/guide/disk-utility/dskua9e6a110/mac",
+            source: "Apple Disk Utility User Guide",
+            note: "Managing APFS containers, volume quotas, and reserve allocations.",
+          },
+          {
+            label: "Apple Support: If Time Machine recommends a larger backup disk",
+            href: "https://support.apple.com/en-az/guide/mac-help/mchl72b408e0/mac",
+            source: "Apple macOS User Guide",
+            note: "Capacity sizing guidelines and snapshot pruning behavior.",
+          },
+          {
+            label: "Apple Support: If you can't back up or restore your Mac using Time Machine",
+            href: "https://support.apple.com/en-gb/102220",
+            source: "Apple Support",
+            note: "Troubleshooting backup issues and disk errors.",
+          },
+          {
+            label: "tmutil(8) Manual Page",
+            href: "https://keith.github.io/xcode-man-pages/tmutil.8.html",
+            source: "macOS Developer Manual",
+            note: "Options for destinationinfo, setquota, and Full Disk Access requirements.",
+          },
+        ],
+      },
+    ],
+  },
+  {
     slug: "how-to-copy-files-between-two-cloud-drive-providers",
     title:
       "How to Copy Files Between Two Cloud Drive Providers: Pitfalls, What to Avoid, and the Right Setup",
