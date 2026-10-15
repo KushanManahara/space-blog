@@ -23,7 +23,7 @@ export function TopicTile({ topic, rank }: { topic: Topic; rank?: number }) {
         {rank ? (
           <span
             className={cn(
-              "absolute top-2.5 left-2.5 inline-flex items-center rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-bold shadow-xs backdrop-blur-[14px] backdrop-saturate-150",
+              "absolute top-2.5 left-2.5 inline-flex items-center rounded-full bg-white/90 px-2.5 py-1 text-[11.5px] font-bold shadow-xs backdrop-blur-[14px] backdrop-saturate-150",
               visual.ink,
             )}
           >
@@ -52,7 +52,7 @@ export function TopicCard({ topic }: { topic: Topic }) {
   return (
     <Link
       href={`/topics/${topic.slug}`}
-      className="group flex items-center gap-3.5 rounded-xl border border-line-1 bg-bg-2 p-[18px] transition-[transform,box-shadow,border-color] duration-300 ease-out hover:-translate-y-1 hover:border-line-2 hover:shadow-card-hover-md active:scale-[0.98] active:duration-150 active:ease-out"
+      className="group flex items-center gap-3.5 rounded-lg border border-line-1 bg-bg-2 p-[18px] transition-[transform,box-shadow,border-color] duration-300 ease-out hover:-translate-y-1 hover:border-line-2 hover:shadow-card-hover-md active:scale-[0.98] active:duration-150 active:ease-out"
     >
       <PostCover
         topic={topic.name}

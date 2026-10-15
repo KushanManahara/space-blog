@@ -27,7 +27,7 @@ export function SeriesNav({
               <Link
                 href={`/articles/${part.slug}`}
                 aria-current={isCurrent ? "page" : undefined}
-                className="flex items-start gap-3 rounded-sm transition-colors duration-300 ease-expo hover:text-brand"
+                className="tap-target flex items-start gap-3 rounded-sm transition-colors duration-300 ease-expo hover:text-brand"
               >
                 <span
                   className={cn(

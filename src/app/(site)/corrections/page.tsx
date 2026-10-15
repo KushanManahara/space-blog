@@ -45,7 +45,7 @@ export default function CorrectionsPage() {
             </p>
             <Link
               href={routes.articles}
-              className="mt-6 inline-flex items-center gap-1.5 text-[14px] font-semibold text-brand transition-colors duration-300 ease-expo hover:text-brand-strong"
+              className="tap-target mt-6 inline-flex items-center gap-1.5 text-[14px] font-semibold text-brand transition-colors duration-300 ease-expo hover:text-brand-strong"
             >
               Read the archive
               <ArrowUpRight className="size-4" strokeWidth={2} />

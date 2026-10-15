@@ -15,7 +15,7 @@ export function AuthorCard() {
   return (
     <section
       aria-labelledby="author-card-name"
-      className="mt-10 flex flex-col gap-4 rounded-xl border border-line-1 bg-bg-2 p-5 shadow-xs sm:flex-row sm:items-start sm:gap-4.5"
+      className="mt-10 flex flex-col gap-4 rounded-lg border border-line-1 bg-bg-2 p-5 shadow-xs sm:flex-row sm:items-start sm:gap-4.5"
     >
       <AuthorAvatar className="size-12 shrink-0 text-[16px]" />
       <div className="min-w-0 flex-1">
@@ -29,7 +29,7 @@ export function AuthorCard() {
         <p className="mt-2 text-[14.5px] leading-[1.6] text-pretty text-fg-2">{author.bio}</p>
         <Link
           href={routes.about}
-          className="mt-3 inline-flex items-center gap-1.5 text-[13.5px] font-semibold text-brand transition-colors duration-300 ease-expo hover:text-brand-strong"
+          className="tap-target mt-3 inline-flex items-center gap-1.5 text-[13.5px] font-semibold text-brand transition-colors duration-300 ease-expo hover:text-brand-strong"
         >
           More about {author.name.split(" ")[0]}
           <ArrowRight className="size-3.5" strokeWidth={1.75} aria-hidden />

@@ -61,7 +61,7 @@ export default function ContactPage() {
                 </p>
                 <a
                   href={`mailto:${author.email}`}
-                  className="mt-2 block font-mono text-[15px] text-fg-1 transition-colors duration-300 ease-expo hover:text-brand"
+                  className="tap-target mt-2 block font-mono text-[15px] text-fg-1 transition-colors duration-300 ease-expo hover:text-brand"
                 >
                   {author.email}
                 </a>

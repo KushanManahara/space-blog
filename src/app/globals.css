@@ -117,6 +117,17 @@
   /* Hairline in brand colour, used on chips and toggles that carry a tint. */
   --color-line-brand: #c7e2fe;
 
+  /* Site chrome. The header's dark glass and the footer's wash are fixed
+     values rather than theme-swapped surfaces (they pair with explicit dark:
+     variants), but they live here with every other colour. */
+  --color-chrome-night: #070e22;
+  --color-footer-day-1: #f0f7ff;
+  --color-footer-day-2: #e8f3fe;
+  --color-footer-day-3: #dceefe;
+  --color-footer-night-1: #080d1a;
+  --color-footer-night-2: #09152e;
+  --color-footer-night-3: #070f24;
+
   /* Diagonal sheen used by GlareHover. Dimmed for dark surfaces below. */
   --glare-tint: rgba(255, 255, 255, 0.55);
 
@@ -1186,3 +1197,14 @@ html[data-magicui-theme-vt="active"]::view-transition-new(root) {
  * type from Excalidraw itself at render time, which is why they still look
  * right. Removing them also drops unpkg.com from the CSP.
  */
+
+/*
+ * Grows a standalone text link's hit box to at least 24px (WCAG 2.5.8) without
+ * moving anything: the padding is taken straight back by an equal negative
+ * margin, so the text sits exactly where it did. For footer columns, series
+ * lists and "View all" style links that are only a line of text tall.
+ */
+@utility tap-target {
+  padding-block: 4px;
+  margin-block: -4px;
+}
