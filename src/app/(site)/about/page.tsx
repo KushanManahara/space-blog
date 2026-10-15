@@ -213,7 +213,7 @@ export default function AboutPage() {
                   especially the last one.
                 </p>
                 <div className="mt-4.5 flex flex-col gap-2.5 font-mono text-[13.5px] text-cornflower-200">
-                  <a href={`mailto:${author.email}`} className="hover:underline">
+                  <a href={`mailto:${author.email}`} className="tap-target hover:underline">
                     {author.email}
                   </a>
                   <div className="flex flex-wrap items-center gap-2 font-sans text-[13px] text-white/80">

@@ -60,7 +60,7 @@ export default async function SeriesDetailPage({ params }: PageProps<"/series/[s
           <Reveal>
             <Link
               href={routes.series}
-              className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-fg-3 transition-colors duration-300 ease-expo hover:text-brand"
+              className="tap-target inline-flex items-center gap-1.5 text-[13px] font-semibold text-fg-3 transition-colors duration-300 ease-expo hover:text-brand"
             >
               All series
             </Link>
@@ -106,7 +106,7 @@ export default async function SeriesDetailPage({ params }: PageProps<"/series/[s
                   </InteractiveHoverButton>
                   <Link
                     href={`${routes.articles}?series=${series.slug}`}
-                    className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-brand transition-colors duration-300 ease-expo hover:text-brand-strong"
+                    className="tap-target inline-flex items-center gap-1.5 text-[14px] font-semibold text-brand transition-colors duration-300 ease-expo hover:text-brand-strong"
                   >
                     See them in the archive
                     <ArrowRight className="size-4" />

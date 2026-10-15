@@ -27,8 +27,15 @@ export function AuthorByline({
   return (
     <div className={cn("flex items-center gap-2.5", className)}>
       <AuthorAvatar className={scale.avatar} />
-      <span className={cn("font-semibold text-fg-1", scale.name)}>{author.name}</span>
-      <span className={cn("text-fg-3", scale.meta)}>· {formatDate(date)}</span>
+      {/* Name and date each stay whole: in narrow cards (320px) they used to
+          break mid-phrase — "Kushan / Manahara", "· Feb 18, / 2025". Now the
+          date drops to its own line as a unit when there is no room. */}
+      <span className="flex min-w-0 flex-wrap items-baseline gap-x-2.5">
+        <span className={cn("font-semibold whitespace-nowrap text-fg-1", scale.name)}>
+          {author.name}
+        </span>
+        <span className={cn("whitespace-nowrap text-fg-3", scale.meta)}>· {formatDate(date)}</span>
+      </span>
     </div>
   );
 }

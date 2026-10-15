@@ -146,7 +146,7 @@ export default async function SeriesPage({ searchParams }: PageProps<"/series">)
                         <h2 className="text-[20px] leading-[1.25] font-bold tracking-[-0.015em] text-fg-1">
                           <Link
                             href={`${routes.series}/${series.slug}`}
-                            className="transition-colors duration-300 ease-expo hover:text-brand-strong"
+                            className="tap-target transition-colors duration-300 ease-expo hover:text-brand-strong"
                           >
                             {series.title}
                           </Link>
@@ -179,7 +179,7 @@ export default async function SeriesPage({ searchParams }: PageProps<"/series">)
                         </span>
                         <Link
                           href={`${routes.articles}/${post.slug}`}
-                          className="leading-[1.45] text-fg-1 transition-colors duration-300 ease-expo hover:text-brand"
+                          className="tap-target leading-[1.45] text-fg-1 transition-colors duration-300 ease-expo hover:text-brand"
                         >
                           <span className="font-mono text-[12.5px] text-fg-faint">
                             {partIndex + 1}.

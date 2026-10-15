@@ -335,10 +335,10 @@ export function SiteHeader() {
             "absolute -top-px -left-px -z-10 h-[calc(100%+2px)] w-[calc(100%+2px)] rounded-full border",
             "backdrop-blur-[24px] backdrop-saturate-[180%] transition-[background-color,box-shadow,border-color] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]",
             isCollapsed
-              ? "border-white/60 bg-white/75 shadow-[0_12px_32px_rgb(0_0_0/0.12),0_2px_6px_rgb(0_0_0/0.06),inset_0_1px_1px_rgb(255_255_255/0.95)] dark:border-white/12 dark:bg-[#070e22]/80 dark:shadow-[0_16px_36px_rgb(0_0_0/0.7),inset_0_1px_0_rgb(255_255_255/0.14)]"
+              ? "border-white/60 bg-white/75 shadow-[0_12px_32px_rgb(0_0_0/0.12),0_2px_6px_rgb(0_0_0/0.06),inset_0_1px_1px_rgb(255_255_255/0.95)] dark:border-white/12 dark:bg-chrome-night/80 dark:shadow-[0_16px_36px_rgb(0_0_0/0.7),inset_0_1px_0_rgb(255_255_255/0.14)]"
               : isScrolled
-                ? "border-white/60 bg-white/70 shadow-[0_8px_24px_rgb(0_0_0/0.08),0_1px_3px_rgb(0_0_0/0.04),inset_0_1px_1px_rgb(255_255_255/0.85)] dark:border-white/12 dark:bg-[#070e22]/75 dark:shadow-[0_12px_28px_rgb(0_0_0/0.6),inset_0_1px_0_rgb(255_255_255/0.12)]"
-                : "border-white/50 bg-white/60 shadow-sm dark:border-white/10 dark:bg-[#070e22]/65 dark:shadow-[0_4px_16px_rgb(0_0_0/0.4),inset_0_1px_0_rgb(255_255_255/0.08)]",
+                ? "border-white/60 bg-white/70 shadow-[0_8px_24px_rgb(0_0_0/0.08),0_1px_3px_rgb(0_0_0/0.04),inset_0_1px_1px_rgb(255_255_255/0.85)] dark:border-white/12 dark:bg-chrome-night/75 dark:shadow-[0_12px_28px_rgb(0_0_0/0.6),inset_0_1px_0_rgb(255_255_255/0.12)]"
+                : "border-white/50 bg-white/60 shadow-sm dark:border-white/10 dark:bg-chrome-night/65 dark:shadow-[0_4px_16px_rgb(0_0_0/0.4),inset_0_1px_0_rgb(255_255_255/0.08)]",
           )}
         />
         <Link

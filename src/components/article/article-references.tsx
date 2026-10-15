@@ -35,7 +35,9 @@ export function ArticleReferences({
                 href={item.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group inline font-medium text-fg-link underline decoration-line-brand underline-offset-4 transition-colors hover:text-brand"
+                // Inline, so vertical padding grows the tap area without
+                // touching the line box — 24px+ per WCAG 2.5.8.
+                className="group inline py-1.5 font-medium text-fg-link underline decoration-line-brand underline-offset-4 transition-colors hover:text-brand"
               >
                 {item.label}
                 <ArrowUpRight

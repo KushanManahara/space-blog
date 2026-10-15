@@ -111,7 +111,7 @@ function PageStep({
       href={href}
       scroll={false}
       className={cn(
-        "inline-flex items-center gap-2 text-[14px] transition-colors duration-300 ease-expo hover:text-fg-1",
+        "tap-target inline-flex items-center gap-2 text-[14px] transition-colors duration-300 ease-expo hover:text-fg-1",
         direction === "next" ? "font-semibold text-fg-1" : "text-fg-3",
       )}
     >

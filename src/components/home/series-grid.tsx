@@ -29,7 +29,7 @@ export function SeriesGrid() {
           </div>
           <Link
             href={routes.series}
-            className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-brand transition-colors duration-300 ease-expo hover:text-brand-strong"
+            className="tap-target inline-flex items-center gap-1.5 text-[14px] font-semibold text-brand transition-colors duration-300 ease-expo hover:text-brand-strong"
           >
             All series
             <ArrowRight className="size-4 transition-transform duration-300 ease-expo hover:translate-x-0.5" />
@@ -67,7 +67,7 @@ function SeriesRow({ series, tone, index }: { series: Series; tone: string; inde
           >
             {/* A bare number read as a ranking; it is the length of the run. */}
             {series.partCount}
-            <span className="mt-0.5 text-[10px] font-semibold tracking-[0.04em] uppercase">
+            <span className="mt-0.5 text-[11.5px] font-semibold tracking-[0.02em] uppercase">
               {series.partCount === 1 ? "part" : "parts"}
             </span>
           </span>

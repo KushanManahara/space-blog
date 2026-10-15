@@ -167,7 +167,9 @@ export default function PrivacyPage() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <Reveal className="mt-11">
-      <h2 className="text-[22px] font-bold tracking-[-0.02em] text-fg-1 sm:text-[24px]">{title}</h2>
+      <h2 className="text-[22px] leading-[1.25] font-bold tracking-[-0.02em] text-fg-1 sm:text-[24px]">
+        {title}
+      </h2>
       <div className="mt-3.5">{children}</div>
     </Reveal>
   );

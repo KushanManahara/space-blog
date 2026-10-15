@@ -35,7 +35,7 @@ export default function NotFound() {
             <p className="text-gradient font-display text-[clamp(64px,9vw,104px)] leading-none font-light tracking-[-0.04em]">
               404
             </p>
-            <h1 className="mt-4.5 text-[clamp(24px,2.8vw,32px)] font-bold tracking-[-0.02em] text-fg-1">
+            <h1 className="mt-4.5 text-[clamp(24px,2.8vw,32px)] leading-[1.2] font-bold tracking-[-0.02em] text-fg-1">
               This page never shipped.
             </h1>
             <p className="mt-3 text-[16.5px] leading-[1.65] text-fg-2">
@@ -46,7 +46,7 @@ export default function NotFound() {
             <div className="mt-7 flex flex-wrap justify-center gap-3">
               <Link
                 href={routes.home}
-                className="rounded-full bg-ink px-6.5 py-3.5 text-[15px] font-semibold text-on-ink transition-[transform,box-shadow] duration-[350ms] ease-bounce hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.96] active:duration-150 active:ease-out"
+                className="inline-flex h-13 items-center rounded-full bg-ink px-6.5 text-[15px] font-semibold text-on-ink transition-[transform,box-shadow] duration-[350ms] ease-bounce hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.96] active:duration-150 active:ease-out"
               >
                 Back home
               </Link>

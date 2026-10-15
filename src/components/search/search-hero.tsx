@@ -47,7 +47,7 @@ export function SearchHero({ query, resultCount }: { query: string; resultCount:
           <Link
             key={suggestion}
             href={`${routes.search}?q=${encodeURIComponent(suggestion)}`}
-            className="text-fg-2 underline decoration-n-300 underline-offset-[3px] transition-colors duration-300 ease-expo hover:text-brand"
+            className="-mx-1 tap-target px-1 leading-5 text-fg-2 underline decoration-n-300 underline-offset-[3px] transition-colors duration-300 ease-expo hover:text-brand"
           >
             {suggestion}
           </Link>

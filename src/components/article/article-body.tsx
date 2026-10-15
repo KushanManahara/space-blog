@@ -118,8 +118,8 @@ function ArticleBlockView({
           id={block.id}
           className={
             block.level === 3
-              ? "mt-8 mb-3 scroll-mt-28 text-[20px] font-bold tracking-[-0.01em] break-words text-fg-1 sm:text-[22px] md:text-[24px]"
-              : "mt-12 mb-4 scroll-mt-28 text-[24px] font-bold tracking-[-0.02em] break-words text-fg-1 sm:text-[28px] md:text-[32px]"
+              ? "mt-8 mb-3 scroll-mt-28 text-[20px] leading-[1.3] font-bold tracking-[-0.01em] break-words text-fg-1 sm:text-[22px] md:text-[24px]"
+              : "mt-12 mb-4 scroll-mt-28 text-[24px] leading-[1.2] font-bold tracking-[-0.02em] break-words text-fg-1 sm:text-[28px] md:text-[32px]"
           }
           dangerouslySetInnerHTML={{ __html: markdownToHtml(block.text) }}
         />

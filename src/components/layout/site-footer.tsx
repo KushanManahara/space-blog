@@ -5,7 +5,7 @@ import { author, footerColumns, site } from "@/lib/content";
 
 export function SiteFooter() {
   return (
-    <footer className="relative isolate overflow-hidden border-t border-blue-200/70 bg-gradient-to-b from-[#F0F7FF] via-[#E8F3FE] to-[#DCEEFE] dark:border-blue-900/40 dark:from-[#080D1A] dark:via-[#09152E] dark:to-[#070F24]">
+    <footer className="relative isolate overflow-hidden border-t border-blue-200/70 bg-gradient-to-b from-footer-day-1 via-footer-day-2 to-footer-day-3 dark:border-blue-900/40 dark:from-footer-night-1 dark:via-footer-night-2 dark:to-footer-night-3">
       {/* Ambient Blue Lighting Overlays */}
       <div
         aria-hidden
@@ -44,7 +44,7 @@ export function SiteFooter() {
                         href={link.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[14px] font-medium text-fg-2 transition-colors duration-300 ease-expo hover:text-brand"
+                        className="tap-target text-[14px] font-medium text-fg-2 transition-colors duration-300 ease-expo hover:text-brand"
                       >
                         {link.label}
                       </a>
@@ -52,7 +52,7 @@ export function SiteFooter() {
                       <Link
                         key={link.label}
                         href={link.href}
-                        className="text-[14px] font-medium text-fg-2 transition-colors duration-300 ease-expo hover:text-brand"
+                        className="tap-target text-[14px] font-medium text-fg-2 transition-colors duration-300 ease-expo hover:text-brand"
                       >
                         {link.label}
                       </Link>

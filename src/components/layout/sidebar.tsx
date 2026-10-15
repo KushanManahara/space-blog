@@ -60,7 +60,7 @@ function TagsCard() {
     <SidebarCard>
       <div className="flex items-center justify-between">
         <h2 className="text-[16px] font-bold text-fg-1">Tags</h2>
-        <Link href={routes.tags} className="text-[12.5px] font-semibold text-brand">
+        <Link href={routes.tags} className="tap-target text-[12.5px] font-semibold text-brand">
           View all ↗
         </Link>
       </div>
