@@ -4,6 +4,467 @@ import { postSchema, type Post } from "./schemas";
 
 const parsedPosts = postSchema.array().parse([
   {
+    slug: "tesla-roadster-fans-thrusters-physics",
+    title: "The Roadster Flew on Two Old Ideas and 250 kg of Air",
+    dek: "A fan car from 1970 and a spacecraft thruster from the 1960s, in one road car, under software control. The stunts were real. Run the arithmetic and you get about four seconds of hover — and one Tesla claim that does not survive contact with a calculator.",
+    topic: "Experiments",
+    publishedAt: "2026-10-17",
+    likes: 0,
+    views: 0,
+    commentCount: 0,
+    tags: ["#tesla", "#aerodynamics", "#propulsion", "#physics", "#spacex"],
+    coverImage: "/articles/tesla-roadster-cover.png",
+    body: [
+      {
+        kind: "paragraph",
+        html: "On 15 October, at SpaceX's rocket test site in McGregor, Texas, a car drove up a ramp past vertical and stayed there — roughly 21 metres up, upside down, held by nothing but its own fans. Then it let go, caught itself on jets of compressed air, and landed. Later it jumped a parked line of Teslas with a Semi in it, corkscrewing through the air at about seven metres. On the pad it ran 0 to 60 mph in 0.81 seconds. Nobody was driving.",
+      },
+      {
+        kind: "paragraph",
+        html: "It looks like new physics. It isn't. There are two ideas here and both are old: the **fan car**, which dates to 1970, and the **cold-gas thruster**, which has been steering spacecraft since the 1960s. What is genuinely new is putting both in one road car and handing them to software quick enough to use them as control surfaces.",
+      },
+      {
+        kind: "paragraph",
+        html: "I spent a couple of days taking the claims apart — Tesla's patents, NASA's reports on the hardware, the 1970 Can-Am car this descends from — and running the numbers myself. Most of what Tesla said holds up. One claim doesn't. And the flight, as flown, lasts about four seconds.",
+      },
+      {
+        kind: "callout",
+        title: "Whose numbers these are",
+        body: "Anything attributed to Tesla is Tesla's figure, taken from the event or its site. Everything in the physics sections is **my own calculation** from those figures, with assumptions stated as I go. There is no independent test of this car, and nothing below should be read as one.",
+      },
+      {
+        kind: "heading",
+        id: "what-was-shown",
+        text: "What Tesla actually showed",
+      },
+      {
+        kind: "paragraph",
+        html: "The reveal had been pushed from 1 October by weather, and landed almost nine years after the first Roadster prototype in November 2017. Three stunts carried it. The car drove up a curved ramp to a pitch of about 170 degrees and hung inverted with an on-screen downforce readout of **4,700 kg**, then dropped and used its thrusters to arrest the fall. It cleared a row of parked vehicles — Semi and Cybercab among them — in what Tesla called a kickflip. And it ran a live 0–60 on the launch pad in **0.81 seconds**, a run Tesla said was cut short because the pad was too small.",
+      },
+      {
+        kind: "paragraph",
+        html: "There was no human aboard for any of it. Musk said the car was technically autonomous for the demo, for safety; a Starman mannequin rode along for one run. In customer hands, Tesla says the Roadster will be the only car it sells that you drive yourself.",
+      },
+      {
+        kind: "table",
+        headers: ["Trim", "Seats", "Thrusters", "0–60 mph claim", "Reservation"],
+        rows: [
+          ["**Performance** — road ready", "2", "None (fans only)", "Under 1.6 s", "$50,000"],
+          ["**Thrust** — race ready", "2", "Rear only", "Under 0.9 s", "$250,000"],
+          ["**Rocket** — air ready", "1", "10, all around", "Under 0.59 s", "Invite only"],
+        ],
+        caption:
+          "All three are quoted at about 300 miles of range and over 230 mph. Tesla gave no price, battery size, power figure or kerb weight — and its own site marks the flying trim as not approved for public roads. Production is promised for 2028.",
+      },
+      {
+        kind: "heading",
+        id: "sticking",
+        text: "Half the trick is not flying — it is sticking",
+      },
+      {
+        kind: "paragraph",
+        html: "A tyre can only push as hard as the road pushes back. On flat ground that ceiling is set by grip and weight, and Tesla's engineering VP Lars Moravy put it at about **1.26 g**. That single number is why the quickest road cars have sat stubbornly around 1.7 to 2.0 seconds to 60 mph for years. You cannot out-tyre a tyre.",
+      },
+      {
+        kind: "paragraph",
+        html: "There are exactly two ways past it: press the car onto the road harder, or push it with something that does not need grip at all. The Roadster does both. The fans do the first.",
+      },
+      {
+        kind: "paragraph",
+        html: "This is where fans beat wings. A wing makes downforce out of moving air, so its force grows with the **square** of speed and is precisely zero when you are sitting still on the line. A fan makes downforce out of a pressure difference, which it can hold at any speed, including a standstill. That is the whole reason a fan car can launch harder than an aerodynamic one — and the reason it can hang off a ramp doing 0 mph.",
+      },
+      {
+        kind: "mermaid",
+        caption:
+          "The suction loop. Nothing is gripping the surface: the fans only lower the pressure underneath, and the atmosphere above does all the pushing.",
+        code: `flowchart TD
+    SEAL["<b>1 · Seal the floor</b><br/>skirts close the gap to the road,<br/>trapping a pocket of air"]
+    PUMP["<b>2 · Pump it out</b><br/>electric fans pull air from the pocket<br/>and exhaust it rearward"]
+    DROP["<b>3 · Pressure falls</b><br/>under-floor pressure drops 10-13 kPa,<br/>about a tenth of an atmosphere"]
+    PUSH["<b>4 · The atmosphere pushes</b><br/>downforce = pressure drop × floor area<br/>≈ 46 kN over ≈ 4 m²"]
+    SENSE["pressure sensors<br/>inside the sealed region"]
+    LEAK["air leaking back in<br/>at every gap and bump"]
+
+    SEAL --> PUMP --> DROP --> PUSH
+    DROP -. "measured suction" .-> SENSE
+    SENSE -. "fan speed · skirt position" .-> PUMP
+    LEAK -. "this is the real power bill" .-> PUMP`,
+      },
+      {
+        kind: "paragraph",
+        html: "The force itself is almost disappointingly simple. Downforce is just the pressure you remove, multiplied by the area you remove it from:",
+      },
+      {
+        kind: "formula",
+        tex: "\\Delta p = \\frac{F}{A}",
+        caption:
+          "The 4,700 kg readout is about 46 kN of force. Divide by the sealed floor area to get the vacuum needed to produce it.",
+      },
+      {
+        kind: "table",
+        headers: ["Assumed sealed floor area", "Pressure drop needed", "Share of one atmosphere"],
+        rows: [
+          ["3.5 m²", "13.2 kPa", "13%"],
+          ["4.0 m²", "11.5 kPa", "11%"],
+          ["4.5 m²", "10.2 kPa", "10%"],
+        ],
+        caption:
+          "My calculation from Tesla's 4,700 kg readout. The headline is how little vacuum is required — roughly a tenth of an atmosphere. A small pressure difference across a large area is a very large force.",
+        numericColumns: [1, 2],
+      },
+      {
+        kind: "paragraph",
+        html: "So the hard part was never the vacuum. It is the **seal**. Air floods back in through every gap between floor and road, and the fans have to evacuate it at least as fast as it arrives. The power a fan puts into the air is the pressure difference it sustains times the volume it moves — and that volume is set almost entirely by how much is leaking.",
+      },
+      {
+        kind: "figure",
+        variant: "bar",
+        title: "Fan power against ride-height gap at the seal",
+        xKey: "gap",
+        xLabel: "gap between skirt and road",
+        yLabel: "fan power (kW)",
+        note: "My estimate: 4 m² floor, 13 m sealing edge, 60% fan efficiency",
+        caption:
+          "Roughly 20 kW for every extra millimetre of gap. On a smooth test ramp a tight seal is easy; on a public road with bumps, camber and debris, holding it is the entire engineering problem.",
+        series: [{ key: "power", label: "fan power" }],
+        data: [
+          { gap: "3 mm", power: 60 },
+          { gap: "5 mm", power: 100 },
+          { gap: "10 mm", power: 210 },
+        ],
+      },
+      {
+        kind: "callout",
+        title: "Why this needed a big battery",
+        body: "The 1970 Chaparral 2J sealed about 4.5 m² and made roughly 11,000 N — a pressure drop of only about 2.4 kPa, which its fans delivered with around 11 kW of air power from a 45 hp snowmobile engine. Tesla's 4,700 kg readout needs suction **four to five times deeper** than that. An electric car carrying a very large battery is a far better home for this idea than a 1970 race car ever was.",
+      },
+      {
+        kind: "paragraph",
+        html: 'Tesla has two granted patents covering the fan system. [US 12,377,920 B1](https://patents.google.com/patent/US12377920B1/en), filed April 2025 and granted that August, describes four fans with deployable skirts and two operating modes — all skirts down and the central fans evacuating a sealed region for low-speed launches, then front and rear skirts lifting at higher speed while all four fans push air under the car. It is close to what Moravy described on stage. Crucially, its controller reads **pressure sensors inside the sealed region**, meaning the car can measure its own suction and close the loop. A second patent, "Electric fan car", granted in September 2026, puts four ducted fans in the rear diffuser with no skirts at all. A third covers a hidden active rear wing rated to 700 kg, using actuators from the Optimus programme.',
+      },
+      {
+        kind: "paragraph",
+        html: "Neither patent states a downforce or pressure figure. They describe how the thing works, not how hard it pulls. Every performance number in this article is Tesla's event claim or my arithmetic on top of it.",
+      },
+      {
+        kind: "heading",
+        id: "flying",
+        text: "The flying part is a 1960s spacecraft thruster",
+      },
+      {
+        kind: "paragraph",
+        html: 'A cold-gas thruster is the simplest rocket that exists. Store gas at high pressure, open a valve, let it out through a nozzle. Nothing burns — hence "cold". NASA\'s Manned Maneuvering Unit, the jet backpack astronauts flew untethered in the 1980s, used 24 nitrogen cold-gas thrusters. SpaceX steers Falcon 9 boosters with the same class of hardware on the way back down.',
+      },
+      {
+        kind: "mermaid",
+        caption:
+          "The gas path. The bell is what makes it supersonic: past the throat the flow keeps accelerating, and the banded shock pattern in the exhaust — Mach diamonds — is the visible proof.",
+        code: `flowchart LR
+    TANK[("COPV tank<br/>≈380 bar · 250 kg of air")]
+    VALVE["fast electric valve<br/>micro-adjusts in a fraction of a second"]
+    THROAT["converging throat<br/>flow reaches Mach 1"]
+    BELL["diverging bell<br/>flow goes supersonic"]
+    OUT["exhaust ≈ 690 m/s<br/>Mach diamonds in the plume"]
+    THRUST["thrust: over 80 kN<br/>across 10 nozzles"]
+
+    TANK --> VALVE --> THROAT --> BELL --> OUT
+    OUT -. "Newton's third law" .-> THRUST`,
+      },
+      {
+        kind: "paragraph",
+        html: "Cold gas is popular because it is simple, reliable, and can fire in very short, repeatable pulses — exactly what you want for attitude control. Its weakness is efficiency. Rocket people measure that as **specific impulse**, in seconds, and nitrogen cold gas manages roughly 65 to 76 s at best, against several hundred for a chemical engine. Air is mostly nitrogen, so air behaves about the same. That single limitation is why this car empties its tanks in seconds rather than minutes.",
+      },
+      {
+        kind: "list",
+        items: [
+          "**Ten nozzles**, fed from about 600 litres of tank volume holding roughly **250 kg of air** (Moravy).",
+          "**Four main thrusters** in the rear diffuser for acceleration, plus **attitude thrusters at the corners** — fire one side then the other and the car rolls, and stops rolling.",
+          "**Over 80 kN** of total thrust, per Tesla. That would hold up more than 8,000 kg against gravity.",
+          "**All-electric valves**, which Tesla says adjust in a fraction of a second. That speed is what makes thrusters usable for control rather than just a straight-line launch.",
+          "**Self-refilling tanks**, claimed by Musk — with no word on how, or how long it takes.",
+          "Tesla noted this was **harder than in space**: at sea level the atmosphere pushes back on the nozzle exit, which needed new hardware and new control logic.",
+        ],
+      },
+      {
+        kind: "heading",
+        id: "does-it-add-up",
+        text: "Does it add up?",
+      },
+      {
+        kind: "paragraph",
+        html: "Mostly, yes. Start with the acceleration claims, because they make the case for the fans on their own. Average acceleration to 60 mph is just 26.8 m/s divided by the time, and every single trim lands above what tyres alone can deliver.",
+      },
+      {
+        kind: "figure",
+        variant: "line",
+        title: "Average g needed for each 0–60 mph claim",
+        xKey: "run",
+        xLabel: "0–60 mph time",
+        yLabel: "average g required",
+        note: "My calculation from Tesla's quoted times",
+        caption:
+          "The flat line is Moravy's 1.26 g tyre ceiling. Even the fan-only Performance trim sits above it, which means the fans must be adding real grip at launch. The thruster trims are far beyond anything grip can supply — only thrust gets you there.",
+        series: [
+          { key: "needed", label: "g required" },
+          { key: "tyres", label: "tyres alone (1.26 g)" },
+        ],
+        data: [
+          { run: "1.60 s", needed: 1.71, tyres: 1.26 },
+          { run: "0.90 s", needed: 3.04, tyres: 1.26 },
+          { run: "0.81 s", needed: 3.38, tyres: 1.26 },
+          { run: "0.59 s", needed: 4.63, tyres: 1.26 },
+        ],
+      },
+      {
+        kind: "paragraph",
+        html: "Now the part that decides what this car actually is. Expanding air from about 380 bar to sea level at 20 °C gives an exhaust velocity of roughly 690 m/s — a specific impulse near 71 s, right in the textbook band. Thrust is mass flow times exhaust velocity, so run it backwards:",
+      },
+      {
+        kind: "formula",
+        tex: "\\dot{m} = \\frac{F}{v_e} = \\frac{80{,}000\\ \\text{N}}{690\\ \\text{m/s}} \\approx 115\\ \\text{kg/s}",
+        caption:
+          "At full thrust the car consumes about 115 kg of air every second. It carries 250 kg.",
+      },
+      {
+        kind: "paragraph",
+        html: "That is **about two seconds** of full thrust, and realistically less, because thrust decays as the tank pressure falls. Hovering is gentler — you only need to cancel weight, roughly 23 kN, which burns about 33 kg/s — and even then I make it **four to five seconds** of hover per full tank. Which is precisely what we were shown: hops, flips and landings. Not flight.",
+      },
+      {
+        kind: "callout",
+        title: "The one claim that does not survive the arithmetic",
+        body: "Tesla posted that thrust is **4 to 5 times** the tyre force. If the 4,700 kg readout was the fans at their stated 2 g, the car weighs about 2,350 kg — consistent with Marques Brownlee's remark that it is over 4,000 lb. At that mass, tyre force at 1.26 g is about 29 kN, so 80 kN is **2.8×**, not 4–5×. For Tesla's ratio to hold, the car would have to weigh around 1,450–1,600 kg, or the thrust would have to be well above 80 kN. Tesla has not said which — and both cannot be true at once.",
+      },
+      {
+        kind: "paragraph",
+        html: "Worth noting that the headline claim still survives even at the heavier figure: at 2,350 kg, tyres plus 80 kN give about 4.7 g, just clearing the 4.63 g that a 0.59-second run demands. The ratio is wrong. The time is reachable.",
+      },
+      {
+        kind: "heading",
+        id: "tanks",
+        text: "The riskiest part is not the flying",
+      },
+      {
+        kind: "paragraph",
+        html: "It is the tanks. Tesla stores the air in **composite overwrapped pressure vessels** — a thin liner wrapped in carbon fibre, the same class of hardware SpaceX flies. Two of them, with Tesla saying every usable void in the car is packed with tankage. Nobody stated a pressure on stage, but 250 kg in 600 litres works out to about 417 kg/m³, roughly 340 times the density of sea-level air, which puts you in the several-hundred-bar range; a trackside screen in Tesla's own photos reportedly read 5,500 psi, about 380 bar.",
+      },
+      {
+        kind: "paragraph",
+        html: "A tank that size is a large amount of stored energy sitting in a road car, and the failure modes are well documented:",
+      },
+      {
+        kind: "list",
+        items: [
+          "**Stress rupture.** Carbon fibre can fail after long periods under sustained load, below its rated burst strength. NASA has studied this for decades because COPVs sit on nearly every spacecraft, and published fresh work on it in 2026.",
+          "**It has happened.** The September 2016 AMOS-6 pad loss destroyed a Falcon 9 and its payload; SpaceX traced it to a COPV. Room-temperature air is a far gentler case, but the hardware class earns respect.",
+          "**Road cars are worse than rockets** in one specific way: crashes, fire, and thousands of fill cycles. Hydrogen and CNG vehicles already certify tanks against exactly this. A road-legal thruster car would have to do the same.",
+          "**Cold.** Gas leaving a tank chills what remains, hard. Valves and nozzles have to keep working far below freezing, and the air has to be bone dry or it will ice up mid-firing.",
+        ],
+      },
+      {
+        kind: "heading",
+        id: "lineage",
+        text: "Everything here has been built before",
+      },
+      {
+        kind: "table",
+        headers: ["Car", "Year", "How the fan was driven", "Downforce", "What happened"],
+        rows: [
+          [
+            "[Chaparral 2J](https://petroleummuseum.org/chaparral-2j/)",
+            "1970",
+            "Two 17-inch fans on a separate 45 hp snowmobile engine",
+            "≈11,000 N over ≈4.5 m²",
+            "Fastest in qualifying, never won, banned after one Can-Am season",
+          ],
+          [
+            "[Brabham BT46B](https://www.motorsportmagazine.com/archive/article/march-2001/58/brabham-bt46b/)",
+            "1978",
+            "One fan geared to the race engine, costing 30–40 hp",
+            "Never published",
+            "Won its only race, then withdrawn and banned",
+          ],
+          [
+            "Gordon Murray T.50",
+            "2020s",
+            "One 400 mm electric fan at the rear",
+            "≈50% more in high-downforce mode",
+            "In production as a road car",
+          ],
+          [
+            "[McMurtry Spéirling](https://www.motoringresearch.com/car-news/mcmurtry-speirling-drives-upside-down)",
+            "2022–26",
+            "Twin electric fans to 23,000 rpm",
+            "2,000 kg from 0 mph, on a ~1,000 kg car",
+            "First car to drive upside down, on a rig, April 2025",
+          ],
+          [
+            "**Tesla Roadster**",
+            "2026",
+            "Electric fans (count and power not stated)",
+            "4,700 kg readout, up to 2 g claimed",
+            "Held itself inverted on a ramp at the reveal",
+          ],
+        ],
+        caption:
+          "The 2J is the direct ancestor; the Spéirling is the closest modern match. Tesla's contribution is doing it with a much heavier car — and bolting thrusters on.",
+      },
+      {
+        kind: "paragraph",
+        html: "The Chaparral 2J is worth knowing properly. Jim Hall's team sealed the floor with flexible Lexan skirts linked to the suspension, holding about a 25 mm gap to the road; with the fans running the car visibly squatted about 5 cm. It was the quickest thing in qualifying and it kept breaking, mostly in the fan drive. Rivals argued the skirts were a movable aerodynamic device, which the rules banned, and complained about the grit it fired at them. The SCCA killed it after a single season.",
+      },
+      {
+        kind: "paragraph",
+        html: "Gordon Murray's Brabham BT46B came from a packaging problem — the flat-12 Alfa engine sat exactly where ground-effect tunnels needed to be, so a fan did the job instead. Murray maintained the fan was there to cool the engine. It won its first race so comprehensively that it never raced again.",
+      },
+      {
+        kind: "paragraph",
+        html: 'The thruster half has a quieter precedent. In 2018 **Bosch tested a motorcycle** that fires a sideways gas jet when sensors detect the front wheel sliding, nudging the bike back onto its line; it used airbag-style gas generators, so it was single-use. That is the useful reframing here. A thruster that fires when the tyres let go is not a stunt — it is an active safety system. Musk first promised a "SpaceX package" of about ten small thrusters back in June 2018. This is that promise, eight years late.',
+      },
+      {
+        kind: "heading",
+        id: "verdict",
+        text: "Confirmed, claimed, and questionable",
+      },
+      {
+        kind: "table",
+        headers: ["Claim", "Status", "Basis"],
+        rows: [
+          [
+            "Revealed 15 Oct 2026 at SpaceX McGregor",
+            "**Confirmed**",
+            "Live event, covered by CNN, CBS, TechCrunch and others",
+          ],
+          [
+            "No human aboard during the stunts",
+            "**Confirmed**",
+            "Stated on stage; a mannequin rode one run",
+          ],
+          [
+            "Held itself inverted, flipped, landed",
+            "**Confirmed as shown**",
+            "Livestream and live audience",
+          ],
+          [
+            "Up to 2 g of fan suction, 4,700 kg",
+            "Tesla's figure",
+            "On-screen readout; no independent test",
+          ],
+          [
+            "Over 80 kN thrust, 250 kg air, 10 nozzles",
+            "Tesla's figure",
+            "Stated by Tesla; consistent with basic physics",
+          ],
+          [
+            "0–60 mph in 0.81 s",
+            "Shown once",
+            "Live run on a cut-short pad; no independent timing",
+          ],
+          [
+            "Thrust is 4–5× tyre force",
+            "**Questionable**",
+            "Only holds if the car is far lighter than the 4,700 kg readout implies",
+          ],
+          [
+            "Sustained flight",
+            "**Not shown**",
+            "Hops of a few seconds; my estimate caps hover at 4–5 s",
+          ],
+          [
+            "Street-legal thrusters",
+            "**Unclear**",
+            "Musk said it may not be legal everywhere; the Rocket trim is marked not road approved",
+          ],
+          [
+            "Production in 2028",
+            "Promise",
+            "The Roadster has slipped repeatedly since its promised 2020 launch",
+          ],
+        ],
+        caption:
+          "One report dissents: Motor1 described the inverted section as a suction rig with a tethered flip, where other outlets describe the car's own fans holding it unaided. I could not resolve that from the coverage.",
+      },
+      {
+        kind: "paragraph",
+        html: "And the questions Tesla simply has not answered: what the car weighs by trim; how many fans, at what power, and whether the production car uses skirts at all; how the tanks refill, how long that takes, and how many launches a fill buys; whether the Thrust trim may legally fire on a public road; how a several-hundred-bar tank gets certified for crash and fire; what happens if a fan quits or the seal breaks while the car is inverted, or a valve sticks mid-air. Gizmodo, citing MotorTrend, reports the FAA imposed airspace limits around the test site for the event — which is its own kind of answer about where this sits.",
+      },
+      {
+        kind: "paragraph",
+        html: "A demo proves a stunt can be done once, under conditions its engineers chose. That is not nothing — holding 2,350 kg inverted on fan suction alone is a genuinely hard thing that nobody had done at this mass. But the gap between that and a car you can buy is measured in tank certification, seal durability on broken tarmac, and a regulator deciding what a road vehicle that leaves the ground actually is. The physics is sound and mostly old. The engineering is the part that is new, and it is the part we have seen least of.",
+      },
+      {
+        kind: "references",
+        title: "References",
+        items: [
+          {
+            label: "Tesla reveals SpaceX-powered Roadster that flies and falls with style",
+            href: "https://techcrunch.com/2026/10/15/tesla-reveals-spacex-powered-roadster-that-flies-and-falls-with-style/",
+            source: "TechCrunch",
+          },
+          {
+            label: "Tesla unveils what it says is a flying car",
+            href: "https://www.cnn.com/2026/10/15/business/tesla-unveils-what-it-says-is-a-flying-car",
+            source: "CNN",
+          },
+          {
+            label: "Roadster",
+            href: "https://www.tesla.com/roadster",
+            source: "Tesla",
+            note: "Trim table, range and road-approval note.",
+          },
+          {
+            label: "US 12,377,920 B1 — Adaptive vehicle aerodynamics for downforce",
+            href: "https://patents.google.com/patent/US12377920B1/en",
+            source: "Google Patents",
+            note: "Four fans, deployable skirts, two modes, pressure sensors in the sealed regions.",
+          },
+          {
+            label: "Feasibility Study of a Fan-Driven Device Generating Downforce for Road Cars",
+            href: "https://www.mdpi.com/1996-1073/15/15/5549",
+            source: "Szudarek, Piechna & Piechna, Energies 15(15) 5549, 2022",
+            note: "The closest academic work: CFD of fan downforce on a road car, and the best technical account of the Chaparral 2J.",
+          },
+          {
+            label: "Ground effect aerodynamics of race cars",
+            href: "https://eprints.soton.ac.uk/42969",
+            source: "Zhang, Toet & Zerihan, Applied Mechanics Reviews 59(1), 2006",
+          },
+          {
+            label: "NASA Contractor Report 198531 — small spacecraft propulsion comparison",
+            href: "https://ntrs.nasa.gov/api/citations/19970001472/downloads/19970001472.pdf",
+            source: "NASA NTRS",
+            note: "Gives nitrogen cold gas a maximum specific impulse of 76 s.",
+          },
+          {
+            label: "Simulation of a Cold Gas Thruster System and Test Data Correlation",
+            href: "https://ntrs.nasa.gov/search.jsp?R=20120003741",
+            source: "Hauser & Quinn, NASA TM-2012-217271",
+            note: "Why the whole gas system must be modelled, not just the nozzle.",
+          },
+          {
+            label: "Mechanics leading to stress rupture failure in carbon fibre COPVs",
+            href: "https://ntrs.nasa.gov/citations/20260002192",
+            source: "NASA TM-20260002192, 2026",
+          },
+          {
+            label: "Chaparral 2J",
+            href: "https://petroleummuseum.org/chaparral-2j/",
+            source: "Permian Basin Petroleum Museum",
+          },
+          {
+            label: "McMurtry Spéirling drives upside down",
+            href: "https://www.motoringresearch.com/car-news/mcmurtry-speirling-drives-upside-down",
+            source: "Motoring Research",
+          },
+          {
+            label: "Bosch tests gas-jet accident prevention for motorcycles",
+            href: "https://autocarpro.in/news-international/bosch-accident-prevention-29537",
+            source: "Autocar Professional, 2018",
+          },
+        ],
+      },
+    ],
+  },
+  {
     slug: "how-to-cap-time-machine-on-a-shared-ssd",
     title: "Putting Time Machine on a Storage Budget",
     dek: "I share a 2 TB external SSD between everyday project files and macOS backups. When Time Machine crossed 700 GB with no sign of slowing down, I needed a way to set a hard boundary. Here is how APFS containers, tmutil, and macOS permissions work together to cap it.",
