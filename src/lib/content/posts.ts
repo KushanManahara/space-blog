@@ -13,6 +13,7 @@ const parsedPosts = postSchema.array().parse([
     views: 0,
     commentCount: 0,
     tags: ["#tesla", "#aerodynamics", "#propulsion", "#physics", "#spacex"],
+    coverImage: "/articles/tesla-roadster-cover.png",
     body: [
       {
         kind: "paragraph",
