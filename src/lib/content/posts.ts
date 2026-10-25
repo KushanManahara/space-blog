@@ -6,7 +6,7 @@ const parsedPosts = postSchema.array().parse([
   {
     slug: "tesla-roadster-fans-thrusters-physics",
     title: "The Roadster Flew on Two Old Ideas and 250 kg of Air",
-    dek: "A fan car from 1970 and a spacecraft thruster from the 1960s, in one road car, under software control. The stunts were real. Run the arithmetic and you get about four seconds of hover — and one Tesla claim that does not survive contact with a calculator.",
+    dek: "A fan car from 1970 and a spacecraft thruster from the 1960s, in one road car, under software control. The stunts were real. Run the arithmetic and you get about four seconds of hover, and one Tesla claim that does not survive contact with a calculator.",
     topic: "Experiments",
     publishedAt: "2026-10-17",
     likes: 0,
@@ -17,7 +17,7 @@ const parsedPosts = postSchema.array().parse([
     body: [
       {
         kind: "paragraph",
-        html: "On 15 October, at SpaceX's rocket test site in McGregor, Texas, a car drove up a ramp past vertical and stayed there — roughly 21 metres up, upside down, held by nothing but its own fans. Then it let go, caught itself on jets of compressed air, and landed. Later it jumped a parked line of Teslas with a Semi in it, corkscrewing through the air at about seven metres. On the pad it ran 0 to 60 mph in 0.81 seconds. Nobody was driving.",
+        html: "On 15 October, at SpaceX's rocket test site in McGregor, Texas, a car drove up a ramp past vertical and stayed there: roughly 21 metres up, upside down, held by nothing but its own fans. Then it let go, caught itself on jets of compressed air, and landed. Later it jumped a parked line of Teslas with a Semi in it, corkscrewing through the air at about seven metres. On the pad it ran 0 to 60 mph in 0.81 seconds. Nobody was driving.",
       },
       {
         kind: "paragraph",
@@ -25,7 +25,7 @@ const parsedPosts = postSchema.array().parse([
       },
       {
         kind: "paragraph",
-        html: "I spent a couple of days taking the claims apart — Tesla's patents, NASA's reports on the hardware, the 1970 Can-Am car this descends from — and running the numbers myself. Most of what Tesla said holds up. One claim doesn't. And the flight, as flown, lasts about four seconds.",
+        html: "I spent a couple of days taking the claims apart (Tesla's patents, NASA's reports on the hardware, the 1970 Can-Am car this descends from) and running the numbers myself. Most of what Tesla said holds up. One claim doesn't. And the flight, as flown, lasts about four seconds.",
       },
       {
         kind: "callout",
@@ -39,7 +39,7 @@ const parsedPosts = postSchema.array().parse([
       },
       {
         kind: "paragraph",
-        html: "The reveal had been pushed from 1 October by weather, and landed almost nine years after the first Roadster prototype in November 2017. Three stunts carried it. The car drove up a curved ramp to a pitch of about 170 degrees and hung inverted with an on-screen downforce readout of **4,700 kg**, then dropped and used its thrusters to arrest the fall. It cleared a row of parked vehicles — Semi and Cybercab among them — in what Tesla called a kickflip. And it ran a live 0–60 on the launch pad in **0.81 seconds**, a run Tesla said was cut short because the pad was too small.",
+        html: "The reveal had been pushed from 1 October by weather, and landed almost nine years after the first Roadster prototype in November 2017. Three stunts carried it. The car drove up a curved ramp to a pitch of about 170 degrees and hung inverted with an on-screen downforce readout of **4,700 kg**, then dropped and used its thrusters to arrest the fall. It cleared a row of parked vehicles, Semi and Cybercab among them, in what Tesla called a kickflip. And it ran a live 0–60 on the launch pad in **0.81 seconds**, a run Tesla said was cut short because the pad was too small.",
       },
       {
         kind: "paragraph",
@@ -49,17 +49,17 @@ const parsedPosts = postSchema.array().parse([
         kind: "table",
         headers: ["Trim", "Seats", "Thrusters", "0–60 mph claim", "Reservation"],
         rows: [
-          ["**Performance** — road ready", "2", "None (fans only)", "Under 1.6 s", "$50,000"],
-          ["**Thrust** — race ready", "2", "Rear only", "Under 0.9 s", "$250,000"],
-          ["**Rocket** — air ready", "1", "10, all around", "Under 0.59 s", "Invite only"],
+          ["**Performance** (road ready)", "2", "None (fans only)", "Under 1.6 s", "$50,000"],
+          ["**Thrust** (race ready)", "2", "Rear only", "Under 0.9 s", "$250,000"],
+          ["**Rocket** (air ready)", "1", "10, all around", "Under 0.59 s", "Invite only"],
         ],
         caption:
-          "All three are quoted at about 300 miles of range and over 230 mph. Tesla gave no price, battery size, power figure or kerb weight — and its own site marks the flying trim as not approved for public roads. Production is promised for 2028.",
+          "All three are quoted at about 300 miles of range and over 230 mph. Tesla gave no price, battery size, power figure or kerb weight, and its own site marks the flying trim as not approved for public roads. Production is promised for 2028.",
       },
       {
         kind: "heading",
         id: "sticking",
-        text: "Half the trick is not flying — it is sticking",
+        text: "Half the trick is not flying, it is sticking",
       },
       {
         kind: "paragraph",
@@ -71,7 +71,7 @@ const parsedPosts = postSchema.array().parse([
       },
       {
         kind: "paragraph",
-        html: "This is where fans beat wings. A wing makes downforce out of moving air, so its force grows with the **square** of speed and is precisely zero when you are sitting still on the line. A fan makes downforce out of a pressure difference, which it can hold at any speed, including a standstill. That is the whole reason a fan car can launch harder than an aerodynamic one — and the reason it can hang off a ramp doing 0 mph.",
+        html: "This is where fans beat wings. A wing makes downforce out of moving air, so its force grows with the **square** of speed and is precisely zero when you are sitting still on the line. A fan makes downforce out of a pressure difference, which it can hold at any speed, including a standstill. That is the whole reason a fan car can launch harder than an aerodynamic one, and the reason it can hang off a ramp doing 0 mph.",
       },
       {
         kind: "mermaid",
@@ -109,12 +109,12 @@ const parsedPosts = postSchema.array().parse([
           ["4.5 m²", "10.2 kPa", "10%"],
         ],
         caption:
-          "My calculation from Tesla's 4,700 kg readout. The headline is how little vacuum is required — roughly a tenth of an atmosphere. A small pressure difference across a large area is a very large force.",
+          "My calculation from Tesla's 4,700 kg readout. The headline is how little vacuum is required: roughly a tenth of an atmosphere. A small pressure difference across a large area is a very large force.",
         numericColumns: [1, 2],
       },
       {
         kind: "paragraph",
-        html: "So the hard part was never the vacuum. It is the **seal**. Air floods back in through every gap between floor and road, and the fans have to evacuate it at least as fast as it arrives. The power a fan puts into the air is the pressure difference it sustains times the volume it moves — and that volume is set almost entirely by how much is leaking.",
+        html: "So the hard part was never the vacuum. It is the **seal**. Air floods back in through every gap between floor and road, and the fans have to evacuate it at least as fast as it arrives. The power a fan puts into the air is the pressure difference it sustains times the volume it moves, and that volume is set almost entirely by how much is leaking.",
       },
       {
         kind: "figure",
@@ -136,11 +136,11 @@ const parsedPosts = postSchema.array().parse([
       {
         kind: "callout",
         title: "Why this needed a big battery",
-        body: "The 1970 Chaparral 2J sealed about 4.5 m² and made roughly 11,000 N — a pressure drop of only about 2.4 kPa, which its fans delivered with around 11 kW of air power from a 45 hp snowmobile engine. Tesla's 4,700 kg readout needs suction **four to five times deeper** than that. An electric car carrying a very large battery is a far better home for this idea than a 1970 race car ever was.",
+        body: "The 1970 Chaparral 2J sealed about 4.5 m² and made roughly 11,000 N. That is a pressure drop of only about 2.4 kPa, which its fans delivered with around 11 kW of air power from a 45 hp snowmobile engine. Tesla's 4,700 kg readout needs suction **four to five times deeper** than that. An electric car carrying a very large battery is a far better home for this idea than a 1970 race car ever was.",
       },
       {
         kind: "paragraph",
-        html: 'Tesla has two granted patents covering the fan system. [US 12,377,920 B1](https://patents.google.com/patent/US12377920B1/en), filed April 2025 and granted that August, describes four fans with deployable skirts and two operating modes — all skirts down and the central fans evacuating a sealed region for low-speed launches, then front and rear skirts lifting at higher speed while all four fans push air under the car. It is close to what Moravy described on stage. Crucially, its controller reads **pressure sensors inside the sealed region**, meaning the car can measure its own suction and close the loop. A second patent, "Electric fan car", granted in September 2026, puts four ducted fans in the rear diffuser with no skirts at all. A third covers a hidden active rear wing rated to 700 kg, using actuators from the Optimus programme.',
+        html: 'Tesla has two granted patents covering the fan system. [US 12,377,920 B1](https://patents.google.com/patent/US12377920B1/en), filed April 2025 and granted that August, describes four fans with deployable skirts and two operating modes: all skirts down and the central fans evacuating a sealed region for low-speed launches, then front and rear skirts lifting at higher speed while all four fans push air under the car. It is close to what Moravy described on stage. Crucially, its controller reads **pressure sensors inside the sealed region**, meaning the car can measure its own suction and close the loop. A second patent, "Electric fan car", granted in September 2026, puts four ducted fans in the rear diffuser with no skirts at all. A third covers a hidden active rear wing rated to 700 kg, using actuators from the Optimus programme.',
       },
       {
         kind: "paragraph",
@@ -153,12 +153,12 @@ const parsedPosts = postSchema.array().parse([
       },
       {
         kind: "paragraph",
-        html: 'A cold-gas thruster is the simplest rocket that exists. Store gas at high pressure, open a valve, let it out through a nozzle. Nothing burns — hence "cold". NASA\'s Manned Maneuvering Unit, the jet backpack astronauts flew untethered in the 1980s, used 24 nitrogen cold-gas thrusters. SpaceX steers Falcon 9 boosters with the same class of hardware on the way back down.',
+        html: 'A cold-gas thruster is the simplest rocket that exists. Store gas at high pressure, open a valve, let it out through a nozzle. Nothing burns, hence "cold". NASA\'s Manned Maneuvering Unit, the jet backpack astronauts flew untethered in the 1980s, used 24 nitrogen cold-gas thrusters. SpaceX steers Falcon 9 boosters with the same class of hardware on the way back down.',
       },
       {
         kind: "mermaid",
         caption:
-          "The gas path. The bell is what makes it supersonic: past the throat the flow keeps accelerating, and the banded shock pattern in the exhaust — Mach diamonds — is the visible proof.",
+          "The gas path. The bell is what makes it supersonic: past the throat the flow keeps accelerating, and the banded shock pattern in the exhaust (Mach diamonds) is the visible proof.",
         code: `flowchart LR
     TANK[("COPV tank<br/>≈380 bar · 250 kg of air")]
     VALVE["fast electric valve<br/>micro-adjusts in a fraction of a second"]
@@ -172,16 +172,16 @@ const parsedPosts = postSchema.array().parse([
       },
       {
         kind: "paragraph",
-        html: "Cold gas is popular because it is simple, reliable, and can fire in very short, repeatable pulses — exactly what you want for attitude control. Its weakness is efficiency. Rocket people measure that as **specific impulse**, in seconds, and nitrogen cold gas manages roughly 65 to 76 s at best, against several hundred for a chemical engine. Air is mostly nitrogen, so air behaves about the same. That single limitation is why this car empties its tanks in seconds rather than minutes.",
+        html: "Cold gas is popular because it is simple, reliable, and can fire in very short, repeatable pulses, which is exactly what you want for attitude control. Its weakness is efficiency. Rocket people measure that as **specific impulse**, in seconds, and nitrogen cold gas manages roughly 65 to 76 s at best, against several hundred for a chemical engine. Air is mostly nitrogen, so air behaves about the same. That single limitation is why this car empties its tanks in seconds rather than minutes.",
       },
       {
         kind: "list",
         items: [
           "**Ten nozzles**, fed from about 600 litres of tank volume holding roughly **250 kg of air** (Moravy).",
-          "**Four main thrusters** in the rear diffuser for acceleration, plus **attitude thrusters at the corners** — fire one side then the other and the car rolls, and stops rolling.",
+          "**Four main thrusters** in the rear diffuser for acceleration, plus **attitude thrusters at the corners**. Fire one side then the other and the car rolls, and stops rolling.",
           "**Over 80 kN** of total thrust, per Tesla. That would hold up more than 8,000 kg against gravity.",
           "**All-electric valves**, which Tesla says adjust in a fraction of a second. That speed is what makes thrusters usable for control rather than just a straight-line launch.",
-          "**Self-refilling tanks**, claimed by Musk — with no word on how, or how long it takes.",
+          "**Self-refilling tanks**, claimed by Musk, with no word on how, or how long it takes.",
           "Tesla noted this was **harder than in space**: at sea level the atmosphere pushes back on the nozzle exit, which needed new hardware and new control logic.",
         ],
       },
@@ -203,7 +203,7 @@ const parsedPosts = postSchema.array().parse([
         yLabel: "average g required",
         note: "My calculation from Tesla's quoted times",
         caption:
-          "The flat line is Moravy's 1.26 g tyre ceiling. Even the fan-only Performance trim sits above it, which means the fans must be adding real grip at launch. The thruster trims are far beyond anything grip can supply — only thrust gets you there.",
+          "The flat line is Moravy's 1.26 g tyre ceiling. Even the fan-only Performance trim sits above it, which means the fans must be adding real grip at launch. The thruster trims are far beyond anything grip can supply. Only thrust gets you there.",
         series: [
           { key: "needed", label: "g required" },
           { key: "tyres", label: "tyres alone (1.26 g)" },
@@ -217,7 +217,7 @@ const parsedPosts = postSchema.array().parse([
       },
       {
         kind: "paragraph",
-        html: "Now the part that decides what this car actually is. Expanding air from about 380 bar to sea level at 20 °C gives an exhaust velocity of roughly 690 m/s — a specific impulse near 71 s, right in the textbook band. Thrust is mass flow times exhaust velocity, so run it backwards:",
+        html: "Now the part that decides what this car actually is. Expanding air from about 380 bar to sea level at 20 °C gives an exhaust velocity of roughly 690 m/s, a specific impulse near 71 s, right in the textbook band. Thrust is mass flow times exhaust velocity, so run it backwards:",
       },
       {
         kind: "formula",
@@ -227,12 +227,12 @@ const parsedPosts = postSchema.array().parse([
       },
       {
         kind: "paragraph",
-        html: "That is **about two seconds** of full thrust, and realistically less, because thrust decays as the tank pressure falls. Hovering is gentler — you only need to cancel weight, roughly 23 kN, which burns about 33 kg/s — and even then I make it **four to five seconds** of hover per full tank. Which is precisely what we were shown: hops, flips and landings. Not flight.",
+        html: "That is **about two seconds** of full thrust, and realistically less, because thrust decays as the tank pressure falls. Hovering is gentler (you only need to cancel weight, roughly 23 kN, which burns about 33 kg/s), and even then I make it **four to five seconds** of hover per full tank. Which is precisely what we were shown: hops, flips and landings. Not flight.",
       },
       {
         kind: "callout",
         title: "The one claim that does not survive the arithmetic",
-        body: "Tesla posted that thrust is **4 to 5 times** the tyre force. If the 4,700 kg readout was the fans at their stated 2 g, the car weighs about 2,350 kg — consistent with Marques Brownlee's remark that it is over 4,000 lb. At that mass, tyre force at 1.26 g is about 29 kN, so 80 kN is **2.8×**, not 4–5×. For Tesla's ratio to hold, the car would have to weigh around 1,450–1,600 kg, or the thrust would have to be well above 80 kN. Tesla has not said which — and both cannot be true at once.",
+        body: "Tesla posted that thrust is **4 to 5 times** the tyre force. If the 4,700 kg readout was the fans at their stated 2 g, the car weighs about 2,350 kg, consistent with Marques Brownlee's remark that it is over 4,000 lb. At that mass, tyre force at 1.26 g is about 29 kN, so 80 kN is **2.8×**, not 4–5×. For Tesla's ratio to hold, the car would have to weigh around 1,450–1,600 kg, or the thrust would have to be well above 80 kN. Tesla has not said which, and at the weight its own readout implies, the two figures cannot both be right.",
       },
       {
         kind: "paragraph",
@@ -245,7 +245,7 @@ const parsedPosts = postSchema.array().parse([
       },
       {
         kind: "paragraph",
-        html: "It is the tanks. Tesla stores the air in **composite overwrapped pressure vessels** — a thin liner wrapped in carbon fibre, the same class of hardware SpaceX flies. Two of them, with Tesla saying every usable void in the car is packed with tankage. Nobody stated a pressure on stage, but 250 kg in 600 litres works out to about 417 kg/m³, roughly 340 times the density of sea-level air, which puts you in the several-hundred-bar range; a trackside screen in Tesla's own photos reportedly read 5,500 psi, about 380 bar.",
+        html: "It is the tanks. Tesla stores the air in **composite overwrapped pressure vessels**: a thin liner wrapped in carbon fibre, the same class of hardware SpaceX flies. Two of them, with Tesla saying every usable void in the car is packed with tankage. Nobody stated a pressure on stage, but 250 kg in 600 litres works out to about 417 kg/m³, roughly 340 times the density of sea-level air, which puts you in the several-hundred-bar range; a trackside screen in Tesla's own photos reportedly read 5,500 psi, about 380 bar.",
       },
       {
         kind: "paragraph",
@@ -306,7 +306,7 @@ const parsedPosts = postSchema.array().parse([
           ],
         ],
         caption:
-          "The 2J is the direct ancestor; the Spéirling is the closest modern match. Tesla's contribution is doing it with a much heavier car — and bolting thrusters on.",
+          "The 2J is the direct ancestor; the Spéirling is the closest modern match. Tesla's contribution is doing it with a much heavier car, and bolting thrusters on.",
       },
       {
         kind: "paragraph",
@@ -314,11 +314,11 @@ const parsedPosts = postSchema.array().parse([
       },
       {
         kind: "paragraph",
-        html: "Gordon Murray's Brabham BT46B came from a packaging problem — the flat-12 Alfa engine sat exactly where ground-effect tunnels needed to be, so a fan did the job instead. Murray maintained the fan was there to cool the engine. It won its first race so comprehensively that it never raced again.",
+        html: "Gordon Murray's Brabham BT46B came from a packaging problem: the flat-12 Alfa engine sat exactly where ground-effect tunnels needed to be, so a fan did the job instead. Murray maintained the fan was there to cool the engine. It won its first race so comprehensively that it never raced again.",
       },
       {
         kind: "paragraph",
-        html: 'The thruster half has a quieter precedent. In 2018 **Bosch tested a motorcycle** that fires a sideways gas jet when sensors detect the front wheel sliding, nudging the bike back onto its line; it used airbag-style gas generators, so it was single-use. That is the useful reframing here. A thruster that fires when the tyres let go is not a stunt — it is an active safety system. Musk first promised a "SpaceX package" of about ten small thrusters back in June 2018. This is that promise, eight years late.',
+        html: 'The thruster half has a quieter precedent. In 2018 **Bosch tested a motorcycle** that fires a sideways gas jet when sensors detect the front wheel sliding, nudging the bike back onto its line; it used airbag-style gas generators, so it was single-use. That is the useful reframing here. A thruster that fires when the tyres let go is not a stunt. It is an active safety system. Musk first promised a "SpaceX package" of about ten small thrusters back in June 2018. This is that promise, eight years late.',
       },
       {
         kind: "heading",
@@ -385,11 +385,11 @@ const parsedPosts = postSchema.array().parse([
       },
       {
         kind: "paragraph",
-        html: "And the questions Tesla simply has not answered: what the car weighs by trim; how many fans, at what power, and whether the production car uses skirts at all; how the tanks refill, how long that takes, and how many launches a fill buys; whether the Thrust trim may legally fire on a public road; how a several-hundred-bar tank gets certified for crash and fire; what happens if a fan quits or the seal breaks while the car is inverted, or a valve sticks mid-air. Gizmodo, citing MotorTrend, reports the FAA imposed airspace limits around the test site for the event — which is its own kind of answer about where this sits.",
+        html: "And the questions Tesla simply has not answered: what the car weighs by trim; how many fans, at what power, and whether the production car uses skirts at all; how the tanks refill, how long that takes, and how many launches a fill buys; whether the Thrust trim may legally fire on a public road; how a several-hundred-bar tank gets certified for crash and fire; what happens if a fan quits or the seal breaks while the car is inverted, or a valve sticks mid-air. Gizmodo, citing MotorTrend, reports the FAA imposed airspace limits around the test site for the event, which is its own kind of answer about where this sits.",
       },
       {
         kind: "paragraph",
-        html: "A demo proves a stunt can be done once, under conditions its engineers chose. That is not nothing — holding 2,350 kg inverted on fan suction alone is a genuinely hard thing that nobody had done at this mass. But the gap between that and a car you can buy is measured in tank certification, seal durability on broken tarmac, and a regulator deciding what a road vehicle that leaves the ground actually is. The physics is sound and mostly old. The engineering is the part that is new, and it is the part we have seen least of.",
+        html: "A demo proves a stunt can be done once, under conditions its engineers chose. That is not nothing. Holding 2,350 kg inverted on fan suction alone is a genuinely hard thing that nobody had done at this mass. But the gap between that and a car you can buy is measured in tank certification, seal durability on broken tarmac, and a regulator deciding what a road vehicle that leaves the ground actually is. The physics is sound and mostly old. The engineering is the part that is new, and it is the part we have seen least of.",
       },
       {
         kind: "references",
@@ -412,7 +412,7 @@ const parsedPosts = postSchema.array().parse([
             note: "Trim table, range and road-approval note.",
           },
           {
-            label: "US 12,377,920 B1 — Adaptive vehicle aerodynamics for downforce",
+            label: "US 12,377,920 B1: Adaptive vehicle aerodynamics for downforce",
             href: "https://patents.google.com/patent/US12377920B1/en",
             source: "Google Patents",
             note: "Four fans, deployable skirts, two modes, pressure sensors in the sealed regions.",
@@ -429,7 +429,7 @@ const parsedPosts = postSchema.array().parse([
             source: "Zhang, Toet & Zerihan, Applied Mechanics Reviews 59(1), 2006",
           },
           {
-            label: "NASA Contractor Report 198531 — small spacecraft propulsion comparison",
+            label: "NASA Contractor Report 198531: small spacecraft propulsion comparison",
             href: "https://ntrs.nasa.gov/api/citations/19970001472/downloads/19970001472.pdf",
             source: "NASA NTRS",
             note: "Gives nitrogen cold gas a maximum specific impulse of 76 s.",
@@ -1412,7 +1412,7 @@ Quota         : 800 GB`,
   {
     slug: "pytorch-tensor-to-neural-network",
     title: "PyTorch: From Tensor to Neural Network",
-    dek: "People think PyTorch is enormous. It isn't. It's one data structure and a pile of operations on it — and once that clicks, every model you'll ever read looks obvious. Here's the ground floor.",
+    dek: "People think PyTorch is enormous. It isn't. It's one data structure and a pile of operations on it, and once that clicks, every model you'll ever read looks obvious. Here's the ground floor.",
     topic: "Engineering",
     publishedAt: "2026-09-08",
     likes: 0,
@@ -1428,7 +1428,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "There aren't. PyTorch is a numerical computing library that turned out to be very good at deep learning. Take away the pretrained models and the training helpers and what's left is a single data structure — the **tensor** — and a large, well-organised set of operations on it. A neural network is just a function built from those operations. Training is just calculus on that function. Get comfortable with the tensor and the rest of the library stops being intimidating and starts being predictable.",
+        html: "There aren't. PyTorch is a numerical computing library that turned out to be very good at deep learning. Take away the pretrained models and the training helpers and what's left is a single data structure, the **tensor**, and a large, well-organised set of operations on it. A neural network is just a function built from those operations. Training is just calculus on that function. Get comfortable with the tensor and the rest of the library stops being intimidating and starts being predictable.",
       },
       {
         kind: "paragraph",
@@ -1446,16 +1446,16 @@ Quota         : 800 GB`,
       {
         kind: "list",
         items: [
-          "A **scalar** — a single loss value — is a 0-D tensor.",
-          "A **vector** — the 10 class scores for one image — is 1-D, shape `(10,)`.",
-          "A **matrix** — a batch of those score vectors — is 2-D, shape `(32, 10)`.",
+          "A **scalar**, such as a single loss value, is a 0-D tensor.",
+          "A **vector**, such as the 10 class scores for one image, is 1-D, shape `(10,)`.",
+          "A **matrix**, such as a batch of those score vectors, is 2-D, shape `(32, 10)`.",
           "A **batch of RGB images** is 4-D, shape `(32, 3, 224, 224)`: batch, channels, height, width.",
           "A **batch of token embeddings** is 3-D: batch, sequence length, embedding dimension.",
         ],
       },
       {
         kind: "paragraph",
-        html: "If you've used NumPy, this is familiar ground — the API was deliberately kept close, and most `np.` code has a one-to-one `torch.` translation. Try the snippet below; every line runs.",
+        html: "If you've used NumPy, this is familiar ground: the API was deliberately kept close, and most `np.` code has a one-to-one `torch.` translation. Try the snippet below; every line runs.",
       },
       {
         kind: "code",
@@ -1466,7 +1466,7 @@ Quota         : 800 GB`,
       {
         kind: "callout",
         title: "Coming from NumPy?",
-        body: "`torch.from_numpy(arr)` and `tensor.numpy()` convert both ways and *share memory* — change one, the other changes. That's a feature for zero-copy interop and a trap if you forget it. Use `.clone()` when you want an independent copy.",
+        body: "`torch.from_numpy(arr)` and `tensor.numpy()` convert both ways and *share memory*: change one and the other changes. That's a feature for zero-copy interop and a trap if you forget it. Use `.clone()` when you want an independent copy.",
       },
       {
         kind: "heading",
@@ -1479,7 +1479,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: '**`device`** says where the data physically lives: `cpu` (your RAM) or `cuda:0` (the first GPU\'s memory). Operations run wherever their inputs live, so moving a tensor to the GPU with `.to("cuda")` is literally what makes the maths run on the accelerator. Mix devices in one operation and PyTorch stops you with an error — a rite of passage covered properly in part 5.',
+        html: '**`device`** says where the data physically lives: `cpu` (your RAM) or `cuda:0` (the first GPU\'s memory). Operations run wherever their inputs live, so moving a tensor to the GPU with `.to("cuda")` is literally what makes the maths run on the accelerator. Mix devices in one operation and PyTorch stops you with an error, a rite of passage covered properly in part 5.',
       },
       {
         kind: "paragraph",
@@ -1493,7 +1493,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "The `device` attribute isn't a formality. The same operation — a matrix multiply — runs orders of magnitude faster on a GPU once the matrices are big enough to hide the cost of shipping them there. Below is `A @ B` for square matrices of growing size; hover the lines. For small tensors the CPU wins (no transfer overhead); the GPU pulls ahead fast and then runs away.",
+        html: "The `device` attribute isn't a formality. The same operation, a matrix multiply, runs orders of magnitude faster on a GPU once the matrices are big enough to hide the cost of shipping them there. Below is `A @ B` for square matrices of growing size; hover the lines. For small tensors the CPU wins (no transfer overhead); the GPU pulls ahead fast and then runs away.",
       },
       {
         kind: "figure",
@@ -1502,7 +1502,7 @@ Quota         : 800 GB`,
         xKey: "n",
         xLabel: "matrix size N",
         yLabel: "milliseconds (log-ish)",
-        note: "Illustrative — exact numbers depend on hardware",
+        note: "Illustrative. Exact numbers depend on hardware",
         caption:
           "Below ~256, the GPU's transfer and launch overhead makes it slower. Past ~1024 it isn't close. This gap is the entire reason `.to(\"cuda\")` exists.",
         series: [
@@ -1525,11 +1525,11 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "Here's the honest truth about writing models: the maths is rarely the hard part. The hard part is getting a `(32, 3, 224, 224)` tensor to line up with a layer that expected `(32, 150528)`. Shape errors are the mosquitoes of deep learning — not dangerous, endlessly annoying, and you will get bitten daily until you learn the patterns.",
+        html: "Here's the honest truth about writing models: the maths is rarely the hard part. The hard part is getting a `(32, 3, 224, 224)` tensor to line up with a layer that expected `(32, 150528)`. Shape errors are the mosquitoes of deep learning: not dangerous, endlessly annoying, and you will get bitten daily until you learn the patterns.",
       },
       {
         kind: "paragraph",
-        html: "The key rule is **broadcasting**: when two tensors have different shapes, PyTorch tries to make them compatible by aligning dimensions from the right and stretching any dimension of size 1 to match its partner. It never copies data to do this — it's a view trick — so it's free.",
+        html: "The key rule is **broadcasting**: when two tensors have different shapes, PyTorch tries to make them compatible by aligning dimensions from the right and stretching any dimension of size 1 to match its partner. It never copies data to do this (it's a view trick), so it's free.",
       },
       {
         kind: "table",
@@ -1541,7 +1541,7 @@ Quota         : 800 GB`,
           ["`(32, 10)` + `(32,)`", "error", "trailing dims 10 and 32 don't match"],
         ],
         caption:
-          "Broadcasting aligns from the right. When it fails, the error names the exact dimension index that didn't match — read it, don't guess.",
+          "Broadcasting aligns from the right. When it fails, the error names the exact dimension index that didn't match. Read it, don't guess.",
       },
       {
         kind: "callout",
@@ -1575,7 +1575,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "Stack two of these with a non-linearity between them and you have a multi-layer perceptron — a universal function approximator, in principle. The only missing ingredient is a way to choose good values for `W` and `b` instead of random ones.",
+        html: "Stack two of these with a non-linearity between them and you have a multi-layer perceptron, in principle a universal function approximator. The only missing ingredient is a way to choose good values for `W` and `b` instead of random ones.",
       },
       {
         kind: "heading",
@@ -1593,7 +1593,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "Every serious model — a ResNet, a Transformer, Stable Diffusion's U-Net — is this same idea scaled up: `nn.Module` objects holding other `nn.Module` objects, with a `forward` method that says how tensors flow through them. The object graph is small:",
+        html: "Every serious model (a ResNet, a Transformer, Stable Diffusion's U-Net) is this same idea scaled up: `nn.Module` objects holding other `nn.Module` objects, with a `forward` method that says how tensors flow through them. The object graph is small:",
       },
       {
         kind: "mermaid",
@@ -1631,28 +1631,28 @@ Quota         : 800 GB`,
         kind: "list",
         items: [
           "**Tensors** hold the numbers, plus a shape, a dtype, a device, and a gradient-tracking flag.",
-          "**Operations** on tensors — matmul, `relu`, `sum` — are the arithmetic a network is made of.",
+          "**Operations** on tensors (matmul, `relu`, `sum`) are the arithmetic a network is made of.",
           "**Broadcasting** is how tensors of different shapes combine without copying; shape errors name the dimension that failed.",
           "**`nn.Parameter`** is a tensor a layer owns and wants gradients for.",
-          "**`nn.Module`** bundles parameters with a `forward` method into a reusable unit — and a model is just Modules nested inside Modules.",
+          "**`nn.Module`** bundles parameters with a `forward` method into a reusable unit, and a model is just Modules nested inside Modules.",
         ],
       },
       {
         kind: "callout",
         title: "Next in the series",
-        body: "You have a model full of random weights and no idea how it becomes a model that works. That transformation is `loss.backward()`, and the machinery behind it — a graph PyTorch builds while your code runs, then walks in reverse — is **Part 2: Autograd**.",
+        body: "You have a model full of random weights and no idea how it becomes a model that works. That transformation is `loss.backward()`, and the machinery behind it, a graph PyTorch builds while your code runs and then walks in reverse, is **Part 2: Autograd**.",
       },
       {
         kind: "references",
         title: "References",
         items: [
           {
-            label: "torch.Tensor — API reference",
+            label: "torch.Tensor: API reference",
             href: "https://pytorch.org/docs/stable/tensors.html",
             source: "PyTorch documentation",
           },
           {
-            label: "Tensors — Learn the Basics",
+            label: "Tensors: Learn the Basics",
             href: "https://pytorch.org/tutorials/beginner/basics/tensorqs_tutorial.html",
             source: "PyTorch tutorials",
           },
@@ -1663,7 +1663,7 @@ Quota         : 800 GB`,
             note: "The exact rules for how mismatched shapes are reconciled.",
           },
           {
-            label: "Building models with nn.Module — Introduction to PyTorch",
+            label: "Building models with nn.Module: Introduction to PyTorch",
             href: "https://pytorch.org/tutorials/beginner/introyt/modelsyt_tutorial.html",
             source: "PyTorch tutorials",
           },
@@ -1671,7 +1671,7 @@ Quota         : 800 GB`,
             label: "PyTorch: An Imperative Style, High-Performance Deep Learning Library",
             href: "https://arxiv.org/abs/1912.01703",
             source: "Paszke et al., NeurIPS 2019",
-            note: "The design paper — why PyTorch is built the way it is.",
+            note: "The design paper, explaining why PyTorch is built the way it is.",
           },
         ],
       },
@@ -1680,7 +1680,7 @@ Quota         : 800 GB`,
   {
     slug: "pytorch-autograd-how-pytorch-learns",
     title: "Autograd: How PyTorch Learns",
-    dek: "Every training loop on Earth is basically the same four lines. The one that does the real work — loss.backward() — is a graph PyTorch builds while your code runs and then walks backwards. Let's take it apart.",
+    dek: "Every training loop on Earth is basically the same four lines. The one that does the real work, loss.backward(), is a graph PyTorch builds while your code runs and then walks backwards. Let's take it apart.",
     topic: "Engineering",
     publishedAt: "2026-09-09",
     likes: 0,
@@ -1692,11 +1692,11 @@ Quota         : 800 GB`,
     body: [
       {
         kind: "paragraph",
-        html: "Part 1 left you with a model full of random numbers. It can take an image and confidently tell you it's the digit 4 when it's a 9. Training is the process of dragging those random numbers towards ones that are usually right — and every single step of that process needs a **gradient**: a number for each parameter that says \"increase me to make the loss worse, decrease me to make it better, and by roughly this much.\"",
+        html: "Part 1 left you with a model full of random numbers. It can take an image and confidently tell you it's the digit 4 when it's a 9. Training is the process of dragging those random numbers towards ones that are usually right, and every single step of that process needs a **gradient**: a number for each parameter that says \"increase me to make the loss worse, decrease me to make it better, and by roughly this much.\"",
       },
       {
         kind: "paragraph",
-        html: "For a model with a hundred million parameters, computing those gradients by hand is not on the table. Autograd is the part of PyTorch that does it for you — automatically, exactly, and fast enough that you never think about it. Understanding how it works is the difference between training models and debugging them by superstition.",
+        html: "For a model with a hundred million parameters, computing those gradients by hand is not on the table. Autograd is the part of PyTorch that does it for you: automatically, exactly, and fast enough that you never think about it. Understanding how it works is the difference between training models and debugging them by superstition.",
       },
       {
         kind: "heading",
@@ -1715,7 +1715,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "Do that a few hundred thousand times and, if the landscape is kind and the step size is sane, you end up somewhere low. The entire job of autograd is to hand you ∇L — the gradient of the loss with respect to every parameter — after each forward pass.",
+        html: "Do that a few hundred thousand times and, if the landscape is kind and the step size is sane, you end up somewhere low. The entire job of autograd is to hand you ∇L, the gradient of the loss with respect to every parameter, after each forward pass.",
       },
       {
         kind: "heading",
@@ -1724,7 +1724,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "The moment a tensor has `requires_grad=True`, PyTorch starts watching. Every operation you perform on it creates a new node in a **computational graph**: the result tensor, a reference to the function that produced it (its `grad_fn`), and pointers back to the inputs. There is no compile step and no graph definition phase — the graph is a side effect of running your forward pass, which is exactly why you can put `if` statements, loops, and print calls inside a model and it all just works.",
+        html: "The moment a tensor has `requires_grad=True`, PyTorch starts watching. Every operation you perform on it creates a new node in a **computational graph**: the result tensor, a reference to the function that produced it (its `grad_fn`), and pointers back to the inputs. There is no compile step and no graph definition phase. The graph is a side effect of running your forward pass, which is exactly why you can put `if` statements, loops, and print calls inside a model and it all just works.",
       },
       {
         kind: "code",
@@ -1734,7 +1734,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "For `y = x³ + 2x`, the graph PyTorch just recorded looks like this — a small pipeline of operations, each remembering what it needs to compute its own local derivative later:",
+        html: "For `y = x³ + 2x`, the graph PyTorch just recorded looks like this: a small pipeline of operations, each remembering what it needs to compute its own local derivative later:",
       },
       {
         kind: "mermaid",
@@ -1762,7 +1762,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "Calling `y.backward()` starts at `y` with a seed gradient of 1 and traverses the graph towards the leaves. At each node it multiplies the incoming gradient by that operation's local derivative — the **chain rule**, applied mechanically — and when two paths reach the same tensor, their contributions add. The final number lands in each leaf tensor's `.grad`.",
+        html: "Calling `y.backward()` starts at `y` with a seed gradient of 1 and traverses the graph towards the leaves. At each node it multiplies the incoming gradient by that operation's local derivative (the **chain rule**, applied mechanically), and when two paths reach the same tensor, their contributions add. The final number lands in each leaf tensor's `.grad`.",
       },
       {
         kind: "formula",
@@ -1778,7 +1778,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "That's the trick in full. It scales from this three-node graph to a Transformer with billions of parameters without any change in principle — just more nodes, and the arithmetic running on a GPU.",
+        html: "That's the trick in full. It scales from this three-node graph to a Transformer with billions of parameters without any change in principle, just more nodes, and the arithmetic running on a GPU.",
       },
       {
         kind: "heading",
@@ -1787,7 +1787,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "Below is the simplest possible optimisation — minimising `L(θ) = θ²` starting from θ = 10 — run with a sensible learning rate and with one that's slightly too large. Hover the lines. The takeaway that will save you the most time: a diverging loss is almost never a broken model, it's a learning rate that's too high.",
+        html: "Below is the simplest possible optimisation, minimising `L(θ) = θ²` starting from θ = 10, run with a sensible learning rate and with one that's slightly too large. Hover the lines. The takeaway that will save you the most time: a diverging loss is almost never a broken model, it's a learning rate that's too high.",
       },
       {
         kind: "figure",
@@ -1798,7 +1798,7 @@ Quota         : 800 GB`,
         yLabel: "loss  L(θ) = θ²",
         note: "Minimising θ² from θ₀ = 10",
         caption:
-          "η = 0.1 slides smoothly to zero. η = 1.1 overshoots the minimum by more each step and explodes. Same model, same code — only the step size changed.",
+          "η = 0.1 slides smoothly to zero. η = 1.1 overshoots the minimum by more each step and explodes. Same model, same code, only the step size changed.",
         series: [
           { key: "good", label: "η = 0.1 (stable)" },
           { key: "toobig", label: "η = 1.1 (diverges)" },
@@ -1821,7 +1821,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "Every supervised training loop in PyTorch — from a tutorial notebook to a foundation-model run — is a variation on these five lines. The **optimizer** holds a reference to the model's parameters and knows one update rule (SGD, Adam, …); you hand it gradients, it takes the step.",
+        html: "Every supervised training loop in PyTorch, from a tutorial notebook to a foundation-model run, is a variation on these five lines. The **optimizer** holds a reference to the model's parameters and knows one update rule (SGD, Adam, …); you hand it gradients, it takes the step.",
       },
       {
         kind: "code",
@@ -1831,16 +1831,16 @@ Quota         : 800 GB`,
       {
         kind: "list",
         items: [
-          "**`opt.zero_grad()`** — gradients *accumulate* by default. Skip this and step N's gradient is added on top of step N−1's, and your training quietly falls apart.",
-          "**`loss.backward()`** — frees the graph as it walks it. Call it twice on one forward pass and PyTorch raises an error unless you asked for `retain_graph=True`.",
-          "**`opt.step()`** — reads `.grad`, mutates the parameters in place, never touches the graph.",
-          "**`with torch.no_grad():`** — switch graph-building off entirely for evaluation and inference. Saves memory and time, and you weren't going to call `backward()` anyway.",
+          "**`opt.zero_grad()`**: gradients *accumulate* by default. Skip this and step N's gradient is added on top of step N−1's, and your training quietly falls apart.",
+          "**`loss.backward()`**: frees the graph as it walks it. Call it twice on one forward pass and PyTorch raises an error unless you asked for `retain_graph=True`.",
+          "**`opt.step()`**: reads `.grad`, mutates the parameters in place, never touches the graph.",
+          "**`with torch.no_grad():`** turns graph-building off entirely for evaluation and inference. Saves memory and time, and you weren't going to call `backward()` anyway.",
         ],
       },
       {
         kind: "callout",
         title: "The bug everyone ships once",
-        body: "Forgetting `opt.zero_grad()`. The loss doesn't crash — it just stops improving, or improves and then wanders off. If training looks haunted, check that line first.",
+        body: "Forgetting `opt.zero_grad()`. The loss doesn't crash. It just stops improving, or improves and then wanders off. If training looks haunted, check that line first.",
       },
       {
         kind: "heading",
@@ -1849,11 +1849,11 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "Two tools stop autograd following a tensor. `tensor.detach()` returns a view that shares the same storage but sits outside the graph — reach for it when you want a value for logging or a metric but not its history. `with torch.no_grad():` disables recording for its whole block, which is the standard wrapper around a validation loop and any inference code.",
+        html: "Two tools stop autograd following a tensor. `tensor.detach()` returns a view that shares the same storage but sits outside the graph. Reach for it when you want a value for logging or a metric but not its history. `with torch.no_grad():` disables recording for its whole block, which is the standard wrapper around a validation loop and any inference code.",
       },
       {
         kind: "paragraph",
-        html: "And that's the core of how PyTorch learns: a forward pass quietly records a graph, `backward()` walks it in reverse to produce an exact gradient for every parameter, and the optimizer turns those gradients into a step downhill. Everything above this in the stack — schedulers, mixed precision, distributed training, `torch.compile` — is an optimisation of this loop, never a replacement for it. Part 3 goes up a level: how to structure the model itself so it survives contact with a real project.",
+        html: "And that's the core of how PyTorch learns: a forward pass quietly records a graph, `backward()` walks it in reverse to produce an exact gradient for every parameter, and the optimizer turns those gradients into a step downhill. Everything above this in the stack (schedulers, mixed precision, distributed training, `torch.compile`) is an optimisation of this loop, never a replacement for it. Part 3 goes up a level: how to structure the model itself so it survives contact with a real project.",
       },
       {
         kind: "references",
@@ -1876,7 +1876,7 @@ Quota         : 800 GB`,
             source: "PyTorch documentation",
           },
           {
-            label: "torch.optim — optimizers and the update step",
+            label: "torch.optim: optimizers and the update step",
             href: "https://pytorch.org/docs/stable/optim.html",
             source: "PyTorch documentation",
           },
@@ -1893,7 +1893,7 @@ Quota         : 800 GB`,
   {
     slug: "pytorch-nn-module-building-networks",
     title: "nn.Module: Building Networks That Hold Together",
-    dek: "nn.Sequential is training wheels. Real models are custom Modules — with skip connections, shared weights, and branches. Here's how nn.Module actually works, and every footgun it hides.",
+    dek: "nn.Sequential is training wheels. Real models are custom Modules with skip connections, shared weights, and branches. Here's how nn.Module actually works, and every footgun it hides.",
     topic: "Engineering",
     publishedAt: "2026-09-10",
     likes: 0,
@@ -1905,7 +1905,7 @@ Quota         : 800 GB`,
     body: [
       {
         kind: "paragraph",
-        html: "`nn.Sequential` is wonderful for about a week. Then you need a skip connection, or two heads sharing a backbone, or a branch that only runs at inference, and a straight pipe of layers can't express any of it. That's when you write your own `nn.Module` — and it turns out the base class you've been leaning on this whole time has a few sharp edges worth knowing about before you cut yourself.",
+        html: "`nn.Sequential` is wonderful for about a week. Then you need a skip connection, or two heads sharing a backbone, or a branch that only runs at inference, and a straight pipe of layers can't express any of it. That's when you write your own `nn.Module`, and it turns out the base class you've been leaning on this whole time has a few sharp edges worth knowing about before you cut yourself.",
       },
       {
         kind: "paragraph",
@@ -1918,7 +1918,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "A Module is two methods. `__init__` **declares** the pieces — layers, parameters, constants — and assigns them to `self`. `forward` **describes** how a tensor flows through those pieces. You never call `forward` directly; you call the module (`model(x)`), which runs hooks and then `forward`. Here's a residual block, the pattern at the heart of every ResNet and Transformer:",
+        html: "A Module is two methods. `__init__` **declares** the pieces (layers, parameters, constants) and assigns them to `self`. `forward` **describes** how a tensor flows through those pieces. You never call `forward` directly; you call the module (`model(x)`), which runs hooks and then `forward`. Here's a residual block, the pattern at the heart of every ResNet and Transformer:",
       },
       {
         kind: "code",
@@ -1928,7 +1928,7 @@ Quota         : 800 GB`,
       {
         kind: "callout",
         title: "Why assign layers to self?",
-        body: "`nn.Module.__setattr__` is overridden. When you write `self.fc1 = nn.Linear(...)`, the Module notices it's a submodule and registers it, so its parameters show up in `model.parameters()` and move with `model.to(device)`. Store a layer in a plain Python list and it becomes invisible — the optimizer never sees it, and it silently doesn't train.",
+        body: "`nn.Module.__setattr__` is overridden. When you write `self.fc1 = nn.Linear(...)`, the Module notices it's a submodule and registers it, so its parameters show up in `model.parameters()` and move with `model.to(device)`. Store a layer in a plain Python list and it becomes invisible: the optimizer never sees it, and it silently doesn't train.",
       },
       {
         kind: "heading",
@@ -1948,7 +1948,7 @@ Quota         : 800 GB`,
           ["Plain attribute tensor", "No", "No", "a constant you forgot to register"],
         ],
         caption:
-          "Buffers are state that must persist and move devices but isn't learned. Register them with `self.register_buffer(\"name\", tensor)` — a plain `self.name = tensor` won't follow `.to(device)` and won't be saved.",
+          "Buffers are state that must persist and move devices but isn't learned. Register them with self.register_buffer(\"name\", tensor). A plain self.name = tensor won't follow .to(device) and won't be saved.",
       },
       {
         kind: "code",
@@ -1963,9 +1963,9 @@ Quota         : 800 GB`,
       {
         kind: "list",
         items: [
-          "**`nn.Sequential`** — a fixed chain, output of each feeds the next. Use it for genuinely linear sub-parts.",
-          "**`nn.ModuleList`** — a list that *does* register its contents. Use it when depth is a hyperparameter and you loop over layers in `forward`.",
-          "**`nn.ModuleDict`** — the same, keyed by name, for branches you select at runtime.",
+          "**`nn.Sequential`**: a fixed chain, where each output feeds the next. Use it for genuinely linear sub-parts.",
+          "**`nn.ModuleList`**: a list that *does* register its contents. Use it when depth is a hyperparameter and you loop over layers in `forward`.",
+          "**`nn.ModuleDict`**: the same, keyed by name, for branches you select at runtime.",
         ],
       },
       {
@@ -1975,7 +1975,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "Because it's residual, you can stack these deep without the gradient vanishing. Parameter count grows linearly with depth and quadratically with width — worth having a feel for when you're choosing a model size against a memory budget:",
+        html: "Because it's residual, you can stack these deep without the gradient vanishing. Parameter count grows linearly with depth and quadratically with width, which is worth having a feel for when you're choosing a model size against a memory budget:",
       },
       {
         kind: "figure",
@@ -2002,7 +2002,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "`nn.Linear` initialises its weights with a reasonable default (Kaiming uniform). For most work that's fine. When it isn't — a custom layer, a paper that specifies an init, a training run that won't get moving — you override it with `model.apply()`, which walks every submodule:",
+        html: "`nn.Linear` initialises its weights with a reasonable default (Kaiming uniform). For most work that's fine. When it isn't (a custom layer, a paper that specifies an init, a training run that won't get moving), you override it with `model.apply()`, which walks every submodule:",
       },
       {
         kind: "code",
@@ -2021,16 +2021,16 @@ Quota         : 800 GB`,
       {
         kind: "callout",
         title: "Two symmetrical bugs",
-        body: "Forget `model.eval()` before validating and your metrics are noisy and pessimistic — dropout is still firing. Forget `model.train()` when you resume training and BatchNorm stops updating its statistics. Set the mode explicitly at the top of every epoch's train and eval sections.",
+        body: "Forget `model.eval()` before validating and your metrics are noisy and pessimistic, because dropout is still firing. Forget `model.train()` when you resume training and BatchNorm stops updating its statistics. Set the mode explicitly at the top of every epoch's train and eval sections.",
       },
       {
         kind: "heading",
         id: "saving",
-        text: "Saving and loading — the state dict, not the object",
+        text: "Saving and loading: the state dict, not the object",
       },
       {
         kind: "paragraph",
-        html: "Save `model.state_dict()` — an ordered dictionary of tensors — not the model object itself. Pickling the object ties the file to your exact class definition and directory layout, and it breaks the first time you refactor. The state dict is just data.",
+        html: "Save `model.state_dict()`, an ordered dictionary of tensors, not the model object itself. Pickling the object ties the file to your exact class definition and directory layout, and it breaks the first time you refactor. The state dict is just data.",
       },
       {
         kind: "code",
@@ -2060,10 +2060,10 @@ Quota         : 800 GB`,
       {
         kind: "list",
         items: [
-          "`__init__` declares, `forward` connects, and you call the module — never `forward` directly.",
+          "`__init__` declares, `forward` connects, and you call the module, never `forward` directly.",
           "Layers must be attributes (or live in a `ModuleList` / `ModuleDict`) to be registered and trained.",
           "Parameters are learned; buffers persist but aren't; register buffers explicitly.",
-          "`model.train()` / `model.eval()` change what Dropout and BatchNorm do — set them deliberately.",
+          "`model.train()` / `model.eval()` change what Dropout and BatchNorm do, so set them deliberately.",
           "Save the `state_dict`, rebuild the architecture, then `load_state_dict`.",
         ],
       },
@@ -2072,12 +2072,12 @@ Quota         : 800 GB`,
         title: "References",
         items: [
           {
-            label: "nn.Module — API reference",
+            label: "nn.Module: API reference",
             href: "https://pytorch.org/docs/stable/generated/torch.nn.Module.html",
             source: "PyTorch documentation",
           },
           {
-            label: "Modules — design and behaviour notes",
+            label: "Modules: design and behaviour notes",
             href: "https://pytorch.org/docs/stable/notes/modules.html",
             source: "PyTorch documentation",
             note: "Registration, hooks, train/eval, and buffers explained in depth.",
@@ -2088,7 +2088,7 @@ Quota         : 800 GB`,
             source: "PyTorch tutorials",
           },
           {
-            label: "torch.nn.init — initialization functions",
+            label: "torch.nn.init: initialization functions",
             href: "https://pytorch.org/docs/stable/nn.init.html",
             source: "PyTorch documentation",
           },
@@ -2110,7 +2110,7 @@ Quota         : 800 GB`,
   {
     slug: "pytorch-datasets-and-dataloaders",
     title: "Datasets and DataLoaders: Keeping the GPU Fed",
-    dek: "You bought a fast GPU and it's sitting at 30% utilisation. The model isn't the bottleneck — the input pipeline is. Here's how Dataset and DataLoader work, and how to stop starving the accelerator.",
+    dek: "You bought a fast GPU and it's sitting at 30% utilisation. The model isn't the bottleneck. The input pipeline is. Here's how Dataset and DataLoader work, and how to stop starving the accelerator.",
     topic: "Engineering",
     publishedAt: "2026-09-11",
     likes: 0,
@@ -2122,11 +2122,11 @@ Quota         : 800 GB`,
     body: [
       {
         kind: "paragraph",
-        html: "Here's a scene that plays out in every ML team. Someone profiles a training run that feels slow, expecting to find a fat matrix multiply. Instead they find the GPU idle 60% of the time, waiting. The bottleneck isn't the model — it's everything that has to happen before a batch of data reaches the model: reading files off disk, decoding JPEGs, resizing, augmenting, stacking into a tensor, copying to the GPU.",
+        html: "Here's a scene that plays out in every ML team. Someone profiles a training run that feels slow, expecting to find a fat matrix multiply. Instead they find the GPU idle 60% of the time, waiting. The bottleneck isn't the model. It's everything that has to happen before a batch of data reaches the model: reading files off disk, decoding JPEGs, resizing, augmenting, stacking into a tensor, copying to the GPU.",
       },
       {
         kind: "paragraph",
-        html: "PyTorch splits that work across two abstractions. **`Dataset`** knows how to produce one example. **`DataLoader`** turns a Dataset into a stream of batches, and — crucially — does the slow parts in parallel worker processes while the GPU is busy with the previous batch.",
+        html: "PyTorch splits that work across two abstractions. **`Dataset`** knows how to produce one example. **`DataLoader`** turns a Dataset into a stream of batches and, crucially, does the slow parts in parallel worker processes while the GPU is busy with the previous batch.",
       },
       {
         kind: "mermaid",
@@ -2150,7 +2150,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "The common kind is a **map-style** Dataset: implement `__len__` and `__getitem__(i)`, and you have something that behaves like a list of `(input, target)` pairs. Where the data lives — memory, a folder of images, a database, a set of shards — is entirely your business; the DataLoader only ever asks for item `i`.",
+        html: "The common kind is a **map-style** Dataset: implement `__len__` and `__getitem__(i)`, and you have something that behaves like a list of `(input, target)` pairs. Where the data lives (memory, a folder of images, a database, a set of shards) is entirely your business; the DataLoader only ever asks for item `i`.",
       },
       {
         kind: "code",
@@ -2183,7 +2183,7 @@ Quota         : 800 GB`,
         xKey: "workers",
         xLabel: "num_workers",
         yLabel: "images / second",
-        note: "Illustrative — the plateau point depends on your CPU, storage, and transform cost",
+        note: "Illustrative. The plateau point depends on your CPU, storage, and transform cost",
         caption:
           "Throughput climbs steeply, then flattens once the workers can supply batches as fast as the GPU consumes them. Adding more after the knee costs memory and buys nothing. Measure it for your own pipeline.",
         series: [{ key: "throughput", label: "images / sec" }],
@@ -2204,7 +2204,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "The default `collate_fn` takes a list of samples and `torch.stack`s the tensors — which only works if every sample has the same shape. Images resized to a fixed size are fine. Variable-length sequences are not, and you supply your own:",
+        html: "The default `collate_fn` takes a list of samples and `torch.stack`s the tensors, which only works if every sample has the same shape. Images resized to a fixed size are fine. Variable-length sequences are not, and you supply your own:",
       },
       {
         kind: "code",
@@ -2218,7 +2218,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "`torchvision.transforms.v2` is the current API — it transforms images, bounding boxes, and masks together, and runs on tensors (so it can go on the GPU) as well as PIL images. Compose the pipeline once, hand it to the Dataset, and let it execute in the workers.",
+        html: "`torchvision.transforms.v2` is the current API. It transforms images, bounding boxes, and masks together, and runs on tensors (so it can go on the GPU) as well as PIL images. Compose the pipeline once, hand it to the Dataset, and let it execute in the workers.",
       },
       {
         kind: "code",
@@ -2232,7 +2232,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "`shuffle=True` is shorthand for a `RandomSampler`. When you need something other than uniform random order — an imbalanced dataset, or one shard per GPU in distributed training — you pass a `sampler` explicitly. For class imbalance, `WeightedRandomSampler` oversamples the rare classes:",
+        html: "`shuffle=True` is shorthand for a `RandomSampler`. When you need something other than uniform random order (an imbalanced dataset, or one shard per GPU in distributed training), you pass a `sampler` explicitly. For class imbalance, `WeightedRandomSampler` oversamples the rare classes:",
       },
       {
         kind: "code",
@@ -2272,7 +2272,7 @@ Quota         : 800 GB`,
         items: [
           "`Dataset` yields one example; `DataLoader` yields batches and parallelises the slow work.",
           "Put decoding and augmentation in `__getitem__` so the workers do it off the critical path.",
-          "Tune `num_workers` to where throughput plateaus — then stop.",
+          "Tune `num_workers` to where throughput plateaus, then stop.",
           "`pin_memory=True` + `.to(device, non_blocking=True)` overlaps the copy with compute.",
           "Custom `collate_fn` for variable-length data; `WeightedRandomSampler` for imbalance.",
         ],
@@ -2282,13 +2282,13 @@ Quota         : 800 GB`,
         title: "References",
         items: [
           {
-            label: "torch.utils.data — Dataset, DataLoader, samplers",
+            label: "torch.utils.data: Dataset, DataLoader, samplers",
             href: "https://pytorch.org/docs/stable/data.html",
             source: "PyTorch documentation",
             note: "Map- vs iterable-style, multiprocessing behaviour, memory pinning.",
           },
           {
-            label: "Datasets & DataLoaders — Learn the Basics",
+            label: "Datasets & DataLoaders: Learn the Basics",
             href: "https://pytorch.org/tutorials/beginner/basics/data_tutorial.html",
             source: "PyTorch tutorials",
           },
@@ -2321,7 +2321,7 @@ Quota         : 800 GB`,
     body: [
       {
         kind: "paragraph",
-        html: "The training loop in Part 2 is correct and it's also a toy. It runs on the CPU in full precision, at a fixed learning rate, with no way to stop and resume. A real run — one that takes hours and costs money — wraps that same five-line core in a few layers of machinery. None of it is complicated. All of it is standard. This part assembles the loop you'll actually copy into projects.",
+        html: "The training loop in Part 2 is correct and it's also a toy. It runs on the CPU in full precision, at a fixed learning rate, with no way to stop and resume. A real run, one that takes hours and costs money, wraps that same five-line core in a few layers of machinery. None of it is complicated. All of it is standard. This part assembles the loop you'll actually copy into projects.",
       },
       {
         kind: "heading",
@@ -2340,7 +2340,7 @@ Quota         : 800 GB`,
       {
         kind: "callout",
         title: '"Expected all tensors to be on the same device"',
-        body: "The most common first-GPU error. Something — a metric tensor, a manually created constant, a loss weight — is still on the CPU while everything else is on `cuda`. Trace back to the tensor you built with `torch.tensor(...)` and never moved.",
+        body: "The most common first-GPU error. Something (a metric tensor, a manually created constant, a loss weight) is still on the CPU while everything else is on `cuda`. Trace back to the tensor you built with `torch.tensor(...)` and never moved.",
       },
       {
         kind: "heading",
@@ -2383,7 +2383,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "A fixed learning rate is a compromise: large enough to make early progress, small enough not to bounce around the minimum later. A **schedule** removes the compromise — start with a short linear **warmup** (so the first steps don't wreck freshly-initialised weights), then **decay**, usually along a cosine curve, toward zero.",
+        html: "A fixed learning rate is a compromise: large enough to make early progress, small enough not to bounce around the minimum later. A **schedule** removes the compromise: start with a short linear **warmup** (so the first steps don't wreck freshly-initialised weights), then **decay**, usually along a cosine curve, toward zero.",
       },
       {
         kind: "formula",
@@ -2431,7 +2431,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "**Clipping** caps the global norm of the gradient before the step, which stops a single bad batch from throwing the weights off a cliff — standard practice for Transformers and RNNs. **Accumulation** runs several forward/backward passes before one optimizer step, so you get the training dynamics of a large batch on a GPU that can't hold one.",
+        html: "**Clipping** caps the global norm of the gradient before the step, which stops a single bad batch from throwing the weights off a cliff. It is standard practice for Transformers and RNNs. **Accumulation** runs several forward/backward passes before one optimizer step, so you get the training dynamics of a large batch on a GPU that can't hold one.",
       },
       {
         kind: "code",
@@ -2445,7 +2445,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "A checkpoint that only holds the model weights cannot resume a run — the optimizer's momentum buffers, the scheduler's step count, and the AMP scaler's state all matter. Save the lot in one dict.",
+        html: "A checkpoint that only holds the model weights cannot resume a run, because the optimizer's momentum buffers, the scheduler's step count, and the AMP scaler's state all matter. Save the lot in one dict.",
       },
       {
         kind: "code",
@@ -2455,7 +2455,7 @@ Quota         : 800 GB`,
       {
         kind: "callout",
         title: "Reproducibility, roughly",
-        body: "Seed `random`, `numpy`, and `torch` (`torch.manual_seed`), and set a DataLoader `worker_init_fn`. For bit-exact runs also set `torch.use_deterministic_algorithms(True)` and `cudnn.deterministic = True` — but expect a speed cost, and know that some ops have no deterministic implementation.",
+        body: "Seed `random`, `numpy`, and `torch` (`torch.manual_seed`), and set a DataLoader `worker_init_fn`. For bit-exact runs also set `torch.use_deterministic_algorithms(True)` and `cudnn.deterministic = True`, but expect a speed cost, and know that some ops have no deterministic implementation.",
       },
       {
         kind: "heading",
@@ -2481,7 +2481,7 @@ Quota         : 800 GB`,
         kind: "list",
         items: [
           "One device, chosen once; model moved in place, batches moved every step with `non_blocking=True`.",
-          "AMP with `autocast` + `GradScaler` — roughly 2× throughput and half the memory.",
+          "AMP with `autocast` + `GradScaler`, for roughly 2× throughput and half the memory.",
           "Warmup then cosine decay; `scheduler.step()` once per optimizer step.",
           "Clip the gradient norm; accumulate when the batch you want won't fit.",
           "Checkpoint model + optimizer + scheduler + scaler + epoch, or you can't truly resume.",
@@ -2490,14 +2490,14 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "That's the series. Five parts ago this was a single data structure; now it's a training run you could put on a cluster. Everything past here — `torch.compile`, FSDP and multi-node, quantisation, custom kernels — is a refinement of these same pieces, and none of it will surprise you once this loop is muscle memory.",
+        html: "That's the series. Five parts ago this was a single data structure; now it's a training run you could put on a cluster. Everything past here (`torch.compile`, FSDP and multi-node, quantisation, custom kernels) is a refinement of these same pieces, and none of it will surprise you once this loop is muscle memory.",
       },
       {
         kind: "references",
         title: "References",
         items: [
           {
-            label: "Automatic Mixed Precision package — torch.amp",
+            label: "Automatic Mixed Precision package: torch.amp",
             href: "https://pytorch.org/docs/stable/amp.html",
             source: "PyTorch documentation",
           },
@@ -2507,7 +2507,7 @@ Quota         : 800 GB`,
             source: "PyTorch tutorials",
           },
           {
-            label: "How to adjust learning rate — torch.optim.lr_scheduler",
+            label: "How to adjust learning rate: torch.optim.lr_scheduler",
             href: "https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate",
             source: "PyTorch documentation",
           },
@@ -2549,7 +2549,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "In many parts of the tech industry, the title 'engineer' is used casually—often appended to frontend developers, prompt engineers, or sales specialists without formal statutory meaning. In Sri Lanka, however, the **Engineering Council, Sri Lanka Act No. 4 of 2017** established a strict legal framework regulating the practice of engineering across all disciplines.",
+        html: "In many parts of the tech industry, the title 'engineer' is used casually, often appended to frontend developers, prompt engineers, or sales specialists without formal statutory meaning. In Sri Lanka, however, the **Engineering Council, Sri Lanka Act No. 4 of 2017** established a strict legal framework regulating the practice of engineering across all disciplines.",
       },
       {
         kind: "heading",
@@ -2558,7 +2558,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "Under the ECSL Act, registration as an Associate Engineer recognizes individuals holding a four-year engineering honors degree from an accredited institution. For me, this is rooted in my graduation from the **Department of Computer Engineering at the University of Peradeniya**—a program accredited under the international **Washington Accord** by the Institution of Engineers, Sri Lanka (IESL).",
+        html: "Under the ECSL Act, registration as an Associate Engineer recognizes individuals holding a four-year engineering honors degree from an accredited institution. For me, this is rooted in my graduation from the **Department of Computer Engineering at the University of Peradeniya**, a program accredited under the international **Washington Accord** by the Institution of Engineers, Sri Lanka (IESL).",
       },
       {
         kind: "paragraph",
@@ -2571,7 +2571,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "As software systems become increasingly autonomous—powering critical health infrastructure, automated trading desks, and LLM agentic pipelines—the boundary between traditional civil/mechanical engineering and computer engineering blurs. When an AI pipeline hallucinates an automated medical recommendation or an asynchronous worker pool exhausts server memory during an emergency, the consequences are concrete and severe.",
+        html: "As software systems become increasingly autonomous (powering critical health infrastructure, automated trading desks, and LLM agentic pipelines), the boundary between traditional civil/mechanical engineering and computer engineering blurs. When an AI pipeline hallucinates an automated medical recommendation or an asynchronous worker pool exhausts server memory during an emergency, the consequences are concrete and severe.",
       },
       {
         kind: "paragraph",
@@ -2746,7 +2746,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "The problem is twofold: direct financial cost and cognitive degradation. Each MCP tool definition is not just a function name—it is a verbose JSON Schema containing parameter types, nested properties, enums, and detailed markdown descriptions intended to guide the model's decision making.",
+        html: "The problem is twofold: direct financial cost and cognitive degradation. Each MCP tool definition is not just a function name. It is a verbose JSON Schema containing parameter types, nested properties, enums, and detailed markdown descriptions intended to guide the model's decision making.",
       },
       {
         kind: "paragraph",
@@ -2764,7 +2764,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "Docker's official answer—built into Docker Desktop 4.50+ via the **MCP Toolkit** and the open-source **Docker MCP Gateway**—fundamentally redesigns how agents interact with external capabilities. Instead of treating MCP servers as host-level node or python processes that must be statically declared in client configuration files, Docker introduces three core concepts:",
+        html: "Docker's official answer, built into Docker Desktop 4.50+ via the **MCP Toolkit** and the open-source **Docker MCP Gateway**, fundamentally redesigns how agents interact with external capabilities. Instead of treating MCP servers as host-level node or python processes that must be statically declared in client configuration files, Docker introduces three core concepts:",
       },
       {
         kind: "list",
@@ -2998,7 +2998,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "For complex, broad architectural tasks—such as converting legacy completion-handler code to modern `async/await` actors or generating comprehensive XCTest suites—Apple introduced **Swift Assist**. Unlike completion, Swift Assist handles high-level conversational directives and routes computationally intensive reasoning tasks to **Private Cloud Compute (PCC)** when needed, backed by cryptographic privacy guarantees.",
+        html: "For complex, broad architectural tasks, such as converting legacy completion-handler code to modern `async/await` actors or generating comprehensive XCTest suites, Apple introduced **Swift Assist**. Unlike completion, Swift Assist handles high-level conversational directives and routes computationally intensive reasoning tasks to **Private Cloud Compute (PCC)** when needed, backed by cryptographic privacy guarantees.",
       },
       {
         kind: "code",
@@ -3066,7 +3066,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "Instead of searching for snippets on demand, **Cache-Augmented Generation** pre-loads entire knowledge bases—technical documentation, full codebase indexes, legal contracts, or customer histories (up to hundreds of thousands of tokens)—directly into the LLM's system prompt.",
+        html: "Instead of searching for snippets on demand, **Cache-Augmented Generation** pre-loads entire knowledge bases (technical documentation, full codebase indexes, legal contracts or customer histories, up to hundreds of thousands of tokens) directly into the LLM's system prompt.",
       },
       {
         kind: "paragraph",
@@ -3385,7 +3385,7 @@ Quota         : 800 GB`,
       {
         kind: "callout",
         title: "The Strategic Play",
-        body: "The registration of `genai.apple.com` was not just marketing—it was the deployment beacon for a distributed AI architecture that treats privacy not as a policy checkbox, but as a hard cryptographic guarantee.",
+        body: "The registration of `genai.apple.com` was not just marketing. It was the deployment beacon for a distributed AI architecture that treats privacy not as a policy checkbox, but as a hard cryptographic guarantee.",
       },
     ],
   },
@@ -3609,7 +3609,7 @@ Quota         : 800 GB`,
         items: [
           "**Prompt Engineering & Few-Shot**: Best for rapid iteration and testing domain feasibility.",
           "**Retrieval-Augmented Generation (RAG)**: Essential when knowledge is volatile, external, requires citations, or updates daily.",
-          "**Fine-Tuning**: Necessary when you need to teach a model *how to behave* rather than *what to know*—e.g., teaching custom tool syntax, reducing 2,000-token prompt instructions into weight memory to save latency, or mastering esoteric programming languages.",
+          "**Fine-Tuning**: Necessary when you need to teach a model *how to behave* rather than *what to know*, for example teaching custom tool syntax, reducing 2,000-token prompt instructions into weight memory to save latency, or mastering esoteric programming languages.",
         ],
       },
       {
@@ -3650,7 +3650,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "For a weight matrix of dimensions `4096×4096` (16.7 million parameters), a LoRA adapter with rank `r = 16` trains only `2 × 16 × 4096 = 131,072` parameters—a **99.2% reduction in trainable parameters**. During inference, the product `ΔW = (α/r)(B × A)` can be mathematically merged back into `W₀`, resulting in **zero inference latency penalty**.",
+        html: "For a weight matrix of dimensions `4096×4096` (16.7 million parameters), a LoRA adapter with rank `r = 16` trains only `2 × 16 × 4096 = 131,072` parameters, a **99.2% reduction in trainable parameters**. During inference, the product `ΔW = (α/r)(B × A)` can be mathematically merged back into `W₀`, resulting in **zero inference latency penalty**.",
       },
       {
         kind: "heading",
@@ -3687,7 +3687,7 @@ Quota         : 800 GB`,
     body: [
       {
         kind: "paragraph",
-        html: "Getting a large language model to run inside a Jupyter notebook is straightforward. Serving that same model in an enterprise production cluster—handling thousands of concurrent requests, achieving sub-50ms Time-to-First-Token, optimizing GPU memory bandwidth, and maintaining zero-downtime rolling deployments—is one of the hardest infrastructure challenges in systems engineering.",
+        html: "Getting a large language model to run inside a Jupyter notebook is straightforward. Serving that same model in an enterprise production cluster (handling thousands of concurrent requests, achieving sub-50ms Time-to-First-Token, optimizing GPU memory bandwidth, and maintaining zero-downtime rolling deployments) is one of the hardest infrastructure challenges in systems engineering.",
       },
       {
         kind: "paragraph",
@@ -4214,7 +4214,7 @@ Quota         : 800 GB`,
     body: [
       {
         kind: "paragraph",
-        html: "In applied machine learning, there is a dangerous trap: equating a high validation score with a trustworthy model. Deep neural networks, gradient-boosted decision trees, and large language models frequently achieve 98% accuracy by latching onto spurious background correlations—such as classifying an image as a wolf simply because the training photos contained snow in the background.",
+        html: "In applied machine learning, there is a dangerous trap: equating a high validation score with a trustworthy model. Deep neural networks, gradient-boosted decision trees, and large language models frequently achieve 98% accuracy by latching onto spurious background correlations, such as classifying an image as a wolf simply because the training photos contained snow in the background.",
       },
       {
         kind: "paragraph",
@@ -4563,7 +4563,7 @@ Quota         : 800 GB`,
     body: [
       {
         kind: "paragraph",
-        html: "If you inspect the foundations of modern cloud infrastructure—Docker, Kubernetes, Terraform, Prometheus, Etcd, CockroachDB, and Caddy—you notice an unmistakable pattern: almost all of them are written in **Go**.",
+        html: "If you inspect the foundations of modern cloud infrastructure (Docker, Kubernetes, Terraform, Prometheus, Etcd, CockroachDB, and Caddy), you notice an unmistakable pattern: almost all of them are written in **Go**.",
       },
       {
         kind: "paragraph",
@@ -4637,7 +4637,7 @@ Quota         : 800 GB`,
     body: [
       {
         kind: "paragraph",
-        html: "Every few years, a new programming language arrives with claims that it will render C++ obsolete. Yet in 2026, when you inspect the cutting edge of technological innovation—specifically the explosive growth of **large language model inference engines** (such as Georgi Gerganov's `llama.cpp`, vLLM's custom CUDA kernels, and NVIDIA's TensorRT-LLM)—you find that C++ remains utterly irreplaceable.",
+        html: "Every few years, a new programming language arrives with claims that it will render C++ obsolete. Yet in 2026, when you inspect the cutting edge of technological innovation, specifically the explosive growth of **large language model inference engines** such as Georgi Gerganov's `llama.cpp`, vLLM's custom CUDA kernels and NVIDIA's TensorRT-LLM, you find that C++ remains utterly irreplaceable.",
       },
       {
         kind: "paragraph",
@@ -4668,7 +4668,7 @@ Quota         : 800 GB`,
       {
         kind: "list",
         items: [
-          "**RAII (Resource Acquisition Is Initialization)**: Resources—heap memory, file descriptors, GPU buffers, and mutex locks—are bound to object lifetimes. When an object leaves its scope, its destructor runs deterministically, guaranteeing zero memory leaks without runtime garbage collection pauses.",
+          "**RAII (Resource Acquisition Is Initialization)**: Resources (heap memory, file descriptors, GPU buffers, and mutex locks) are bound to object lifetimes. When an object leaves its scope, its destructor runs deterministically, guaranteeing zero memory leaks without runtime garbage collection pauses.",
           "**Zero-Cost Abstractions**: What you don't use, you don't pay for. And what you do use, you couldn't hand-code any better in assembly. Concepts, templates, and `constexpr` evaluation execute entirely at compile time.",
         ],
       },
@@ -4798,7 +4798,7 @@ Quota         : 800 GB`,
     body: [
       {
         kind: "paragraph",
-        html: "Stepping outside the university computer laboratories into a mature software engineering company is always an eye-opening experience. During our undergraduate journey at the University of Peradeniya, our department organized an industrial visit to **Creative Software** in Colombo—one of Sri Lanka's pioneer software exporters with a track record spanning over two decades.",
+        html: "Stepping outside the university computer laboratories into a mature software engineering company is always an eye-opening experience. During our undergraduate journey at the University of Peradeniya, our department organized an industrial visit to **Creative Software** in Colombo, one of Sri Lanka's pioneer software exporters with a track record spanning over two decades.",
       },
       {
         kind: "paragraph",
@@ -4899,7 +4899,7 @@ Quota         : 800 GB`,
       {
         kind: "callout",
         title: "Moving Forward",
-        body: "Graduation is not the finish line of learning—it is simply the acquisition of the tools required to teach yourself anything. Space is the continuation of that curiosity: an open notebook documenting what I learn as I build systems and explore AI.",
+        body: "Graduation is not the finish line of learning. It is simply the acquisition of the tools required to teach yourself anything. Space is the continuation of that curiosity: an open notebook documenting what I learn as I build systems and explore AI.",
       },
     ],
   },
@@ -4975,7 +4975,7 @@ Quota         : 800 GB`,
       {
         kind: "callout",
         title: "Project Milestone",
-        body: "Bridging computer engineering with computational biology demonstrated the power of multidisciplinary problem solving—and proved that strong systems engineering fundamentals can conquer any new technical domain.",
+        body: "Bridging computer engineering with computational biology demonstrated the power of multidisciplinary problem solving, and proved that strong systems engineering fundamentals can conquer any new technical domain.",
       },
     ],
   },
