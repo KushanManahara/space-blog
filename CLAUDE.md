@@ -142,6 +142,58 @@ These are the standing rules for this codebase.
   Never knowingly leave lint, type, or build errors unresolved.
 - Prefer simple, clear, reusable, modular code over clever code.
 
+## Writing articles
+
+Use the user-level `tech-blog-writing` skill for every article (voice, structure, accuracy, references,
+editing passes). This section is the Space-specific half: what the skill's step 0 needs to know here.
+
+### Content model
+
+- Articles are records in `src/lib/content/posts.ts`, newest first at the top of the array, validated
+  by `postSchema`. Required: `slug`, `title`, `dek`, `topic`, `publishedAt`, `tags`, `body`; keep
+  `likes`/`views`/`commentCount` at 0 (live counts come from the DB). Reading time is derived.
+- Body block kinds (`articleBlockSchema`): `paragraph`, `heading` (needs a unique `id`), `list`,
+  `code` (`runnable: true` only for browser-safe Python with no network/keys), `formula` (KaTeX `tex`),
+  `table`, `figure` (interactive Recharts line/area/bar — hover + legend toggles), `mermaid`,
+  `callout`, `image`, `references`, `footnotes`, `correction`, `chart` (legacy static bars).
+- **Markdown renders in** paragraph html, headings, list items, table cells, callout title/body.
+  **Plain text only in** table/figure/formula/mermaid **captions** and reference label/source/note —
+  backticks or `**` there show literally.
+- In a `figure`, the `xKey` must not collide with any series `key`.
+- Topics are defined in `site.ts` `topicBlurbs`; pick by each topic's description. Every topic must keep
+  at least one post (schema requires a positive count). Series: `series: { slug, title, part }` plus a
+  blurb in `seriesBlurbs`.
+
+### Rendering gotchas
+
+- Mermaid (11.17.2, pinned) is converted through `@excalidraw/mermaid-to-excalidraw` with a local
+  patch, so rendered diagrams have no `.node` classes. Validate new diagram source by importing the
+  pinned mermaid version from cdn.jsdelivr.net in the page and calling `parse()`/`render()`.
+- Mermaid and Recharts render on intersection / measured width — a hidden or non-painting preview pane
+  can show them as empty. Scroll them into a painting viewport before concluding they're broken.
+- Covers: `coverImage: "/articles/<slug>.png"` in `public/articles/`, served via Next/Image
+  (`object-cover`, centre-anchored — keep the subject centred). Existing covers are ~1.6 MB PNGs; SVG
+  is allowed. No cover falls back to the topic gradient.
+
+### Adding a new block or interactive component
+
+New kinds (e.g. a slider-driven simulation) are welcome when they genuinely help. Add the schema entry
+in `schemas.ts`, then handle it in the exhaustive switches in `block-text.ts` and
+`components/article/article-body.tsx`, plus `export-article.ts` (has a default). Client-only renderers
+are lazy-loaded with `next/dynamic` in `article-body.tsx` so posts that don't use them don't pay.
+Follow the design-system and a11y rules above; reader mode reuses `ArticleBody`.
+
+### Publishing
+
+`pnpm format && pnpm lint && pnpm typecheck && pnpm embeddings && pnpm build`, check the article in
+the dev server, then branch + PR (the repo merges PRs into `main`; Vercel deploys `main`). After
+deploy, confirm the live URL, the archive, `sitemap.xml` and `rss.xml`.
+
+### Privacy
+
+No personal paths, account names, filenames, hostnames or identifiers in articles; use placeholders and
+say so. Published git history keeps old versions.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know
