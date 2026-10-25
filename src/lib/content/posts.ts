@@ -474,7 +474,7 @@ const parsedPosts = postSchema.array().parse([
     views: 0,
     commentCount: 0,
     tags: ["#macos", "#timemachine", "#apfs", "#storage", "#cli", "#systems"],
-    coverImage: "/articles/time-machine-quota-cover.svg",
+    coverImage: "/articles/time-machine-quota-cover.png",
     body: [
       {
         kind: "paragraph",
@@ -915,7 +915,7 @@ Quota         : 800 GB`,
     views: 0,
     commentCount: 0,
     tags: ["#rclone", "#cloud-storage", "#migration", "#cli", "#backups"],
-    coverImage: "/articles/rclone-dry-run-cover.svg",
+    coverImage: "/articles/rclone-dry-run-cover.png",
     body: [
       {
         kind: "paragraph",
