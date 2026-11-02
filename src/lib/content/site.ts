@@ -7,6 +7,7 @@ import {
   searchSuggestions,
   siteIdentity,
   siteUrl,
+  teachingChannel,
   topicNames,
 } from "./config";
 import { posts } from "./posts";
@@ -280,7 +281,15 @@ export const timeline: TimelineEntry[] = timelineEntrySchema.array().parse([
   },
 ]);
 
-export { contactTopics, newsletterBenefits, primaryNav, routes, searchSuggestions, siteUrl };
+export {
+  contactTopics,
+  newsletterBenefits,
+  primaryNav,
+  routes,
+  searchSuggestions,
+  siteUrl,
+  teachingChannel,
+};
 
 export const aboutSetup = [
   { label: "OS", value: "Linux & macOS" },
@@ -320,6 +329,7 @@ export const footerColumns = [
       { label: "GitHub", href: author.github, external: true },
       { label: "LinkedIn", href: author.linkedin, external: true },
       { label: "X", href: author.twitter, external: true },
+      { label: "YouTube", href: author.youtube, external: true },
       { label: "RSS Feed", href: "/rss.xml", external: true },
     ],
   },
