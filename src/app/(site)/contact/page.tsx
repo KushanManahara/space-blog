@@ -3,7 +3,13 @@ import Link from "next/link";
 import { Mail } from "lucide-react";
 
 import { ContactForm } from "@/components/contact/contact-form";
-import { GitHubIcon, LinkedInIcon, RssIcon, XIcon } from "@/components/icons/social-icons";
+import {
+  GitHubIcon,
+  LinkedInIcon,
+  RssIcon,
+  XIcon,
+  YouTubeIcon,
+} from "@/components/icons/social-icons";
 import { MastheadBadge, PageMasthead } from "@/components/layout/page-masthead";
 import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
@@ -21,6 +27,7 @@ const socials = [
   { label: "GitHub", href: author.github, icon: GitHubIcon },
   { label: "LinkedIn", href: author.linkedin, icon: LinkedInIcon },
   { label: "X", href: author.twitter, icon: XIcon },
+  { label: "YouTube", href: author.youtube, icon: YouTubeIcon },
   { label: "RSS", href: "/rss.xml", icon: RssIcon },
 ] as const;
 
