@@ -138,7 +138,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                   // people, which is who it is for.
                   url: `${siteUrl}/about`,
                   image: `${siteUrl}${author.avatar}`,
-                  sameAs: [author.github, author.linkedin, author.twitter],
+                  sameAs: [author.github, author.linkedin, author.twitter, author.youtube],
                 },
               ],
             }),
