@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
+import { TeachingChannel } from "@/components/about/teaching-channel";
 import { PageMasthead } from "@/components/layout/page-masthead";
 import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
 import { GlareHover } from "@/components/ui/glare-hover";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
-import { aboutSetup, author, listTags, routes, timeline } from "@/lib/content";
+import { aboutSetup, author, listTags, routes, teachingChannel, timeline } from "@/lib/content";
 import { alternates, openGraph, twitter } from "@/lib/metadata";
 
 export const metadata: Metadata = {
@@ -135,6 +136,22 @@ export default function AboutPage() {
         </div>
       </section>
 
+      <section id="teaching" className="mx-auto max-w-page px-gutter py-band">
+        <div className="grid items-start gap-[clamp(28px,5vw,72px)] lg:grid-cols-[300px_1fr]">
+          <Reveal>
+            <h2 className="text-h3 text-fg-1">Teaching</h2>
+            <p className="mt-3 text-[16px] leading-[1.65] text-fg-2">
+              The writing lives here. The lessons live on {teachingChannel.name}, on{" "}
+              {teachingChannel.platform}.
+            </p>
+          </Reveal>
+
+          <Reveal className="max-w-[760px]">
+            <TeachingChannel />
+          </Reveal>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-page px-gutter py-band">
         <div className="grid items-start gap-[clamp(28px,5vw,72px)] lg:grid-cols-[300px_1fr]">
           <Reveal>
@@ -240,6 +257,14 @@ export default function AboutPage() {
                       className="rounded-full bg-white/10 px-3 py-1.5 font-medium transition-colors hover:bg-white/20 hover:text-white active:scale-95"
                     >
                       X (Twitter)
+                    </a>
+                    <a
+                      href={author.youtube}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-full bg-white/10 px-3 py-1.5 font-medium transition-colors hover:bg-white/20 hover:text-white active:scale-95"
+                    >
+                      YouTube
                     </a>
                   </div>
                 </div>
