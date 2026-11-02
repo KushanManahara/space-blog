@@ -244,6 +244,7 @@ export const authorSchema = z.object({
   github: z.string().min(1).default("https://github.com/KushanManahara"),
   linkedin: z.string().min(1).default("https://www.linkedin.com/in/kushan-manahara"),
   twitter: z.string().min(1).default("https://x.com/Kushan_Manahara"),
+  youtube: z.string().min(1).default("https://www.youtube.com/@Brain-Link-ai"),
 });
 
 export const commentSchema = z.object({

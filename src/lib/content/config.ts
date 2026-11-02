@@ -35,6 +35,35 @@ export const authorConfig = {
   github: "https://github.com/KushanManahara",
   linkedin: "https://www.linkedin.com/in/kushan-manahara",
   twitter: "https://x.com/Kushan_Manahara",
+  youtube: "https://www.youtube.com/@Brain-Link-ai",
+} as const;
+
+/**
+ * Brain Link, the YouTube channel where the teaching lives. Copy is the
+ * channel's own About text, trimmed to fit; nothing here is a statistic, so
+ * nothing here goes stale.
+ */
+export const teachingChannel = {
+  name: "Brain Link",
+  platform: "YouTube",
+  handle: "@Brain-Link-ai",
+  url: authorConfig.youtube,
+  tagline: "Explore. Understand. Build.",
+  summary:
+    "An educational platform exploring the science, mathematics, and engineering behind artificial intelligence and modern computing.",
+  approach:
+    "Structured learning series, clear explanations, visual demonstrations, and practical examples that make complex technical ideas easier to understand.",
+  principles: ["Strong foundations", "Mathematical intuition", "First principles"],
+  topics: [
+    "Artificial Intelligence & Machine Learning",
+    "Deep Learning & Neural Networks",
+    "Mathematics for Machine Learning",
+    "Computer Science & Computational Foundations",
+    "Programming & Software Engineering",
+    "Emerging Technologies & AI Research",
+  ],
+  audience:
+    "For curious learners, students, developers, and engineers who want to go beyond the surface.",
 } as const;
 
 export const routes = {
