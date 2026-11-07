@@ -1,6 +1,7 @@
+import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 
-import { YouTubeIcon } from "@/components/icons/social-icons";
+import { YouTubeLogo } from "@/components/icons/social-icons";
 import { Button } from "@/components/ui/button";
 import { MagicCard } from "@/components/ui/magic-card";
 import { teachingChannel } from "@/lib/content";
@@ -24,8 +25,15 @@ export function TeachingChannel() {
     <MagicCard className="rounded-lg shadow-lg md:shadow-xl" surfaceClassName="bg-bg-2">
       <div className="p-5 sm:p-[clamp(28px,4vw,44px)]">
         <div className="flex items-center gap-4">
-          <span className="inline-flex size-12 shrink-0 items-center justify-center rounded-xl bg-tint-violet text-brand">
-            <YouTubeIcon className="size-6" />
+          <span className="relative shrink-0">
+            <Image
+              src={channel.logo}
+              alt=""
+              width={112}
+              height={112}
+              className="size-14 rounded-xl border border-line-1"
+            />
+            <YouTubeLogo className="absolute -right-1.5 -bottom-1 h-4 w-auto" />
           </span>
           <div className="min-w-0">
             <p className="text-[11.5px] font-semibold tracking-[0.14em] text-fg-3 uppercase">
@@ -83,8 +91,9 @@ export function TeachingChannel() {
         </div>
 
         <div className="mt-7 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-          <Button asChild variant="primary" size="md">
+          <Button asChild variant="dark" size="md">
             <a href={channel.url} target="_blank" rel="noopener noreferrer">
+              <YouTubeLogo className="h-4 w-auto" />
               Watch on {channel.platform}
               <ArrowUpRight className="size-4" strokeWidth={2} />
             </a>

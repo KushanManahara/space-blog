@@ -5,6 +5,7 @@ import { MostViewed } from "@/components/home/most-viewed";
 import { NewsletterBlock } from "@/components/home/newsletter-block";
 import { PublicationStrip } from "@/components/home/publication-strip";
 import { SeriesGrid } from "@/components/home/series-grid";
+import { TeachingBand } from "@/components/home/teaching-band";
 import { TopicsSection } from "@/components/home/topics-section";
 import { getFeaturedPost, toSummaries, type TopicFilter } from "@/lib/content";
 import { getLivePosts } from "@/lib/db/queries";
@@ -32,6 +33,7 @@ export async function HomeView({ activeTopic }: { activeTopic: TopicFilter }) {
       <MostViewed posts={toSummaries(livePosts)} />
       <LatestWriting topic={activeTopic} />
       <SeriesGrid />
+      <TeachingBand />
       <TopicsSection />
       <NewsletterBlock />
       <MostReadSection posts={livePosts} />

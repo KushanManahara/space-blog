@@ -60,6 +60,23 @@ export function YouTubeIcon({ className }: IconProps) {
   );
 }
 
+/**
+ * YouTube's own logo, for the places that present the channel rather than list
+ * it among the socials. Filled and in brand red, unlike the rest of this set,
+ * because the brand rules do not allow it to be recoloured.
+ */
+export function YouTubeLogo({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 17" aria-hidden className={className}>
+      <path
+        className="fill-youtube"
+        d="M23.498 2.641a3.016 3.016 0 0 0-2.122-2.136C19.505 0 12 0 12 0S4.495 0 2.623.505A3.017 3.017 0 0 0 .502 2.641C0 4.525 0 8.455 0 8.455s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 12.385 24 8.455 24 8.455s0-3.93-.502-5.814z"
+      />
+      <path className="fill-white" d="M9.545 12.023V4.887l6.273 3.568-6.273 3.568z" />
+    </svg>
+  );
+}
+
 export function RssIcon({ className }: IconProps) {
   return (
     <Svg className={className}>
