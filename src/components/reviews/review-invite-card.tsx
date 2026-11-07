@@ -48,7 +48,7 @@ export function ReviewInviteCard() {
       {visible && (
         <aside
           aria-label="Review invitation"
-          className="relative mt-9 flex flex-col gap-3 rounded-lg border border-line-1 bg-bg-2 p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-6"
+          className="relative mt-9 flex flex-col gap-3 overflow-hidden rounded-lg border border-line-brand bg-tint-cornflower p-5 shadow-glow-sm sm:flex-row sm:items-center sm:justify-between sm:p-6"
         >
           <div className="pr-8 sm:pr-0">
             <p className="text-[16px] font-semibold text-fg-1">Was this useful?</p>
