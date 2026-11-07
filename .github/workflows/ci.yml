@@ -39,6 +39,8 @@ jobs:
       # checkout cannot see them.
       - run: pnpm typecheck
 
+      - run: pnpm test
+
       # The content layer parses every post through its zod schemas at module
       # load, so malformed content fails here rather than in production.
       - run: pnpm build

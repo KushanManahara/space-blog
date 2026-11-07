@@ -1,4 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "crons": [{ "path": "/api/cron/email-queue", "schedule": "15 0 * * *" }]
+  "schedules": {
+    "email-queue": {
+      "schedule": "15 0 * * *",
+      "timezone": "Asia/Colombo",
+      "path": "/api/cron/email-queue",
+      "requestMethod": "GET"
+    }
+  }
 }

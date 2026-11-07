@@ -26,7 +26,8 @@ pnpm comments     # moderate held comments: list / approve <id> / approve --all 
 pnpm embeddings   # rebuild src/lib/content/embeddings.json — run after editing article bodies
 ```
 
-There is no test runner configured yet. If one is added, record the single-test invocation here.
+Tests use Node's built-in runner through tsx: `pnpm test` runs `tests/*.test.ts`; one file with
+`node --import tsx --test tests/email-queue-schedule.test.ts`, one test with `--test-name-pattern "<name>"`.
 
 ## Architecture
 
