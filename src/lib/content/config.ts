@@ -25,7 +25,7 @@ export const authorConfig = {
   initials: "KM",
   avatar: "/images/kushan.png",
   role: "Machine Learning Engineer",
-  bio: "Machine learning engineer building production-grade AI/ML systems, agentic architectures, and scalable infrastructure.",
+  bio: "Machine learning engineer at H2O.ai working on production AI/ML systems, agentic architectures, and the infrastructure underneath them.",
   longBio:
     "Machine Learning Engineer working across production AI/ML systems, LLMs, AI agents, and software engineering. I write here to take things apart, follow the reasoning all the way down, and understand what's really happening under the abstractions.",
   email: "hi@gimhara.com",
