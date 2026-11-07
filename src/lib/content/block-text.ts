@@ -27,6 +27,8 @@ export function blockText(block: ArticleBlock): string {
       return `${block.code} ${block.caption ?? ""}`;
     case "image":
       return `${block.alt} ${block.caption ?? ""}`;
+    case "video":
+      return `${block.title} ${block.caption ?? ""}`;
     case "table":
       return [
         block.headers.join(" "),

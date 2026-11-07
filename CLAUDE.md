@@ -156,7 +156,8 @@ editing passes). This section is the Space-specific half: what the skill's step 
 - Body block kinds (`articleBlockSchema`): `paragraph`, `heading` (needs a unique `id`), `list`,
   `code` (`runnable: true` only for browser-safe Python with no network/keys), `formula` (KaTeX `tex`),
   `table`, `figure` (interactive Recharts line/area/bar — hover + legend toggles), `mermaid`,
-  `callout`, `image`, `references`, `footnotes`, `correction`, `chart` (legacy static bars).
+  `callout`, `image`, `video` (YouTube, `variant: "compact"` near the top or `"feature"` card; the player
+  loads only on play), `references`, `footnotes`, `correction`, `chart` (legacy static bars).
 - **Markdown renders in** paragraph html, headings, list items, table cells, callout title/body.
   **Plain text only in** table/figure/formula/mermaid **captions** and reference label/source/note —
   backticks or `**` there show literally.

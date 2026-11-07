@@ -11,6 +11,7 @@ import { ArticleImage } from "@/components/article/article-image";
 import { ArticleMermaid } from "@/components/article/article-mermaid";
 import { ArticleReferences } from "@/components/article/article-references";
 import { ArticleTable } from "@/components/article/article-table";
+import { ArticleVideo } from "@/components/article/article-video";
 import { markdownToHtml } from "@/components/article/markdown";
 import type { ArticleBlock } from "@/lib/content";
 import { formatDate } from "@/lib/format";
@@ -231,6 +232,16 @@ function ArticleBlockView({
           // Only the article's first figure is a candidate for the LCP, so it
           // is the only one worth a preload hint.
           priority={blocks.findIndex((entry) => entry.kind === "image") === index}
+        />
+      );
+
+    case "video":
+      return (
+        <ArticleVideo
+          youtubeId={block.youtubeId}
+          title={block.title}
+          caption={block.caption}
+          variant={block.variant}
         />
       );
 

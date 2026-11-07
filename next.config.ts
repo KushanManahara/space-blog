@@ -44,6 +44,8 @@ const csp = [
   // report thirty blocked font loads, not by reading its source.
   "font-src 'self' data: https://esm.sh",
   "img-src 'self' data: blob: https://upload.wikimedia.org https://images.unsplash.com",
+  // Article videos: the player is only framed after the reader presses play.
+  "frame-src https://www.youtube-nocookie.com",
   "media-src 'self' blob:",
   "frame-ancestors 'self'",
   "base-uri 'self'",
@@ -126,6 +128,8 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "upload.wikimedia.org" },
       { protocol: "https", hostname: "images.unsplash.com" },
+      // Video thumbnails for `video` blocks.
+      { protocol: "https", hostname: "i.ytimg.com", pathname: "/vi/**" },
     ],
     /**
      * Article figures may be SVG. The optimizer is bypassed for those
