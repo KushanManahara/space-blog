@@ -13,6 +13,7 @@ const parsedPosts = postSchema.array().parse([
     views: 0,
     commentCount: 0,
     tags: ["#git", "#version-control", "#internals", "#hashing", "#data-structures"],
+    coverImage: "/articles/how-git-actually-works.png",
     body: [
       {
         kind: "paragraph",
