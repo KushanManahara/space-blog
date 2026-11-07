@@ -310,6 +310,7 @@ export const footerColumns = [
       { label: "Topics", href: routes.topics },
       { label: "Tags", href: routes.tags },
       { label: "Corrections", href: routes.corrections },
+      { label: "Reviews", href: routes.reviews },
       { label: "Search", href: routes.search },
       { label: "Saved", href: routes.saved },
       { label: "About", href: routes.about },

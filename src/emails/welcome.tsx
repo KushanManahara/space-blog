@@ -49,6 +49,8 @@ What you can expect:
 
 Browse latest articles: ${siteUrl}/articles
 
+If Space has helped you, a short review helps other readers find it: ${siteUrl}/reviews
+
 Subscribed as: ${subscriberEmail}
 
 ----------------------------------------
@@ -116,6 +118,14 @@ export function WelcomeEmail({
                 Read Latest Articles &rarr;
               </Button>
             </Section>
+
+            <Text style={footnote}>
+              If Space has helped you, a{" "}
+              <Link href={`${siteUrl}/reviews`} style={link}>
+                short review
+              </Link>{" "}
+              helps other readers find it.
+            </Text>
 
             <Text style={footnote}>
               Subscribed as <span style={emailHighlight}>{subscriberEmail}</span>

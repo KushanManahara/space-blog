@@ -22,6 +22,11 @@ function parsePage(value: string | string[] | undefined): number {
   return Number.isInteger(page) && page > 0 && page < 10_000 ? page : 1;
 }
 
+function parseRating(value: string | string[] | undefined): number {
+  const rating = Number(typeof value === "string" ? value : 0);
+  return Number.isInteger(rating) && rating >= 1 && rating <= 5 ? rating : 0;
+}
+
 export default async function ReviewsPage({ searchParams }: PageProps<"/reviews">) {
   const params = await searchParams;
   const { items, total, average, page, pageCount } = await getApprovedReviews(
@@ -96,7 +101,7 @@ export default async function ReviewsPage({ searchParams }: PageProps<"/reviews"
         <p className="mt-2 mb-6 text-[15px] leading-[1.7] text-fg-2">
           No account needed. Tell other readers what you found useful.
         </p>
-        <ReviewForm />
+        <ReviewForm initialRating={parseRating(params.rating)} />
       </section>
     </>
   );

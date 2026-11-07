@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 
 import { Reveal } from "@/components/motion/reveal";
 import { ReviewCard, StarRow } from "@/components/reviews/review-card";
-import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
+import { WriteReviewCta } from "@/components/reviews/write-review-cta";
 import { routes } from "@/lib/content";
 import { getApprovedReviews, HOMEPAGE_REVIEWS } from "@/lib/reviews";
 
@@ -15,7 +15,11 @@ export async function ReviewsSection() {
   const { items, total, average } = await getApprovedReviews(1, HOMEPAGE_REVIEWS);
 
   return (
-    <section aria-labelledby="reviews-heading" className="mx-auto max-w-page px-gutter pb-tail">
+    <section
+      aria-labelledby="reviews-heading"
+      data-review-invite-quiet
+      className="mx-auto max-w-page px-gutter pb-tail"
+    >
       <Reveal className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2
@@ -47,9 +51,7 @@ export async function ReviewsSection() {
               <ArrowRight className="size-4" aria-hidden />
             </Link>
           )}
-          <InteractiveHoverButton href={`${routes.reviews}#write`} className="px-6 py-3">
-            Write a review
-          </InteractiveHoverButton>
+          <WriteReviewCta />
         </div>
       </Reveal>
 

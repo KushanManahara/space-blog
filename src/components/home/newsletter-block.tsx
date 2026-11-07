@@ -31,7 +31,10 @@ export function NewsletterBlock() {
   }, [state.status]);
 
   return (
-    <section className="mx-auto max-w-page px-gutter pb-[clamp(76px,9vw,132px)]">
+    <section
+      data-review-invite-quiet
+      className="mx-auto max-w-page px-gutter pb-[clamp(76px,9vw,132px)]"
+    >
       {/* MagicCard draws the border and the surface, so the grid inside only
           carries padding — keeping the block's own border would double the
           outline against the card's. */}
