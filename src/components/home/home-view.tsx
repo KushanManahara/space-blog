@@ -4,6 +4,7 @@ import { MostReadSection } from "@/components/home/most-read-section";
 import { MostViewed } from "@/components/home/most-viewed";
 import { NewsletterBlock } from "@/components/home/newsletter-block";
 import { PublicationStrip } from "@/components/home/publication-strip";
+import { ReviewsSection } from "@/components/reviews/reviews-section";
 import { SeriesGrid } from "@/components/home/series-grid";
 import { TeachingBand } from "@/components/home/teaching-band";
 import { TopicsSection } from "@/components/home/topics-section";
@@ -37,6 +38,7 @@ export async function HomeView({ activeTopic }: { activeTopic: TopicFilter }) {
       <TopicsSection />
       <NewsletterBlock />
       <MostReadSection posts={livePosts} />
+      <ReviewsSection />
     </>
   );
 }

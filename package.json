@@ -16,6 +16,7 @@
     "db:sync": "tsx scripts/sync-db.ts",
     "db:sync:force": "tsx scripts/sync-db.ts --force",
     "comments": "tsx scripts/moderate-comments.ts",
+    "reviews": "tsx scripts/moderate-reviews.ts",
     "embeddings": "tsx scripts/build-embeddings.ts",
     "broadcast": "tsx scripts/broadcast.ts",
     "prune:limits": "tsx scripts/prune-rate-limits.ts",

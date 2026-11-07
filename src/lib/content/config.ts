@@ -83,6 +83,7 @@ export const routes = {
   privacy: "/privacy",
   saved: "/saved",
   unsubscribe: "/unsubscribe",
+  reviews: "/reviews",
   // Not routed while Studio is parked in `src/app/_studio/`; kept so that code
   // still typechecks and the paths are in one place when it comes back.
   studio: "/studio",

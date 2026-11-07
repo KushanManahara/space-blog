@@ -26,6 +26,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     routes.corrections,
     routes.about,
     routes.contact,
+    routes.reviews,
     routes.privacy,
   ] as const;
 

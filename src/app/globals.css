@@ -90,6 +90,8 @@
   --color-bg-3: var(--color-n-100);
   --color-bg-inverse: var(--color-n-900);
   --color-youtube: #ff0000;
+  /* Review star ratings. Readable on both themes' surfaces. */
+  --color-star: #f5a524;
 
   /* — Lines & strokes — */
   --color-line-1: var(--color-n-200);

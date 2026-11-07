@@ -496,3 +496,45 @@ export async function sendContactNotification(input: {
     return { success: false, error };
   }
 }
+
+/**
+ * Tells the site owner a review is waiting, with signed one-click moderation
+ * links. Each link opens a confirmation page (GET never changes anything, so
+ * mail scanners can't approve by visiting it) and the button there applies it.
+ * Best effort: the review is already stored, and `pnpm reviews` moderates
+ * without email.
+ */
+export async function sendReviewModerationEmail(review: {
+  id: string;
+  displayName: string;
+  rating: number;
+  body: string;
+  email: string | null;
+}) {
+  const to = process.env.CONTACT_TO_EMAIL;
+  if (!emailEnabled || !to) return { success: false as const };
+
+  const { moderationLink } = await import("@/lib/reviews");
+  const link = (action: "approve" | "feature" | "reject" | "hide") =>
+    moderationLink(SITE_URL, review.id, action);
+  const stars = "★".repeat(review.rating) + "☆".repeat(5 - review.rating);
+
+  const result = await sendCounted("email: review moderation", {
+    from: SENDER_EMAIL,
+    to,
+    subject: `[Space review] ${stars} from ${review.displayName}`.slice(0, 120),
+    text: `A new reader review is waiting for approval. Nothing is published until you approve it.
+
+${stars} (${review.rating}/5) from ${review.displayName}${review.email ? ` <${review.email}>` : ""}
+
+${review.body}
+
+Approve:            ${link("approve")}
+Approve and feature: ${link("feature")}
+Reject:             ${link("reject")}
+Hide (if approved): ${link("hide")}
+
+Links work for 30 days. Later changes: pnpm reviews (id ${review.id.slice(0, 8)}).`,
+  });
+  return result;
+}
