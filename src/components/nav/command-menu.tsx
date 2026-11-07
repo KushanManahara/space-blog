@@ -123,6 +123,12 @@ function CommandMenu({
             autoFocus
             value={query}
             onChange={(event) => setQuery(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key !== "Enter") return;
+              // The top result, or the full search page when nothing matches.
+              if (results[0]) go(`/articles/${results[0].slug}`);
+              else if (query.trim()) go(`${routes.search}?q=${encodeURIComponent(query.trim())}`);
+            }}
             placeholder="Search posts, topics, or jump to a page"
             aria-label="Search posts, topics, or jump to a page"
             className="flex-1 bg-transparent py-1 text-[16px] text-fg-1 outline-none placeholder:text-fg-3"

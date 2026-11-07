@@ -159,7 +159,7 @@ const parsedPosts = postSchema.array().parse([
         kind: "mermaid",
         caption:
           "The gas path. The bell is what makes it supersonic: past the throat the flow keeps accelerating, and the banded shock pattern in the exhaust (Mach diamonds) is the visible proof.",
-        code: `flowchart LR
+        code: `flowchart TB
     TANK[("COPV tank<br/>≈380 bar · 250 kg of air")]
     VALVE["fast electric valve<br/>micro-adjusts in a fraction of a second"]
     THROAT["converging throat<br/>flow reaches Mach 1"]
@@ -1460,7 +1460,6 @@ Quota         : 800 GB`,
       {
         kind: "code",
         filename: "tensors.py",
-        runnable: true,
         code: "import torch\n\nx = torch.tensor([[1.0, 2.0], [3.0, 4.0]])\n\nprint(x.shape)        # torch.Size([2, 2])\nprint(x.dtype)        # torch.float32\nprint(x.mean())       # tensor(2.5000)\nprint(x @ x)          # matrix multiply\nprint(x.sum(dim=0))   # column sums -> tensor([4., 6.])\nprint(x.reshape(4))   # tensor([1., 2., 3., 4.])\nprint(x.T)            # transpose",
       },
       {
@@ -1488,7 +1487,6 @@ Quota         : 800 GB`,
       {
         kind: "code",
         filename: "attributes.py",
-        runnable: true,
         code: "import torch\n\nw = torch.randn(3, 3, requires_grad=True)\nprint(w.device)        # cpu\nprint(w.requires_grad)  # True\n\n# A parameter you'll optimise: float, on the right device, tracked.\n# A batch of input data: float, same device, NOT tracked.\nbatch = torch.randn(16, 3)\nprint(batch.requires_grad)  # False",
       },
       {
@@ -1570,7 +1568,6 @@ Quota         : 800 GB`,
       {
         kind: "code",
         filename: "linear_by_hand.py",
-        runnable: true,
         code: "import torch\n\nbatch, in_features, out_features = 4, 3, 2\n\nx = torch.randn(batch, in_features)\nW = torch.randn(out_features, in_features)\nb = torch.randn(out_features)\n\ny = x @ W.T + b            # broadcasting adds b to every row\nprint(y.shape)             # torch.Size([4, 2])\n\n# A non-linearity turns a stack of linear layers into something\n# more expressive than one big linear layer.\nh = torch.relu(y)\nprint(h.min() >= 0)        # tensor(True)",
       },
       {
@@ -1729,7 +1726,6 @@ Quota         : 800 GB`,
       {
         kind: "code",
         filename: "grad_fn.py",
-        runnable: true,
         code: "import torch\n\nx = torch.tensor(2.0, requires_grad=True)\ny = x ** 3 + 2 * x\n\nprint(y)           # tensor(12., grad_fn=<AddBackward0>)\nprint(y.grad_fn)    # <AddBackward0 object ...>\n\n# Walk one step back into the graph by hand:\nprint(y.grad_fn.next_functions)  # the pow and mul nodes feeding the add",
       },
       {
@@ -1773,7 +1769,6 @@ Quota         : 800 GB`,
       {
         kind: "code",
         filename: "backward.py",
-        runnable: true,
         code: "import torch\n\nx = torch.tensor(2.0, requires_grad=True)\ny = x ** 3 + 2 * x\ny.backward()\n\nprint(x.grad)   # tensor(14.)\n\n# Check it: d/dx (x³ + 2x) = 3x² + 2  ->  3·4 + 2 = 14\nprint(3 * x.item() ** 2 + 2)   # 14.0",
       },
       {
@@ -2132,7 +2127,7 @@ Quota         : 800 GB`,
         kind: "mermaid",
         caption:
           "The input pipeline. The dashed box runs in num_workers separate processes, overlapped with the GPU's work on the previous batch.",
-        code: `flowchart LR
+        code: `flowchart TB
     DISK[("disk / storage")]
     subgraph W["worker processes (num_workers)"]
         GET["Dataset.__getitem__<br/>read · decode · transform"]

@@ -92,26 +92,22 @@ export async function underLimit(
   const now = Math.floor(Date.now() / 1000);
 
   try {
-    const [row] = await db.select().from(rateLimits).where(eq(rateLimits.key, key));
+    // One atomic statement. Reading the count and writing it back as two steps
+    // let a burst of parallel requests all read the same value and all pass.
+    const expired = sql`${now} - ${rateLimits.windowStart} >= ${windowSeconds}`;
+    const [row] = await db
+      .insert(rateLimits)
+      .values({ key, count: 1, windowStart: now })
+      .onConflictDoUpdate({
+        target: rateLimits.key,
+        set: {
+          count: sql`CASE WHEN ${expired} THEN 1 ELSE ${rateLimits.count} + 1 END`,
+          windowStart: sql`CASE WHEN ${expired} THEN ${now} ELSE ${rateLimits.windowStart} END`,
+        },
+      })
+      .returning({ count: rateLimits.count });
 
-    if (!row || now - row.windowStart >= windowSeconds) {
-      await db
-        .insert(rateLimits)
-        .values({ key, count: 1, windowStart: now })
-        .onConflictDoUpdate({
-          target: rateLimits.key,
-          set: { count: 1, windowStart: now },
-        });
-      return true;
-    }
-
-    if (row.count >= limit) return false;
-
-    await db
-      .update(rateLimits)
-      .set({ count: sql`${rateLimits.count} + 1` })
-      .where(eq(rateLimits.key, key));
-    return true;
+    return row.count <= limit;
   } catch (error) {
     console.error("RATE LIMIT CHECK FAILED, ALLOWING REQUEST:", error);
     return true;
