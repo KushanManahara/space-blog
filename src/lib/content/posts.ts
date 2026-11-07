@@ -4,6 +4,326 @@ import { postSchema, type Post } from "./schemas";
 
 const parsedPosts = postSchema.array().parse([
   {
+    slug: "how-git-actually-works",
+    title: "How Git Actually Works: Fingerprints, Snapshots and a 41-Byte Branch",
+    dek: "Git doesn't store your changes. It keeps a small database of objects, each named by a fingerprint of its content. Open the .git folder with real hashes and you can explain what a commit saves, why its ID looks random, and why a new branch costs 41 bytes.",
+    topic: "Systems",
+    publishedAt: "2026-11-07",
+    likes: 0,
+    views: 0,
+    commentCount: 0,
+    tags: ["#git", "#version-control", "#internals", "#hashing", "#data-structures"],
+    coverImage: "/articles/how-git-actually-works.png",
+    body: [
+      {
+        kind: "paragraph",
+        html: "Before version control, most of us had a folder like this: `report.docx`, `report_v2.docx`, `report_v2_final.docx`, `report_v2_final_REAL.docx`. Every version is a full copy, and after a few weeks you can't tell which one is which.",
+      },
+      {
+        kind: "paragraph",
+        html: "Git keeps every version of every file in a project, often for years, and the whole history still fits in one hidden folder. It can tell instantly whether anything changed, and creating a branch takes no measurable time. None of that comes from clever compression of differences. It comes from three small ideas, and once you see them, Git stops being a black box.",
+      },
+      {
+        kind: "paragraph",
+        html: "By the end of this article you should be able to answer three questions: what Git actually saves when you commit, why every commit has that long random-looking ID, and what a branch really is. No commands to memorise. We'll open the `.git` folder and look at real objects.",
+      },
+      {
+        kind: "video",
+        youtubeId: "wReu4datc5U",
+        title: "How Git Actually Works",
+        caption:
+          "I explain the same ideas visually on my channel, Brain Link: the hash changing letter by letter, trees sharing blobs, and the branch label sliding forward.",
+        variant: "compact",
+      },
+      {
+        kind: "heading",
+        id: "fingerprints",
+        text: "Git names everything by a fingerprint of its content",
+      },
+      {
+        kind: "paragraph",
+        html: "Start with a practical problem. You have thousands of files across thousands of versions, and you want to know whether a file changed. Comparing every byte against every old copy would be slow. What you want is a short ID that is always the same for the same content and always different when the content changes.",
+      },
+      {
+        kind: "paragraph",
+        html: "That is exactly what a **hash function** gives you. Think of it as a machine: put any amount of data in, and a fixed-length fingerprint comes out. The same input always produces the same fingerprint. Git will show you one directly:",
+      },
+      {
+        kind: "code",
+        filename: "terminal",
+        code: `$ printf 'hello\\n' | git hash-object --stdin
+ce013625030ba8dba906f756967f9e9ca394464a
+
+$ printf 'Hello\\n' | git hash-object --stdin
+e965047ad7c57865823c7d992b1d046ea66edf78`,
+      },
+      {
+        kind: "paragraph",
+        html: "One capital letter, and the fingerprint is completely different. Not slightly different: nearly every character changed. Change it back to `hello` and you get `ce01362…` again, on your machine, on mine, on anyone's. That last property matters more than it looks. Two people who never talk to each other will still give identical content the identical name.",
+      },
+      {
+        kind: "paragraph",
+        html: "The fingerprint is 40 characters, and each one is a hexadecimal digit (0 to 9, then a to f). That's just a compact way of writing a very large number, which means the number of possible fingerprints is enormous:",
+      },
+      {
+        kind: "formula",
+        tex: "16^{40} = 2^{160} \\approx 1.46 \\times 10^{48}",
+        caption:
+          "Possible 40-character hexadecimal fingerprints. Two different files landing on the same one by accident is not a practical concern.",
+      },
+      {
+        kind: "paragraph",
+        html: "Now the central trick. Git saves each piece of content in a file **named after its fingerprint**. Our `hello` content lives at `.git/objects/ce/013625030ba8dba906f756967f9e9ca394464a`. The first two characters become a folder name so that no single folder ends up holding hundreds of thousands of files. This is called **content addressing**: things are stored by what they contain, not by a name somebody chose. And because the same content always gets the same address, Git can never store the same content twice.",
+      },
+      {
+        kind: "callout",
+        title: "The honest detail behind the hash",
+        body: "Git doesn't hash the raw file. It hashes a small header plus the content, here `blob 6\\0hello\\n` (the type, the size in bytes, a null byte, then the data). That's why `ce01362…` isn't the plain SHA-1 of the text: `printf 'hello\\n' | shasum` gives `f572d39…`, while hashing the header-plus-content gives `ce01362…`, the same value Git printed.",
+      },
+      {
+        kind: "paragraph",
+        html: "The algorithm is SHA-1. One caveat the usual explanation skips: researchers produced a deliberate SHA-1 collision in 2017 (two different PDFs with the same SHA-1 hash). Accidental collisions are still not a realistic concern, but deliberate ones were, so Git 2.13 switched to a hardened SHA-1 that detects that attack, and newer versions can create repositories that use SHA-256 instead (`git init --object-format=sha256`). Everything in this article works the same either way. Only the fingerprints get longer.",
+      },
+      {
+        kind: "heading",
+        id: "three-objects",
+        text: "Three kinds of object: blobs, trees and commits",
+      },
+      {
+        kind: "paragraph",
+        html: "Everything Git stores is one of a few object types, all filed by fingerprint in `.git/objects`. To see them with real values, make a tiny repository with a fixed author and date. The fixed values matter: a commit's fingerprint includes who made it and when, so with these settings you'll get exactly the hashes shown below.",
+      },
+      {
+        kind: "code",
+        filename: "try-it.sh",
+        code: `mkdir git-demo && cd git-demo && git init -b main
+export GIT_AUTHOR_NAME=Ada GIT_AUTHOR_EMAIL=ada@example.com
+export GIT_COMMITTER_NAME=Ada GIT_COMMITTER_EMAIL=ada@example.com
+export GIT_AUTHOR_DATE=2026-01-01T00:00:00Z GIT_COMMITTER_DATE=2026-01-01T00:00:00Z
+
+printf 'hello\\n' > hello.txt
+git add hello.txt
+git commit -m first`,
+      },
+      {
+        kind: "paragraph",
+        html: "**Blob.** The file's content, nothing else. A blob has no filename and no date. It's the `ce01362…` object we just hashed.",
+      },
+      {
+        kind: "paragraph",
+        html: "**Tree.** If the blob has no name, where does `hello.txt` live? In a tree, which is Git's version of a folder: a list of entries, each with a mode, a type, a fingerprint and a name. A subfolder is just an entry pointing at another tree.",
+      },
+      {
+        kind: "code",
+        filename: "terminal",
+        code: `$ git cat-file -p HEAD^{tree}
+100644 blob ce013625030ba8dba906f756967f9e9ca394464a	hello.txt`,
+      },
+      {
+        kind: "paragraph",
+        html: "Here's where content addressing pays off. Add a second file, `copy.txt`, with exactly the same text, and commit both together in a fresh repository. The tree gets two entries, and **both point at the same blob**. Git creates three objects (one blob, one tree, one commit), not four. The duplicate costs one line in a tree.",
+      },
+      {
+        kind: "paragraph",
+        html: "**Commit.** A commit points at one tree, the complete snapshot of the project, and adds who, when and why. From the second commit on, it also records its parent: the commit that came before it.",
+      },
+      {
+        kind: "code",
+        filename: "terminal",
+        code: `$ git cat-file -p HEAD
+tree aaa96ced2d9a1c8e72c56b253a0e2fe78393feb7
+author Ada <ada@example.com> 1767225600 +0000
+committer Ada <ada@example.com> 1767225600 +0000
+
+first`,
+      },
+      {
+        kind: "paragraph",
+        html: "That small text is the whole commit. Its own fingerprint is `4c831a3…`, the hash of exactly these lines. (The number after the email is the date as seconds since 1970, followed by the timezone.) There is a fourth object type, the annotated tag, used for release labels, but blobs, trees and commits are what every commit is made of.",
+      },
+      {
+        kind: "heading",
+        id: "snapshots",
+        text: "Snapshots, not changes",
+      },
+      {
+        kind: "paragraph",
+        html: "Most people picture Git storing a list of edits: line 2 added, line 5 removed. It doesn't. Every commit points to a full snapshot of the project. That sounds wasteful until you see what a second commit actually creates. Append the line `world` to `hello.txt` and commit again:",
+      },
+      {
+        kind: "code",
+        filename: "terminal",
+        code: `$ printf 'world\\n' >> hello.txt
+$ git commit -am second
+$ git cat-file -p HEAD
+tree b2ebf159fb11cd612e1c3e62636be14ce60424ad
+parent 4c831a34c24a412d6d390d7cd8d4cae28c7e8e09
+author Ada <ada@example.com> 1767225600 +0000
+committer Ada <ada@example.com> 1767225600 +0000
+
+second`,
+      },
+      {
+        kind: "paragraph",
+        html: "The changed file gets a new blob (`94954ab…`), so the folder listing changes and gets a new tree (`b2ebf15…`), and a new commit points at that tree and back at its parent. Anything that didn't change is referenced by its old fingerprint. Nothing is copied.",
+      },
+      {
+        kind: "mermaid",
+        code: `flowchart LR
+  C2[commit 5002a2a second] -->|parent| C1[commit 4c831a3 first]
+  C1 --> T1[tree aaa96ce]
+  C2 --> T2[tree b2ebf15]
+  T1 --> B1[blob ce01362 hello]
+  T2 --> B2[blob 94954ab hello world]`,
+        caption:
+          "Each commit points to a complete snapshot (a tree). The second commit points back to its parent. Every label is a real hash from the example.",
+      },
+      {
+        kind: "paragraph",
+        html: "Real projects have folders inside folders, so the rule is: one new blob per changed file, one new tree for every folder on the path to it, and one new commit. I checked this with a project of 100 files, 99 of them inside `src/`. Editing one file in `src/` and committing created exactly four objects:",
+      },
+      {
+        kind: "table",
+        headers: ["New object", "Why it's needed"],
+        rows: [
+          ["Blob for the edited file", "Its content changed, so its fingerprint changed"],
+          ["Tree for `src/`", "One entry in the folder now points to a different blob"],
+          ["Root tree", "Its `src` entry now points to a different tree"],
+          ["Commit", "Points to the new root tree and back to the previous commit"],
+        ],
+        caption:
+          "What one edit in a 100-file project creates, verified with git 2.51. The other 99 files reuse their existing blobs.",
+      },
+      {
+        kind: "paragraph",
+        html: "There's a quiet consequence here. A commit's fingerprint covers its tree's fingerprint and its parent's fingerprint, and those cover everything beneath and before them. Change one old file, or one word in an old commit message, and every commit after it gets a new ID. You can't rewrite history without everyone's IDs disagreeing, which is what makes Git history tamper-evident.",
+      },
+      {
+        kind: "callout",
+        title: "Then why isn't .git enormous?",
+        body: "Each object is already zlib-compressed on disk (the `hello` blob file is 21 bytes). Over time Git also packs objects into packfiles, where similar versions of a file are stored as one full copy plus small differences. So Git's model is snapshots, and its storage format uses differences as an optimisation underneath.",
+      },
+      {
+        kind: "heading",
+        id: "branches",
+        text: "A branch is a 41-byte file",
+      },
+      {
+        kind: "paragraph",
+        html: "History is a chain of commits, each pointing back to its parent. The arrows go backwards in time because a commit can only point at something that already existed when it was made. So how does Git know where the chain ends? Look inside `.git`:",
+      },
+      {
+        kind: "code",
+        filename: "terminal",
+        code: `$ cat .git/refs/heads/main
+5002a2ac50307eee79907c0b493dabfeaf3c083c
+$ wc -c < .git/refs/heads/main
+41
+$ cat .git/HEAD
+ref: refs/heads/main`,
+      },
+      {
+        kind: "paragraph",
+        html: "That's a branch: a file holding one commit fingerprint, 40 characters plus a newline. Creating a branch called `feature` writes one more 41-byte file with the same hash in it. Nothing in your project is copied, which is why branches in Git are effectively free. When you commit on a branch, Git creates the new commit and then rewrites that one file with the new fingerprint. The label slides forward.",
+      },
+      {
+        kind: "paragraph",
+        html: "`HEAD` is one level up: it names the branch you're on. It's a pointer to a pointer. Switching branches means pointing `HEAD` at a different branch file, and Git then rebuilds your working folder from that commit's tree. (Depending on your setup and Git version, branch names may also be stored in `.git/packed-refs` or the newer reftable format instead of one file each. The idea is the same: a name mapped to one commit fingerprint.)",
+      },
+      {
+        kind: "paragraph",
+        html: "One more piece fits now: the staging area, also called the index. It's Git's draft of the next tree. `git add` writes the blob into `.git/objects` immediately and records it in the draft. `git commit` turns the draft into tree objects and wraps the root tree in a new commit.",
+      },
+      {
+        kind: "paragraph",
+        html: "And deleting a branch? Only the 41-byte pointer goes. The commits stay in `.git/objects` as long as anything still points to them, and even unreachable ones survive until Git's garbage collection removes them later, which is how you can often recover a branch you deleted by mistake.",
+      },
+      {
+        kind: "heading",
+        id: "check-yourself",
+        text: "Check yourself",
+      },
+      {
+        kind: "paragraph",
+        html: "Try these before reading the answers. If the model has clicked, you won't need to look anything up.",
+      },
+      {
+        kind: "list",
+        items: [
+          "**Two people on two computers each save a file containing exactly `hello`. Do they get the same fingerprint?** Yes. Same content, same fingerprint, anywhere.",
+          "**You change one word in one file at the top of a project and commit. How many new objects?** Three: one blob for the file, one root tree, one commit. If the file sits in a subfolder, add one tree per folder on the path.",
+          "**You create a new branch. How much is copied?** Nothing from your project. Git writes one 41-byte file.",
+        ],
+      },
+      {
+        kind: "video",
+        youtubeId: "wReu4datc5U",
+        title: "How Git Actually Works",
+        caption:
+          "Watch the same three ideas animated step by step: fingerprints, the three objects, and branches as pointers. If it helps, a like or a subscribe helps the channel reach more people.",
+        variant: "feature",
+      },
+      {
+        kind: "paragraph",
+        html: "With these three ideas you can already explain features that look magical from the outside. A merge commit is simply a commit with two parents. Pushing is copying objects the other side doesn't have yet, which Git can work out by comparing fingerprints. The next question worth asking is how Git squeezes thousands of snapshots into a small folder, and that's where packfiles and delta compression come in.",
+      },
+      {
+        kind: "references",
+        title: "References",
+        items: [
+          {
+            label: "Git Internals: Git Objects",
+            href: "https://git-scm.com/book/en/v2/Git-Internals-Git-Objects",
+            source: "Pro Git, Scott Chacon and Ben Straub",
+            note: "Blobs, trees and commits built by hand.",
+          },
+          {
+            label: "Git Internals: Git References",
+            href: "https://git-scm.com/book/en/v2/Git-Internals-Git-References",
+            source: "Pro Git",
+            note: "Branches, HEAD and tags as references.",
+          },
+          {
+            label: "Git Internals: Packfiles",
+            href: "https://git-scm.com/book/en/v2/Git-Internals-Packfiles",
+            source: "Pro Git",
+          },
+          {
+            label: "git-hash-object documentation",
+            href: "https://git-scm.com/docs/git-hash-object",
+            source: "Git docs",
+          },
+          {
+            label: "git-cat-file documentation",
+            href: "https://git-scm.com/docs/git-cat-file",
+            source: "Git docs",
+          },
+          {
+            label: "Hash function transition (SHA-1 to SHA-256)",
+            href: "https://git-scm.com/docs/hash-function-transition",
+            source: "Git docs",
+          },
+          {
+            label: "SHAttered: the first practical SHA-1 collision",
+            href: "https://shattered.io/",
+            source: "CWI Amsterdam and Google, 2017",
+          },
+          {
+            label: "Git 2.13 has been released",
+            href: "https://github.blog/open-source/git/git-2-13-has-been-released/",
+            source: "GitHub Blog",
+            note: "Collision-detecting SHA-1 became the default.",
+          },
+          {
+            label: "How Git Actually Works (video)",
+            href: "https://www.youtube.com/watch?v=wReu4datc5U",
+            source: "Brain Link on YouTube",
+          },
+        ],
+      },
+    ],
+  },
+  {
     slug: "tesla-roadster-fans-thrusters-physics",
     title: "The Roadster Flew on Two Old Ideas and 250 kg of Air",
     dek: "A fan car from 1970 and a spacecraft thruster from the 1960s, in one road car, under software control. The stunts were real. Run the arithmetic and you get about four seconds of hover, and one Tesla claim that does not survive contact with a calculator.",

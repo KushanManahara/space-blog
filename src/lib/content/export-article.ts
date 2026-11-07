@@ -57,6 +57,11 @@ function blockToMarkdown(block: ArticleBlock): string {
       return `![${block.alt}](${src})${caption}`;
     }
 
+    case "video": {
+      const caption = block.caption ? `\n*${block.caption}*` : "";
+      return `[▶ Watch: ${block.title}](https://www.youtube.com/watch?v=${block.youtubeId})${caption}`;
+    }
+
     case "table": {
       const headerRow = `| ${block.headers.join(" | ")} |`;
       const dividerRow = `| ${block.headers.map(() => "---").join(" | ")} |`;

@@ -151,6 +151,20 @@ export const articleBlockSchema = z.discriminatedUnion("kind", [
       message: "Every table row must have the same number of cells as headers.",
     }),
 
+  /**
+   * A YouTube video. Shows the thumbnail and loads the player (from
+   * youtube-nocookie.com) only when the reader presses play, so a post with a
+   * video costs nothing until it is watched. "compact" is the short "prefer to
+   * watch?" prompt near the top of a post; "feature" is the full card.
+   */
+  z.object({
+    kind: z.literal("video"),
+    youtubeId: z.string().regex(/^[\w-]{11}$/, "A YouTube video ID is 11 characters."),
+    title: z.string().min(1),
+    caption: z.string().min(1).optional(),
+    variant: z.enum(["feature", "compact"]).default("feature"),
+  }),
+
   /** Interactive chart: hover for values, toggle series through the legend. */
   z.object({
     kind: z.literal("figure"),
