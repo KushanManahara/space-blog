@@ -127,6 +127,11 @@ async function main() {
   }
 
   console.log(`\nSent to ${result.count} subscriber(s).`);
+  if (result.remaining) {
+    console.log(
+      `${result.remaining} more are queued: today's email quota is used, and the daily queue job sends the rest.`,
+    );
+  }
 }
 
 main().catch((error) => {

@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 
 import { underLimit } from "@/lib/abuse";
+import { recordSent } from "@/lib/email-quota";
 import { emailEnabled, getResend, SENDER_EMAIL } from "@/lib/resend";
 
 /**
@@ -51,12 +52,13 @@ export async function reportError(where: string, error: unknown): Promise<void> 
     if (!(await underLimit("alert", signature, 1, 3600))) return;
     if (!(await underLimit("alert-total", "all", 20, 86_400))) return;
 
-    await getResend().emails.send({
+    const { error: sendError } = await getResend().emails.send({
       from: SENDER_EMAIL,
       to,
       subject: `[Space alert] ${where}`.slice(0, 120),
       text: `${where}\n\n${summary}\n\nTime: ${new Date(now).toISOString()}\nDeployment: ${process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? "unknown"}\n\nFull details are in the Vercel logs. The same error will not alert again for an hour.`,
     });
+    if (!sendError) await recordSent(1);
   } catch (alertError) {
     // Reporting must never become a second failure for the caller.
     console.error("[monitoring] could not send alert", alertError);

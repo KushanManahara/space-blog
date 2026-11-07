@@ -1,7 +1,10 @@
 import {
+  broadcastDeliveries,
+  broadcasts,
   comments,
   contactMessages,
   db,
+  emailUsage,
   newsletterSubscribers,
   postStats,
   rateLimits,
@@ -22,9 +25,16 @@ export async function GET(): Promise<Response> {
 
   try {
     await Promise.all(
-      [postStats, comments, newsletterSubscribers, contactMessages, rateLimits].map((table) =>
-        db.select().from(table).limit(1),
-      ),
+      [
+        postStats,
+        comments,
+        newsletterSubscribers,
+        contactMessages,
+        rateLimits,
+        emailUsage,
+        broadcasts,
+        broadcastDeliveries,
+      ].map((table) => db.select().from(table).limit(1)),
     );
     return Response.json({ ok: true, database: true, email: emailEnabled }, { headers });
   } catch (error) {

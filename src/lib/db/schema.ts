@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { integer, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 /**
  * Live persistent metrics for posts (likes and views).
@@ -52,6 +52,16 @@ export const newsletterSubscribers = sqliteTable("newsletter_subscribers", {
    * is dropped from it.
    */
   confirmed: integer("confirmed").notNull().default(1),
+  /**
+   * Unix seconds when the confirmation email last left. Null with
+   * `confirmed = 0` means the email is still owed (quota, outage), and the
+   * daily queue job sends it.
+   */
+  confirmSentAt: integer("confirm_sent_at"),
+  /** Failed confirmation sends. The queue gives up after a few. */
+  confirmAttempts: integer("confirm_attempts").notNull().default(0),
+  /** 1 when the address confirmed but its welcome email has not gone out yet. */
+  welcomePending: integer("welcome_pending").notNull().default(0),
 });
 
 /**
@@ -79,3 +89,34 @@ export const rateLimits = sqliteTable("rate_limits", {
   /** Unix seconds when the current window opened. */
   windowStart: integer("window_start").notNull(),
 });
+
+/**
+ * Emails sent per period, against Resend's free-plan quota. `period` is a UTC
+ * day ("2026-11-07") or month ("2026-11"), so a new period starts at zero
+ * without any cleanup. Advisory: Resend's own quota error is the source of truth.
+ */
+export const emailUsage = sqliteTable("email_usage", {
+  period: text("period").primaryKey(),
+  count: integer("count").default(0).notNull(),
+});
+
+/**
+ * One row per post that has been broadcast. A broadcast larger than the day's
+ * quota is finished by the queue job on later days; `completedAt` marks done.
+ */
+export const broadcasts = sqliteTable("broadcasts", {
+  slug: text("slug").primaryKey(),
+  startedAt: text("started_at").notNull(),
+  completedAt: text("completed_at"),
+});
+
+/** Who already received a post, so a resumed broadcast never mails anyone twice. */
+export const broadcastDeliveries = sqliteTable(
+  "broadcast_deliveries",
+  {
+    slug: text("slug").notNull(),
+    email: text("email").notNull(),
+    sentAt: integer("sent_at").notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.slug, table.email] })],
+);
