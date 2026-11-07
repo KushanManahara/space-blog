@@ -12,6 +12,7 @@ import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button
 import { MagicCard } from "@/components/ui/magic-card";
 import { Textarea } from "@/components/ui/textarea";
 import { initialFormState } from "@/lib/form-state";
+import { markSubmitted } from "@/lib/review-invite";
 import { cn } from "@/lib/utils";
 
 const BODY_MAX = 1000;
@@ -54,12 +55,13 @@ function loadTurnstile(): Promise<Turnstile> {
   });
 }
 
-export function ReviewForm() {
+/** `initialRating` comes from `?rating=` when the reader picked a star on an invitation. */
+export function ReviewForm({ initialRating = 0 }: { initialRating?: number }) {
   const [state, formAction] = useActionState(submitReviewAction, initialFormState);
   const formRef = React.useRef<HTMLFormElement>(null);
   const widgetRef = React.useRef<HTMLDivElement>(null);
   const widgetId = React.useRef<string | null>(null);
-  const [rating, setRating] = React.useState(Number(state.values?.rating) || 0);
+  const [rating, setRating] = React.useState(Number(state.values?.rating) || initialRating);
   const [bodyLength, setBodyLength] = React.useState(state.values?.body?.length ?? 0);
   const [challengeError, setChallengeError] = React.useState(false);
 
@@ -101,7 +103,11 @@ export function ReviewForm() {
   React.useEffect(() => {
     if (state.status === "idle") return;
     if (widgetId.current) window.turnstile?.reset(widgetId.current);
-    if (state.status === "success") formRef.current?.reset();
+    if (state.status === "success") {
+      formRef.current?.reset();
+      // No more review invitations for this visitor.
+      markSubmitted();
+    }
   }, [state]);
 
   if (!siteKey) {

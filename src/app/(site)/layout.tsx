@@ -3,9 +3,21 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { ScrollToTop } from "@/components/layout/scroll-to-top";
 import { KeyboardShortcuts } from "@/components/nav/keyboard-shortcuts";
+import { ReviewInviteFloat, type InviteQuote } from "@/components/reviews/review-invite-float";
+import { getApprovedReviews } from "@/lib/reviews";
+
+/** A featured review, cut at a word boundary, to quote in the floating invitation. */
+async function inviteQuote(): Promise<InviteQuote | null> {
+  const [top] = (await getApprovedReviews(1, 1)).items;
+  if (!top?.featured) return null;
+  const text =
+    top.body.length > 120 ? `${top.body.slice(0, 120).replace(/\s+\S*$/, "")}…` : top.body;
+  return { text, name: top.displayName };
+}
 
 /** Public site chrome, plus the site-wide skip link and shortcut sheet. */
-export default function SiteLayout({ children }: LayoutProps<"/">) {
+export default async function SiteLayout({ children }: LayoutProps<"/">) {
+  const quote = await inviteQuote();
   return (
     <>
       {/* First thing in the tab order: a keyboard or screen-reader user should
@@ -23,6 +35,7 @@ export default function SiteLayout({ children }: LayoutProps<"/">) {
       <SiteFooter />
       <ScrollToTop />
       <KeyboardShortcuts />
+      <ReviewInviteFloat quote={quote} />
     </>
   );
 }

@@ -8,6 +8,7 @@ import { ArticleBody } from "@/components/article/article-body";
 import { highlightBlocks } from "@/components/article/code-highlight";
 import { ArticleHeader } from "@/components/article/article-header";
 import { CommentThread } from "@/components/article/comment-thread";
+import { ReviewInviteCard } from "@/components/reviews/review-invite-card";
 import { CopySelectionWatermark } from "@/components/article/copy-selection-watermark";
 import { PrintFooterWatermark, PrintHeaderWatermark } from "@/components/article/print-watermark";
 import { ReaderModeProvider } from "@/components/article/reader-mode-provider";
@@ -251,6 +252,8 @@ export default async function ArticlePage({ params }: PageProps<"/articles/[slug
                     ) : null}
                   </nav>
                 ) : null}
+
+                <ReviewInviteCard />
 
                 <AuthorCard />
 
