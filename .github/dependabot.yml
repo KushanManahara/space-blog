@@ -1,0 +1,19 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      # One PR for routine bumps. Security updates still arrive on their own.
+      minor-and-patch:
+        update-types: [minor, patch]
+    ignore:
+      # Carries a local patch in patches/, keyed to this exact version.
+      - dependency-name: "@excalidraw/mermaid-to-excalidraw"
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

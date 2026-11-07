@@ -1,5 +1,9 @@
 "use client";
 
+import * as React from "react";
+
+import { reportClientErrorAction } from "@/app/actions";
+
 /**
  * Last resort: catches failures in the root layout itself, where the site
  * chrome and its stylesheet may never have rendered. It therefore has to ship
@@ -14,6 +18,10 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  React.useEffect(() => {
+    if (!error.digest) void reportClientErrorAction(error.message, window.location.pathname);
+  }, [error]);
+
   return (
     <html lang="en">
       <body

@@ -6,6 +6,7 @@ import { db, newsletterSubscribers } from "@/lib/db";
 import { verifyUnsubscribe } from "@/lib/newsletter-token";
 import { emailEnabled, getResend } from "@/lib/resend";
 import { escapeHtml, page } from "@/lib/newsletter-page";
+import { reportError } from "@/lib/monitoring";
 
 /**
  * Unsubscribe, RFC 8058 style.
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
         "You will no longer receive post notifications.",
     );
   } catch (error) {
-    console.error("UNSUBSCRIBE ROUTE ERROR:", error);
+    await reportError("newsletter unsubscribe", error);
     return new NextResponse("Failed to process the unsubscribe request.", { status: 500 });
   }
 }

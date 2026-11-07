@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "tsx scripts/migrate.ts && next build",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
@@ -77,7 +77,8 @@
       "nanoid@>=4.0.0 <5.1.16": "^5.1.16",
       "dompurify@<3.4.17": "^3.4.17",
       "source-map-js@<1.2.2": "^1.2.2",
-      "katex@<0.18.2": "^0.18.4"
+      "katex@<0.18.2": "^0.18.4",
+      "@react-email/render": "^2.2.0"
     },
     "patchedDependencies": {
       "@excalidraw/mermaid-to-excalidraw@2.2.2": "patches/@excalidraw__mermaid-to-excalidraw@2.2.2.patch"
