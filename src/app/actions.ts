@@ -148,14 +148,14 @@ export async function subscribeAction(
     const addressKey = createHash("sha256").update(email).digest("hex").slice(0, 32);
     if (!(await underLimit("confirm-mail", addressKey, 3, 86_400))) return pending;
 
-    // Telling someone to check their inbox for a mail that never left would
-    // strand them, so a failed send is reported as one.
+    // The address is saved either way. If the email could not go out (daily
+    // quota, Resend outage) the queue sends it later, so the reader is told
+    // to wait rather than to try again — trying again would not help.
     const sent = await sendConfirmationEmail(email);
     if (!sent.success) {
       return {
-        status: "error",
-        message: "Could not send the confirmation email. Please try again.",
-        values,
+        status: "success",
+        message: `You're on the list. Our confirmation email to ${email} is delayed and should arrive within a day — no need to sign up again.`,
       };
     }
     return pending;
