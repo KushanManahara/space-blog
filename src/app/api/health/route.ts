@@ -8,6 +8,7 @@ import {
   newsletterSubscribers,
   postStats,
   rateLimits,
+  reviews,
 } from "@/lib/db";
 import { reportError } from "@/lib/monitoring";
 import { emailEnabled } from "@/lib/resend";
@@ -34,6 +35,7 @@ export async function GET(): Promise<Response> {
         emailUsage,
         broadcasts,
         broadcastDeliveries,
+        reviews,
       ].map((table) => db.select().from(table).limit(1)),
     );
     return Response.json({ ok: true, database: true, email: emailEnabled }, { headers });

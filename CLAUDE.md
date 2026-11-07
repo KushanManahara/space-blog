@@ -23,6 +23,7 @@ pnpm typecheck    # tsc --noEmit
 pnpm format       # prettier --write . (tailwind class sorting via plugin)
 pnpm format:check # prettier --check .
 pnpm comments     # moderate held comments: list / approve <id> / approve --all / reject <id>
+pnpm reviews      # moderate reader reviews: list / --all / approve|feature|hide|reject <id>
 pnpm embeddings   # rebuild src/lib/content/embeddings.json — run after editing article bodies
 ```
 
@@ -66,6 +67,11 @@ save/like state, home carousels and tabs, article reading progress (one scroll l
 editor. Reader state (saved/liked posts) lives in `SavedPostsProvider`; there is no global store.
 
 Form submissions go through the server actions in `src/app/actions.ts`, which own validation.
+
+Reader reviews (`/reviews`, homepage "What readers say") live in `src/lib/reviews.ts`. Every review is
+stored `pending`; the owner gets an email with signed moderation links (`/api/reviews/moderate`, GET
+shows, POST applies) or uses `pnpm reviews`. Turnstile keys: `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and
+`TURNSTILE_SECRET_KEY` (without them production refuses reviews; locally Cloudflare's test keys apply).
 
 ### Design system
 

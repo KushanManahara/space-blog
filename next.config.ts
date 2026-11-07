@@ -34,7 +34,7 @@ const csp = [
   // builds its WASM backend by dynamically importing a blob: module, and
   // Pyodide does the same for its workers. Without it semantic search fails
   // with "no available backend found".
-  `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval' " : ""}'wasm-unsafe-eval' blob: https://cdn.jsdelivr.net`,
+  `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval' " : ""}'wasm-unsafe-eval' blob: https://cdn.jsdelivr.net https://challenges.cloudflare.com`,
   "worker-src 'self' blob:",
   "child-src 'self' blob:",
   "connect-src 'self' https://cdn.jsdelivr.net https://esm.sh https://huggingface.co https://*.huggingface.co https://*.hf.co",
@@ -44,8 +44,9 @@ const csp = [
   // report thirty blocked font loads, not by reading its source.
   "font-src 'self' data: https://esm.sh",
   "img-src 'self' data: blob: https://upload.wikimedia.org https://images.unsplash.com",
-  // Article videos: the player is only framed after the reader presses play.
-  "frame-src https://www.youtube-nocookie.com",
+  // Article videos (framed only after the reader presses play) and the
+  // Cloudflare Turnstile challenge on the review form.
+  "frame-src https://www.youtube-nocookie.com https://challenges.cloudflare.com",
   "media-src 'self' blob:",
   "frame-ancestors 'self'",
   "base-uri 'self'",

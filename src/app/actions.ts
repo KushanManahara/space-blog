@@ -25,8 +25,10 @@ import {
   broadcastArticleNotification,
   sendConfirmationEmail,
   sendContactNotification,
+  sendReviewModerationEmail,
 } from "@/lib/newsletter";
 import { reportError } from "@/lib/monitoring";
+import { createReview, reviewInputSchema, verifyTurnstile } from "@/lib/reviews";
 
 /**
  * Every public write path is unauthenticated, so each field carries a ceiling
@@ -470,4 +472,74 @@ export async function reportClientErrorAction(message: unknown, path: unknown) {
   if (!(await underLimit("client-error", await callerId(), 10, 3600))) return;
 
   await reportError(`browser ${path.split("?")[0].slice(0, 100)}`, message.slice(0, 300));
+}
+
+/**
+ * Public reader review. Never publishes: the row is stored `pending` and the
+ * owner is emailed signed moderation links.
+ *
+ * Checks run cheapest first: honeypot, field validation, the per-caller limit,
+ * then Turnstile (a network call), then the database, where a unique
+ * fingerprint of the text refuses duplicates. A bot that trips the honeypot,
+ * and a duplicate, both get the normal thank-you so neither learns anything.
+ */
+export async function submitReviewAction(
+  _previous: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const thanks: FormState = {
+    status: "success",
+    message: "Thank you. Your review will appear once it has been approved.",
+  };
+  if (isHoneypotTripped(formData)) return thanks;
+
+  const raw = {
+    displayName: String(formData.get("displayName") ?? ""),
+    rating: String(formData.get("rating") ?? ""),
+    body: String(formData.get("body") ?? ""),
+    email: String(formData.get("email") ?? ""),
+  };
+  const values = {
+    displayName: raw.displayName.slice(0, 60),
+    rating: raw.rating.slice(0, 1),
+    body: raw.body.slice(0, 1000),
+    email: raw.email.slice(0, EMAIL_MAX),
+  };
+
+  const parsed = reviewInputSchema.safeParse(raw);
+  if (!parsed.success) {
+    return { status: "error", message: parsed.error.issues[0].message, values };
+  }
+
+  if (!(await underLimit("review", await callerId(), 3, 86_400))) {
+    return {
+      status: "error",
+      message: "You've sent a few reviews today. Please try again tomorrow.",
+      values,
+    };
+  }
+
+  const token = formData.get("cf-turnstile-response");
+  if (!(await verifyTurnstile(typeof token === "string" ? token : null))) {
+    return {
+      status: "error",
+      message: "We couldn't confirm you're human. Please complete the check and try again.",
+      values,
+    };
+  }
+
+  try {
+    const created = await createReview(parsed.data);
+    if (created.status === "duplicate") return thanks;
+
+    await sendReviewModerationEmail({ id: created.id, ...parsed.data });
+    return thanks;
+  } catch (error) {
+    await reportError("review submission", error);
+    return {
+      status: "error",
+      message: "Unable to save your review right now. Please try again.",
+      values,
+    };
+  }
 }

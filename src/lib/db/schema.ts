@@ -120,3 +120,26 @@ export const broadcastDeliveries = sqliteTable(
   },
   (table) => [primaryKey({ columns: [table.slug, table.email] })],
 );
+
+/**
+ * Public reader reviews. Every row starts `pending` and nothing reaches the
+ * site until a moderator approves it (`approved`). `hidden` takes an approved
+ * review down without losing it; `rejected` keeps the row so the same text
+ * can't simply be resubmitted. `email` is optional and never rendered.
+ * `bodyHash` (unique) is a fingerprint of the normalised text, so a duplicate
+ * submission is refused at the database, not just in code.
+ */
+export const reviews = sqliteTable("reviews", {
+  id: text("id").primaryKey(),
+  displayName: text("display_name").notNull(),
+  rating: integer("rating").notNull(),
+  body: text("body").notNull(),
+  email: text("email"),
+  status: text("status", { enum: ["pending", "approved", "rejected", "hidden"] })
+    .notNull()
+    .default("pending"),
+  featured: integer("featured").notNull().default(0),
+  bodyHash: text("body_hash").notNull().unique(),
+  createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
+  moderatedAt: text("moderated_at"),
+});

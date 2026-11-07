@@ -44,6 +44,8 @@ const TABLES = [
   "CREATE TABLE IF NOT EXISTS email_usage (period text PRIMARY KEY NOT NULL, count integer DEFAULT 0 NOT NULL)",
   "CREATE TABLE IF NOT EXISTS broadcasts (slug text PRIMARY KEY NOT NULL, started_at text NOT NULL, completed_at text)",
   "CREATE TABLE IF NOT EXISTS broadcast_deliveries (slug text NOT NULL, email text NOT NULL, sent_at integer NOT NULL, PRIMARY KEY (slug, email))",
+  "CREATE TABLE IF NOT EXISTS reviews (id text PRIMARY KEY NOT NULL, display_name text NOT NULL, rating integer NOT NULL, body text NOT NULL, email text, status text DEFAULT 'pending' NOT NULL, featured integer DEFAULT 0 NOT NULL, body_hash text NOT NULL UNIQUE, created_at text DEFAULT CURRENT_TIMESTAMP, moderated_at text)",
+  "CREATE INDEX IF NOT EXISTS reviews_status_idx ON reviews (status, featured, created_at)",
 ];
 
 async function main() {
