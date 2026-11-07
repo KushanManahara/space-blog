@@ -4,7 +4,9 @@ name: Uptime
 # alert for what the site cannot report about itself: being down entirely.
 on:
   schedule:
-    - cron: "*/30 * * * *"
+    # Off the top and half of the hour: GitHub delays or drops scheduled runs
+    # at those busy minutes, and this one never started at */30.
+    - cron: "7,37 * * * *"
   workflow_dispatch:
 
 permissions:

@@ -80,7 +80,11 @@
       "dompurify@<3.4.17": "^3.4.17",
       "source-map-js@<1.2.2": "^1.2.2",
       "katex@<0.18.2": "^0.18.4",
-      "@react-email/render": "^2.2.0"
+      "@react-email/render": "^2.2.0",
+      "minimatch@>=7.0.0 <11.0.1": "^11.0.1",
+      "brace-expansion@<1.1.21": "^1.1.21",
+      "js-yaml@>=4.0.0 <4.3.2": "^4.3.2",
+      "esbuild@<=0.24.2": "^0.25.0"
     },
     "patchedDependencies": {
       "@excalidraw/mermaid-to-excalidraw@2.2.2": "patches/@excalidraw__mermaid-to-excalidraw@2.2.2.patch"
