@@ -47,6 +47,9 @@ export const teachingChannel = {
   name: "Brain Link",
   platform: "YouTube",
   handle: "@Brain-Link-ai",
+  logo: "/brain-link/logo.png",
+  /** White lettering: only for surfaces that are dark in both themes. */
+  wordmark: "/brain-link/wordmark.png",
   url: authorConfig.youtube,
   tagline: "Explore. Understand. Build.",
   summary:
