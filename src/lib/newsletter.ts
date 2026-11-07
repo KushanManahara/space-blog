@@ -338,12 +338,60 @@ const MAX_CONFIRM_ATTEMPTS = 5;
 const PENDING_TTL_DAYS = 14;
 
 /**
- * The daily catch-up for everything quota or an outage held back, in priority
- * order: confirmations, then unfinished broadcasts, then welcome emails. Each
- * stage stops at the first quota refusal; the next run carries on.
+ * Posts dated before this went out before automatic sending existed (some by
+ * hand), so they are never mailed automatically.
  */
-export async function processEmailQueue(getPost: (slug: string) => Post | undefined) {
-  const summary = { expired: 0, confirmations: 0, broadcast: 0, welcomes: 0 };
+export const AUTO_BROADCAST_FROM = "2026-11-07";
+/** A post dated further back than this is treated as old, not new, and skipped. */
+const AUTO_BROADCAST_WINDOW_DAYS = 14;
+
+/** YYYY-MM-DD in the author's timezone, the same form as `publishedAt`. */
+const colomboDate = (time: number) =>
+  new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Colombo" }).format(new Date(time));
+
+/**
+ * Records a broadcast for every newly published post, so publishing is all
+ * the author does: the queue sends it like any other unfinished broadcast.
+ *
+ * A post qualifies when it is dated on or after `AUTO_BROADCAST_FROM`, within
+ * the last two weeks, and not in the future (a future date means scheduled).
+ * A post that already has a broadcast row, sent by hand with `pnpm broadcast`
+ * or started on an earlier run, is left alone, so nothing goes out twice.
+ *
+ * Returns the slugs started on this run.
+ */
+async function startNewBroadcasts(posts: Post[]): Promise<string[]> {
+  const today = colomboDate(Date.now());
+  const oldest = colomboDate(Date.now() - AUTO_BROADCAST_WINDOW_DAYS * 86_400_000);
+  const due = posts.filter(
+    ({ publishedAt }) =>
+      publishedAt >= AUTO_BROADCAST_FROM && publishedAt >= oldest && publishedAt <= today,
+  );
+  if (due.length === 0) return [];
+
+  const started = await db
+    .insert(broadcasts)
+    .values(due.map(({ slug }) => ({ slug, startedAt: sqliteNow() })))
+    .onConflictDoNothing({ target: broadcasts.slug })
+    .returning({ slug: broadcasts.slug });
+  return started.map(({ slug }) => slug);
+}
+
+/**
+ * The daily run: starts broadcasts for newly published posts, then sends
+ * everything owed in priority order: confirmations, then broadcasts (new and
+ * unfinished), then welcome emails. Each stage stops at the first quota
+ * refusal; the next run carries on.
+ */
+export async function processEmailQueue(posts: Post[]) {
+  const summary = {
+    expired: 0,
+    started: [] as string[],
+    confirmations: 0,
+    broadcast: 0,
+    welcomes: 0,
+  };
+  const getPost = (slug: string) => posts.find((post) => post.slug === slug);
 
   const expired = await db
     .delete(newsletterSubscribers)
@@ -356,6 +404,8 @@ export async function processEmailQueue(getPost: (slug: string) => Post | undefi
   summary.expired = expired.rowsAffected;
 
   if (!emailEnabled) return summary;
+
+  summary.started = await startNewBroadcasts(posts);
 
   const owed = await db
     .select({ email: newsletterSubscribers.email })

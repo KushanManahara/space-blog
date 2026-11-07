@@ -190,6 +190,11 @@ Follow the design-system and a11y rules above; reader mode reuses `ArticleBody`.
 the dev server, then branch + PR (the repo merges PRs into `main`; Vercel deploys `main`). After
 deploy, confirm the live URL, the archive, `sitemap.xml` and `rss.xml`.
 
+Subscribers are emailed automatically: the daily `email-queue` schedule (00:15 Asia/Colombo) sends any
+post dated today or in the last 14 days that has not been sent yet. A future `publishedAt` waits for
+that date. `pnpm broadcast <slug> --test=<email>` still previews the email; `--send` sends now instead
+of waiting, and the schedule then skips that post.
+
 ### Privacy
 
 No personal paths, account names, filenames, hostnames or identifiers in articles; use placeholders and
