@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { author, site } from "@/lib/content";
+import { author, site, siteUrl } from "@/lib/content";
 
 /**
  * Page metadata helpers.
@@ -26,6 +26,21 @@ export const defaultOgImage = {
   width: 1200,
   height: 630,
   alt: site.title,
+};
+
+/**
+ * The homepage's social preview: the official launch artwork in
+ * `public/og/`, served as a JPEG (under 300 KB, which WhatsApp needs to show a
+ * preview; LinkedIn does not reliably render WebP). Absolute so every scraper
+ * gets the production URL regardless of `metadataBase`.
+ */
+export const homeOgImage = {
+  url: `${siteUrl}/og/space-home.jpg`,
+  secureUrl: `${siteUrl}/og/space-home.jpg`,
+  type: "image/jpeg",
+  width: 1672,
+  height: 941,
+  alt: "The Space logo, a blue planet with a small moon, beside the word Space on a soft blue glass background",
 };
 
 /** Canonical URL for a page, keeping feed autodiscovery attached. */
