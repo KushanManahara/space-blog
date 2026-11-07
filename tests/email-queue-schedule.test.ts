@@ -80,6 +80,7 @@ describe("GET /api/cron/email-queue", () => {
       confirmations: 0,
       broadcast: 0,
       welcomes: 0,
+      pruned: 0,
     });
   });
 
@@ -122,6 +123,20 @@ describe("GET /api/cron/email-queue", () => {
     );
     const response = await scheduled("schx_fourth");
     assert.equal((await response.json()).expired, 1);
+  });
+
+  test("prunes rate-limit rows whose window closed over two days ago", async () => {
+    const now = Math.floor(Date.now() / 1000);
+    await raw.execute({
+      sql: "INSERT INTO rate_limits (key, count, window_start) VALUES ('view:old', 1, ?), ('view:recent', 1, ?)",
+      args: [now - 3 * 86_400, now - 3_600],
+    });
+    const response = await scheduled("schx_prune");
+    assert.equal((await response.json()).pruned, 1);
+    const keys = (await raw.execute("SELECT key FROM rate_limits")).rows.map((row) => row.key);
+    assert.ok(!keys.includes("view:old"));
+    assert.ok(keys.includes("view:recent"));
+    assert.ok(keys.includes("schedule-run:schx_prune"), "today's dedupe record is kept");
   });
 
   test("does nothing outside production", async () => {

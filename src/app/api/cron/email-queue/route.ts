@@ -1,7 +1,7 @@
 import { timingSafeEqual } from "crypto";
 import { eq } from "drizzle-orm";
 
-import { underLimit } from "@/lib/abuse";
+import { pruneRateLimits, underLimit } from "@/lib/abuse";
 import { posts } from "@/lib/content";
 import { db, rateLimits } from "@/lib/db";
 import { reportError } from "@/lib/monitoring";
@@ -27,7 +27,7 @@ function authorised(request: Request): boolean {
 
 /**
  * Daily email run: sends newly published posts to subscribers, and catches
- * up on email held back by Resend's quota.
+ * up on email held back by Resend's quota. Also prunes expired rate-limit rows.
  *
  * Called by the `email-queue` Vercel Schedule (see vercel.json), which sends
  * `Authorization: Bearer $CRON_SECRET` on path targets, exactly as Cron Jobs
@@ -61,8 +61,11 @@ export async function GET(request: Request): Promise<Response> {
 
   try {
     const summary = await processEmailQueue(posts);
-    console.log("[email queue]", { executionId, ...summary });
-    return json(summary);
+    // Daily housekeeping: drop rate-limit rows whose window closed more than
+    // two days ago. Nothing else removes them, and a failure here only logs.
+    const pruned = await pruneRateLimits();
+    console.log("[email queue]", { executionId, ...summary, pruned });
+    return json({ ...summary, pruned });
   } catch (error) {
     await reportError("email queue", error);
     return new Response("Email queue failed", { status: 500 });

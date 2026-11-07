@@ -6,7 +6,8 @@
  * per article per day, forever. Rows whose window has closed are inert — the
  * next request for that key overwrites them — so this only reclaims space.
  *
- * Run it on a schedule (a Vercel cron hitting a small route, or a cron job):
+ * Production runs this automatically: the daily `email-queue` schedule calls
+ * `pruneRateLimits()` after sending. This script is for running it by hand:
  *
  *   pnpm prune:limits
  */
