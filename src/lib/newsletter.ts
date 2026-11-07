@@ -515,14 +515,23 @@ export async function sendReviewModerationEmail(review: {
   if (!emailEnabled || !to) return { success: false as const };
 
   const { moderationLink } = await import("@/lib/reviews");
+  // Outside production the review lives in a local database and the link is
+  // signed with the local secret, so it must point back at the dev server.
+  // Pointing at the live site produced links that production rejected.
+  const isProduction = process.env.VERCEL_ENV === "production";
+  const base = isProduction ? SITE_URL : "http://localhost:3000";
   const link = (action: "approve" | "feature" | "reject" | "hide") =>
-    moderationLink(SITE_URL, review.id, action);
+    moderationLink(base, review.id, action);
   const stars = "★".repeat(review.rating) + "☆".repeat(5 - review.rating);
 
   const result = await sendCounted("email: review moderation", {
     from: SENDER_EMAIL,
     to,
-    subject: `[Space review] ${stars} from ${review.displayName}`.slice(0, 120),
+    subject:
+      `${isProduction ? "" : "[dev] "}[Space review] ${stars} from ${review.displayName}`.slice(
+        0,
+        120,
+      ),
     text: `A new reader review is waiting for approval. Nothing is published until you approve it.
 
 ${stars} (${review.rating}/5) from ${review.displayName}${review.email ? ` <${review.email}>` : ""}
