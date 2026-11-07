@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { RotateCw } from "lucide-react";
 
+import { reportClientErrorAction } from "@/app/actions";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { routes } from "@/lib/content/config";
 
@@ -22,6 +23,7 @@ export default function SiteError({
 }) {
   React.useEffect(() => {
     console.error("Site error boundary caught:", error);
+    if (!error.digest) void reportClientErrorAction(error.message, window.location.pathname);
   }, [error]);
 
   return (

@@ -3,6 +3,7 @@ import { and, desc, eq, sql } from "drizzle-orm";
 
 import { author, posts, type Comment, type CommentNode, type Post } from "@/lib/content";
 import { comments, db, postStats } from "./index";
+import { reportError } from "@/lib/monitoring";
 
 const TONES: ("violet" | "cornflower" | "orchid")[] = ["violet", "cornflower", "orchid"];
 
@@ -56,7 +57,7 @@ const getCachedPostStatsEntries = unstable_cache(
         }
       }
     } catch (error) {
-      console.error("Error fetching all live post stats:", error);
+      await reportError("live post stats", error);
     }
     return [...map.entries()];
   },
@@ -97,7 +98,7 @@ export async function getLivePostStats(slug: string) {
     const [row] = await db.select().from(postStats).where(eq(postStats.slug, slug));
     return row ? { likes: row.likes, views: row.views } : null;
   } catch (error) {
-    console.error("Error fetching live post stats:", error);
+    await reportError("live post stats", error);
     return null;
   }
 }
@@ -149,7 +150,7 @@ export async function getLiveComments(slug: string): Promise<CommentNode[]> {
 
     return roots;
   } catch (error) {
-    console.error("Error fetching live comments:", error);
+    await reportError("live comments", error);
     return [];
   }
 }

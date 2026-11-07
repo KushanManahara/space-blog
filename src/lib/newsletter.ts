@@ -19,6 +19,7 @@ import {
   getConfirmSubscriptionText,
 } from "@/emails/confirm-subscription";
 import type { Post } from "@/lib/content";
+import { reportError } from "@/lib/monitoring";
 
 // BASE PRODUCTION DOMAIN FOR LINK GENERATION
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://space.gimhara.com";
@@ -92,12 +93,12 @@ export async function sendConfirmationEmail(email: string) {
     });
 
     if (error) {
-      console.error("RESEND CONFIRMATION EMAIL ERROR:", error);
+      await reportError("email: confirmation", error);
       return { success: false, error };
     }
     return { success: true, id: data?.id };
   } catch (error) {
-    console.error("RESEND CONFIRMATION EMAIL EXCEPTION:", error);
+    await reportError("email: confirmation", error);
     return { success: false, error };
   }
 }
@@ -129,13 +130,13 @@ export async function sendWelcomeEmail(email: string) {
     });
 
     if (error) {
-      console.error("RESEND WELCOME EMAIL ERROR:", error);
+      await reportError("email: welcome", error);
       return { success: false, error };
     }
 
     return { success: true, id: data?.id };
   } catch (error) {
-    console.error("RESEND WELCOME EMAIL EXCEPTION:", error);
+    await reportError("email: welcome", error);
     return { success: false, error };
   }
 }
@@ -224,7 +225,7 @@ export async function broadcastArticleNotification(post: Post, recipients?: stri
 
     return { success: true, count: dispatched };
   } catch (error) {
-    console.error("ARTICLE BROADCAST EXCEPTION:", error);
+    await reportError("email: broadcast", error);
     return {
       success: false,
       count: 0,
@@ -270,13 +271,13 @@ export async function sendContactNotification(input: {
     });
 
     if (error) {
-      console.error("RESEND CONTACT NOTIFICATION ERROR:", error);
+      await reportError("email: contact notification", error);
       return { success: false, error };
     }
 
     return { success: true, id: data?.id };
   } catch (error) {
-    console.error("RESEND CONTACT NOTIFICATION EXCEPTION:", error);
+    await reportError("email: contact notification", error);
     return { success: false, error };
   }
 }

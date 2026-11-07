@@ -7,6 +7,7 @@ import { db, newsletterSubscribers } from "@/lib/db";
 import { syncResendContact, sendWelcomeEmail } from "@/lib/newsletter";
 import { escapeHtml, page } from "@/lib/newsletter-page";
 import { verifyConfirm } from "@/lib/newsletter-token";
+import { reportError } from "@/lib/monitoring";
 
 /**
  * Double opt-in confirmation.
@@ -89,7 +90,7 @@ export async function POST(request: NextRequest) {
         "Every one carries a one-click unsubscribe link.",
     );
   } catch (error) {
-    console.error("NEWSLETTER CONFIRM ROUTE ERROR:", error);
+    await reportError("newsletter confirm", error);
     return new NextResponse("Failed to confirm the subscription.", { status: 500 });
   }
 }

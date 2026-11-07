@@ -26,6 +26,7 @@ import {
   sendConfirmationEmail,
   sendContactNotification,
 } from "@/lib/newsletter";
+import { reportError } from "@/lib/monitoring";
 
 /**
  * Every public write path is unauthenticated, so each field carries a ceiling
@@ -159,7 +160,7 @@ export async function subscribeAction(
     }
     return pending;
   } catch (error) {
-    console.error("NEWSLETTER SUBSCRIPTION ACTION ERROR:", error);
+    await reportError("newsletter signup", error);
     return {
       status: "error",
       message: "Unable to save subscription right now. Please try again.",
@@ -229,7 +230,7 @@ export async function contactAction(_previous: FormState, formData: FormData): P
       message: "Message received. Corrections and reproductions get answered first.",
     };
   } catch (error) {
-    console.error("Contact form error:", error);
+    await reportError("contact form", error);
     return {
       status: "error",
       message: "Unable to send message right now. Please try again.",
@@ -313,7 +314,7 @@ export async function likePostAction(slugInput: unknown, incrementInput: unknown
     revalidatePath("/");
     return { success: true as const, likes: row?.likes ?? null, limited: false as const };
   } catch (error) {
-    console.error("Like post error:", error);
+    await reportError("like", error);
     return { success: false as const, likes: null, limited: false as const };
   }
 }
@@ -355,7 +356,7 @@ export async function recordViewAction(slugInput: unknown) {
 
     return { success: true };
   } catch (error) {
-    console.error("Record view error:", error);
+    await reportError("record view", error);
     return { success: false };
   }
 }
@@ -418,7 +419,7 @@ export async function addCommentAction(data: {
     }
     return { success: true, id, held: true };
   } catch (error) {
-    console.error("Add comment error:", error);
+    await reportError("add comment", error);
     return { success: false, error: "Failed to post comment." };
   }
 }
@@ -457,4 +458,16 @@ export async function broadcastArticleAction(
   }
 
   return await broadcastArticleNotification(post);
+}
+
+/**
+ * Errors that only happened in a reader's browser, which the server would
+ * otherwise never hear about. Errors with a digest came from the server and
+ * were reported there. A public endpoint, so input is bounded and limited.
+ */
+export async function reportClientErrorAction(message: unknown, path: unknown) {
+  if (typeof message !== "string" || typeof path !== "string") return;
+  if (!(await underLimit("client-error", await callerId(), 10, 3600))) return;
+
+  await reportError(`browser ${path.split("?")[0].slice(0, 100)}`, message.slice(0, 300));
 }
