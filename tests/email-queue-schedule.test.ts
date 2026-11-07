@@ -76,6 +76,7 @@ describe("GET /api/cron/email-queue", () => {
     assert.equal(response.status, 200);
     assert.deepEqual(await response.json(), {
       expired: 0,
+      started: [],
       confirmations: 0,
       broadcast: 0,
       welcomes: 0,

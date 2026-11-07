@@ -2,7 +2,7 @@ import { timingSafeEqual } from "crypto";
 import { eq } from "drizzle-orm";
 
 import { underLimit } from "@/lib/abuse";
-import { getPostBySlug } from "@/lib/content";
+import { posts } from "@/lib/content";
 import { db, rateLimits } from "@/lib/db";
 import { reportError } from "@/lib/monitoring";
 import { processEmailQueue } from "@/lib/newsletter";
@@ -26,7 +26,8 @@ function authorised(request: Request): boolean {
 }
 
 /**
- * Daily catch-up for email held back by Resend's quota.
+ * Daily email run: sends newly published posts to subscribers, and catches
+ * up on email held back by Resend's quota.
  *
  * Called by the `email-queue` Vercel Schedule (see vercel.json), which sends
  * `Authorization: Bearer $CRON_SECRET` on path targets, exactly as Cron Jobs
@@ -59,7 +60,7 @@ export async function GET(request: Request): Promise<Response> {
   }
 
   try {
-    const summary = await processEmailQueue(getPostBySlug);
+    const summary = await processEmailQueue(posts);
     console.log("[email queue]", { executionId, ...summary });
     return json(summary);
   } catch (error) {
