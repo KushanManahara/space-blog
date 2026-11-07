@@ -166,7 +166,7 @@ editing passes). This section is the Space-specific half: what the skill's step 
 
 ### Rendering gotchas
 
-- Mermaid (11.17.2, pinned) is converted through `@excalidraw/mermaid-to-excalidraw` with a local
+- Mermaid (12.3.0, pinned) is converted through `@excalidraw/mermaid-to-excalidraw` with a local
   patch, so rendered diagrams have no `.node` classes. Validate new diagram source by importing the
   pinned mermaid version from cdn.jsdelivr.net in the page and calling `parse()`/`render()`.
 - Mermaid and Recharts render on intersection / measured width — a hidden or non-painting preview pane

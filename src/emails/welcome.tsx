@@ -9,11 +9,14 @@ import {
   Heading,
   Hr,
   Html,
+  Img,
   Link,
   Preview,
   Section,
   Text,
 } from "@react-email/components";
+
+import { LOGO_URL } from "./brand";
 
 export interface WelcomeEmailProps {
   subscriberEmail?: string;
@@ -77,6 +80,7 @@ export function WelcomeEmail({
         <Container style={container}>
           {/* HEADER BRANDING */}
           <Section style={headerSection}>
+            <Img src={LOGO_URL} alt="Space" width="48" height="45" style={logo} />
             <Text style={brandBadge}>SPACE</Text>
           </Section>
 
@@ -165,6 +169,8 @@ const headerSection = {
   textAlign: "center" as const,
   marginBottom: "24px",
 };
+
+const logo = { display: "block", margin: "0 auto 12px" };
 
 const brandBadge = {
   display: "inline-block",
