@@ -28,10 +28,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   viewportFit: "cover",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f8fafc" },
-    { media: "(prefers-color-scheme: dark)", color: "#080d1a" },
-  ],
+  // Light by default whatever the OS prefers, so the browser chrome matches.
+  themeColor: "#f8fafc",
 };
 
 export const metadata: Metadata = {
@@ -89,19 +87,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             /*
-             * An explicit choice wins; otherwise follow the operating system.
-             *
-             * This used to fall through to light whenever `theme` was unset,
-             * so every first-time visitor with a dark OS got a light site —
-             * while `viewport.themeColor` below was already promising the
-             * browser a dark chrome for exactly that reader.
+             * Light by default. Dark only when the reader has chosen it with
+             * the theme toggle (stored as `theme: "dark"`); the operating
+             * system's setting is deliberately not followed.
              */
             __html: `
               try {
-                var stored = localStorage.getItem('theme');
-                var dark = stored
-                  ? stored === 'dark'
-                  : window.matchMedia('(prefers-color-scheme: dark)').matches;
+                var dark = localStorage.getItem('theme') === 'dark';
                 document.documentElement.classList.add(dark ? 'dark' : 'light');
                 document.documentElement.classList.remove(dark ? 'light' : 'dark');
               } catch (_) {

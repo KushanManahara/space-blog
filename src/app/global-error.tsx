@@ -38,12 +38,6 @@ export default function GlobalError({
           textAlign: "center",
         }}
       >
-        <style>{`
-          @media (prefers-color-scheme: dark) {
-            body { background: #0f172a !important; color: #e2e8f0 !important; }
-            .ge-sub { color: #94a3b8 !important; }
-          }
-        `}</style>
         <main style={{ maxWidth: "440px" }}>
           <h1 style={{ fontSize: "26px", lineHeight: 1.2, margin: "0 0 12px", fontWeight: 700 }}>
             Space is temporarily unavailable
