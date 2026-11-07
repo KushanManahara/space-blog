@@ -16,6 +16,8 @@ import {
   Text,
 } from "@react-email/components";
 
+import { LOGO_URL } from "./brand";
+
 export interface ArticleNotificationEmailProps {
   title?: string;
   dek?: string;
@@ -88,6 +90,7 @@ export function ArticleNotificationEmail({
         <Container style={container}>
           {/* HEADER BRANDING */}
           <Section style={headerSection}>
+            <Img src={LOGO_URL} alt="Space" width="48" height="45" style={logo} />
             <Text style={brandBadge}>SPACE &middot; {topic.toUpperCase()}</Text>
           </Section>
 
@@ -160,6 +163,8 @@ const headerSection = {
   textAlign: "center" as const,
   marginBottom: "24px",
 };
+
+const logo = { display: "block", margin: "0 auto 12px" };
 
 const brandBadge = {
   display: "inline-block",

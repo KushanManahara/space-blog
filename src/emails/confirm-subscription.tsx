@@ -9,10 +9,13 @@ import {
   Heading,
   Hr,
   Html,
+  Img,
   Preview,
   Section,
   Text,
 } from "@react-email/components";
+
+import { LOGO_URL } from "./brand";
 
 export interface ConfirmSubscriptionEmailProps {
   subscriberEmail: string;
@@ -54,6 +57,7 @@ export function ConfirmSubscriptionEmail({
       <Body style={main}>
         <Container style={container}>
           <Section style={headerSection}>
+            <Img src={LOGO_URL} alt="Space" width="48" height="45" style={logo} />
             <Text style={brandBadge}>SPACE</Text>
           </Section>
 
@@ -100,6 +104,8 @@ const main = {
 const container = { maxWidth: "580px", margin: "0 auto" };
 
 const headerSection = { textAlign: "center" as const, marginBottom: "24px" };
+
+const logo = { display: "block", margin: "0 auto 12px" };
 
 const brandBadge = {
   display: "inline-block",
