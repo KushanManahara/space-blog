@@ -45,13 +45,20 @@ export function ContactForm() {
         <HoneypotField id="contact-company-website" />
         <div className="flex flex-col gap-5">
           <Field label="Your name" htmlFor="contact-name">
-            <Input id="contact-name" name="name" required placeholder="Ada Rehman" />
+            <Input
+              id="contact-name"
+              name="name"
+              required
+              placeholder="Ada Rehman"
+              defaultValue={state.values?.name}
+            />
           </Field>
 
           <Field label="Email address" htmlFor="contact-email">
             <Input
               id="contact-email"
               name="email"
+              defaultValue={state.values?.email}
               type="email"
               required
               placeholder="you@work.email"
@@ -87,6 +94,7 @@ export function ContactForm() {
             <Textarea
               id="contact-message"
               name="message"
+              defaultValue={state.values?.message}
               required
               minLength={10}
               placeholder="If it's a correction, a link to what I got wrong helps."

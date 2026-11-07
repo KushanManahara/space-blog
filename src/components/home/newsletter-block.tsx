@@ -74,6 +74,7 @@ export function NewsletterBlock() {
                   <input
                     id="newsletter-email"
                     name="email"
+                    defaultValue={state.values?.email}
                     type="email"
                     required
                     placeholder="you@work.email"

@@ -36,6 +36,9 @@ import {
  */
 const EMAIL_MAX = 254;
 
+/** Likes one caller may add to one article per day. */
+const LIKE_LIMIT = 50;
+
 const subscribeSchema = z.object({
   email: z.string().email("Enter an email address we can actually reach.").max(EMAIL_MAX),
 });
@@ -96,9 +99,10 @@ export async function subscribeAction(
   }
 
   const parsed = subscribeSchema.safeParse({ email: formData.get("email") });
+  const values = { email: String(formData.get("email") ?? "").slice(0, EMAIL_MAX) };
 
   if (!parsed.success) {
-    return { status: "error", message: parsed.error.issues[0].message };
+    return { status: "error", message: parsed.error.issues[0].message, values };
   }
 
   const email = parsed.data.email.trim().toLowerCase();
@@ -107,6 +111,7 @@ export async function subscribeAction(
     return {
       status: "error",
       message: "That is a lot of signups from one place. Try again in an hour.",
+      values,
     };
   }
 
@@ -142,13 +147,23 @@ export async function subscribeAction(
     const addressKey = createHash("sha256").update(email).digest("hex").slice(0, 32);
     if (!(await underLimit("confirm-mail", addressKey, 3, 86_400))) return pending;
 
-    await sendConfirmationEmail(email);
+    // Telling someone to check their inbox for a mail that never left would
+    // strand them, so a failed send is reported as one.
+    const sent = await sendConfirmationEmail(email);
+    if (!sent.success) {
+      return {
+        status: "error",
+        message: "Could not send the confirmation email. Please try again.",
+        values,
+      };
+    }
     return pending;
   } catch (error) {
     console.error("NEWSLETTER SUBSCRIPTION ACTION ERROR:", error);
     return {
       status: "error",
       message: "Unable to save subscription right now. Please try again.",
+      values,
     };
   }
 }
@@ -181,14 +196,21 @@ export async function contactAction(_previous: FormState, formData: FormData): P
     message: formData.get("message"),
   });
 
+  const values = {
+    name: String(formData.get("name") ?? "").slice(0, 80),
+    email: String(formData.get("email") ?? "").slice(0, EMAIL_MAX),
+    message: String(formData.get("message") ?? "").slice(0, 5000),
+  };
+
   if (!parsed.success) {
-    return { status: "error", message: parsed.error.issues[0].message };
+    return { status: "error", message: parsed.error.issues[0].message, values };
   }
 
   if (!(await underLimit("contact", await callerId(), 3, 3600))) {
     return {
       status: "error",
       message: "You have sent a few messages already. Try again in an hour.",
+      values,
     };
   }
 
@@ -211,6 +233,7 @@ export async function contactAction(_previous: FormState, formData: FormData): P
     return {
       status: "error",
       message: "Unable to send message right now. Please try again.",
+      values,
     };
   }
 }
@@ -237,14 +260,15 @@ export async function likePostAction(slugInput: unknown, incrementInput: unknown
   // The ceiling is per article per caller per day.
   const caller = await callerId();
   if (increment) {
-    if (!(await underLimit(`like:${slug}`, caller, 50, 86_400))) {
+    if (!(await underLimit(`like:${slug}`, caller, LIKE_LIMIT, 86_400))) {
       return { success: false as const, likes: null, limited: true as const };
     }
   } else {
     // An unlike has to undo a like this caller made. Unlimited unlikes let
     // anyone drive any article's count to zero. Refused unlikes are a quiet
     // no-op that returns the real count, so the reader's button still settles.
-    const liked = await countInWindow(`like:${slug}`, caller, 86_400);
+    // Capped: refused likes still advance the counter, and must not buy unlikes.
+    const liked = Math.min(await countInWindow(`like:${slug}`, caller, 86_400), LIKE_LIMIT);
     if (liked === 0 || !(await underLimit(`unlike:${slug}`, caller, liked, 86_400))) {
       const [row] = await db
         .select({ likes: postStats.likes })

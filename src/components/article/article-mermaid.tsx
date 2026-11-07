@@ -215,6 +215,30 @@ function sanitizeMermaidForExcalidraw(mermaidCode: string): string {
     .replace(/<\/?span[^>]*>/gi, "");
 }
 
+/** Label size a diagram may be scaled to, so every diagram reads alike. */
+const MIN_DIAGRAM_TEXT_PX = 12;
+const MAX_DIAGRAM_TEXT_PX = 18;
+
+/**
+ * Diagrams are fitted to the column, so a wide flowchart shrank until it could
+ * not be read: labels measured 5.9px on desktop and 2.9px on a phone. This sets
+ * the width at which the smallest label is still legible; past that the
+ * diagram scrolls inside its focusable container instead of shrinking. Narrow
+ * diagrams had the opposite problem, stretching to fill the column with 36px
+ * labels, so the width is capped as well.
+ */
+function keepTextReadable(svg: SVGSVGElement) {
+  const width = svg.viewBox.baseVal.width;
+  const sizes = Array.from(svg.querySelectorAll("text"), (text) =>
+    Number.parseFloat(text.getAttribute("font-size") ?? ""),
+  ).filter(Number.isFinite);
+  if (!width || sizes.length === 0) return;
+
+  const smallest = Math.min(...sizes);
+  svg.style.minWidth = `${Math.ceil((width * MIN_DIAGRAM_TEXT_PX) / smallest)}px`;
+  svg.style.maxWidth = `${Math.ceil((width * MAX_DIAGRAM_TEXT_PX) / smallest)}px`;
+}
+
 export function ArticleMermaid({
   code,
   caption,
@@ -326,6 +350,7 @@ export function ArticleMermaid({
             });
 
             if (!cancelled && el) {
+              keepTextReadable(el);
               setSvg(el.outerHTML);
               setIsSketch(true);
               return;
@@ -444,7 +469,9 @@ export function ArticleMermaid({
             {svg ? (
               <div
                 className={cn(
-                  "mx-auto flex w-full items-center justify-center",
+                  // No justify-center: it would clip the left of a diagram wider
+                  // than the column. The SVG's own auto margins centre it.
+                  "mx-auto flex w-full items-center",
                   "[&_svg]:mx-auto [&_svg]:h-auto [&_svg]:w-full [&_svg]:max-w-full",
                   diagramClass,
                 )}
