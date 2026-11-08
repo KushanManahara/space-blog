@@ -6,7 +6,7 @@ import { ViewTransitionGuard } from "@/components/motion/view-transition-guard";
 import { CommandMenuProvider } from "@/components/nav/command-menu";
 import { SavedPostsProvider } from "@/components/providers/saved-posts-provider";
 import { author, site, siteUrl } from "@/lib/content";
-import { homeOgImage, openGraph, twitter } from "@/lib/metadata";
+import { openGraph, twitter } from "@/lib/metadata";
 
 import "./globals.css";
 
@@ -48,12 +48,10 @@ export const metadata: Metadata = {
     title: site.title,
     description: site.description,
     url: "/",
-    images: [homeOgImage],
   }),
   twitter: twitter({
     title: site.title,
     description: site.description,
-    images: [{ url: homeOgImage.url, alt: homeOgImage.alt }],
   }),
   icons: {
     icon: [
