@@ -1,9 +1,9 @@
 import { loadOgFonts, loadOgLogo, OG_SIZE } from "@/lib/og";
 
 /**
- * The Space share card: a light blue field, two layered glass pages with a
- * pen (writing), and a frosted pill holding the logo and wordmark that runs
- * off the right edge. Drawn in code
+ * The Space share card: a light blue field, a pen finishing two fading
+ * handwriting strokes, and a frosted pill holding the logo and wordmark that
+ * runs off the right edge. Drawn in code
  * (satori, behind `ImageResponse`) so the text and logo stay sharp at any
  * size. `label` names the page being shared; the homepage passes none.
  *
@@ -15,81 +15,75 @@ import { loadOgFonts, loadOgLogo, OG_SIZE } from "@/lib/og";
 const INK = "#0F172A";
 const BRAND_STRONG = "#0056B3";
 
-const GLASS =
-  "linear-gradient(160deg, rgba(255,255,255,0.92) 0%, rgba(240,246,255,0.82) 60%, rgba(222,236,253,0.86) 100%)";
-
-/** One frosted page. `lines` are widths in px; the first is the blue heading. */
-function Page({
-  left,
-  top,
-  rotate,
-  lines,
-  faint,
-}: {
-  left: number;
-  top: number;
-  rotate: number;
-  lines: number[];
-  faint?: boolean;
-}) {
+/**
+ * Two handwriting strokes that fade in from the left and end at the pen's nib,
+ * leading the eye into the pill.
+ */
+function Strokes({ width, height }: { width: number; height: number }) {
   return (
-    <div
-      style={{
-        position: "absolute",
-        left,
-        top,
-        width: 168,
-        height: 194,
-        borderRadius: 22,
-        display: "flex",
-        flexDirection: "column",
-        gap: 15,
-        padding: "30px 26px",
-        transform: `rotate(${rotate}deg)`,
-        // The front page is near-opaque so the back page's lines don't show through.
-        background: faint
-          ? GLASS
-          : "linear-gradient(160deg, #FFFFFF 0%, #F3F8FF 60%, #E6F0FE 100%)",
-        border: "2px solid rgba(255,255,255,0.95)",
-        opacity: faint ? 0.75 : 1,
-        boxShadow: "0 22px 36px rgba(0, 102, 230, 0.22), inset 0 1px 0 rgba(255,255,255,0.9)",
-      }}
+    <svg
+      width={width}
+      height={height}
+      viewBox={`0 0 ${width} ${height}`}
+      style={{ position: "absolute", left: 0, top: 0 }}
     >
-      {lines.map((w, i) => (
-        <div
-          key={i}
-          style={{
-            width: w,
-            height: i === 0 ? 9 : 8,
-            borderRadius: 8,
-            background: i === 0 && !faint ? "#1E7BF0" : "rgba(126, 172, 235, 0.55)",
-          }}
-        />
-      ))}
-    </div>
+      <defs>
+        <linearGradient id="ink" x1="70" y1="0" x2="255" y2="0" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#1E7BF0" stopOpacity="0" />
+          <stop offset="0.55" stopColor="#1E7BF0" stopOpacity="0.55" />
+          <stop offset="1" stopColor="#0A63DD" stopOpacity="1" />
+        </linearGradient>
+        <linearGradient
+          id="ink-faint"
+          x1="70"
+          y1="0"
+          x2="240"
+          y2="0"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop offset="0" stopColor="#4C9AF5" stopOpacity="0" />
+          <stop offset="1" stopColor="#4C9AF5" stopOpacity="0.75" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M 72 342 C 100 330 128 326 140 322 C 150 319 146 333 158 331 C 180 327 205 318 236 314"
+        fill="none"
+        stroke="url(#ink-faint)"
+        strokeWidth={5}
+        strokeLinecap="round"
+      />
+      <path
+        d="M 76 412 C 104 399 134 393 148 390 C 160 387 156 402 170 400 C 196 397 222 393 251 391"
+        fill="none"
+        stroke="url(#ink)"
+        strokeWidth={5.5}
+        strokeLinecap="round"
+      />
+    </svg>
   );
 }
 
-/** A slim pen lying across the front page's corner. */
+/** A slim pen, nib down-left at the end of the lower stroke. */
 function Pen() {
   return (
     <div
       style={{
         position: "absolute",
-        left: 228,
-        top: 362,
-        width: 124,
-        height: 22,
+        // Rotates about its centre; placed so the nib lands on the lower stroke's end (251, 391).
+        left: 220,
+        top: 318,
+        width: 150,
+        height: 24,
         display: "flex",
         alignItems: "center",
-        transform: "rotate(-52deg)",
+        transform: "rotate(-54deg)",
       }}
     >
       {/* Nib */}
       <div
         style={{
-          width: 18,
-          height: 12,
+          width: 20,
+          height: 13,
           borderRadius: "10px 2px 2px 10px",
           background: "linear-gradient(90deg, #0B5BD3, #2F8CF5)",
         }}
@@ -101,9 +95,9 @@ function Pen() {
       {/* Barrel */}
       <div
         style={{
-          width: 76,
-          height: 22,
-          borderRadius: "3px 11px 11px 3px",
+          width: 96,
+          height: 24,
+          borderRadius: "3px 12px 12px 3px",
           background: "linear-gradient(180deg, #FFFFFF 0%, #DCEBFD 55%, #A9CDF8 100%)",
           boxShadow: "0 10px 18px rgba(0, 102, 230, 0.28)",
         }}
@@ -143,9 +137,8 @@ export async function renderSpaceCard(label?: string) {
           boxShadow: "0 60px 110px 40px rgba(0, 122, 255, 0.42)",
         }}
       />
-      {/* Writing: two layered pages and a pen. */}
-      <Page left={76} top={176} rotate={-12} lines={[120, 104, 96, 84]} faint />
-      <Page left={136} top={238} rotate={0} lines={[92, 116, 104, 100, 56]} />
+      {/* Writing: a pen finishing two strokes. */}
+      <Strokes width={width} height={height} />
       <Pen />
 
       {/* Frosted pill, running off the right edge. */}
