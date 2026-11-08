@@ -1,8 +1,9 @@
 import { loadOgFonts, loadOgLogo, OG_SIZE } from "@/lib/og";
 
 /**
- * The Space share card: a light blue field, an orbit line with three glass
- * spheres, and a frosted pill holding the logo and wordmark. Drawn in code
+ * The Space share card: a light blue field, two layered glass pages with a
+ * pen (writing), and a frosted pill holding the logo and wordmark that runs
+ * off the right edge. Drawn in code
  * (satori, behind `ImageResponse`) so the text and logo stay sharp at any
  * size. `label` names the page being shared; the homepage passes none.
  *
@@ -14,20 +15,100 @@ import { loadOgFonts, loadOgLogo, OG_SIZE } from "@/lib/og";
 const INK = "#0F172A";
 const BRAND_STRONG = "#0056B3";
 
-function Sphere({ x, y, size }: { x: number; y: number; size: number }) {
+const GLASS =
+  "linear-gradient(160deg, rgba(255,255,255,0.92) 0%, rgba(240,246,255,0.82) 60%, rgba(222,236,253,0.86) 100%)";
+
+/** One frosted page. `lines` are widths in px; the first is the blue heading. */
+function Page({
+  left,
+  top,
+  rotate,
+  lines,
+  faint,
+}: {
+  left: number;
+  top: number;
+  rotate: number;
+  lines: number[];
+  faint?: boolean;
+}) {
   return (
     <div
       style={{
         position: "absolute",
-        left: x - size / 2,
-        top: y - size / 2,
-        width: size,
-        height: size,
-        borderRadius: size,
-        background: "radial-gradient(circle at 35% 30%, #FFFFFF 0%, #E3EEFC 45%, #B9D4F7 100%)",
-        boxShadow: "0 14px 22px rgba(0, 122, 255, 0.22)",
+        left,
+        top,
+        width: 168,
+        height: 194,
+        borderRadius: 22,
+        display: "flex",
+        flexDirection: "column",
+        gap: 15,
+        padding: "30px 26px",
+        transform: `rotate(${rotate}deg)`,
+        // The front page is near-opaque so the back page's lines don't show through.
+        background: faint
+          ? GLASS
+          : "linear-gradient(160deg, #FFFFFF 0%, #F3F8FF 60%, #E6F0FE 100%)",
+        border: "2px solid rgba(255,255,255,0.95)",
+        opacity: faint ? 0.75 : 1,
+        boxShadow: "0 22px 36px rgba(0, 102, 230, 0.22), inset 0 1px 0 rgba(255,255,255,0.9)",
       }}
-    />
+    >
+      {lines.map((w, i) => (
+        <div
+          key={i}
+          style={{
+            width: w,
+            height: i === 0 ? 9 : 8,
+            borderRadius: 8,
+            background: i === 0 && !faint ? "#1E7BF0" : "rgba(126, 172, 235, 0.55)",
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/** A slim pen lying across the front page's corner. */
+function Pen() {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 228,
+        top: 362,
+        width: 124,
+        height: 22,
+        display: "flex",
+        alignItems: "center",
+        transform: "rotate(-52deg)",
+      }}
+    >
+      {/* Nib */}
+      <div
+        style={{
+          width: 18,
+          height: 12,
+          borderRadius: "10px 2px 2px 10px",
+          background: "linear-gradient(90deg, #0B5BD3, #2F8CF5)",
+        }}
+      />
+      {/* Grip */}
+      <div
+        style={{ width: 30, height: 20, background: "linear-gradient(180deg, #4DA2FA, #0A63DD)" }}
+      />
+      {/* Barrel */}
+      <div
+        style={{
+          width: 76,
+          height: 22,
+          borderRadius: "3px 11px 11px 3px",
+          background: "linear-gradient(180deg, #FFFFFF 0%, #DCEBFD 55%, #A9CDF8 100%)",
+          boxShadow: "0 10px 18px rgba(0, 102, 230, 0.28)",
+        }}
+      />
+    </div>
   );
 }
 
@@ -54,7 +135,7 @@ export async function renderSpaceCard(label?: string) {
       <div
         style={{
           position: "absolute",
-          left: 560,
+          left: 540,
           top: 400,
           width: 640,
           height: 40,
@@ -62,32 +143,18 @@ export async function renderSpaceCard(label?: string) {
           boxShadow: "0 60px 110px 40px rgba(0, 122, 255, 0.42)",
         }}
       />
-      {/* Orbit line. */}
-      <svg
-        width={width}
-        height={height}
-        viewBox={`0 0 ${width} ${height}`}
-        style={{ position: "absolute", left: 0, top: 0 }}
-      >
-        <path
-          d="M 352 125 C 290 128 220 140 168 170 C 90 215 45 300 62 355 C 82 420 200 380 188 445 C 178 500 140 545 262 548"
-          fill="none"
-          stroke="#7FAFEC"
-          strokeWidth={2.5}
-          strokeLinecap="round"
-        />
-      </svg>
-      <Sphere x={168} y={170} size={52} />
-      <Sphere x={352} y={125} size={38} />
-      <Sphere x={266} y={548} size={42} />
+      {/* Writing: two layered pages and a pen. */}
+      <Page left={76} top={176} rotate={-12} lines={[120, 104, 96, 84]} faint />
+      <Page left={136} top={238} rotate={0} lines={[92, 116, 104, 100, 56]} />
+      <Pen />
 
       {/* Frosted pill, running off the right edge. */}
       <div
         style={{
           position: "absolute",
-          left: 360,
+          left: 352,
           top: 205,
-          width: 920,
+          width: 1000,
           height: 284,
           borderRadius: 142,
           display: "flex",
