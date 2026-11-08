@@ -82,9 +82,19 @@ export async function generateMetadata({
       publishedTime: post.publishedAt,
       authors: [author.name],
       tags: post.tags,
+      // The article's own card, at its stable URL. Without this the helper's
+      // site-wide default won, so every article previewed with the generic card.
+      images: [
+        {
+          url: `/articles/${post.slug}/card.png`,
+          width: 1200,
+          height: 630,
+          alt: `${post.title}, on Space`,
+        },
+      ],
     }),
-    // No `images`: the article's own opengraph-image file fills twitter:image.
     twitter: {
+      images: [`/articles/${post.slug}/card.png`],
       card: "summary_large_image",
       title: post.title,
       description: post.dek,

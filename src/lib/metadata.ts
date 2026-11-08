@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { author, site, siteUrl } from "@/lib/content";
+import { ogCardPath } from "@/lib/og-sign";
 
 /**
  * Page metadata helpers.
@@ -14,34 +15,25 @@ import { author, site, siteUrl } from "@/lib/content";
  */
 
 /**
- * The site-wide 1200x630 card rendered by `app/opengraph-image.tsx`.
- *
- * Next only attaches that file to routes that declare no Open Graph images of
- * their own, and a page that sets `openGraph` at all replaces the inherited
- * images — so without this every topic, tag and series page shared with no
- * image whatsoever.
+ * Share card for a page, rendered by `app/og/route.tsx`: the Space card with
+ * the page's name, or the plain card when there is none (homepage). Pages that
+ * set no image of their own get one through `openGraph`, `twitter` and
+ * `pageMetadata` below.
  */
-export const defaultOgImage = {
-  url: "/opengraph-image",
-  width: 1200,
-  height: 630,
-  alt: site.title,
-};
+export function ogImage(label?: string) {
+  return {
+    url: `${siteUrl}${ogCardPath(label)}`,
+    width: 1200,
+    height: 630,
+    type: "image/png",
+    alt: label
+      ? `${label} on Space: the Space logo and wordmark on a soft blue glass card`
+      : "The Space logo and wordmark on a soft blue glass card",
+  };
+}
 
-/**
- * The homepage's social preview: the official launch artwork in
- * `public/og/`, served as a JPEG (under 300 KB, which WhatsApp needs to show a
- * preview; LinkedIn does not reliably render WebP). Absolute so every scraper
- * gets the production URL regardless of `metadataBase`.
- */
-export const homeOgImage = {
-  url: `${siteUrl}/og/space-home.jpg`,
-  secureUrl: `${siteUrl}/og/space-home.jpg`,
-  type: "image/jpeg",
-  width: 1672,
-  height: 941,
-  alt: "The Space logo, a blue planet with a small moon, beside the word Space on a soft blue glass background",
-};
+/** The plain card, for pages that don't name themselves. */
+export const defaultOgImage = ogImage();
 
 /** Canonical URL for a page, keeping feed autodiscovery attached. */
 export function alternates(canonical: string): Metadata["alternates"] {
@@ -101,8 +93,8 @@ export function pageMetadata({
     title,
     description,
     alternates: alternates(path),
-    openGraph: openGraph({ title, description, url: path }),
-    twitter: twitter({ title, description }),
+    openGraph: openGraph({ title, description, url: path, images: [ogImage(title)] }),
+    twitter: twitter({ title, description, images: [ogImage(title).url] }),
     ...rest,
   };
 }

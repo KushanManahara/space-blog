@@ -1,59 +1,17 @@
 import { ImageResponse } from "next/og";
 
-import { site } from "@/lib/content";
-import { loadOgFonts, loadOgLogo, OG_CONTENT_TYPE, OG_SIZE } from "@/lib/og";
+import { OG_CONTENT_TYPE, OG_SIZE } from "@/lib/og";
+import { renderSpaceCard } from "@/lib/og-card";
 
-export const alt = site.title;
+export const alt = "The Space logo and wordmark on a soft blue glass card";
 export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;
 
-/** Site-wide fallback card, used by any route without its own image. */
+/**
+ * Site-wide fallback card, for any route Next attaches it to. The same plain
+ * card as `/og`, so a page never previews with an older design.
+ */
 export default async function Image() {
-  const [fonts, logo] = await Promise.all([loadOgFonts(), loadOgLogo()]);
-
-  return new ImageResponse(
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        gap: 26,
-        padding: 84,
-        background: "linear-gradient(145deg, #080D1A 0%, #0A1B3F 55%, #0052CC 100%)",
-        fontFamily: "Louis George Cafe",
-        color: "#ffffff",
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-        <img src={logo} width={48} height={48} alt="" />
-        <div style={{ fontSize: 40, fontWeight: 700, letterSpacing: -0.6 }}>{site.name}</div>
-      </div>
-
-      <div
-        style={{
-          display: "flex",
-          fontSize: 66,
-          fontWeight: 700,
-          lineHeight: 1.1,
-          letterSpacing: -1.8,
-        }}
-      >
-        {site.title}
-      </div>
-
-      <div
-        style={{
-          display: "flex",
-          fontSize: 27,
-          color: "rgba(255,255,255,0.85)",
-          lineHeight: 1.35,
-        }}
-      >
-        {site.description}
-      </div>
-    </div>,
-    { ...size, fonts },
-  );
+  const { card, fonts } = await renderSpaceCard();
+  return new ImageResponse(card, { ...OG_SIZE, fonts });
 }
