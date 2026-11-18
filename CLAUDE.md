@@ -151,6 +151,9 @@ These are the standing rules for this codebase.
 
 ## Writing articles
 
+Full authoring documentation: `docs/authoring/ARTICLE_AUTHORING_GUIDE.md` (components, publishing,
+best practices, AI-agent instructions).
+
 Use the user-level `tech-blog-writing` skill for every article (voice, structure, accuracy, references,
 editing passes). This section is the Space-specific half: what the skill's step 0 needs to know here.
 
