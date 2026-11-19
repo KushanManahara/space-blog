@@ -10,6 +10,7 @@ import { ArticleHeader } from "@/components/article/article-header";
 import { CommentThread } from "@/components/article/comment-thread";
 import { ReviewInviteCard } from "@/components/reviews/review-invite-card";
 import { CopySelectionWatermark } from "@/components/article/copy-selection-watermark";
+import { markdownToText } from "@/components/article/markdown";
 import { PrintFooterWatermark, PrintHeaderWatermark } from "@/components/article/print-watermark";
 import { ReaderModeProvider } from "@/components/article/reader-mode-provider";
 import { ReaderModeView } from "@/components/article/reader-mode-view";
@@ -140,8 +141,12 @@ export default async function ArticlePage({ params }: PageProps<"/articles/[slug
 
   const topicSlug = topics.find((entry) => entry.name === post.topic)?.slug;
 
+  // The table of contents prints text, not HTML, so inline markdown in a
+  // heading is reduced to its words here rather than shown as `**` or backticks.
   const headings = post.body.flatMap((block) =>
-    block.kind === "heading" ? [{ id: block.id, text: block.text, level: block.level ?? 2 }] : [],
+    block.kind === "heading"
+      ? [{ id: block.id, text: markdownToText(block.text), level: block.level ?? 2 }]
+      : [],
   );
 
   return (

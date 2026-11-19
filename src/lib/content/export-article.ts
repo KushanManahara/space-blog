@@ -1,5 +1,6 @@
 import { authorConfig as author, siteIdentity as site, siteUrl } from "./config";
 import type { ArticleBlock, Post } from "./schemas";
+import { markdownToHtml } from "@/components/article/markdown";
 import { formatDate } from "@/lib/format";
 
 /**
@@ -94,6 +95,9 @@ function blockToMarkdown(block: ArticleBlock): string {
         )
         .join("\n")}`;
 
+    case "chart":
+      return `### ${block.title}\n${block.bars.map((bar) => `- ${bar.label}: ${bar.value}`).join("\n")}\n*${block.caption}*`;
+
     default:
       return "";
   }
@@ -155,19 +159,19 @@ export function formatArticleToHtml(post: Post): string {
     .map((block) => {
       switch (block.kind) {
         case "paragraph":
-          return `<p style="margin: 1em 0; line-height: 1.65; color: #1e293b;">${block.html}</p>`;
+          return `<p style="margin: 1em 0; line-height: 1.65; color: #1e293b;">${markdownToHtml(block.html)}</p>`;
         case "heading":
-          return `<h2 style="margin: 1.5em 0 0.5em; font-size: 1.5em; font-weight: 700; color: #0f172a;">${block.text}</h2>`;
+          return `<h2 style="margin: 1.5em 0 0.5em; font-size: 1.5em; font-weight: 700; color: #0f172a;">${markdownToHtml(block.text)}</h2>`;
         case "list":
-          return `<ul style="margin: 1em 0; padding-left: 1.5em; color: #1e293b;">${block.items.map((i) => `<li style="margin-bottom: 0.35em;">${i}</li>`).join("")}</ul>`;
+          return `<ul style="margin: 1em 0; padding-left: 1.5em; color: #1e293b;">${block.items.map((i) => `<li style="margin-bottom: 0.35em;">${markdownToHtml(i)}</li>`).join("")}</ul>`;
         case "code":
           return `<div style="margin: 1.5em 0; background: #0f172a; border-radius: 8px; padding: 1em; overflow-x: auto;"><div style="color: #94a3b8; font-size: 12px; margin-bottom: 0.5em; font-family: monospace;">// ${block.filename}</div><pre style="margin: 0; color: #f8fafc; font-family: monospace; font-size: 13.5px; line-height: 1.5;"><code>${escapeHtml(block.code)}</code></pre></div>`;
         case "callout":
-          return `<blockquote style="margin: 1.5em 0; padding: 1em 1.25em; border-left: 4px solid #0062d2; background: #f0f7ff; color: #0f172a; border-radius: 0 8px 8px 0;"><strong style="color: #0062d2;">${block.title}</strong><p style="margin: 0.5em 0 0;">${block.body}</p></blockquote>`;
+          return `<blockquote style="margin: 1.5em 0; padding: 1em 1.25em; border-left: 4px solid #0062d2; background: #f0f7ff; color: #0f172a; border-radius: 0 8px 8px 0;"><strong style="color: #0062d2;">${markdownToHtml(block.title)}</strong><p style="margin: 0.5em 0 0;">${markdownToHtml(block.body)}</p></blockquote>`;
         case "correction":
-          return `<div style="margin: 1.5em 0; padding: 1em; border: 1px solid #f59e0b; background: #fffbeb; border-radius: 8px; color: #92400e;"><strong>Correction (${block.date}):</strong> ${block.note}</div>`;
+          return `<div style="margin: 1.5em 0; padding: 1em; border: 1px solid #f59e0b; background: #fffbeb; border-radius: 8px; color: #92400e;"><strong>Correction (${block.date}):</strong> ${markdownToHtml(block.note)}</div>`;
         case "table":
-          return `<div style="margin: 1.5em 0; overflow-x: auto;"><table style="width: 100%; border-collapse: collapse; font-size: 14px; text-align: left;"><thead style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;"><tr>${block.headers.map((h) => `<th style="padding: 10px; font-weight: 600;">${h}</th>`).join("")}</tr></thead><tbody>${block.rows.map((row) => `<tr style="border-bottom: 1px solid #f1f5f9;">${row.map((cell) => `<td style="padding: 10px;">${cell}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+          return `<div style="margin: 1.5em 0; overflow-x: auto;"><table style="width: 100%; border-collapse: collapse; font-size: 14px; text-align: left;"><thead style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;"><tr>${block.headers.map((h) => `<th style="padding: 10px; font-weight: 600;">${markdownToHtml(h)}</th>`).join("")}</tr></thead><tbody>${block.rows.map((row) => `<tr style="border-bottom: 1px solid #f1f5f9;">${row.map((cell) => `<td style="padding: 10px;">${markdownToHtml(cell)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
         default:
           return `<p style="margin: 1em 0; color: #1e293b;">${escapeHtml(blockToMarkdown(block))}</p>`;
       }
