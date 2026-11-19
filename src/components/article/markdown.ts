@@ -40,15 +40,20 @@ export function markdownToHtml(raw: string): string {
     return `\u0000${codeSpans.length - 1}\u0000`;
   });
 
+  // Link targets are held out of the emphasis passes the same way, so an
+  // underscore in a URL (`foo_bar_baz`) is not turned into <em> inside href.
+  // One level of balanced parentheses is allowed in the URL, as in
+  // `wiki/Pascal_(unit)`.
+  const hrefs: string[] = [];
+
   return (
     withoutCode
       // Links: [text](url). The href goes through a scheme allowlist and the
       // label is escaped, so neither can close the attribute nor open a tag.
-      .replace(
-        /\[([^\]]+)\]\(([^)]+)\)/g,
-        (_, label: string, url: string) =>
-          `<a href="${safeHref(url)}" target="_blank" rel="noopener noreferrer" class="font-medium text-fg-link underline decoration-line-brand underline-offset-4 transition-colors hover:text-brand">${escapeHtml(label)}</a>`,
-      )
+      .replace(/\[([^\]]+)\]\(((?:[^()]|\([^()]*\))+)\)/g, (_, label: string, url: string) => {
+        hrefs.push(safeHref(url));
+        return `<a href="\u0001${hrefs.length - 1}\u0001" target="_blank" rel="noopener noreferrer" class="font-medium text-fg-link underline decoration-line-brand underline-offset-4 transition-colors hover:text-brand">${escapeHtml(label)}</a>`;
+      })
       // Ensure raw HTML external links open in a new tab
       .replace(/<a\s+([^>]*href=["']https?:\/\/[^"']+["'][^>]*)>/gi, (match, attrs) => {
         if (/target\s*=/i.test(attrs)) return match;
@@ -68,5 +73,21 @@ export function markdownToHtml(raw: string): string {
         (_, index: string) =>
           `<code class="rounded border border-line-1 bg-bg-2 px-1.5 py-0.5 font-mono text-[0.88em] font-medium text-brand">${escapeHtml(codeSpans[Number(index)])}</code>`,
       )
+      // Link targets: restored verbatim
+      .replace(/\u0001(\d+)\u0001/g, (_, index: string) => hrefs[Number(index)])
   );
+}
+
+/**
+ * Inline markdown reduced to its words, for surfaces that print text rather
+ * than HTML (the table of contents, the header's section label).
+ */
+export function markdownToText(raw: string): string {
+  return raw
+    .replace(/\[([^\]]+)\]\((?:[^()]|\([^()]*\))+\)/g, "$1")
+    .replace(/<[^>]+>/g, "")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/(\*\*|__|~~)(.+?)\1/g, "$2")
+    .replace(/(^|[^\w*])[*_]([^*_]+)[*_](?=[^\w*]|$)/g, "$1$2")
+    .trim();
 }

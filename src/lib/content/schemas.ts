@@ -166,18 +166,22 @@ export const articleBlockSchema = z.discriminatedUnion("kind", [
   }),
 
   /** Interactive chart: hover for values, toggle series through the legend. */
-  z.object({
-    kind: z.literal("figure"),
-    variant: z.enum(["line", "area", "bar"]),
-    title: z.string().min(1),
-    caption: z.string().min(1).optional(),
-    note: z.string().min(1).optional(),
-    xKey: z.string().min(1),
-    xLabel: z.string().min(1).optional(),
-    yLabel: z.string().min(1).optional(),
-    series: z.array(z.object({ key: z.string().min(1), label: z.string().min(1) })).min(1),
-    data: z.array(z.record(z.string(), z.union([z.string(), z.number()]))).min(1),
-  }),
+  z
+    .object({
+      kind: z.literal("figure"),
+      variant: z.enum(["line", "area", "bar"]),
+      title: z.string().min(1),
+      caption: z.string().min(1).optional(),
+      note: z.string().min(1).optional(),
+      xKey: z.string().min(1),
+      xLabel: z.string().min(1).optional(),
+      yLabel: z.string().min(1).optional(),
+      series: z.array(z.object({ key: z.string().min(1), label: z.string().min(1) })).min(1),
+      data: z.array(z.record(z.string(), z.union([z.string(), z.number()]))).min(1),
+    })
+    .refine((block) => block.series.every((series) => series.key !== block.xKey), {
+      message: "A figure's xKey must not also be a series key: each row holds one value per field.",
+    }),
 ]);
 
 export const postSchema = z.object({
@@ -211,7 +215,25 @@ export const postSchema = z.object({
     })
     .optional(),
   coverImage: z.string().optional(),
-  body: z.array(articleBlockSchema).min(1),
+  body: z
+    .array(articleBlockSchema)
+    .min(1)
+    .superRefine((body, ctx) => {
+      // Heading ids are anchors and table-of-contents keys, so a duplicate
+      // silently sends both links to the first heading.
+      const seen = new Set<string>();
+      body.forEach((block, index) => {
+        if (block.kind !== "heading") return;
+        if (seen.has(block.id)) {
+          ctx.addIssue({
+            code: "custom",
+            path: [index, "id"],
+            message: `Duplicate heading id "${block.id}".`,
+          });
+        }
+        seen.add(block.id);
+      });
+    }),
 });
 
 export const seriesSchema = z.object({
