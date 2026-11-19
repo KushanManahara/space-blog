@@ -34,6 +34,9 @@ When this documentation and the code disagree, the code wins. Check these before
 - Do not change existing slugs or heading ids.
 - No Markdown in plain-text fields (table/figure/formula/mermaid/image/video captions, figure `note`, reference `label`/`source`/`note`).
 - In `figure`, `xKey` must not equal a series `key`.
+- Heading `id`s must be unique. Neither this nor the `xKey` rule is checked by the schema, so check them yourself.
+- No Markdown in heading text (the table of contents prints it literally), no `__`/`_` emphasis, and no parentheses inside link URLs.
+- No `<b>`/`<i>` styling in Mermaid labels. The Excalidraw converter strips it.
 - Only mark code `runnable: true` if it runs under Pyodide in the browser without network access.
 - Keep personal data out. Use placeholders and say they are placeholders.
 - Avoid em dashes and semicolons in prose. Code and formulas are exempt.

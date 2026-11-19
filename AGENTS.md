@@ -23,10 +23,11 @@ pnpm typecheck    # tsc --noEmit
 pnpm format       # prettier --write . (tailwind class sorting via plugin)
 pnpm format:check # prettier --check .
 pnpm comments     # moderate held comments: list / approve <id> / approve --all / reject <id>
-pnpm embeddings   # rebuild src/lib/content/embeddings.json — run after editing article bodies
+pnpm embeddings   # rebuild public/embeddings.json — run after editing article bodies
 ```
 
-There is no test runner configured yet. If one is added, record the single-test invocation here.
+Tests use Node's built-in runner through tsx: `pnpm test` runs `tests/*.test.ts`; one file with
+`node --import tsx --test tests/<file>.test.ts`, one test with `--test-name-pattern "<name>"`.
 
 ## Architecture
 
@@ -39,17 +40,15 @@ All copy and post data lives here, not in components.
   RSC payload stays small (`toSummary` / `toSummaries` in `queries.ts`).
 - `posts.ts`, `site.ts` — the data, parsed through the schemas at module load, so bad content
   fails fast at build time.
-- `article-body.ts` — long-form article content as a typed block union rendered by
-  `components/article/article-body.tsx`. The mock dataset shares one body across posts; give a post
-  its own body by replacing `body` on that record.
+- `article-body.ts` — an unused sample body from the original mock dataset. Every published post
+  carries its own `body` in `posts.ts`, rendered by `components/article/article-body.tsx`.
 - `queries.ts` — every read goes through these selectors (`listPosts`, `getPostBySlug`,
   `getRelatedPosts`, `searchPosts`, …). Components never filter or sort raw arrays themselves.
 
 ### Routing
 
-`src/app/(site)/` carries the public chrome (header + footer). `src/app/studio/` deliberately sits
-outside that group: the studio list renders its own header and the editor is a full-screen surface
-with no site or studio nav. `src/app/not-found.tsx` renders the chrome itself for the same reason.
+`src/app/(site)/` carries the public chrome (header + footer). The studio is parked in `src/app/_studio/`
+(the leading underscore keeps it out of routing) and is not part of the live site. `src/app/not-found.tsx` renders the chrome itself for the same reason.
 
 Filtering, sorting and pagination are URL state (`?topic=`, `?sort=`, `?series=`, `?q=`, `?page=`),
 parsed and validated in the page with the `is*` guards from the content layer, and built with
@@ -61,7 +60,7 @@ plain links/forms, so they work before hydration.
 Server by default. Client components exist only for: the scroll-aware header (`useScrollDirection`
 in `src/hooks/` drives the collapse-on-scroll-down / expand-on-scroll-up bar), ⌘K command menu,
 save/like state, home carousels and tabs, article reading progress (one scroll listener shared via
-`ReadingProgressProvider`), share sheet, comment composer, discover modals, forms and the studio
+`ReadingProgressProvider`), share sheet, comment composer, discover modals, forms and the (parked) studio
 editor. Reader state (saved/liked posts) lives in `SavedPostsProvider`; there is no global store.
 
 Form submissions go through the server actions in `src/app/actions.ts`, which own validation.

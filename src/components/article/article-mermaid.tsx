@@ -22,26 +22,16 @@ import { cn } from "@/lib/utils";
  *    the fallback path, and all diagram work is serialised through `queue`.
  *
  * 2. Mermaid 11.14 began prefixing subgraph cluster ids with the render id,
- *    which the library's subgraph lookup does not expect — every subgraph then
- *    throws and the diagram silently degrades to a flat bitmap. Mermaid is
- *    pinned to 11.13.0 (see the `pnpm.overrides` entry) until upstream catches
- *    up. `pnpm why mermaid` should report a single version.
+ *    which the converter's subgraph lookup does not expect, so subgraphs threw
+ *    and diagrams degraded to a flat bitmap. Instead of pinning Mermaid back,
+ *    `patches/@excalidraw__mermaid-to-excalidraw@2.2.2.patch` teaches the
+ *    converter to accept the prefixed ids. Mermaid is pinned to 12.3.0 in both
+ *    `dependencies` and `pnpm.overrides`; `pnpm why mermaid` should report a
+ *    single version.
  *
- * That pin holds back ten published Mermaid advisories, all fixed in 11.16.1,
- * so it is a knowingly accepted risk rather than an oversight:
- *
- * - The exposure is HTML/CSS injection, prototype pollution and parser DoS, and
- *   every one of them requires attacker-controlled diagram source. Mermaid here
- *   only ever parses `kind: "mermaid"` blocks from `posts.ts` — committed to the
- *   repo, schema-validated at module load, and never reachable from a comment,
- *   a search query or any other reader input.
- * - Taking the fix today means breaking a real diagram: one of the two Mermaid
- *   blocks in the archive uses `subgraph`, which is precisely what 11.14 broke,
- *   and `@excalidraw/mermaid-to-excalidraw@2.2.2` is still the newest release.
- *
- * Re-check on any new release of that library: if it handles the prefixed
- * cluster ids, drop the override, run `pnpm audit`, and confirm both diagrams
- * still render as vector rather than a flat bitmap.
+ * Re-check on any Mermaid or converter upgrade: confirm subgraph diagrams still
+ * render as vector rather than a flat bitmap, and drop the patch once the
+ * converter handles prefixed ids itself.
  */
 
 type MermaidModule = typeof import("mermaid").default;
