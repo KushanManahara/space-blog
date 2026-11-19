@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 340" width="800" height="340" role="img" aria-label="Two-panel diagram of forward FLOPs and batch weight reuse. Left panel shows how one output neuron in Linear(20, 64) counts 20 weight-input multiplications, 19 summation additions, and 1 bias addition to equal 40 FLOPs, or 2 times d_in. Right panel shows batch B = 32 examples multiplying shared transposed matrix W.T once via GEMM to reuse loaded weights across all 32 rows for 122,880 forward FLOPs.">
+  <title>Why each output neuron costs 2 times d_in FLOPs and why batching reuses weights</title>
+
+  <rect x="0.5" y="0.5" width="799" height="339" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+
+  <!-- Header -->
+  <text x="400" y="28" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#0f172a">How one neuron counts 2 × d_in FLOPs, and how batches reuse weights</text>
+  <text x="400" y="47" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#475569">Arithmetic work scales directly with batch size B while loaded weights get reused across every row</text>
+
+  <line x1="400" y1="64" x2="400" y2="300" stroke="#e2e8f0" stroke-width="1" />
+
+  <!-- LEFT PANEL: 1 neuron = 20 muls + 19 adds + 1 bias = 40 FLOPs -->
+  <rect x="28" y="72" width="352" height="222" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2" />
+  <text x="204" y="96" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#0f172a">One output neuron in Linear(20, 64)</text>
+
+  <!-- Step boxes stacked cleanly -->
+  <rect x="48" y="114" width="312" height="38" rx="7" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="1" />
+  <text x="62" y="131" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#0369a1">1. Pairwise products: W[0, j] * x[j]</text>
+  <text x="346" y="137" text-anchor="end" font-family="ui-monospace, monospace" font-size="12" font-weight="700" fill="#0369a1">20 FLOPs</text>
+  <text x="62" y="145" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#475569">20 separate weight-input multiplications</text>
+
+  <rect x="48" y="162" width="312" height="38" rx="7" fill="#fff7ed" stroke="#fed7aa" stroke-width="1" />
+  <text x="62" y="179" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#9a3412">2. Sum products: p0 + ... + p19</text>
+  <text x="346" y="185" text-anchor="end" font-family="ui-monospace, monospace" font-size="12" font-weight="700" fill="#9a3412">19 FLOPs</text>
+  <text x="62" y="193" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#475569">Adding N terms requires N - 1 plus ops</text>
+
+  <rect x="48" y="210" width="312" height="34" rx="7" fill="#fef3c7" stroke="#fcd34d" stroke-width="1" />
+  <text x="62" y="231" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#92400e">3. Add scalar bias offset: + b[0]</text>
+  <text x="346" y="231" text-anchor="end" font-family="ui-monospace, monospace" font-size="12" font-weight="700" fill="#92400e">+1 FLOP</text>
+
+  <!-- Summary pill -->
+  <rect x="48" y="254" width="312" height="28" rx="6" fill="#0f172a" />
+  <text x="204" y="272" text-anchor="middle" font-family="ui-monospace, monospace" font-size="11.5" font-weight="700" fill="#ffffff">20 + 19 + 1 = 40 (× 64 = 2,560 FLOPs)</text>
+
+  <!-- RIGHT PANEL: Batch B = 32 GEMM weight reuse -->
+  <rect x="420" y="72" width="352" height="222" rx="10" fill="#f0fdf4" stroke="#86efac" stroke-width="1.2" />
+  <text x="596" y="96" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#065f46">Batch B = 32: GEMM weight reuse</text>
+
+  <!-- Matrix blocks: X (32 x 20) @ W.T (20 x 64) + broadcast b = Y (32 x 64) -->
+  <!-- X: (442, 122, w=54, h=86) -->
+  <rect x="442" y="124" width="52" height="84" rx="4" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.5" />
+  <line x1="442" y1="138" x2="494" y2="138" stroke="#7dd3fc" stroke-width="1" />
+  <line x1="442" y1="152" x2="494" y2="152" stroke="#7dd3fc" stroke-width="1" />
+  <line x1="442" y1="166" x2="494" y2="166" stroke="#7dd3fc" stroke-width="1" />
+  <line x1="442" y1="180" x2="494" y2="180" stroke="#7dd3fc" stroke-width="1" />
+  <line x1="442" y1="194" x2="494" y2="194" stroke="#7dd3fc" stroke-width="1" />
+  <text x="468" y="224" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10.5" font-weight="700" fill="#0369a1">X (32,20)</text>
+
+  <text x="506" y="170" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="700" fill="#334155">@</text>
+
+  <!-- W.T: (518, 140, w=88, h=52) -->
+  <rect x="518" y="140" width="88" height="52" rx="4" fill="#eff6ff" stroke="#1d4ed8" stroke-width="1.5" />
+  <line x1="540" y1="140" x2="540" y2="192" stroke="#bfdbfe" stroke-width="1" />
+  <line x1="562" y1="140" x2="562" y2="192" stroke="#bfdbfe" stroke-width="1" />
+  <line x1="584" y1="140" x2="584" y2="192" stroke="#bfdbfe" stroke-width="1" />
+  <text x="562" y="170" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="700" fill="#1e3a8a">loaded once</text>
+  <text x="562" y="224" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10.5" font-weight="700" fill="#1e3a8a">W.T (20,64)</text>
+
+  <text x="618" y="170" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="700" fill="#334155">=</text>
+
+  <!-- Y: (630, 124, w=116, h=84) -->
+  <rect x="630" y="124" width="118" height="84" rx="4" fill="#d1fae5" stroke="#059669" stroke-width="1.5" />
+  <line x1="630" y1="138" x2="748" y2="138" stroke="#6ee7b7" stroke-width="1" />
+  <line x1="630" y1="152" x2="748" y2="152" stroke="#6ee7b7" stroke-width="1" />
+  <line x1="630" y1="166" x2="748" y2="166" stroke="#6ee7b7" stroke-width="1" />
+  <line x1="630" y1="180" x2="748" y2="180" stroke="#6ee7b7" stroke-width="1" />
+  <line x1="630" y1="194" x2="748" y2="194" stroke="#6ee7b7" stroke-width="1" />
+  <text x="689" y="170" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="700" fill="#065f46">+ b broadcast</text>
+  <text x="689" y="224" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10.5" font-weight="700" fill="#065f46">Y (32,64)</text>
+
+  <!-- Reuse explanation box -->
+  <rect x="436" y="240" width="320" height="42" rx="6" fill="#ffffff" stroke="#86efac" stroke-width="1" />
+  <text x="596" y="257" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="10.8" font-weight="700" fill="#065f46">Read 1,280 weights once, multiply 32 rows at once</text>
+  <text x="596" y="273" text-anchor="middle" font-family="ui-monospace, monospace" font-size="9.5" fill="#047857">2-layer batch (B=32): 32 × 3,840 = 122,880 FLOPs</text>
+
+  <!-- Footer -->
+  <text x="400" y="320" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#334155">Batching multiplies FLOPs by B linearly while dramatically boosting GPU speed through weight reuse in GEMM.</text>
+</svg>

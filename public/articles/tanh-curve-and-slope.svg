@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 335" width="800" height="335" role="img" aria-label="Two-panel plot comparing tanh against dashed sigmoid across z equals -5 to +5. Left panel shows tanh spanning (-1, 1) centered at the origin (0, 0), unlike sigmoid inside (0, 1), while still saturating near plus or minus 3. Right panel shows tanh derivative peaking at 1.000 at z equals 0, four times higher than sigmoid's 0.25 peak, yet still collapsing to 0.0099 at z equals plus or minus 3.">
+  <title>Tanh activation curve and derivative vs. sigmoid</title>
+
+  <rect x="0.5" y="0.5" width="799" height="334" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+
+  <!-- Header -->
+  <text x="400" y="28" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#0f172a">Tanh centers outputs around zero and reaches slope 1.0, yet tails still flatten</text>
+  <text x="400" y="47" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#475569">Stretching and shifting sigmoid gives (-1, 1) zero-centered activations and 4× steeper slope at z = 0</text>
+
+  <line x1="400" y1="62" x2="400" y2="294" stroke="#e2e8f0" stroke-width="1" />
+
+  <!-- LEFT PANEL: px(z) = 206 + 28z ([-5..+5] -> 66..346), py(y) = 175 - 65y ([-1..+1] -> 240..110) -->
+  <text x="206" y="75" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#0f766e">Output tanh(z) = 2σ(2z) − 1</text>
+  <rect x="24" y="86" width="356" height="202" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+
+  <!-- Tail saturation shading beyond |z| >= 3 (66..122 and 290..346) -->
+  <rect x="66" y="102" width="56" height="142" fill="#fef3c7" fill-opacity="0.55" />
+  <rect x="290" y="102" width="56" height="142" fill="#fef3c7" fill-opacity="0.55" />
+
+  <!-- Guides: +1 (110), 0 (175), -1 (240) -->
+  <line x1="62" y1="110" x2="352" y2="110" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="4 3" />
+  <line x1="62" y1="175" x2="352" y2="175" stroke="#94a3b8" stroke-width="1.2" />
+  <line x1="62" y1="240" x2="352" y2="240" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="4 3" />
+  <line x1="206" y1="98" x2="206" y2="240" stroke="#94a3b8" stroke-width="1.2" />
+
+  <text x="54" y="244" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" fill="#475569">-1</text>
+  <text x="54" y="179" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" fill="#475569">0</text>
+  <text x="54" y="114" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" fill="#475569">+1</text>
+
+  <text x="66" y="258" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">-5</text>
+  <text x="122" y="258" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">-3</text>
+  <text x="206" y="258" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#0f172a">0</text>
+  <text x="290" y="258" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">+3</text>
+  <text x="346" y="258" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">+5</text>
+
+  <!-- Sigmoid reference dashed -->
+  <polyline points="66.0,174.6 73.0,174.4 80.0,174.3 87.0,174.1 94.0,173.8 101.0,173.5 108.0,173.1 115.0,172.6 122.0,171.9 129.0,171.1 136.0,170.1 143.0,168.8 150.0,167.3 157.0,165.4 164.0,163.1 171.0,160.5 178.0,157.5 185.0,154.1 192.0,150.5 199.0,146.5 206.0,142.5 213.0,138.5 220.0,134.5 227.0,130.9 234.0,127.5 241.0,124.5 248.0,121.9 255.0,119.6 262.0,117.7 269.0,116.2 276.0,114.9 283.0,113.9 290.0,113.1 297.0,112.4 304.0,111.9 311.0,111.5 318.0,111.2 325.0,110.9 332.0,110.7 339.0,110.6 346.0,110.4" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-dasharray="4 3" />
+
+  <!-- Tanh curve -->
+  <polyline points="66.0,240.0 73.0,240.0 80.0,240.0 87.0,240.0 94.0,240.0 101.0,239.9 108.0,239.9 115.0,239.8 122.0,239.7 129.0,239.5 136.0,239.1 143.0,238.6 150.0,237.7 157.0,236.2 164.0,233.8 171.0,230.1 178.0,224.5 185.0,216.3 192.0,205.0 199.0,190.9 206.0,175.0 213.0,159.1 220.0,145.0 227.0,133.7 234.0,125.5 241.0,119.9 248.0,116.2 255.0,113.8 262.0,112.3 269.0,111.4 276.0,110.9 283.0,110.5 290.0,110.3 297.0,110.2 304.0,110.1 311.0,110.1 318.0,110.0 325.0,110.0 332.0,110.0 339.0,110.0 346.0,110.0" fill="none" stroke="#0d9488" stroke-width="2.8" />
+
+  <!-- Key points -->
+  <circle cx="206" cy="175" r="4.5" fill="#0d9488" stroke="#ffffff" stroke-width="1.5" />
+  <text x="190" y="191" text-anchor="end" font-family="ui-monospace, monospace" font-size="9.5" font-weight="700" fill="#0f766e">(0, 0)</text>
+
+  <circle cx="290" cy="110.3" r="4" fill="#d97706" stroke="#ffffff" stroke-width="1.5" />
+  <text x="305" y="138" text-anchor="middle" font-family="ui-monospace, monospace" font-size="9.5" font-weight="700" fill="#b45309">(+3, 0.995)</text>
+
+  <circle cx="122" cy="239.7" r="4" fill="#d97706" stroke="#ffffff" stroke-width="1.5" />
+  <text x="106" y="216" text-anchor="middle" font-family="ui-monospace, monospace" font-size="9.5" font-weight="700" fill="#b45309">(-3, -0.995)</text>
+
+  <!-- Legend row below X ticks -->
+  <line x1="68" y1="274" x2="86" y2="274" stroke="#0d9488" stroke-width="2.8" />
+  <text x="90" y="278" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#0f766e">tanh (-1, 1)</text>
+  <line x1="204" y1="274" x2="222" y2="274" stroke="#94a3b8" stroke-width="1.8" stroke-dasharray="4 3" />
+  <text x="226" y="278" font-family="ui-monospace, monospace" font-size="10" font-weight="600" fill="#64748b">sigmoid (0, 1)</text>
+
+  <!-- RIGHT PANEL: px(z) = 606 + 28z (466..746), py(s) = 240 - 125s ([0..1.0] -> 240..115) -->
+  <text x="606" y="75" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#0f172a">Derivative tanh'(z) = 1 − tanh²(z)</text>
+  <rect x="420" y="86" width="356" height="202" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+
+  <rect x="466" y="102" width="56" height="138" fill="#fef3c7" fill-opacity="0.55" />
+  <rect x="690" y="102" width="56" height="138" fill="#fef3c7" fill-opacity="0.55" />
+
+  <!-- Horizontal guides: 1.0 (115), 0.25 (208.8), 0 (240) -->
+  <line x1="460" y1="115" x2="752" y2="115" stroke="#0d9488" stroke-width="1" stroke-dasharray="4 3" />
+  <line x1="460" y1="208.8" x2="752" y2="208.8" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="3 3" />
+  <line x1="460" y1="240" x2="752" y2="240" stroke="#94a3b8" stroke-width="1.2" />
+  <line x1="606" y1="115" x2="606" y2="240" stroke="#94a3b8" stroke-width="1.2" />
+
+  <text x="454" y="244" text-anchor="end" font-family="ui-monospace, monospace" font-size="9.5" fill="#475569">0</text>
+  <text x="454" y="212" text-anchor="end" font-family="ui-monospace, monospace" font-size="9.5" fill="#64748b">.25</text>
+  <text x="454" y="119" text-anchor="end" font-family="ui-monospace, monospace" font-size="9.5" font-weight="700" fill="#0f766e">1.0</text>
+
+  <text x="466" y="258" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">-5</text>
+  <text x="522" y="258" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">-3</text>
+  <text x="606" y="258" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#0f172a">0</text>
+  <text x="690" y="258" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">+3</text>
+  <text x="746" y="258" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">+5</text>
+
+  <!-- Sigmoid derivative reference dashed -->
+  <polyline points="466.0,239.2 473.0,238.9 480.0,238.6 487.0,238.3 494.0,237.8 501.0,237.2 508.0,236.4 515.0,235.5 522.0,234.4 529.0,232.9 536.0,231.2 543.0,229.2 550.0,226.9 557.0,224.2 564.0,221.4 571.0,218.4 578.0,215.4 585.0,212.8 592.0,210.6 599.0,209.2 606.0,208.8 613.0,209.2 620.0,210.6 627.0,212.8 634.0,215.4 641.0,218.4 648.0,221.4 655.0,224.2 662.0,226.9 669.0,229.2 676.0,231.2 683.0,232.9 690.0,234.4 697.0,235.5 704.0,236.4 711.0,237.2 718.0,237.8 725.0,238.3 732.0,238.6 739.0,238.9 746.0,239.2" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-dasharray="4 3" />
+
+  <!-- Tanh derivative curve -->
+  <polyline points="466.0,240.0 473.0,240.0 480.0,239.9 487.0,239.9 494.0,239.8 501.0,239.7 508.0,239.5 515.0,239.3 522.0,238.8 529.0,238.0 536.0,236.7 543.0,234.6 550.0,231.2 557.0,225.8 564.0,217.4 571.0,204.9 578.0,187.5 585.0,165.4 592.0,141.7 599.0,122.5 606.0,115.0 613.0,122.5 620.0,141.7 627.0,165.4 634.0,187.5 641.0,204.9 648.0,217.4 655.0,225.8 662.0,231.2 669.0,234.6 676.0,236.7 683.0,238.0 690.0,238.8 697.0,239.3 704.0,239.5 711.0,239.7 718.0,239.8 725.0,239.9 732.0,239.9 739.0,240.0 746.0,240.0" fill="none" stroke="#0d9488" stroke-width="2.8" />
+
+  <!-- Peak dot & tail dot -->
+  <circle cx="606" cy="115" r="4.5" fill="#0d9488" stroke="#ffffff" stroke-width="1.5" />
+  <text x="606" y="106" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#0f766e">peak = 1.000 at z = 0</text>
+
+  <circle cx="690" cy="238.8" r="4" fill="#dc2626" stroke="#ffffff" stroke-width="1.5" />
+  <text x="712" y="198" text-anchor="middle" font-family="ui-monospace, monospace" font-size="9.5" font-weight="700" fill="#b91c1c">z=3: 0.0099</text>
+  <line x1="704" y1="204" x2="692" y2="233" stroke="#dc2626" stroke-width="1" stroke-dasharray="2 2" />
+
+  <!-- Legend row below X ticks -->
+  <line x1="454" y1="274" x2="472" y2="274" stroke="#0d9488" stroke-width="2.8" />
+  <text x="476" y="278" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#0f766e">tanh' (peak 1.0)</text>
+  <line x1="600" y1="274" x2="618" y2="274" stroke="#94a3b8" stroke-width="1.8" stroke-dasharray="4 3" />
+  <text x="622" y="278" font-family="ui-monospace, monospace" font-size="10" font-weight="600" fill="#64748b">sigmoid' (peak 0.25)</text>
+
+  <!-- Footer -->
+  <text x="400" y="315" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#334155">Zero-centered outputs help optimization, yet saturating past |z| = 3 still starves deep layers.</text>
+</svg>

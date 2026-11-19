@@ -49,10 +49,11 @@ Reading paths (`readingPaths` in `site.ts`) are different: curated cross-topic r
 
 ## Cover images
 
+- **Aesthetic standard (PREMIUM EDITORIAL DESIGN):** Every generated thumbnail and cover image must follow a **PREMIUM EDITORIAL DESIGN** aesthetic with a unique visual identity. Use creative, topic-relevant compositions with varied backgrounds, environments, lighting, color palettes, and visual arrangements across articles rather than repeating templates, generic AI clichés, or visual clutter.
 - Save to `public/articles/<slug>.png` (SVG is allowed; existing covers are about 1.6 MB PNGs).
 - Served through Next/Image, which delivers resized WebP/AVIF. The source size only affects the repo.
-- Cropped with `object-cover`, anchored at the centre: a wide band in the hero, a small 4:3 crop on cards. Keep the subject centred and leave margin at the edges.
-- No text in the image. The title is rendered beside it.
+- Cropped with `object-cover`, anchored at the centre: a wide band in the hero, a small 4:3 crop on cards. Keep the main subject prominent, visually balanced, and within the **central 60% safe zone** with generous side margins so both hero and card crops stay clean.
+- Prefer **minimal or no text** in the artwork (never duplicate the article title inside the image, as the title is rendered beside it). Every cover should read like a professionally art-directed editorial cover.
 - The social share card is separate and automatic (`/articles/<slug>/card.png`, 1200×630). You do not make it.
 
 ## SEO, generated for you

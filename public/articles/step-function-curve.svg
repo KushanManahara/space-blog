@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 320" width="800" height="320" role="img" aria-label="Plot of the perceptron step activation function outputting 1 when z is at least 0 and 0 when z is below 0. A flat horizontal ray lies along y = 0 for negative z ending at an open circle at (0, 0), jumps vertically at z = 0 to a filled dot at (0, 1), and continues flat along y = 1 through the support-ticket example z = +4.4.">
+  <title>The perceptron step function thresholds weighted evidence z at zero</title>
+
+  <rect x="0.5" y="0.5" width="799" height="319" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+
+  <!-- Header -->
+  <text x="400" y="28" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#0f172a">The perceptron step activation: binary threshold at z = 0</text>
+  <text x="400" y="47" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#475569">Flat on both sides (slope = 0) with a single discontinuous jump from 0 to 1 at the origin</text>
+
+  <!-- Plot box -->
+  <rect x="44" y="68" width="436" height="202" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+
+  <!-- Horizontal guide lines -->
+  <line x1="60" y1="225" x2="462" y2="225" stroke="#94a3b8" stroke-width="1.2" />
+  <line x1="60" y1="110" x2="462" y2="110" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 4" />
+  <!-- Vertical axis z = 0 -->
+  <line x1="238" y1="78" x2="238" y2="255" stroke="#94a3b8" stroke-width="1.2" />
+
+  <!-- Axis ticks and labels -->
+  <text x="54" y="229" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#475569">0</text>
+  <text x="54" y="114" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#475569">1</text>
+  <text x="238" y="266" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#475569">z = 0</text>
+  <text x="104" y="242" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10.5" fill="#64748b">-3</text>
+  <text x="327" y="242" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10.5" fill="#64748b">+2</text>
+  <text x="416" y="242" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10.5" fill="#64748b">+4</text>
+  <text x="462" y="216" text-anchor="end" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#64748b">score z</text>
+
+  <!-- Step discontinuity connector -->
+  <line x1="238" y1="116" x2="238" y2="219" stroke="#0284c7" stroke-width="1.5" stroke-dasharray="4 3" />
+
+  <!-- Left ray: y = 0 for z < 0 -->
+  <line x1="66" y1="225" x2="232" y2="225" stroke="#d97706" stroke-width="3.5" stroke-linecap="round" />
+  <circle cx="238" cy="225" r="5" fill="#ffffff" stroke="#d97706" stroke-width="2.5" />
+  <text x="148" y="210" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="700" fill="#b45309">z &lt; 0 → output 0</text>
+  <text x="148" y="256" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10.5" fill="#9a3412">slope = 0</text>
+
+  <!-- Right ray: y = 1 for z >= 0 -->
+  <line x1="238" y1="110" x2="458" y2="110" stroke="#0284c7" stroke-width="3.5" stroke-linecap="round" />
+  <circle cx="238" cy="110" r="5.5" fill="#0284c7" />
+  <text x="328" y="95" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="700" fill="#0369a1">z ≥ 0 → output 1</text>
+  <text x="328" y="130" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10.5" fill="#0369a1">slope = 0</text>
+
+  <!-- Support ticket z = +4.4 point -->
+  <line x1="433" y1="110" x2="433" y2="225" stroke="#059669" stroke-width="1.2" stroke-dasharray="3 3" />
+  <circle cx="433" cy="110" r="6" fill="#10b981" stroke="#ffffff" stroke-width="2" />
+  <rect x="312" y="148" width="114" height="36" rx="6" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1" />
+  <text x="369" y="164" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="700" fill="#065f46">Ticket z = +4.4</text>
+  <text x="369" y="177" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10" fill="#047857">fires → 1 (urgent)</text>
+
+  <!-- Right insight cards -->
+  <rect x="502" y="68" width="268" height="92" rx="8" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.2" />
+  <text x="516" y="90" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="700" fill="#1e3a8a">Why it works as a switch</text>
+  <text x="516" y="110" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#334155">Every weighted sum clears zero or stays</text>
+  <text x="516" y="126" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#334155">below it, snapping z cleanly into a yes</text>
+  <text x="516" y="142" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#334155">(1) or no (0) binary label.</text>
+
+  <rect x="502" y="176" width="268" height="94" rx="8" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.2" />
+  <text x="516" y="198" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="700" fill="#9a3412">Why modern networks swap it</text>
+  <text x="516" y="218" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#334155">Away from z = 0 the curve is completely</text>
+  <text x="516" y="234" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#334155">flat (slope = 0), so tiny weight nudges</text>
+  <text x="516" y="250" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#334155">give zero gradient feedback for learning.</text>
+
+  <!-- Footer -->
+  <text x="400" y="298" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#475569">Open circle at (0, 0) means strictly z &lt; 0 outputs 0, while filled dot at (0, 1) means z ≥ 0 outputs 1.</text>
+</svg>

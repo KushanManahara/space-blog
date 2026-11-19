@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 365" width="800" height="365" role="img" aria-label="Diagram of nn.Linear(20, 64) matrix multiplication. Weight matrix W has 64 rows and 20 columns, multiplying input column vector x of length 20 and adding bias vector b of length 64 to produce output vector y of length 64.">
+  <title>Why nn.Linear(20, 64) stores a 64 by 20 weight matrix</title>
+
+  <!-- Self-contained light card surface for consistent legibility in light and dark themes -->
+  <rect x="0.5" y="0.5" width="799" height="364" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+
+  <!-- Header -->
+  <text x="400" y="30" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15.5" font-weight="700" fill="#0f172a">Why nn.Linear(20, 64) stores W with shape (64, 20)</text>
+  <text x="400" y="50" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#475569">Proportional dimensions show why inner sizes match: (64 × 20) (20 × 1) + (64 × 1) = (64 × 1)</text>
+
+  <!-- Bracket annotation: inner 20s match -->
+  <path d="M 142 84 C 142 66, 220 66, 220 142" fill="none" stroke="#0284c7" stroke-width="1.5" stroke-dasharray="4 3" />
+  <circle cx="142" cy="84" r="2.5" fill="#0284c7" />
+  <circle cx="220" cy="142" r="2.5" fill="#0284c7" />
+  <rect x="190" y="72" width="114" height="20" rx="5" fill="#e0f2fe" stroke="#bae6fd" stroke-width="1" />
+  <text x="247" y="86" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#0369a1">inner 20s match</text>
+
+  <!-- Left label for W rows -->
+  <text x="98" y="196" text-anchor="end" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="700" fill="#334155">64 rows</text>
+  <text x="98" y="212" text-anchor="end" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#64748b">(outputs, d_out)</text>
+  <path d="M 105 110 L 105 288" stroke="#94a3b8" stroke-width="1.2" />
+  <path d="M 102 110 L 108 110 M 102 288 L 108 288" stroke="#94a3b8" stroke-width="1.2" />
+
+  <!-- Top label for W columns -->
+  <text x="142" y="100" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#0369a1">20 cols (d_in)</text>
+
+  <!-- Matrix W (64 rows x 20 cols -> 56 x 178 proportional box) -->
+  <rect x="114" y="110" width="56" height="178" rx="3" fill="#eff6ff" stroke="#1d4ed8" stroke-width="1.75" />
+  <g stroke="#bfdbfe" stroke-width="0.7">
+    <line x1="128" y1="110" x2="128" y2="288" />
+    <line x1="142" y1="110" x2="142" y2="288" />
+    <line x1="156" y1="110" x2="156" y2="288" />
+    <line x1="114" y1="132" x2="170" y2="132" />
+    <line x1="114" y1="154" x2="170" y2="154" />
+    <line x1="114" y1="176" x2="170" y2="176" />
+    <line x1="114" y1="198" x2="170" y2="198" />
+    <line x1="114" y1="220" x2="170" y2="220" />
+    <line x1="114" y1="242" x2="170" y2="242" />
+    <line x1="114" y1="264" x2="170" y2="264" />
+  </g>
+  <rect x="114" y="110" width="56" height="10" rx="1.5" fill="#1d4ed8" />
+  <text x="142" y="308" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12" font-weight="700" fill="#1e3a8a">W (64, 20)</text>
+
+  <!-- Multiply symbol -->
+  <text x="190" y="205" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="700" fill="#475569">×</text>
+
+  <!-- Vector x (20 x 1 -> 20 x 56 proportional box centered on y=199) -->
+  <text x="220" y="160" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#0369a1">20</text>
+  <rect x="210" y="171" width="20" height="56" rx="3" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.75" />
+  <g stroke="#bae6fd" stroke-width="0.7">
+    <line x1="210" y1="185" x2="230" y2="185" />
+    <line x1="210" y1="199" x2="230" y2="199" />
+    <line x1="210" y1="213" x2="230" y2="213" />
+  </g>
+  <text x="220" y="246" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12" font-weight="700" fill="#0369a1">x (20, 1)</text>
+
+  <!-- Plus symbol -->
+  <text x="251" y="205" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="700" fill="#475569">+</text>
+
+  <!-- Vector b (64 x 1) -->
+  <text x="282" y="100" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#b45309">64</text>
+  <rect x="272" y="110" width="20" height="178" rx="3" fill="#fef3c7" stroke="#d97706" stroke-width="1.75" />
+  <g stroke="#fde68a" stroke-width="0.7">
+    <line x1="272" y1="132" x2="292" y2="132" />
+    <line x1="272" y1="154" x2="292" y2="154" />
+    <line x1="272" y1="176" x2="292" y2="176" />
+    <line x1="272" y1="198" x2="292" y2="198" />
+    <line x1="272" y1="220" x2="292" y2="220" />
+    <line x1="272" y1="242" x2="292" y2="242" />
+    <line x1="272" y1="264" x2="292" y2="264" />
+  </g>
+  <rect x="272" y="110" width="20" height="10" rx="1.5" fill="#d97706" />
+  <text x="282" y="308" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12" font-weight="700" fill="#92400e">b (64,)</text>
+
+  <!-- Equals symbol -->
+  <text x="319" y="205" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="700" fill="#475569">=</text>
+
+  <!-- Output vector y (64 x 1) -->
+  <text x="357" y="100" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#047857">64</text>
+  <rect x="347" y="110" width="20" height="178" rx="3" fill="#d1fae5" stroke="#059669" stroke-width="1.75" />
+  <g stroke="#a7f3d0" stroke-width="0.7">
+    <line x1="347" y1="132" x2="367" y2="132" />
+    <line x1="347" y1="154" x2="367" y2="154" />
+    <line x1="347" y1="176" x2="367" y2="176" />
+    <line x1="347" y1="198" x2="367" y2="198" />
+    <line x1="347" y1="220" x2="367" y2="220" />
+    <line x1="347" y1="242" x2="367" y2="242" />
+    <line x1="347" y1="264" x2="367" y2="264" />
+  </g>
+  <rect x="347" y="110" width="20" height="10" rx="1.5" fill="#059669" />
+  <text x="357" y="308" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12" font-weight="700" fill="#065f46">y (64, 1)</text>
+
+  <!-- Right explanation panel (plenty of horizontal room) -->
+  <rect x="404" y="100" width="360" height="202" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2" />
+
+  <rect x="422" y="118" width="10" height="10" rx="2" fill="#1d4ed8" />
+  <text x="440" y="127" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#0f172a">Row 0 computes 1 output neuron</text>
+  <text x="422" y="147" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#334155">Takes row 0 of W (20 weights), multiplies by all</text>
+  <text x="422" y="163" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#334155">20 values in x, adds bias b[0], and outputs y[0].</text>
+
+  <line x1="422" y1="180" x2="746" y2="180" stroke="#e2e8f0" stroke-width="1" />
+
+  <text x="422" y="202" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#0f172a">Rule for Linear(d_in, d_out)</text>
+  <text x="422" y="222" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11.5" fill="#1e293b">weight.shape == (d_out, d_in) # (64, 20)</text>
+  <text x="422" y="240" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11.5" fill="#1e293b">bias.shape   == (d_out,)      # (64,)</text>
+
+  <line x1="422" y1="256" x2="746" y2="256" stroke="#e2e8f0" stroke-width="1" />
+
+  <text x="422" y="278" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="700" fill="#0f172a">Parameters: 64 × 20 + 64 = 1,344</text>
+  <text x="422" y="293" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#64748b">1,280 weights in the grid + 64 biases in b</text>
+
+  <!-- Footer legend -->
+  <rect x="114" y="332" width="12" height="12" rx="2" fill="#1d4ed8" />
+  <text x="132" y="342" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#475569">Highlighted row (output neuron 0)</text>
+  <rect x="348" y="332" width="12" height="12" rx="2" fill="#d97706" />
+  <text x="366" y="342" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#475569">Bias offset per output</text>
+  <rect x="520" y="332" width="12" height="12" rx="2" fill="#059669" />
+  <text x="538" y="342" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#475569">Resulting output vector</text>
+</svg>

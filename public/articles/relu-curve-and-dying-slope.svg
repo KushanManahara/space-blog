@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 335" width="800" height="335" role="img" aria-label="Two-panel illustration of the ReLU activation function max(0, z), its step derivative, and the dying ReLU failure mode. Left panel shows flat zero output on negative inputs and an unbounded straight line with constant slope 1 on positive inputs. Right panel plots the derivative step from 0 to 1 and explains why weights stuck below zero receive zero gradients and cannot recover.">
+  <title>ReLU activation curve, constant positive derivative, and dying ReLU zone</title>
+
+  <rect x="0.5" y="0.5" width="799" height="334" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+
+  <!-- Header -->
+  <text x="400" y="28" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#0f172a">ReLU(z) = max(0, z): unbounded positive slope 1, flat zero on the left</text>
+  <text x="400" y="47" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#475569">Positive inputs never saturate at any height, while negative inputs drop cleanly to 0</text>
+
+  <line x1="408" y1="62" x2="408" y2="294" stroke="#e2e8f0" stroke-width="1" />
+
+  <!-- LEFT PANEL: px(z) = 196 + 38z ([-3..+4] -> 82..348), py(y) = 238 - 32y ([0..+4] -> 238..110) -->
+  <text x="206" y="75" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#0369a1">Function ReLU(z) = max(0, z)</text>
+  <rect x="24" y="86" width="366" height="202" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+
+  <!-- Subtle horizontal gridlines -->
+  <line x1="68" y1="206" x2="354" y2="206" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3 3" />
+  <line x1="68" y1="174" x2="354" y2="174" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3 3" />
+  <line x1="68" y1="142" x2="354" y2="142" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3 3" />
+  <line x1="68" y1="110" x2="354" y2="110" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3 3" />
+
+  <!-- Axes -->
+  <line x1="68" y1="238" x2="356" y2="238" stroke="#94a3b8" stroke-width="1.2" />
+  <line x1="196" y1="98" x2="196" y2="238" stroke="#94a3b8" stroke-width="1.2" />
+
+  <!-- Y ticks -->
+  <text x="58" y="242" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" fill="#475569">0</text>
+  <text x="58" y="210" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" fill="#475569">1</text>
+  <text x="58" y="178" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" fill="#475569">2</text>
+  <text x="58" y="146" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" fill="#475569">3</text>
+  <text x="58" y="114" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" fill="#475569">4</text>
+
+  <!-- X ticks -->
+  <text x="82" y="255" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">-3</text>
+  <text x="120" y="255" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">-2</text>
+  <text x="158" y="255" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">-1</text>
+  <text x="196" y="255" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#0f172a">0</text>
+  <text x="234" y="255" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">+1</text>
+  <text x="272" y="255" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">+2</text>
+  <text x="310" y="255" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">+3</text>
+  <text x="348" y="255" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">+4</text>
+
+  <!-- Negative zero line (z=-3..0) -->
+  <line x1="82" y1="238" x2="196" y2="238" stroke="#d97706" stroke-width="3.2" stroke-linecap="round" />
+  <text x="132" y="224" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="700" fill="#b45309">clamped to 0</text>
+
+  <!-- Positive 1:1 ramp (z=0..4 -> (196,238)..(348,110)) -->
+  <line x1="196" y1="238" x2="348" y2="110" stroke="#0284c7" stroke-width="3.2" stroke-linecap="round" />
+  <circle cx="196" cy="238" r="5" fill="#0284c7" stroke="#ffffff" stroke-width="1.8" />
+  <circle cx="234" cy="206" r="3.5" fill="#0284c7" />
+  <circle cx="272" cy="174" r="3.5" fill="#0284c7" />
+  <circle cx="310" cy="142" r="3.5" fill="#0284c7" />
+  <circle cx="348" cy="110" r="3.5" fill="#0284c7" />
+
+  <text x="206" y="122" text-anchor="start" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#0369a1">y = z (slope 1)</text>
+  <text x="206" y="135" text-anchor="start" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" fill="#0369a1">stays 1 even at z = 100</text>
+
+  <text x="206" y="276" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#475569">One max(0, z) comparison (no exponentials needed)</text>
+
+  <!-- RIGHT PANEL: Derivative ReLU'(z) + Dying ReLU explanation -->
+  <text x="600" y="75" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#0f172a">Derivative ReLU'(z) &amp; dying ReLU</text>
+  <rect x="424" y="86" width="352" height="202" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+
+  <!-- Top sub-plot: z in [-3, +4] -> px = 580 + 34z (478..716), y=0 at 166, y=1 at 118 -->
+  <line x1="468" y1="166" x2="736" y2="166" stroke="#94a3b8" stroke-width="1.2" />
+  <line x1="580" y1="102" x2="580" y2="178" stroke="#94a3b8" stroke-width="1.2" />
+  <text x="462" y="170" text-anchor="end" font-family="ui-monospace, monospace" font-size="9.5" fill="#475569">0</text>
+  <text x="462" y="122" text-anchor="end" font-family="ui-monospace, monospace" font-size="9.5" fill="#0369a1">1</text>
+
+  <!-- Step segments -->
+  <line x1="478" y1="166" x2="580" y2="166" stroke="#dc2626" stroke-width="3" stroke-linecap="round" />
+  <circle cx="580" cy="166" r="4" fill="#dc2626" stroke="#ffffff" stroke-width="1.5" />
+  <line x1="580" y1="118" x2="722" y2="118" stroke="#059669" stroke-width="3" stroke-linecap="round" />
+  <circle cx="580" cy="118" r="4" fill="#ffffff" stroke="#059669" stroke-width="2" />
+
+  <text x="570" y="152" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#b91c1c">slope = 0 (blocked)</text>
+  <text x="590" y="109" text-anchor="start" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#047857">slope = 1 (100% passes)</text>
+  <text x="580" y="189" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" fill="#475569">z = 0 corner: PyTorch sets gradient = 0.0</text>
+
+  <!-- Bottom warning box: Dying ReLU -->
+  <rect x="438" y="200" width="324" height="78" rx="6" fill="#fef2f2" stroke="#fecaca" stroke-width="1" />
+  <text x="450" y="218" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#991b1b">Why a "dying ReLU" stays stuck</text>
+  <text x="450" y="236" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#7f1d1d">1. Big step pushes weights so w^T x + b &lt; 0 on all inputs</text>
+  <text x="450" y="252" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#7f1d1d">2. ReLU'(z) = 0 multiplies backward gradient to 0.0</text>
+  <text x="450" y="268" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#7f1d1d">3. With zero update, that unit never crosses back above zero</text>
+
+  <!-- Footer -->
+  <text x="400" y="315" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#334155">Active units form an unattenuated 1.0 highway across depth, at the cost of silencing permanently negative units.</text>
+</svg>

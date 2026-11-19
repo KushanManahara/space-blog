@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 335" width="800" height="335" role="img" aria-label="Two-panel plot showing the logistic sigmoid activation function and its derivative slope from z equals -6 to +6. Left panel shows the S-curve bounded between 0 and 1 passing through (0, 0.5), (-5, 0.0067), and (+5, 0.9933) with shaded saturation tails beyond plus or minus 3. Right panel shows the derivative bell curve peaking at 0.25 at z equals 0 and collapsing below 0.007 in both shaded tails.">
+  <title>Logistic sigmoid curve and its derivative slope</title>
+
+  <rect x="0.5" y="0.5" width="799" height="334" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+
+  <!-- Header -->
+  <text x="400" y="28" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#0f172a">Logistic sigmoid: smooth S-curve in (0, 1) with derivative ceiling 0.25</text>
+  <text x="400" y="47" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#475569">Outputs squash cleanly inside (0, 1), while both shaded tails flatten into near-zero slope</text>
+
+  <line x1="400" y1="62" x2="400" y2="294" stroke="#e2e8f0" stroke-width="1" />
+
+  <!-- LEFT PANEL: px(z) = 206 + 25z ([-6..+6] -> 56..356), py(y) = 240 - 130y ([0..1] -> 240..110) -->
+  <text x="206" y="75" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#1e3a8a">Output σ(z) = 1 / (1 + e⁻ᶻ)</text>
+  <rect x="24" y="86" width="356" height="202" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+
+  <!-- Saturated tail zones |z| >= 3 (56..131 and 281..356) -->
+  <rect x="56" y="102" width="75" height="138" fill="#fef3c7" fill-opacity="0.55" />
+  <rect x="281" y="102" width="75" height="138" fill="#fef3c7" fill-opacity="0.55" />
+
+  <!-- Horizontal guides: y=1 (110), y=0.5 (175), y=0 (240) -->
+  <line x1="56" y1="110" x2="360" y2="110" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3" />
+  <line x1="56" y1="175" x2="360" y2="175" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3 3" />
+  <line x1="56" y1="240" x2="360" y2="240" stroke="#94a3b8" stroke-width="1.2" />
+  <line x1="206" y1="98" x2="206" y2="240" stroke="#94a3b8" stroke-width="1.2" />
+
+  <text x="48" y="244" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" fill="#475569">0</text>
+  <text x="48" y="179" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" fill="#475569">0.5</text>
+  <text x="48" y="114" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" fill="#475569">1</text>
+
+  <text x="81" y="256" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">-5</text>
+  <text x="131" y="256" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">-3</text>
+  <text x="206" y="256" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#0f172a">0</text>
+  <text x="281" y="256" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">+3</text>
+  <text x="331" y="256" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">+5</text>
+
+  <!-- Sigmoid curve -->
+  <polyline points="56.0,239.7 62.2,239.6 68.5,239.5 74.8,239.3 81.0,239.1 87.2,238.9 93.5,238.6 99.8,238.2 106.0,237.7 112.2,237.0 118.5,236.2 124.8,235.1 131.0,233.8 137.2,232.2 143.5,230.1 149.8,227.6 156.0,224.5 162.2,220.8 168.5,216.3 174.8,211.0 181.0,205.0 187.2,198.3 193.5,190.9 199.8,183.1 206.0,175.0 212.2,166.9 218.5,159.1 224.8,151.7 231.0,145.0 237.2,139.0 243.5,133.7 249.8,129.2 256.0,125.5 262.2,122.4 268.5,119.9 274.8,117.8 281.0,116.2 287.2,114.9 293.5,113.8 299.8,113.0 306.0,112.3 312.2,111.8 318.5,111.4 324.8,111.1 331.0,110.9 337.2,110.7 343.5,110.5 349.8,110.4 356.0,110.3" fill="none" stroke="#0284c7" stroke-width="2.8" />
+
+  <!-- Tangent segment at z=0: slope = 0.25 -> dy/dz * (-130/25) = -1.3 px/px -> dx=+-30 => dy=-+39 -->
+  <line x1="176" y1="214" x2="236" y2="136" stroke="#059669" stroke-width="1.8" stroke-dasharray="4 2" />
+
+  <!-- Key points & non-overlapping labels -->
+  <circle cx="81" cy="239.1" r="4" fill="#d97706" stroke="#ffffff" stroke-width="1.5" />
+  <text x="93" y="198" text-anchor="middle" font-family="ui-monospace, monospace" font-size="9.5" font-weight="700" fill="#b45309">(-5, 0.007)</text>
+  <line x1="87" y1="204" x2="82" y2="233" stroke="#d97706" stroke-width="1" stroke-dasharray="2 2" />
+
+  <circle cx="206" cy="175" r="4.5" fill="#059669" stroke="#ffffff" stroke-width="1.5" />
+  <text x="220" y="191" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#047857">(0, 0.50)</text>
+
+  <circle cx="331" cy="110.9" r="4" fill="#d97706" stroke="#ffffff" stroke-width="1.5" />
+  <text x="319" y="152" text-anchor="middle" font-family="ui-monospace, monospace" font-size="9.5" font-weight="700" fill="#b45309">(+5, 0.993)</text>
+  <line x1="325" y1="141" x2="330" y2="117" stroke="#d97706" stroke-width="1" stroke-dasharray="2 2" />
+
+  <text x="93" y="122" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" font-weight="600" fill="#9a3412">saturated tail</text>
+  <text x="319" y="228" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" font-weight="600" fill="#9a3412">saturated tail</text>
+  <text x="206" y="275" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#475569">All outputs stay strictly inside (0, 1), never negative</text>
+
+  <!-- RIGHT PANEL: px(z) = 606 + 25z (456..756), py(s) = 240 - 460s (0..0.25 -> 240..125) -->
+  <text x="606" y="75" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#b45309">Derivative σ'(z) = σ(z)(1 − σ(z))</text>
+  <rect x="420" y="86" width="356" height="202" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+
+  <rect x="456" y="102" width="75" height="138" fill="#fef3c7" fill-opacity="0.55" />
+  <rect x="681" y="102" width="75" height="138" fill="#fef3c7" fill-opacity="0.55" />
+
+  <!-- Axes & 0.25 ceiling (125), 0.125 mid (182.5) -->
+  <line x1="456" y1="125" x2="760" y2="125" stroke="#059669" stroke-width="1" stroke-dasharray="4 3" />
+  <line x1="456" y1="182.5" x2="760" y2="182.5" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3 3" />
+  <line x1="456" y1="240" x2="760" y2="240" stroke="#94a3b8" stroke-width="1.2" />
+  <line x1="606" y1="125" x2="606" y2="240" stroke="#94a3b8" stroke-width="1.2" />
+
+  <text x="450" y="244" text-anchor="end" font-family="ui-monospace, monospace" font-size="9.5" fill="#475569">0</text>
+  <text x="450" y="186" text-anchor="end" font-family="ui-monospace, monospace" font-size="9.5" fill="#475569">.125</text>
+  <text x="450" y="129" text-anchor="end" font-family="ui-monospace, monospace" font-size="9.5" font-weight="700" fill="#047857">.25</text>
+
+  <text x="481" y="256" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">-5</text>
+  <text x="531" y="256" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">-3</text>
+  <text x="606" y="256" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#0f172a">0</text>
+  <text x="681" y="256" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">+3</text>
+  <text x="731" y="256" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">+5</text>
+
+  <!-- Derivative curve -->
+  <polyline points="456.0,238.9 462.2,238.5 468.5,238.1 474.8,237.6 481.0,236.9 487.2,236.1 493.5,235.0 499.8,233.6 506.0,231.9 512.2,229.7 518.5,226.9 524.8,223.5 531.0,219.2 537.2,214.0 543.5,207.8 549.8,200.3 556.0,191.7 562.2,182.0 568.5,171.4 574.8,160.4 581.0,149.6 587.2,139.8 593.5,131.9 599.8,126.8 606.0,125.0 612.2,126.8 618.5,131.9 624.8,139.8 631.0,149.6 637.2,160.4 643.5,171.4 649.8,182.0 656.0,191.7 662.2,200.3 668.5,207.8 674.8,214.0 681.0,219.2 687.2,223.5 693.5,226.9 699.8,229.7 706.0,231.9 712.2,233.6 718.5,235.0 724.8,236.1 731.0,236.9 737.2,237.6 743.5,238.1 749.8,238.5 756.0,238.9" fill="none" stroke="#d97706" stroke-width="2.8" />
+
+  <!-- Peak dot & label above ceiling -->
+  <circle cx="606" cy="125" r="4.5" fill="#059669" stroke="#ffffff" stroke-width="1.5" />
+  <text x="606" y="114" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#047857">max peak = 0.25 at z = 0</text>
+
+  <!-- Tail dot (+5, 0.00665) -->
+  <circle cx="731" cy="236.9" r="4" fill="#dc2626" stroke="#ffffff" stroke-width="1.5" />
+  <text x="717" y="198" text-anchor="middle" font-family="ui-monospace, monospace" font-size="9.5" font-weight="700" fill="#b91c1c">0.00665</text>
+  <line x1="726" y1="204" x2="730" y2="231" stroke="#dc2626" stroke-width="1" stroke-dasharray="2 2" />
+
+  <text x="606" y="275" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#475569">Even peak slope shrinks signal by 4× per layer; tails choke it</text>
+
+  <!-- Footer -->
+  <text x="400" y="315" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#334155">Great for turning one output logit into a (0, 1) probability, yet saturates rapidly inside deep stacks.</text>
+</svg>

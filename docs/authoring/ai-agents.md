@@ -13,18 +13,20 @@ When this documentation and the code disagree, the code wins. Check these before
 | Which fields render Markdown                         | `src/components/article/markdown.ts` and where `markdownToHtml` is called |
 | Topics and series                                    | `src/lib/content/site.ts`                                                 |
 | Existing articles to match in tone and component use | top of `src/lib/content/posts.ts`                                         |
+| `Deep Learning` series memory & continuity           | [deep-learning-series-memory.md](deep-learning-series-memory.md)          |
 
 ## Task recipe: write a new article
 
-1. Read the source material completely. Note which claims come from the source and which you will derive.
+1. Read the source material completely. Note which claims come from the source and which you will derive. If writing a part in an ongoing series (such as `Deep Learning`), read its series memory doc first so explanations, notation, and running examples stay continuous.
 2. Read two or three recent articles in `posts.ts` to match voice, structure and component use.
 3. Choose `topic` from the descriptions in `site.ts`. If nothing fits, ask the owner. Do not create a topic on your own.
 4. Create a branch from `main`.
-5. Insert the post as the first element of the array in `posts.ts`. Use [components.md](components.md) for every block's fields.
+5. Insert the post as the first element of the array in `posts.ts`. Use [components.md](components.md) for every block's fields. Build every explanation from first principles with no unexplained jargon, black boxes, or skipped derivation steps, and place relevant curves, diagrams, or illustrations right alongside each concept when it is first introduced rather than waiting for later comparison sections. When generating a cover thumbnail, follow the **PREMIUM EDITORIAL DESIGN** standard in [publishing.md](publishing.md#cover-images) (varied topic-relevant composition, palette, lighting, and environment; prominent subject inside the central `60%` safe zone with generous side margins; avoid clutter, generic AI clichés, and repetitive layouts; minimal or no embedded text).
 6. Run `pnpm format`, `pnpm lint`, `pnpm typecheck`, `pnpm embeddings`, `pnpm build`.
 7. Start `pnpm dev`, open `/articles/<slug>`, and confirm each visual renders. Scroll diagrams and charts into a visible viewport first, they render lazily.
-8. Commit the post, any assets and `public/embeddings.json`. Open a PR. Do not merge or deploy unless asked.
-9. Report what you verified and what you could not.
+8. If adding or advancing a series, update the series memory doc (`deep-learning-series-memory.md` or equivalent) so future articles retain established context.
+9. Commit the post, any assets, updated docs/memory, and `public/embeddings.json`. Open a PR. Do not merge or deploy unless asked.
+10. Report what you verified and what you could not.
 
 ## Hard rules
 

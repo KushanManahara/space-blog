@@ -117,6 +117,10 @@ const seriesBlurbs: Record<string, { title: string; dek: string }> = {
     title: "PyTorch",
     dek: "Building the framework up from its one real primitive — the tensor — through autograd and the training loop.",
   },
+  "deep-learning": {
+    title: "Deep Learning",
+    dek: "First-principles deep learning: from a single neuron and the XOR barrier to parameter counts, FLOPs, activation functions, Softmax, and the losses that train neural networks.",
+  },
 };
 
 /**

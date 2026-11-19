@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 320" width="800" height="320" role="img" aria-label="Plot of the ELU activation curve with alpha = 1.0 compared against a dashed ReLU reference from x = -3.5 to +2.5. Positive values match y = x cleanly through the origin (0, 0) where slope is 1 on both sides. Negative values glide smoothly toward the asymptote y = -1.0, passing through (-1, -0.632) with slope 0.368.">
+  <title>ELU smooths the negative half toward -alpha while matching ReLU on positive inputs</title>
+
+  <rect x="0.5" y="0.5" width="799" height="319" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+
+  <!-- Header -->
+  <text x="400" y="28" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#0f172a">The ELU curve (alpha = 1.0): smooth bend into a -alpha floor</text>
+  <text x="400" y="47" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#475569">Negative inputs drop gently along alpha * (e^x - 1) instead of snapping flat to zero</text>
+
+  <!-- Plot box -->
+  <rect x="44" y="68" width="432" height="202" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+
+  <!-- Subtle horizontal grid: y=+2 -> 111.3, y=+1 -> 153.4, y=0 -> 195.5, y=-1 -> 237.6 -->
+  <line x1="68" y1="153.4" x2="454" y2="153.4" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3 3" />
+  <line x1="68" y1="237.6" x2="454" y2="237.6" stroke="#d97706" stroke-width="1.4" stroke-dasharray="5 4" />
+  <text x="446" y="251" text-anchor="end" font-family="ui-monospace, monospace" font-size="10.5" font-weight="700" fill="#b45309">asymptote y = -alpha (-1.0)</text>
+
+  <!-- Axes: x=0 at 286, y=0 at 195.5 -->
+  <line x1="68" y1="195.5" x2="458" y2="195.5" stroke="#94a3b8" stroke-width="1.2" />
+  <line x1="286" y1="78" x2="286" y2="255" stroke="#94a3b8" stroke-width="1.2" />
+
+  <!-- Ticks -->
+  <text x="62" y="157" text-anchor="end" font-family="ui-monospace, monospace" font-size="10.5" fill="#475569">+1</text>
+  <text x="62" y="199" text-anchor="end" font-family="ui-monospace, monospace" font-size="10.5" fill="#475569">0</text>
+  <text x="62" y="241" text-anchor="end" font-family="ui-monospace, monospace" font-size="10.5" fill="#b45309">-1</text>
+
+  <text x="166" y="187" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">-2</text>
+  <text x="226" y="187" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#0f172a">-1</text>
+  <text x="278" y="187" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#0f172a">0</text>
+  <text x="346" y="210" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#0f172a">+1</text>
+  <text x="406" y="210" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">+2</text>
+
+  <!-- Dashed ReLU reference -->
+  <polyline points="76.0,195.5 91.0,195.5 106.0,195.5 121.0,195.5 136.0,195.5 151.0,195.5 166.0,195.5 181.0,195.5 196.0,195.5 211.0,195.5 226.0,195.5 241.0,195.5 256.0,195.5 271.0,195.5 286.0,195.5 301.0,185.0 316.0,174.4 331.0,163.9 346.0,153.4 361.0,142.9 376.0,132.3 391.0,121.8 406.0,111.3 421.0,100.8 436.0,90.2" fill="none" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4 4" />
+  <text x="135" y="177" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#64748b">ReLU (dashed)</text>
+
+  <!-- ELU exact curve -->
+  <polyline points="76.0,236.3 91.0,236.0 106.0,235.5 121.0,234.9 136.0,234.1 151.0,233.2 166.0,231.9 181.0,230.3 196.0,228.2 211.0,225.5 226.0,222.1 241.0,217.7 256.0,212.1 271.0,204.8 286.0,195.5 301.0,185.0 316.0,174.4 331.0,163.9 346.0,153.4 361.0,142.9 376.0,132.3 391.0,121.8 406.0,111.3 421.0,100.8 436.0,90.2" fill="none" stroke="#0284c7" stroke-width="3.2" stroke-linecap="round" />
+
+  <!-- Key checkpoints -->
+  <circle cx="226" cy="222.1" r="5" fill="#0284c7" stroke="#ffffff" stroke-width="1.8" />
+  <text x="200" y="213" text-anchor="end" font-family="ui-monospace, monospace" font-size="10.5" font-weight="700" fill="#0369a1">(-1, -0.632)</text>
+
+  <circle cx="286" cy="195.5" r="4.5" fill="#059669" stroke="#ffffff" stroke-width="1.5" />
+  <circle cx="346" cy="153.4" r="5" fill="#0284c7" stroke="#ffffff" stroke-width="1.8" />
+  <text x="362" y="152" text-anchor="start" font-family="ui-monospace, monospace" font-size="10.5" font-weight="700" fill="#0369a1">(+1, 1.000)</text>
+
+  <!-- Right insight cards -->
+  <rect x="498" y="68" width="272" height="94" rx="8" fill="#ecfdf5" stroke="#86efac" stroke-width="1.2" />
+  <text x="512" y="90" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="700" fill="#065f46">No corner at (0, 0)</text>
+  <text x="512" y="110" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#334155">When alpha = 1.0, both branches meet at</text>
+  <text x="512" y="126" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#334155">value 0 with matching slope 1.0, leaving</text>
+  <text x="512" y="142" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#334155">mildly negative units active (-0.632 at -1).</text>
+
+  <rect x="498" y="176" width="272" height="94" rx="8" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.2" />
+  <text x="512" y="198" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="700" fill="#9a3412">Still saturates far left</text>
+  <text x="512" y="218" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#334155">Far below zero, the curve flattens into</text>
+  <text x="512" y="234" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#334155">y = -alpha and slope alpha * e^x fades</text>
+  <text x="512" y="250" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#334155">toward 0 (only 0.0067 by x = -5).</text>
+
+  <!-- Footer -->
+  <text x="400" y="298" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#475569">Slope checkpoints: ELU'(+1) = 1.000, ELU'(0) = 1.000, ELU'(-1) = 0.368.</text>
+</svg>

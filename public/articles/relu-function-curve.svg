@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 320" width="800" height="320" role="img" aria-label="Plot of the ReLU activation function y = max(0, z). For z at or below 0, a flat horizontal line lies along y = 0 with slope 0. At the origin (0, 0), the curve bends sharply and climbs linearly with slope 1 through (1, 1), (2, 2), and (3, 3).">
+  <title>The ReLU activation function: ReLU(z) = max(0, z)</title>
+
+  <rect x="0.5" y="0.5" width="799" height="319" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+
+  <!-- Header -->
+  <text x="400" y="28" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#0f172a">The ReLU activation function: ReLU(z) = max(0, z)</text>
+  <text x="400" y="47" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#475569">Flat zero on the negative side (slope = 0), sharp hinge at z = 0, linear 1:1 ramp for positive z (slope = 1)</text>
+
+  <!-- Plot card: z in [-3, +3], y in [0, +3] -->
+  <!-- px(z) = 262 + z * 62 => z=-3: 76, z=0: 262, z=1: 324, z=2: 386, z=3: 448 -->
+  <!-- py(y) = 232 - y * 46 => y=0: 232, y=1: 186, y=2: 140, y=3: 94 -->
+  <rect x="44" y="68" width="436" height="202" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+
+  <!-- Subtle horizontal dashed grid lines -->
+  <line x1="70" y1="186" x2="454" y2="186" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 4" />
+  <line x1="70" y1="140" x2="454" y2="140" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 4" />
+  <line x1="70" y1="94" x2="454" y2="94" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 4" />
+
+  <!-- Axes -->
+  <line x1="70" y1="232" x2="458" y2="232" stroke="#94a3b8" stroke-width="1.2" />
+  <line x1="262" y1="80" x2="262" y2="250" stroke="#94a3b8" stroke-width="1.2" />
+
+  <!-- Axis ticks -->
+  <text x="58" y="236" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10.5" fill="#475569">0</text>
+  <text x="58" y="190" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10.5" fill="#475569">1</text>
+  <text x="58" y="144" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10.5" fill="#475569">2</text>
+  <text x="58" y="98" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10.5" fill="#475569">3</text>
+
+  <text x="138" y="249" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10.5" fill="#64748b">-2</text>
+  <text x="200" y="249" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10.5" fill="#64748b">-1</text>
+  <text x="262" y="251" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10.5" font-weight="700" fill="#0f172a">0</text>
+  <text x="324" y="249" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10.5" fill="#64748b">+1</text>
+  <text x="386" y="249" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10.5" fill="#64748b">+2</text>
+  <text x="448" y="249" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10.5" fill="#64748b">+3</text>
+  <text x="466" y="225" text-anchor="end" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#64748b">z</text>
+
+  <!-- ReLU negative half: y = 0 for z <= 0 -->
+  <line x1="76" y1="232" x2="262" y2="232" stroke="#d97706" stroke-width="3.5" stroke-linecap="round" />
+  <text x="169" y="216" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="700" fill="#b45309">z ≤ 0 → clamped to 0</text>
+  <text x="169" y="261" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10.5" fill="#9a3412">slope = 0</text>
+
+  <!-- ReLU positive half: dead-straight ramp y = z for z >= 0 -->
+  <line x1="262" y1="232" x2="448" y2="94" stroke="#0284c7" stroke-width="3.5" stroke-linecap="round" />
+
+  <!-- Corner hinge dot at (0, 0) -->
+  <circle cx="262" cy="232" r="5.5" fill="#0284c7" stroke="#ffffff" stroke-width="2" />
+  <text x="252" y="200" text-anchor="end" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="700" fill="#0f172a">sharp bend</text>
+
+  <!-- Point highlights on positive ramp -->
+  <circle cx="324" cy="186" r="4" fill="#0284c7" />
+  <circle cx="386" cy="140" r="4" fill="#0284c7" />
+  <text x="355" y="114" text-anchor="end" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="700" fill="#0369a1">z &gt; 0 → y = z</text>
+  <text x="355" y="129" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10.5" fill="#0369a1">constant slope = 1</text>
+
+  <!-- Right insight cards -->
+  <rect x="502" y="68" width="268" height="94" rx="8" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.2" />
+  <text x="516" y="90" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="700" fill="#1e3a8a">Breaks linearity at (0, 0)</text>
+  <text x="516" y="110" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#334155">Zeroing negative values while keeping</text>
+  <text x="516" y="126" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#334155">positive scores lets stacked layers fold</text>
+  <text x="516" y="142" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#334155">space into bent corners like XOR.</text>
+
+  <rect x="502" y="176" width="268" height="94" rx="8" fill="#ecfdf5" stroke="#86efac" stroke-width="1.2" />
+  <text x="516" y="198" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="700" fill="#065f46">Keeps gradient slope = 1</text>
+  <text x="516" y="218" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#334155">Unlike the binary step function (slope 0</text>
+  <text x="516" y="234" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#334155">everywhere), any active unit (z &gt; 0)</text>
+  <text x="516" y="250" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" fill="#334155">passes training signals cleanly backward.</text>
+
+  <!-- Footer -->
+  <text x="400" y="298" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#475569">Test points: ReLU(-2) = 0, ReLU(0) = 0, ReLU(+1) = 1, ReLU(+2) = 2.</text>
+</svg>

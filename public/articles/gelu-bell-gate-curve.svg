@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 335" width="800" height="335" role="img" aria-label="Two-panel illustration of GELU. Left panel shows the standard normal bell curve with shaded cumulative area Phi(+1) = 0.841 to the left of +1, and left tail Phi(-1) = 0.159. Right panel plots GELU(x) = x * Phi(x) across [-3, 3] next to dashed ReLU, highlighting the slight negative dip to -0.170 around x = -0.75, (-1, -0.159), (0, 0), and (+1, 0.841).">
+  <title>Why GELU weights x by a standard normal bell-curve probability gate</title>
+
+  <rect x="0.5" y="0.5" width="799" height="334" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+
+  <!-- Header -->
+  <text x="400" y="28" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#0f172a">How GELU gates x using the standard normal bell curve Φ(x)</text>
+  <text x="400" y="47" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#475569">GELU(x) = x · Φ(x) scales each input by the fraction of a standard bell curve lying at or below x</text>
+
+  <!-- Panel headers -->
+  <text x="200" y="72" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#1e3a8a">Step 1: Fraction below x on N(0, 1)</text>
+  <text x="600" y="72" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#047857">Step 2: GELU(x) = x · Φ(x) curve</text>
+
+  <line x1="400" y1="62" x2="400" y2="296" stroke="#e2e8f0" stroke-width="1" />
+
+  <!-- LEFT PANEL: Bell curve x in [-3, 3] -> px = 200 + 44x ([68..332]), y base = 236 -->
+  <rect x="44" y="84" width="312" height="202" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+  <polygon points="68.0,236.0 68.0,234.7 76.8,233.6 85.6,231.9 94.4,229.3 103.2,225.4 112.0,219.8 120.8,212.3 129.6,202.7 138.4,191.1 147.2,177.7 156.0,163.4 164.8,149.1 173.6,136.0 182.4,125.5 191.2,118.7 200.0,116.3 208.8,118.7 217.6,125.5 226.4,136.0 235.2,149.1 244.0,163.4 244.0,236.0" fill="#0284c7" fill-opacity="0.18" />
+  <polyline points="68.0,234.7 76.8,233.6 85.6,231.9 94.4,229.3 103.2,225.4 112.0,219.8 120.8,212.3 129.6,202.7 138.4,191.1 147.2,177.7 156.0,163.4 164.8,149.1 173.6,136.0 182.4,125.5 191.2,118.7 200.0,116.3 208.8,118.7 217.6,125.5 226.4,136.0 235.2,149.1 244.0,163.4 252.8,177.7 261.6,191.1 270.4,202.7 279.2,212.3 288.0,219.8 296.8,225.4 305.6,229.3 314.4,231.9 323.2,233.6 332.0,234.7" fill="none" stroke="#1d4ed8" stroke-width="2.5" />
+
+  <!-- Axes + markers for -1, 0, +1 -->
+  <line x1="60" y1="236" x2="340" y2="236" stroke="#94a3b8" stroke-width="1.2" />
+  <line x1="200" y1="108" x2="200" y2="236" stroke="#cbd5e1" stroke-width="1.1" stroke-dasharray="3 3" />
+  <line x1="156" y1="163" x2="156" y2="236" stroke="#d97706" stroke-width="1.4" stroke-dasharray="3 3" />
+  <line x1="244" y1="163" x2="244" y2="236" stroke="#0284c7" stroke-width="1.5" />
+
+  <text x="156" y="252" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10.5" font-weight="700" fill="#b45309">-1</text>
+  <text x="200" y="252" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10.5" fill="#475569">0</text>
+  <text x="244" y="252" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10.5" font-weight="700" fill="#0369a1">+1</text>
+
+  <text x="142" y="152" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#b45309">Φ(-1)=0.159</text>
+  <text x="296" y="138" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10.5" font-weight="700" fill="#0369a1">Φ(+1)=0.841</text>
+  <text x="200" y="274" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#334155">Larger x keeps more weight (0.159 → 0.500 → 0.841)</text>
+
+  <!-- RIGHT PANEL: GELU(x) vs dashed ReLU, px=600+44x, py=222-40y -->
+  <rect x="444" y="84" width="312" height="202" rx="8" fill="#f0fdf4" stroke="#86efac" stroke-width="1" />
+  <line x1="464" y1="222" x2="740" y2="222" stroke="#94a3b8" stroke-width="1.2" />
+  <line x1="600" y1="94" x2="600" y2="255" stroke="#94a3b8" stroke-width="1.2" />
+
+  <!-- Y ticks -->
+  <text x="462" y="186" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" fill="#475569">1</text>
+  <text x="462" y="146" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" fill="#475569">2</text>
+  <text x="462" y="226" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" fill="#475569">0</text>
+  <text x="556" y="214" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#475569">-1</text>
+  <text x="644" y="236" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#475569">+1</text>
+  <text x="688" y="236" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">+2</text>
+
+  <!-- Dashed ReLU reference -->
+  <polyline points="468.0,222.0 600.0,222.0 732.0,102.0" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-dasharray="4 4" />
+  <text x="686" y="108" text-anchor="end" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#64748b">ReLU (dashed)</text>
+
+  <!-- Exact GELU polyline -->
+  <polyline points="468.0,222.2 476.8,222.3 485.6,222.5 494.4,222.8 503.2,223.2 512.0,223.8 520.8,224.6 529.6,225.5 538.4,226.5 547.2,227.5 556.0,228.3 564.8,228.8 573.6,228.6 582.4,227.5 591.2,225.4 600.0,222.0 608.8,217.4 617.6,211.5 626.4,204.6 635.2,196.8 644.0,188.3 652.8,179.5 661.6,170.5 670.4,161.5 679.2,152.6 688.0,143.8 696.8,135.2 705.6,126.8 714.4,118.5 723.2,110.3 732.0,102.2" fill="none" stroke="#059669" stroke-width="3" stroke-linecap="round" />
+
+  <!-- Key checkpoints -->
+  <circle cx="566.9" cy="228.8" r="4" fill="#d97706" />
+  <circle cx="556.0" cy="228.3" r="4.5" fill="#059669" stroke="#ffffff" stroke-width="1.5" />
+  <circle cx="644.0" cy="188.3" r="5" fill="#059669" stroke="#ffffff" stroke-width="1.6" />
+
+  <text x="530" y="255" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#b45309">min -0.170 near -0.75</text>
+  <text x="652" y="196" text-anchor="start" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#065f46">(+1, 0.841)</text>
+  <text x="600" y="274" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#065f46">(-1, -0.159) softens cutoff smoothly at zero</text>
+
+  <!-- Footer -->
+  <text x="400" y="316" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#334155">Notice the smooth transition through (0, 0) with slope 0.5 and the gentle negative dip around -0.75.</text>
+</svg>

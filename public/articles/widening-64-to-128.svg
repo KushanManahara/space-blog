@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 325" width="800" height="325" role="img" aria-label="Structural comparison of doubling hidden width from 64 to 128 in Linear(20, hidden) -> ReLU -> Linear(hidden, 10). Layer 1 doubles both weights and biases cleanly from 1,344 to 2,688. Layer 2 doubles weights from 640 to 1,280, but its 10 output biases stay fixed at 10, yielding 1,290 instead of 1,300 and a model total of 3,978 instead of 3,988.">
+  <title>Why doubling hidden width from 64 to 128 yields 3,978 parameters instead of 3,988</title>
+
+  <rect x="0.5" y="0.5" width="799" height="324" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+
+  <!-- Header -->
+  <text x="400" y="28" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#0f172a">Why doubling hidden width (64 → 128) yields 3,978 instead of 3,988</text>
+  <text x="400" y="47" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#475569">Layer 1 doubles both weights and biases, while Layer 2 keeps the same 10 output biases</text>
+
+  <!-- TOP CARD: Baseline hidden = 64 -->
+  <rect x="28" y="66" width="744" height="96" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2" />
+  <text x="44" y="88" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="700" fill="#334155">Baseline (hidden = 64)</text>
+  <text x="756" y="88" text-anchor="end" font-family="ui-monospace, monospace" font-size="12.5" font-weight="700" fill="#334155">Total = 1,994 params  ·  3,840 FLOPs/ex</text>
+
+  <!-- L1 box -->
+  <rect x="44" y="102" width="290" height="44" rx="7" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="1.2" />
+  <text x="58" y="121" font-family="ui-monospace, monospace" font-size="11.5" font-weight="700" fill="#0369a1">Layer 1: Linear(20, 64)</text>
+  <text x="58" y="137" font-family="ui-monospace, monospace" font-size="11" fill="#334155">1,280 weights + 64 biases = 1,344</text>
+
+  <!-- Arrow + ReLU -->
+  <text x="372" y="124" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#64748b">→ ReLU →</text>
+  <text x="372" y="136" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" fill="#64748b">(0 params)</text>
+
+  <!-- L2 box -->
+  <rect x="410" y="102" width="346" height="44" rx="7" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.2" />
+  <text x="424" y="121" font-family="ui-monospace, monospace" font-size="11.5" font-weight="700" fill="#0f172a">Layer 2: Linear(64, 10)</text>
+  <text x="424" y="137" font-family="ui-monospace, monospace" font-size="11" fill="#334155">640 weights + 10 biases = 650</text>
+
+  <!-- BOTTOM CARD: Widened hidden = 128 -->
+  <rect x="28" y="178" width="744" height="106" rx="10" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.2" />
+  <text x="44" y="200" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="700" fill="#1e3a8a">Widened (hidden = 128)</text>
+  <text x="756" y="200" text-anchor="end" font-family="ui-monospace, monospace" font-size="12.5" font-weight="700" fill="#0369a1">Total = 3,978 params  ·  7,680 FLOPs/ex</text>
+
+  <!-- Widened L1 box -->
+  <rect x="44" y="214" width="290" height="54" rx="7" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5" />
+  <text x="58" y="233" font-family="ui-monospace, monospace" font-size="11.5" font-weight="700" fill="#1e3a8a">Layer 1: Linear(20, 128)</text>
+  <text x="58" y="249" font-family="ui-monospace, monospace" font-size="11" fill="#1e40af">2,560 W + 128 b = 2,688 (exact 2×)</text>
+  <text x="58" y="262" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#1d4ed8">Both output rows and biases double</text>
+
+  <!-- Arrow + ReLU -->
+  <text x="372" y="240" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#64748b">→ ReLU →</text>
+  <text x="372" y="252" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" fill="#64748b">(0 params)</text>
+
+  <!-- Widened L2 box with highlighted fixed 10 biases -->
+  <rect x="410" y="214" width="346" height="54" rx="7" fill="#fff7ed" stroke="#f59e0b" stroke-width="1.5" />
+  <text x="424" y="233" font-family="ui-monospace, monospace" font-size="11.5" font-weight="700" fill="#9a3412">Layer 2: Linear(128, 10)</text>
+  <text x="424" y="249" font-family="ui-monospace, monospace" font-size="11" fill="#7c2d12">1,280 W (2×) + 10 b (unchanged) = 1,290</text>
+  <text x="424" y="262" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="700" fill="#b45309">Still only 10 classes, so biases stay 10 (-10 vs naive 1,300)</text>
+
+  <!-- Footer -->
+  <text x="400" y="308" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#334155">2,688 + 1,290 = 3,978 parameters, whereas forward FLOPs double cleanly from 3,840 to 7,680 per example.</text>
+</svg>

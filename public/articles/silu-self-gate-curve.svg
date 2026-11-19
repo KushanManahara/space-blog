@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 335" width="800" height="335" role="img" aria-label="Two-panel illustration of SiLU (Swish). Left panel traces the two-branch self-gating schematic where input x enters both a sigmoid gate branch sigma(x) and a direct pass-through branch, multiplying to form x * sigma(x). Right panel plots SiLU(x) across [-3, 3] next to dashed ReLU, marking (-1.28, -0.278) minimum dip, (-1, -0.269), (0, 0), and (+1, 0.731).">
+  <title>SiLU (Swish) self-gating schematic and activation curve</title>
+
+  <rect x="0.5" y="0.5" width="799" height="334" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+
+  <!-- Header -->
+  <text x="400" y="28" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#0f172a">How SiLU (Swish) self-gates x with sigmoid σ(x)</text>
+  <text x="400" y="47" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#475569">Input x splits to compute its own smooth valve σ(x) inside (0, 1), then multiplies itself</text>
+
+  <!-- Panel headers -->
+  <text x="200" y="72" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#1e3a8a">Step 1: Two-branch self-gate</text>
+  <text x="600" y="72" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#047857">Step 2: SiLU(x) = x · σ(x) curve</text>
+
+  <line x1="400" y1="62" x2="400" y2="296" stroke="#e2e8f0" stroke-width="1" />
+
+  <!-- LEFT PANEL: Circuit schematic -->
+  <rect x="34" y="84" width="336" height="202" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+
+  <!-- Input node x -->
+  <rect x="52" y="160" width="44" height="32" rx="6" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.5" />
+  <text x="74" y="181" text-anchor="middle" font-family="ui-monospace, monospace" font-size="13" font-weight="700" fill="#0369a1">x</text>
+
+  <!-- Top path -> sigma(x) gate -> multiply -->
+  <path d="M 96 168 L 122 126 L 146 126" fill="none" stroke="#1d4ed8" stroke-width="2" />
+  <rect x="148" y="106" width="84" height="36" rx="7" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5" />
+  <text x="190" y="129" text-anchor="middle" font-family="ui-monospace, monospace" font-size="12" font-weight="700" fill="#1e3a8a">gate σ(x)</text>
+  <text x="190" y="99" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#1d4ed8">valve in (0, 1)</text>
+  <path d="M 232 126 L 266 164" fill="none" stroke="#1d4ed8" stroke-width="2" />
+
+  <!-- Bottom pass-through x -> multiply -->
+  <line x1="96" y1="180" x2="256" y2="180" stroke="#64748b" stroke-width="2" />
+  <text x="186" y="196" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#475569">direct input x</text>
+
+  <!-- Multiply circle -->
+  <circle cx="272" cy="176" r="15" fill="#ffffff" stroke="#059669" stroke-width="2" />
+  <text x="272" y="182" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="700" fill="#065f46">×</text>
+
+  <!-- Output node -->
+  <line x1="287" y1="176" x2="306" y2="176" stroke="#059669" stroke-width="2" />
+  <rect x="308" y="158" width="50" height="36" rx="6" fill="#d1fae5" stroke="#059669" stroke-width="1.5" />
+  <text x="333" y="180" text-anchor="middle" font-family="ui-monospace, monospace" font-size="11.5" font-weight="700" fill="#065f46">SiLU</text>
+
+  <!-- Numeric summary inside left card -->
+  <rect x="52" y="218" width="300" height="54" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1" />
+  <text x="64" y="238" font-family="ui-monospace, monospace" font-size="10.5" fill="#0369a1">x = +1 → σ(+1) = 0.731 → out = +0.731</text>
+  <text x="64" y="258" font-family="ui-monospace, monospace" font-size="10.5" fill="#b45309">x = -1 → σ(-1) = 0.269 → out = -0.269</text>
+
+  <!-- RIGHT PANEL: SiLU(x) curve, px=600+44x, py=222-40y -->
+  <rect x="444" y="84" width="312" height="202" rx="8" fill="#f0fdf4" stroke="#86efac" stroke-width="1" />
+  <line x1="464" y1="222" x2="740" y2="222" stroke="#94a3b8" stroke-width="1.2" />
+  <line x1="600" y1="94" x2="600" y2="255" stroke="#94a3b8" stroke-width="1.2" />
+
+  <!-- Ticks -->
+  <text x="462" y="186" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" fill="#475569">1</text>
+  <text x="462" y="146" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" fill="#475569">2</text>
+  <text x="462" y="226" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" fill="#475569">0</text>
+  <text x="556" y="214" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#475569">-1</text>
+  <text x="644" y="236" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#475569">+1</text>
+  <text x="688" y="236" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">+2</text>
+
+  <!-- Dashed ReLU reference -->
+  <polyline points="468.0,222.0 600.0,222.0 732.0,102.0" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-dasharray="4 4" />
+  <text x="686" y="108" text-anchor="end" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#64748b">ReLU (dashed)</text>
+
+  <!-- Exact SiLU curve -->
+  <polyline points="468.0,227.7 476.8,228.4 485.6,229.2 494.4,230.0 503.2,230.8 512.0,231.5 520.8,232.2 529.6,232.8 538.4,233.1 547.2,233.1 556.0,232.8 564.8,231.9 573.6,230.5 582.4,228.4 591.2,225.6 600.0,222.0 608.8,217.6 617.6,212.4 626.4,206.5 635.2,199.9 644.0,192.8 652.8,185.1 661.6,177.1 670.4,168.8 679.2,160.2 688.0,151.5 696.8,142.8 705.6,134.0 714.4,125.2 723.2,116.4 732.0,107.7" fill="none" stroke="#059669" stroke-width="3" stroke-linecap="round" />
+
+  <!-- Key checkpoints -->
+  <circle cx="543.7" cy="233.1" r="4" fill="#d97706" />
+  <circle cx="556.0" cy="232.8" r="4.5" fill="#059669" stroke="#ffffff" stroke-width="1.5" />
+  <circle cx="644.0" cy="192.8" r="5" fill="#059669" stroke="#ffffff" stroke-width="1.6" />
+
+  <text x="536" y="256" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#b45309">min -0.278 near -1.28</text>
+  <text x="652" y="200" text-anchor="start" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#065f46">(+1, 0.731)</text>
+  <text x="600" y="274" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#065f46">(-1, -0.269) creates a wider negative pocket</text>
+
+  <!-- Footer -->
+  <text x="400" y="316" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#334155">Heavier sigmoid tails keep SiLU lower at +1 (0.731 vs GELU 0.841) and deeper below 0 (-0.269 vs -0.159).</text>
+</svg>

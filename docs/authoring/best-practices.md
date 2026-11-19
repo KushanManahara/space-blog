@@ -6,8 +6,8 @@ The full editorial standard lives in the `tech-blog-writing` skill. This page is
 
 - Write like a knowledgeable person explaining something to a curious peer. Clear beats clever.
 - Open with the concrete moment, number or question at the heart of the piece. Do not announce what the article will cover.
-- Explain why things work, not just what they are. Build intuition, then the mechanism, then a worked example, then the limits.
-- Finish the topic. A reader should not need another page to understand the core idea.
+- Build from first principles with zero black boxes: explain why concepts exist, how mechanisms work internally, and every symbol or step in a derivation rather than assuming prior knowledge.
+- Ensure self-contained completeness: finish the core topic thoroughly without leaving knowledge gaps or unexplained jumps. For series articles, preserve established terminology, running examples, and continuity documented in `deep-learning-series-memory.md` (or the relevant series notes).
 - Keep the source's claims and your own calculations visibly separate. Label derived numbers as yours and state assumptions.
 - Never invent experiences, results, quotes, benchmarks or references.
 - House punctuation: avoid em dashes and semicolons in prose. Sentence-case headings. Bold sparingly.
@@ -31,10 +31,11 @@ Add a visual only when it teaches better than prose.
 
 For each visual:
 
+- **Introduce visuals right where concepts first appear:** Put each concept's primary curve, diagram, or illustration directly alongside its first explanation rather than deferring visualization to a later multi-concept comparison section. For example, show `ReLU`'s own curve the moment `ReLU` is introduced instead of waiting for a later comparison plot.
 - Put it right next to the text that explains it. Say before it what to look for and after it what it showed.
 - Label axes, units and series. State whether data is measured, computed or illustrative.
 - Keep the default view meaningful. Many readers never hover or click.
-- Prefer two or three strong visuals over many decorative ones.
+- Prefer purposeful concept visuals over decorative chrome: pair clear prose with meaningful curves, diagrams, or illustrations whenever visual intuition helps a learner see how a mechanism behaves.
 
 ## Interactivity
 
