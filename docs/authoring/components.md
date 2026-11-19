@@ -32,6 +32,8 @@ Every block kind `articleBlockSchema` accepts (`src/lib/content/schemas.ts`), wi
 
 - `html` accepts inline Markdown and raw HTML. Markdown is the norm.
 - Links to external sites open in a new tab automatically. Link schemes are restricted to `http`, `https`, `mailto`, `tel` and relative paths.
+- Use `**bold**` and `*italic*`, not `__bold__` and `_italic_`. Links are converted first, so underscores inside a link URL (for example `foo_bar_baz`) get rewritten into `<em>` inside the `href`. Check any URL that contains underscores.
+- Avoid parentheses inside link URLs. The first `)` ends the link. Percent-encode them (`%28`, `%29`) if you must.
 
 ## heading
 
@@ -159,15 +161,16 @@ Interactive chart built on Recharts. Readers hover for values and click legend i
   kind: "mermaid",
   caption: "The suction loop.",
   code: `flowchart TD
-    SEAL["<b>1 · Seal the floor</b><br/>skirts close the gap"]
-    PUMP["<b>2 · Pump it out</b>"]
+    SEAL["1 · Seal the floor<br/>skirts close the gap"]
+    PUMP["2 · Pump it out"]
     SEAL --> PUMP
     PUMP -. "feedback" .-> SEAL`,
 }
 ```
 
 - Mermaid (version pinned in `package.json`, currently 12.3.0) is converted through `@excalidraw/mermaid-to-excalidraw`, so diagrams render in a hand-drawn style with copy and expand controls.
-- `flowchart` (TD/LR) is the reliable choice. Quote labels that contain spaces, punctuation or `:`. `<b>` and `<br/>` work inside quoted labels.
+- `flowchart` (TD/LR) is the reliable choice. Quote labels that contain spaces, punctuation or `:`.
+- `<br/>` becomes a line break. `<b>`, `<strong>`, `<i>`, `<em>` and `<span>` are stripped on the Excalidraw path (they survive only if the diagram falls back to plain Mermaid rendering), so do not rely on them for emphasis. Structure the label instead, for example a numbered first line.
 - Conversion runs when the diagram scrolls into view.
 - Validate new source before publishing: in a dev page console, import the pinned version from `https://cdn.jsdelivr.net/npm/mermaid@<version>/dist/mermaid.esm.min.mjs` and call `parse()` and `render()`.
 - Use a template literal and avoid backticks and `${` inside it.
@@ -190,7 +193,8 @@ Interactive chart built on Recharts. Readers hover for values and click legend i
 - `alt` is required. Describe what the image shows, not "image of".
 - `width`/`height?` are the intrinsic size and reserve space to avoid layout shift. Set them.
 - `wide?` lets the image break out of the prose column on wide screens.
-- SVGs are served unoptimised. The first image in an article is preloaded.
+- SVGs bypass image optimisation, so a remote SVG must also be allowed by the CSP `img-src` in `next.config.ts` (`'self'`, `data:`, `blob:`, `upload.wikimedia.org`, `images.unsplash.com`). Local SVGs under `public/` always work.
+- The first image in an article is preloaded.
 
 ## video
 
@@ -251,8 +255,9 @@ Legacy static bar chart with hand-set gradients. Kept so older posts render. Use
 
 ## Automatic features (no block needed)
 
-- **Table of contents** from `heading` blocks.
-- **Audio narration** ("Listen"): reads headings, paragraphs, lists, callouts, a label for each code block, and image, figure and mermaid captions. Write captions that make sense spoken aloud.
+- **Table of contents** from `heading` blocks. It prints heading text as plain text, so Markdown in a heading shows literally there.
+- **Audio narration** ("Listen"): reads headings, paragraphs, lists, callouts, a label for each code block, image and mermaid captions, and figure title plus caption. It skips tables, formulas, videos, footnotes, references, corrections and legacy charts, so do not put the only explanation of a point in one of those. Write captions that make sense spoken aloud.
+- **Copy page**: exports the article as Markdown or rich HTML. Legacy `chart` blocks are omitted from the Markdown copy, and the rich-HTML copy leaves inline Markdown in paragraphs, callouts, corrections and tables unconverted and shows formulas, diagrams, images, videos, figures, footnotes and references as plain text.
 - **Reader mode, copy page (Markdown export), print, share, save, like, comments.**
 - **Series navigation** when the post has `series`.
 - **Related posts** ranked by shared tags, then topic, then recency.

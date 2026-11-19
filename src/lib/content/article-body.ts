@@ -1,9 +1,8 @@
 import type { ArticleBlock } from "./schemas";
 
 /**
- * The published body of the flagship post. The mock dataset shares it across
- * every article so each route renders a complete page; per-post bodies drop in
- * by replacing `body` on the individual records in `posts.ts`.
+ * Sample article body left over from the original mock dataset. Published
+ * posts no longer use it: every post in `posts.ts` carries its own `body`.
  */
 export const demoArticleBody: ArticleBlock[] = [
   {

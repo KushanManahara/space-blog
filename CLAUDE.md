@@ -24,7 +24,7 @@ pnpm format       # prettier --write . (tailwind class sorting via plugin)
 pnpm format:check # prettier --check .
 pnpm comments     # moderate held comments: list / approve <id> / approve --all / reject <id>
 pnpm reviews      # moderate reader reviews: list / --all / approve|feature|hide|reject <id>
-pnpm embeddings   # rebuild src/lib/content/embeddings.json — run after editing article bodies
+pnpm embeddings   # rebuild public/embeddings.json — run after editing article bodies
 ```
 
 Tests use Node's built-in runner through tsx: `pnpm test` runs `tests/*.test.ts`; one file with
@@ -41,17 +41,15 @@ All copy and post data lives here, not in components.
   RSC payload stays small (`toSummary` / `toSummaries` in `queries.ts`).
 - `posts.ts`, `site.ts` — the data, parsed through the schemas at module load, so bad content
   fails fast at build time.
-- `article-body.ts` — long-form article content as a typed block union rendered by
-  `components/article/article-body.tsx`. The mock dataset shares one body across posts; give a post
-  its own body by replacing `body` on that record.
+- `article-body.ts` — an unused sample body from the original mock dataset. Every published post
+  carries its own `body` in `posts.ts`, rendered by `components/article/article-body.tsx`.
 - `queries.ts` — every read goes through these selectors (`listPosts`, `getPostBySlug`,
   `getRelatedPosts`, `searchPosts`, …). Components never filter or sort raw arrays themselves.
 
 ### Routing
 
-`src/app/(site)/` carries the public chrome (header + footer). `src/app/studio/` deliberately sits
-outside that group: the studio list renders its own header and the editor is a full-screen surface
-with no site or studio nav. `src/app/not-found.tsx` renders the chrome itself for the same reason.
+`src/app/(site)/` carries the public chrome (header + footer). The studio is parked in `src/app/_studio/`
+(the leading underscore keeps it out of routing) and is not part of the live site. `src/app/not-found.tsx` renders the chrome itself for the same reason.
 
 Filtering, sorting and pagination are URL state (`?topic=`, `?sort=`, `?series=`, `?q=`, `?page=`),
 parsed and validated in the page with the `is*` guards from the content layer, and built with
@@ -63,7 +61,7 @@ plain links/forms, so they work before hydration.
 Server by default. Client components exist only for: the scroll-aware header (`useScrollDirection`
 in `src/hooks/` drives the collapse-on-scroll-down / expand-on-scroll-up bar), ⌘K command menu,
 save/like state, home carousels and tabs, article reading progress (one scroll listener shared via
-`ReadingProgressProvider`), share sheet, comment composer, discover modals, forms and the studio
+`ReadingProgressProvider`), share sheet, comment composer, discover modals, forms and the (parked) studio
 editor. Reader state (saved/liked posts) lives in `SavedPostsProvider`; there is no global store.
 
 Form submissions go through the server actions in `src/app/actions.ts`, which own validation.
@@ -167,10 +165,15 @@ editing passes). This section is the Space-specific half: what the skill's step 
   `table`, `figure` (interactive Recharts line/area/bar — hover + legend toggles), `mermaid`,
   `callout`, `image`, `video` (YouTube, `variant: "compact"` near the top or `"feature"` card; the player
   loads only on play), `references`, `footnotes`, `correction`, `chart` (legacy static bars).
-- **Markdown renders in** paragraph html, headings, list items, table cells, callout title/body.
-  **Plain text only in** table/figure/formula/mermaid **captions** and reference label/source/note —
-  backticks or `**` there show literally.
-- In a `figure`, the `xKey` must not collide with any series `key`.
+- **Markdown renders in** paragraph html, headings, list items, table headers and cells, callout
+  title/body, footnotes, and correction notes. **Plain text only in** table/figure/formula/mermaid/
+  image/video **captions**, figure `note`, and reference label/source/note — backticks or `**` show
+  literally there. Heading text also renders as plain text in the sidebar table of contents, so keep
+  Markdown out of headings.
+- Markdown links: write emphasis with `**`/`*`, not `__`/`_` (underscores inside a link URL get turned
+  into `<em>`), and avoid `(` `)` inside link URLs (they end the link early).
+- Not enforced by the schema, but required: unique heading `id`s, and a `figure` `xKey` that differs
+  from every series `key`.
 - Topics are defined in `site.ts` `topicBlurbs`; pick by each topic's description. Every topic must keep
   at least one post (schema requires a positive count). Series: `series: { slug, title, part }` plus a
   blurb in `seriesBlurbs`.
@@ -178,7 +181,8 @@ editing passes). This section is the Space-specific half: what the skill's step 
 ### Rendering gotchas
 
 - Mermaid (12.3.0, pinned) is converted through `@excalidraw/mermaid-to-excalidraw` with a local
-  patch, so rendered diagrams have no `.node` classes. Validate new diagram source by importing the
+  patch, so rendered diagrams have no `.node` classes. On that path `<br>` becomes a newline and
+  `<b>`/`<strong>`/`<i>`/`<em>`/`<span>` are stripped, so don't rely on them for emphasis. Validate new diagram source by importing the
   pinned mermaid version from cdn.jsdelivr.net in the page and calling `parse()`/`render()`.
 - Mermaid and Recharts render on intersection / measured width — a hidden or non-painting preview pane
   can show them as empty. Scroll them into a painting viewport before concluding they're broken.

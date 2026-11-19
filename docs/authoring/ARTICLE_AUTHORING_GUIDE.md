@@ -43,9 +43,9 @@ The block kinds are: `paragraph`, `heading`, `list`, `code`, `formula`, `table`,
 1. **New articles go at the top of the array** in `posts.ts`.
 2. **Keep `likes`, `views`, `commentCount` at `0`.** Live counts come from the database. Never seed them.
 3. **Do not write `readingMinutes`.** It is derived from the body at 200 words a minute.
-4. **Markdown renders in some fields only.** Paragraphs, headings, list items, table cells and callout title/body render inline Markdown. Captions (table, figure, formula, mermaid, image, video), figure notes and reference fields are plain text, so backticks and `**` appear literally there.
-5. **Every heading needs a unique `id`.** It becomes the anchor and the table-of-contents entry.
-6. **In a `figure`, `xKey` must not equal any series `key`.**
+4. **Markdown renders in some fields only.** Paragraphs, headings, list items, table headers and cells, callout title/body, footnotes and correction notes render inline Markdown. Captions (table, figure, formula, mermaid, image, video), figure notes and reference fields are plain text, so backticks and `**` appear literally there.
+5. **Every heading needs a unique `id`.** It becomes the anchor and the table-of-contents entry. The schema does not check this, so you must. Keep Markdown out of heading text: the sidebar table of contents prints it literally.
+6. **In a `figure`, `xKey` must not equal any series `key`.** Also not checked by the schema.
 7. **Every table row must have as many cells as `headers`.** The schema rejects mismatches.
 8. **`runnable: true` only on browser-safe Python** (no network, no API keys, no packages Pyodide lacks).
 9. **No personal data.** Use placeholder paths, account names and hostnames, and tell the reader they are placeholders. Git history is public and permanent.
@@ -95,13 +95,13 @@ The block kinds are: `paragraph`, `heading`, `list`, `code`, `formula`, `table`,
 
 ## 5. What interactivity exists today
 
-| Capability                           | Block                     | Interaction                                                                                      |
-| ------------------------------------ | ------------------------- | ------------------------------------------------------------------------------------------------ |
-| Line, area and bar charts            | `figure`                  | Hover tooltips, click legend to toggle series                                                    |
-| Diagrams                             | `mermaid`                 | Rendered as hand-drawn style SVG, copy and expand controls                                       |
-| Runnable Python                      | `code` + `runnable: true` | Edit and run in the browser through Pyodide                                                      |
-| Video                                | `video`                   | YouTube player loads only on play                                                                |
-| Audio narration                      | automatic                 | "Listen" reads headings, paragraphs, lists, callouts, code labels, image/figure/mermaid captions |
-| Reader mode, copy page, print, share | automatic                 | Provided by the article page                                                                     |
+| Capability                           | Block                     | Interaction                                                                                                             |
+| ------------------------------------ | ------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Line, area and bar charts            | `figure`                  | Hover tooltips, click legend to toggle series                                                                           |
+| Diagrams                             | `mermaid`                 | Rendered as hand-drawn style SVG, copy and expand controls                                                              |
+| Runnable Python                      | `code` + `runnable: true` | Edit and run in the browser through Pyodide                                                                             |
+| Video                                | `video`                   | YouTube player loads only on play                                                                                       |
+| Audio narration                      | automatic                 | "Listen" reads headings, paragraphs, lists, callouts, code labels, image and mermaid captions, figure title and caption |
+| Reader mode, copy page, print, share | automatic                 | Provided by the article page                                                                                            |
 
 **Not available yet:** sliders, parameter-driven simulations, steppers, toggles inside the body, or embeds other than YouTube. If an article genuinely needs one, add a new block kind first (separate PR). The steps are in [ai-agents.md](ai-agents.md#adding-a-new-block-kind).
