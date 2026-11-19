@@ -4,6 +4,3166 @@ import { postSchema, type Post } from "./schemas";
 
 const parsedPosts = postSchema.array().parse([
   {
+    slug: "why-loss-functions-use-the-log-and-kl-divergence",
+    title: "Why Loss Functions Use the Log, and KL Divergence",
+    dek: "Multiplying probabilities across a dataset collapses to zero in float32, while raw exponentials blow up to infinity. Derive why logarithms turn probability products into sums, how the log-sum-exp trick prevents overflow, and how KL divergence compares full probability distributions.",
+    topic: "Research",
+    publishedAt: "2026-11-19",
+    likes: 0,
+    views: 0,
+    commentCount: 0,
+    tags: [
+      "#deep-learning",
+      "#neural-networks",
+      "#machine-learning",
+      "#pytorch",
+      "#nn-module",
+      "#training",
+    ],
+    series: { slug: "deep-learning", title: "Deep Learning", part: 6 },
+    coverImage: "/articles/why-loss-functions-use-the-log-and-kl-divergence.png",
+    body: [
+      {
+        kind: "paragraph",
+        html: "In [Part 5 of this series](/articles/loss-functions-mse-mae-cross-entropy), we saw how cross-entropy scores a classifier using `-ln(p)`: assign `p = 0.9` to the right support-ticket category and your loss is a tiny `0.105`, while assigning `p = 0.01` shoots the loss up to `4.605`. That formula is easy to memorize, yet one natural question stays unanswered: why does a **logarithm** sit inside almost every classification loss in deep learning?",
+      },
+      {
+        kind: "paragraph",
+        html: "This guide opens the hood on three closely linked ideas that power real training pipelines: why multiplying probabilities across examples breaks computer arithmetic and forces us to take the log, how the **log-sum-exp** trick stops `e^z` from overflowing when logits get large, and how **KL divergence** extends cross-entropy from single hard labels to full target distributions.",
+      },
+      {
+        kind: "video",
+        youtubeId: "Kv6waDvgxcA",
+        title: "Why Do Loss Functions Use the Log?",
+        caption:
+          "Companion Deep Learning Fundamentals episode covering probability underflow, natural logarithms, log-sum-exp stability, and KL divergence.",
+        variant: "compact",
+      },
+      {
+        kind: "mermaid",
+        code: `flowchart TD
+    A["1. Why the log?"] --> A1["Products vanish in float32 -> sums stay safe"]
+    B["2. Log-sum-exp trick"] --> B1["Subtract max(z) -> stop e^z overflow"]
+    C["3. KL divergence"] --> C1["Compare full probability distributions p and q"]`,
+        caption:
+          "Three layers of the same story: turn products into sums, protect exponentials from overflow, and generalize from one-hot labels to soft targets.",
+      },
+      {
+        kind: "heading",
+        id: "why-multiplying-probabilities-breaks",
+        level: 2,
+        text: "Why multiplying probabilities breaks in float32",
+      },
+      {
+        kind: "paragraph",
+        html: "Start with a simple probability rule. Flip one fair coin and the chance of heads is `0.5`. Flip two independent fair coins and the chance of getting heads on both is `0.5 × 0.5 = 0.25`. When independent events all need to happen together, their probabilities **multiply**.",
+      },
+      {
+        kind: "paragraph",
+        html: "Now apply that exact rule to a trained support-ticket classifier checking three independent tickets. Suppose the model assigns `0.90` to the true class on Ticket 1, `0.80` on Ticket 2, and `0.95` on Ticket 3. The joint probability of getting all three right is their product:",
+      },
+      {
+        kind: "formula",
+        tex: String.raw`L = 0.90 \times 0.80 \times 0.95 = 0.684`,
+        caption:
+          "Combined probability of a model predicting three independent support tickets accurately.",
+      },
+      {
+        kind: "paragraph",
+        html: "With three tickets, `0.684` looks completely harmless. Now scale that same good model (`0.9` on every single ticket) up to a realistic training batch or dataset. Ten tickets yield `0.9^10 = 0.3487`. One hundred tickets drop to `0.9^100 ≈ 2.66 × 10^-5`. By `1,000` tickets, the exact mathematical product is `0.9^1000 ≈ 1.75 × 10^-46`.",
+      },
+      {
+        kind: "image",
+        src: "/articles/float32-probability-underflow.svg",
+        alt: "Log-scale comparison showing 0.9 to the power of 1, 10, 100, and 1,000 crossing below the float32 smallest positive number around 1.4e-45 and collapsing to exact zero.",
+        caption:
+          "Standard float32 weights and activations cannot represent positive numbers smaller than about 1.4e-45, so multiplying 1,000 confident 0.9 probabilities underflows to exact 0.0.",
+        width: 800,
+        height: 315,
+      },
+      {
+        kind: "paragraph",
+        html: "Standard 32-bit floating-point numbers (`float32`, the default precision used across PyTorch models) cannot store any positive number smaller than roughly `1.4 × 10^-45`. Anything smaller rounds straight down to exact `0.0`, an error called **numerical underflow**. Once the product hits zero, a strong model (`0.9` per ticket) and a terrible model (`0.2` per ticket) both score `0.0`, leaving training with no useful signal to compare them.",
+      },
+      {
+        kind: "heading",
+        id: "natural-logarithm-rescues-training",
+        level: 2,
+        text: "What a natural logarithm does, and why it rescues training",
+      },
+      {
+        kind: "paragraph",
+        html: "A **logarithm** is simply the inverse of an exponent. In deep learning we almost always use the **natural logarithm**, written `ln(x)`, which uses Euler's constant `e ≈ 2.718` as its base. Asking for `ln(x)` asks one concrete question: *what power must we raise `e` to in order to get `x`?*",
+      },
+      {
+        kind: "list",
+        items: [
+          "**`ln(1) = 0`**, because `e^0 = 1`. A perfectly confident `p = 1.0` produces zero surprise.",
+          "**`ln(0.5) ≈ -0.693`**, because `e^-0.693 ≈ 0.5`. Cutting probability in half moves the log down by `0.693`.",
+          "**`ln(0.1) ≈ -2.303`**, because `e^-2.303 ≈ 0.1`. Lower probabilities push `ln(p)` deeply negative.",
+        ],
+      },
+      {
+        kind: "figure",
+        variant: "line",
+        title: "Natural log ln(p) vs. negative log loss -ln(p)",
+        xKey: "p",
+        xLabel: "Assigned probability p for the true class",
+        yLabel: "Value",
+        series: [
+          { key: "lnP", label: "ln(p) (always <= 0)" },
+          { key: "negLnP", label: "-ln(p) (positive loss)" },
+        ],
+        data: [
+          { p: "0.05", lnP: -2.996, negLnP: 2.996 },
+          { p: "0.10", lnP: -2.303, negLnP: 2.303 },
+          { p: "0.20", lnP: -1.609, negLnP: 1.609 },
+          { p: "0.30", lnP: -1.204, negLnP: 1.204 },
+          { p: "0.40", lnP: -0.916, negLnP: 0.916 },
+          { p: "0.50", lnP: -0.693, negLnP: 0.693 },
+          { p: "0.60", lnP: -0.511, negLnP: 0.511 },
+          { p: "0.70", lnP: -0.357, negLnP: 0.357 },
+          { p: "0.80", lnP: -0.223, negLnP: 0.223 },
+          { p: "0.90", lnP: -0.105, negLnP: 0.105 },
+          { p: "1.00", lnP: 0.0, negLnP: 0.0 },
+        ],
+        note: "Probabilities between 0 and 1 produce negative values under ln(p), so negating it creates a clean positive penalty that shrinks smoothly to zero as p reaches 1.0.",
+      },
+      {
+        kind: "paragraph",
+        html: "Notice two superpowers of `ln(p)` immediately from the curve and its algebra. First, `ln(p)` is strictly increasing: whenever one model has a higher probability than another, its log is also higher, so maximizing `ln(L)` picks the exact same best weights as maximizing `L`. Second, because exponents add when powers multiply (`e^a · e^b = e^(a+b)`), logarithms turn **multiplication into addition**:",
+      },
+      {
+        kind: "formula",
+        tex: String.raw`\ln(a \cdot b) = \ln(a) + \ln(b)`,
+        caption:
+          "The product-to-sum identity of logarithms: multiplying probabilities becomes adding log-probabilities.",
+      },
+      {
+        kind: "paragraph",
+        html: "Verify that rule with concrete numbers. Taking `a = 0.9` and `b = 0.8`, their product is `0.72` and `ln(0.72) = -0.329`. Separately, `ln(0.9) = -0.105` and `ln(0.8) = -0.223`, and `-0.105 + (-0.223) = -0.328` (exact `-0.3285` before rounding). Since probabilities sit between `0` and `1`, every `ln(p_i)` is negative, so we put a minus sign in front to build a positive loss that training can minimize:",
+      },
+      {
+        kind: "formula",
+        tex: String.raw`\begin{aligned}
+-\ln(0.90 \times 0.80 \times 0.95) &= -\ln(0.90) - \ln(0.80) - \ln(0.95) \\
+&= 0.1054 + 0.2231 + 0.0513 = 0.3798
+\end{aligned}`,
+        caption:
+          "The negative log of the three-ticket product equals the sum of their individual cross-entropy losses.",
+      },
+      {
+        kind: "image",
+        src: "/articles/likelihood-to-log-sum.svg",
+        alt: "Two-path diagram comparing raw probability multiplication collapsing 0.9^1000 to float32 0.0 on the left against adding negative log-probabilities safely to 105.4 on the right.",
+        caption:
+          "Adding -ln(p) keeps 1,000 confident predictions at an ordinary number (105.4) instead of collapsing to 0.0, and each example contributes an independent additive term.",
+        width: 800,
+        height: 310,
+      },
+      {
+        kind: "paragraph",
+        html: "Run the `1,000`-ticket stress test again in log space. Each `0.9` prediction contributes `-ln(0.9) ≈ 0.1054`, so `1,000` tickets sum to `1,000 × 0.1054 ≈ 105.4` (exact `105.36`). No underflow, no vanishing digits, and each ticket adds its own independent piece to the batch loss so gradients accumulate cleanly across examples.",
+      },
+      {
+        kind: "callout",
+        title: "Quick check and the formal name",
+        body: "Suppose a model gives probability `0.5` to the right answer on three independent tickets. Since `-ln(0.5) ≈ 0.693`, the total negative log loss is `3 × 0.693 ≈ 2.08` (exact `2.079`). Searching for weights that make the observed dataset as probable as possible is called **maximum likelihood estimation** in statistics, and minimizing total cross-entropy is mathematically the exact same objective.",
+      },
+      {
+        kind: "heading",
+        id: "log-sum-exp-trick",
+        level: 2,
+        text: "The log-sum-exp trick: stopping exponential overflow",
+      },
+      {
+        kind: "paragraph",
+        html: "Logarithms solved **underflow** (numbers crashing to `0.0`). Right inside Softmax and cross-entropy sits the opposite danger: **overflow** (numbers exploding past the largest value `float32` can hold).",
+      },
+      {
+        kind: "paragraph",
+        html: "Remember from [Part 4 of this series](/articles/gelu-silu-and-softmax) that a classifier outputs unconstrained raw scores called **logits** (`z`), and Softmax turns them into probabilities by exponentiating every logit via `e^(z_i)`. The function `e^z` grows astonishingly fast:",
+      },
+      {
+        kind: "list",
+        items: [
+          "**`e^10 ≈ 22,026`**: already over twenty thousand from a modest logit of `10`.",
+          "**`e^88 ≈ 1.65 × 10^38`**: still fits inside `float32`, whose ceiling is `3.40 × 10^38`.",
+          "**`e^89 ≈ 4.49 × 10^38`**: exceeds the `float32` ceiling and overflows straight to `inf`.",
+          "**`e^100 ≈ 2.69 × 10^43` and `e^1000`**: both immediately produce `inf`, turning `e^z / sum(e^z)` into `inf / inf = NaN` and poisoning every weight on the next step.",
+        ],
+      },
+      {
+        kind: "paragraph",
+        html: "The cure starts with one surprising numerical fact about Softmax. Compute Softmax on the modest logits `[2.0, 1.0, 0.1]` and you get `[0.659, 0.242, 0.099]`. Now add `1,000` to every single logit, giving `[1002.0, 1001.0, 1000.1]`. Mathematically, the true probabilities are still `[0.659, 0.242, 0.099]`, completely unchanged.",
+      },
+      {
+        kind: "paragraph",
+        html: "Why does shifting every logit by the same constant `c` leave Softmax untouched? Because adding `c` inside the exponent pulls out a common factor `e^c` from both numerator and denominator, and `e^c / e^c` cancels to `1`. Only the **gaps** between logits determine the probabilities.",
+      },
+      {
+        kind: "formula",
+        tex: String.raw`\operatorname{softmax}(z_i + c) = \frac{e^{z_i + c}}{\sum_j e^{z_j + c}} = \frac{e^c \, e^{z_i}}{e^c \sum_j e^{z_j}} = \frac{e^{z_i}}{\sum_j e^{z_j}}`,
+        caption: "Shifting every logit by any constant c cancels out identically in Softmax.",
+      },
+      {
+        kind: "paragraph",
+        html: "When computing cross-entropy directly from logits, we need the log of the Softmax denominator, called **log-sum-exp**: `ln(sum_j e^(z_j))`. Applying the exact same factoring idea with `m = max_j(z_j)` lets us pull `e^m` outside the sum and outside the logarithm:",
+      },
+      {
+        kind: "formula",
+        tex: String.raw`\ln\!\left(\sum_j e^{z_j}\right) = \ln\!\left(e^m \sum_j e^{z_j - m}\right) = m + \ln\!\left(\sum_j e^{z_j - m}\right)`,
+        caption:
+          "The log-sum-exp identity: shift every logit down by m = max(z), exponentiate safely in (0, 1], take the log, and add m back.",
+      },
+      {
+        kind: "image",
+        src: "/articles/log-sum-exp-max-shift.svg",
+        alt: "Three-step pipeline comparing naive exp([1000, 999, 998]) overflowing to infinity and NaN against subtracting m = 1000 to obtain [0, -1, -2], exponentiating to [1.000, 0.368, 0.135], and returning 1000.408.",
+        caption:
+          "Subtracting the largest logit guarantees every shifted score is <= 0, every exponential sits safely in (0, 1], and at least one term equals 1.000 so the sum can never underflow to zero.",
+        width: 800,
+        height: 315,
+      },
+      {
+        kind: "paragraph",
+        html: "Walk through `[1000, 999, 998]` step by step. First, find `m = 1000` and subtract it from every logit to get `[0, -1, -2]`. Second, exponentiate those tiny shifted scores: `e^0 = 1.000`, `e^-1 = 0.368`, and `e^-2 = 0.135`, whose sum is `1.503`. Third, take `ln(1.503) = 0.408` and add `m` back to get `1000.408`, with zero overflow, zero underflow, and full floating-point precision.",
+      },
+      {
+        kind: "callout",
+        title: "Quick check and what PyTorch handles for you",
+        body: "Try `[5, 4]` mentally: the maximum is `5`, subtracting `5` yields `[0, -1]`, and the shifted exponentials are `[1.000, 0.368]`. You rarely need to write log-sum-exp by hand in training code because PyTorch fuses this exact shift inside `F.log_softmax` and `F.cross_entropy`, which is why both expect raw logits rather than pre-computed Softmax probabilities.",
+      },
+      {
+        kind: "heading",
+        id: "kl-divergence-full-distributions",
+        level: 2,
+        text: "KL divergence: measuring distance between full distributions",
+      },
+      {
+        kind: "paragraph",
+        html: 'Standard cross-entropy assumes every training example has one definite ground-truth class, encoded as a **one-hot target** such as `[1.0, 0.0, 0.0]`. Real datasets are not always that black and white. Suppose a support ticket reads *"I was double-charged after the checkout button crashed"*, and ten human reviewers vote on the best department: `7` pick `billing`, `2` pick `technical`, and `1` picks `account`.',
+      },
+      {
+        kind: "paragraph",
+        html: "Their collective verdict is not a single category. It is a **soft target distribution** `p = [0.7, 0.2, 0.1]`. Now suppose our classifier predicts `q = [0.6, 0.3, 0.1]`. How do we score how far the predicted distribution `q` drifts from the target distribution `p`?",
+      },
+      {
+        kind: "paragraph",
+        html: "Build the formula one class at a time, starting with `billing` (`p = 0.7`, `q = 0.6`). First, take the ratio `p / q = 0.7 / 0.6 ≈ 1.167`, which measures how much `q` fell short relative to `p` (a ratio of `1.0` means an exact match). Second, take the natural log `ln(1.167) ≈ +0.154` so that an exact match (`ratio = 1`) scores `0`. Third, multiply by the target weight `p = 0.7` so major categories matter more than rare ones: `0.7 × 0.154 = +0.108`.",
+      },
+      {
+        kind: "paragraph",
+        html: "Repeat those three operations for every class and sum them together. That sum is **Kullback-Leibler (KL) divergence**, written `D_KL(p || q)` (read *the KL divergence of `p` relative to `q`*):",
+      },
+      {
+        kind: "formula",
+        tex: String.raw`D_{\mathrm{KL}}(p \,\|\, q) = \sum_i p_i \ln\!\left(\frac{p_i}{q_i}\right)`,
+        caption:
+          "KL divergence weights the log-ratio ln(p_i / q_i) by the target probability p_i across every class.",
+      },
+      {
+        kind: "figure",
+        variant: "bar",
+        title: "Comparing target distribution p against close and poor predictions",
+        xKey: "category",
+        xLabel: "Support-ticket department",
+        yLabel: "Probability",
+        series: [
+          { key: "target", label: "Target p (reviewers)" },
+          { key: "close", label: "Close q (KL = 0.027)" },
+          { key: "poor", label: "Poor q (KL = 0.698)" },
+        ],
+        data: [
+          { category: "Billing", target: 0.7, close: 0.6, poor: 0.2 },
+          { category: "Technical", target: 0.2, close: 0.3, poor: 0.2 },
+          { category: "Account", target: 0.1, close: 0.1, poor: 0.6 },
+        ],
+        note: "A close prediction stays near the reviewer votes (KL = 0.027), while putting 0.60 on Account and only 0.20 on Billing spikes KL divergence more than 25x higher (0.698).",
+      },
+      {
+        kind: "paragraph",
+        html: "Let's inspect every class row for both `q_close = [0.6, 0.3, 0.1]` and `q_far = [0.2, 0.2, 0.6]` so nothing stays hidden inside the summation:",
+      },
+      {
+        kind: "table",
+        headers: ["Department", "Target p", "Close q term", "Poor q term"],
+        rows: [
+          ["Billing", "0.70", "0.7 * ln(0.7/0.6) = +0.108", "0.7 * ln(0.7/0.2) = +0.877"],
+          ["Technical", "0.20", "0.2 * ln(0.2/0.3) = -0.081", "0.2 * ln(0.2/0.2) = 0.000"],
+          ["Account", "0.10", "0.1 * ln(0.1/0.1) = 0.000", "0.1 * ln(0.1/0.6) = -0.179"],
+          ["Total KL", "1.00", "0.027", "0.698"],
+        ],
+        numericColumns: [1],
+        caption:
+          "Term-by-term KL divergence on p = [0.7, 0.2, 0.1] for a close prediction and a poor prediction.",
+      },
+      {
+        kind: "paragraph",
+        html: "Why are individual rows like `-0.081` (Technical in `q_close`) and `-0.179` (Account in `q_far`) negative? Because whenever `q_i > p_i`, the model gave that class *more* probability than the target asked for, so `p_i / q_i < 1` and its logarithm is negative. Yet the **total KL divergence can never drop below zero**: probabilities must sum to `1`, so over-allocating mass to one class forces you to steal mass away from other classes, and starving higher-weight classes always costs more than the small negative credit you gained elsewhere.",
+      },
+      {
+        kind: "callout",
+        title: "Quick check: what happens on an exact match?",
+        body: "If the model predicts `q = [0.7, 0.2, 0.1]`, identical to the reviewers' target `p`, every ratio `p_i / q_i` equals `1`, every `ln(1)` equals `0`, and `D_KL(p || q) = 0.000`. Zero KL divergence happens if and only if `q` matches `p` on every class.",
+      },
+      {
+        kind: "heading",
+        id: "kl-divergence-cross-entropy-and-order",
+        level: 2,
+        text: "How KL divergence connects to cross-entropy, and why order matters",
+      },
+      {
+        kind: "paragraph",
+        html: "Apply the quotient rule of logarithms (`ln(a / b) = ln(a) - ln(b)`) to the KL formula, and a clean bridge back to Part 5 drops right out:",
+      },
+      {
+        kind: "formula",
+        tex: String.raw`D_{\mathrm{KL}}(p \,\|\, q) = \sum_i p_i \ln p_i - \sum_i p_i \ln q_i = \underbrace{\left(-\sum_i p_i \ln q_i\right)}_{\mathrm{CE}(p, q)} - \underbrace{\left(-\sum_i p_i \ln p_i\right)}_{H(p)}`,
+        caption:
+          "KL divergence equals cross-entropy minus the target distribution's own entropy H(p).",
+      },
+      {
+        kind: "paragraph",
+        html: "The first term is **cross-entropy** `CE(p, q)`, the exact loss we already know. The second term `H(p)` is the **entropy** of the target distribution, which simply measures how spread out or uncertain the target itself is. On `p = [0.7, 0.2, 0.1]` and `q_far = [0.2, 0.2, 0.6]`, cross-entropy is `1.500`, the target's entropy is `H(p) = 0.802`, and `1.500 - 0.802 = 0.698`, matching our KL table to three decimal places.",
+      },
+      {
+        kind: "paragraph",
+        html: "Because the target labels `p` never change during training, `H(p)` is just a fixed constant offset. Minimizing KL divergence and minimizing cross-entropy therefore push the model's weights in the exact same direction! Even better, for a sharp one-hot target like `[1, 0, 0]`, there is zero uncertainty (`H(p) = 0`), so KL divergence reduces literally to standard cross-entropy.",
+      },
+      {
+        kind: "paragraph",
+        html: "There is one major gotcha before using KL divergence in code: **it is not symmetric**. Swapping `p` and `q` changes which distribution weights the sum, so `D_KL(p || q)` and `D_KL(q || p)` are usually different numbers. On our exact example, `D_KL(p || q_far) = 0.698`, whereas reversing the order gives `D_KL(q_far || p) = 0.825`.",
+      },
+      {
+        kind: "image",
+        src: "/articles/kl-divergence-direction.svg",
+        alt: "Side-by-side comparison showing forward KL(p || q) = 0.698 weighted by target p versus reverse KL(q || p) = 0.825 weighted by prediction q.",
+        caption:
+          "KL divergence is directional: swapping target p and prediction q changes the weights on every term and produces a different number (0.698 vs. 0.825).",
+        width: 800,
+        height: 325,
+      },
+      {
+        kind: "paragraph",
+        html: "Because `D_KL(p || q)` compares full probability distributions cleanly, practitioners reach for it whenever targets are soft rather than one-hot. Two everyday examples are **soft reviewer labels** (like our `7 / 2 / 1` ticket split) and **knowledge distillation**, where a small, fast student model learns to copy a larger teacher model's full output probabilities instead of only its single top-1 guess.",
+      },
+      {
+        kind: "code",
+        filename: "kl_divergence_pytorch.py",
+        code: `import torch
+import torch.nn.functional as F
+
+# Soft target from 10 reviewers (batch size 1, 3 classes)
+target_p = torch.tensor([[0.7, 0.2, 0.1]])
+
+# Raw logits from our classifier (never pass plain probabilities as input)
+logits = torch.tensor([[0.9, 0.2, -0.9]])
+log_q = F.log_softmax(logits, dim=-1)  # Uses log-sum-exp internally
+
+# Always use reduction="batchmean" for true mathematical KL divergence
+kl_loss = F.kl_div(log_q, target_p, reduction="batchmean")
+print(f"KL(p || q): {kl_loss.item():.4f}")`,
+      },
+      {
+        kind: "callout",
+        title: "Two PyTorch F.kl_div traps to avoid",
+        body: 'First, `F.kl_div(input, target)` expects **log-probabilities** (`F.log_softmax(logits, dim=-1)`) as its first argument and regular probabilities (`p`) as its second, because passing raw logits or plain probabilities silently gives wrong numbers. Second, pass `reduction="batchmean"` instead of the default `"mean"`, because `"mean"` divides by `batch_size × num_classes` rather than just `batch_size` and shrinks the true KL value by a factor of `num_classes`.',
+      },
+      {
+        kind: "heading",
+        id: "putting-all-three-together",
+        level: 2,
+        text: "Putting all three pieces together",
+      },
+      {
+        kind: "table",
+        headers: ["Tool", "Problem it solves", "Key formula or rule"],
+        rows: [
+          [
+            "Natural log (-ln p)",
+            "Multiplying probabilities underflows float32 to 0.0",
+            "Turns product into sum: -ln(prod p_i) = sum(-ln p_i)",
+          ],
+          [
+            "Log-sum-exp shift",
+            "Exponentiating large logits overflows float32 to inf",
+            "m + ln(sum e^(z_i - m)) with m = max(z)",
+          ],
+          [
+            "KL divergence",
+            "Hard one-hot labels miss soft probability targets",
+            "D_KL(p || q) = sum p_i ln(p_i / q_i) = CE(p, q) - H(p)",
+          ],
+        ],
+        caption:
+          "Summary of the three mechanics behind stable classification losses and distribution matching.",
+      },
+      {
+        kind: "paragraph",
+        html: "Run the interactive Python lab below right in your browser to verify every number in this article, from `float32` underflow on `1,000` tickets and shift-invariant Softmax to stable log-sum-exp and both directions of KL divergence. Try changing `n_tickets`, bumping `big_logits` to `[5000.0, 4999.0, 4998.0]`, or setting `q_close = p` to watch KL drop to `0.0000`.",
+      },
+      {
+        kind: "code",
+        filename: "log_lse_kl_lab.py",
+        runnable: true,
+        code: `import math
+import struct
+
+def to_float32(x):
+    return struct.unpack("f", struct.pack("f", x))[0]
+
+# 1. Probability product vs. sum of negative logs
+probs = [0.90, 0.80, 0.95]
+likelihood = math.prod(probs)
+neg_log_prod = -math.log(likelihood)
+sum_ce = sum(-math.log(p) for p in probs)
+print(f"3 tickets: likelihood = {likelihood:.3f}, -ln(L) = {neg_log_prod:.4f}, sum CEs = {sum_ce:.4f}")
+
+# Stress test in float32 across 1,000 confident tickets
+n_tickets = 1000
+f32_prod = to_float32(0.9 ** n_tickets)
+log_sum = n_tickets * (-math.log(0.9))
+print(f"{n_tickets:,} tickets at p=0.9: float32(0.9^N) = {f32_prod}, sum -ln(p) = {log_sum:.2f}")
+
+# 2. Shift-invariant Softmax and stable log-sum-exp
+def stable_softmax(z):
+    m = max(z)
+    exps = [math.exp(v - m) for v in z]
+    total = sum(exps)
+    return [e / total for e in exps]
+
+def stable_lse(z):
+    m = max(z)
+    return m + math.log(sum(math.exp(v - m) for v in z))
+
+big_logits = [1000.0, 999.0, 998.0]
+print("Softmax [2, 1, 0.1]:         ", [round(v, 3) for v in stable_softmax([2.0, 1.0, 0.1])])
+print("Softmax [1002, 1001, 1000.1]:", [round(v, 3) for v in stable_softmax([1002.0, 1001.0, 1000.1])])
+print(f"Stable LSE({[int(v) for v in big_logits]}): {stable_lse(big_logits):.4f}")
+
+# 3. KL divergence, entropy offset, and asymmetry
+def kl(p, q):
+    return sum(pi * math.log(pi / qi) for pi, qi in zip(p, q) if pi > 0)
+
+def ce(p, q):
+    return sum(-pi * math.log(qi) for pi, qi in zip(p, q) if pi > 0)
+
+def entropy(p):
+    return sum(-pi * math.log(pi) for pi in p if pi > 0)
+
+p = [0.7, 0.2, 0.1]
+q_close = [0.6, 0.3, 0.1]
+q_far = [0.2, 0.2, 0.6]
+ce_far, h_p = ce(p, q_far), entropy(p)
+
+print(f"KL(p || p):       {kl(p, p):.4f}")
+print(f"KL(p || q_close): {kl(p, q_close):.4f}")
+print(f"KL(p || q_far):   {kl(p, q_far):.4f}  (CE {ce_far:.4f} - H(p) {h_p:.4f} = {ce_far - h_p:.4f})")
+print(f"Reverse KL(q_far || p): {kl(q_far, p):.4f}")`,
+      },
+      {
+        kind: "video",
+        youtubeId: "Kv6waDvgxcA",
+        title: "Why Do Loss Functions Use the Log?",
+        caption:
+          "Watch the full animated walkthrough of probability underflow, natural logs, the log-sum-exp trick, and KL divergence.",
+        variant: "feature",
+      },
+      {
+        kind: "paragraph",
+        html: "Now the hidden machinery inside cross-entropy is completely transparent: logarithms keep probability products from vanishing into `float32` zeros, subtracting `max(z)` inside log-sum-exp keeps exponentials from exploding to `inf`, and KL divergence extends the exact same idea from one-hot classes to full probability distributions. In Part 7 of this series, we will step into specialized losses built for imbalanced classes, decision margins, and similarity search: **focal loss**, **hinge loss**, and **triplet loss**.",
+      },
+      {
+        kind: "references",
+        title: "References",
+        items: [
+          {
+            label: "torch.nn.functional.log_softmax",
+            href: "https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.log_softmax.html",
+            source: "PyTorch documentation",
+            note: "Numerically stable log-probability computation using the log-sum-exp shift.",
+          },
+          {
+            label: "torch.nn.functional.cross_entropy",
+            href: "https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.cross_entropy.html",
+            source: "PyTorch documentation",
+            note: "Combines log-softmax and negative log-likelihood directly on raw logits.",
+          },
+          {
+            label: "torch.nn.functional.kl_div",
+            href: "https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.kl_div.html",
+            source: "PyTorch documentation",
+            note: "KL divergence implementation, log-probability input contract, and batchmean reduction.",
+          },
+          {
+            label: "torch.nn.KLDivLoss",
+            href: "https://docs.pytorch.org/docs/stable/generated/torch.nn.KLDivLoss.html",
+            source: "PyTorch documentation",
+            note: "Module wrapper for pointwise KL divergence and reduction conventions.",
+          },
+          {
+            label: "Why Do Loss Functions Use the Log? (video)",
+            href: "https://www.youtube.com/watch?v=Kv6waDvgxcA",
+            source: "Brain Link on YouTube",
+          },
+          {
+            label: "Deep Learning Fundamentals playlist",
+            href: "https://www.youtube.com/playlist?list=PLX2zaNhVC3Eo",
+            source: "Brain Link on YouTube",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    slug: "loss-functions-mse-mae-cross-entropy",
+    title: "Loss Functions: Measuring Model Error",
+    dek: "A neural network cannot learn from a prediction that is merely called wrong. Build MSE, MAE, binary cross entropy, and multiclass cross entropy from first principles, then see why PyTorch classification losses take logits directly.",
+    topic: "Research",
+    publishedAt: "2026-11-19",
+    likes: 0,
+    views: 0,
+    commentCount: 0,
+    tags: ["#deep-learning", "#neural-networks", "#machine-learning", "#pytorch", "#nn-module"],
+    series: { slug: "deep-learning", title: "Deep Learning", part: 5 },
+    coverImage: "/articles/loss-functions-mse-mae-cross-entropy.png",
+    body: [
+      {
+        kind: "paragraph",
+        html: 'A support ticket says, "I cannot log into the application." A model could predict how many hours the ticket will take to resolve, whether it is urgent, or which team should handle it. Those are three different questions, so the same prediction error cannot mean the same thing in all three cases.',
+      },
+      {
+        kind: "paragraph",
+        html: "A **loss function** takes a model's prediction and the correct target, then returns a single scalar number that measures their disagreement. During training, automatic differentiation works out how that loss number shifts when every weight nudges slightly, and an optimizer updates the parameters in the direction that shrinks it. The loss is not just a grade handed back after the prediction. It defines what the model is actually being asked to improve.",
+      },
+      {
+        kind: "paragraph",
+        html: "We will follow the support ticket through three tasks: predicting resolution hours, deciding whether it is urgent, and choosing one team from billing, login, bug, or feature. First, we see why raw signed errors cancel out. Then we build losses tailored to continuous values, yes-or-no probabilities, and competing multiclass choices.",
+      },
+      {
+        kind: "mermaid",
+        caption:
+          "How one input branches by prediction problem into its loss function, turning each output format into a gradient signal that updates model parameters.",
+        code: `flowchart TD
+  T["Support ticket features -> Neural network"] --> R["Continuous hours -> MSELoss / L1Loss"]
+  T --> B["Urgent (yes/no) logit -> BCEWithLogitsLoss"]
+  T --> C["4 team logits -> CrossEntropyLoss"]
+  R --> L["Scalar loss score -> Gradients -> Weight updates"]
+  B --> L
+  C --> L`,
+      },
+      {
+        kind: "heading",
+        id: "why-raw-errors-do-not-work",
+        text: "Why raw errors do not work",
+      },
+      {
+        kind: "paragraph",
+        html: "For a numerical target, call the correct resolution time `y` and the model's prediction `y_hat` (read y-hat). Define the signed error as prediction minus target: `e = y_hat - y`. If the ticket actually takes `30` hours and the model predicts `10`, then `e = 10 - 30 = -20`. The negative sign tells us the prediction came in too low. A prediction of `50` hours gives `e = 50 - 30 = +20`, meaning it came in too high.",
+      },
+      {
+        kind: "paragraph",
+        html: "That sign helps identify direction, yet it breaks as soon as we average errors across examples. Averaging `-20` and `+20` produces `(-20 + 20) / 2 = 0.0`. A plain average claims perfection even though both predictions missed by twenty hours! Positive and negative misses cancel out unless every error becomes non-negative before averaging. Squaring (`e^2`) and taking absolute value (`|e|`) are the two standard ways to strip that sign cleanly:",
+      },
+      {
+        kind: "image",
+        src: "/articles/raw-error-cancellation.svg",
+        alt: "Comparison showing why raw signed errors cancel out while MSE and MAE catch mistakes. On left, errors -20 hours and +20 hours balance to average 0.0. On right, MSE squares them to 400.0 hours squared and MAE averages their magnitudes to 20.0 hours.",
+        caption:
+          "Averaging raw signed errors hides opposing misses (-20h and +20h balance to 0), whereas squaring or taking absolute values ensures zero loss only occurs when every prediction is exact.",
+        width: 800,
+        height: 295,
+      },
+      {
+        kind: "heading",
+        id: "mean-squared-error",
+        text: "Mean squared error makes large misses count more",
+      },
+      {
+        kind: "paragraph",
+        html: "**Mean squared error**, or **MSE**, squares each prediction error, sums the squares, and divides by the batch size `N`. Squaring removes negative signs and maps exact predictions (`e = 0`) cleanly to `0`. Across `N` examples indexed by `i`, with target `y_i` and prediction `y_hat_i`:",
+      },
+      {
+        kind: "formula",
+        tex: "\\operatorname{MSE} = \\frac{1}{N} \\sum_{i=1}^{N} (\\hat{y}_i - y_i)^2",
+        caption: "Mean squared error averages squared prediction errors across N examples.",
+      },
+      {
+        kind: "paragraph",
+        html: "Trace three ticket errors: `-2`, `1`, and `3` hours. Squaring turns them into `4`, `1`, and `9`. Summing gives `14`, and dividing by `3` yields an MSE of `14 / 3 ≈ 4.67`. Notice the units as well: if targets sit in hours, MSE sits in hours squared, which drives gradient updates cleanly even though it reads differently from raw hours.",
+      },
+      {
+        kind: "paragraph",
+        html: "More importantly, squaring curves upward smoothly on both sides of zero so bigger misses rapidly carry heavier weight. An error of `2` adds `4`, an error of `5` adds `25`, and doubling `5` to `10` quadruples its squared cost from `25` to `100`. Calculus explains why learning reacts proportionally too: the derivative of `e^2` with respect to `e` is `2e`. Twice the error produces twice the slope pushing weights back toward zero (divided by `N` across a batch average):",
+      },
+      {
+        kind: "figure",
+        variant: "line",
+        title: "Mean squared error curve across negative and positive errors",
+        xKey: "error",
+        xLabel: "signed prediction error e (y_hat - y)",
+        yLabel: "per-example squared error e^2",
+        note: "Evaluated for single-example squared error e^2 from e = -5 to +5",
+        caption:
+          "MSE rises in a smooth symmetric parabola centered at e = 0: small errors near zero feel almost flat slopes (2e), while large errors face steep slopes pushing parameters strongly.",
+        series: [{ key: "mse", label: "Squared error: e^2" }],
+        data: [
+          { error: "-5", mse: 25 },
+          { error: "-4", mse: 16 },
+          { error: "-3", mse: 9 },
+          { error: "-2", mse: 4 },
+          { error: "-1", mse: 1 },
+          { error: "0", mse: 0 },
+          { error: "1", mse: 1 },
+          { error: "2", mse: 4 },
+          { error: "3", mse: 9 },
+          { error: "4", mse: 16 },
+          { error: "5", mse: 25 },
+        ],
+      },
+      {
+        kind: "paragraph",
+        html: "That steep parabolic push helps when large mistakes must dominate training, yet it also hands outliers enormous leverage over a mini-batch. Test five ticket errors in hours: `2`, `-3`, `4`, `-2`, and one `100`-hour extreme miss. The first four squares sum to `4 + 9 + 16 + 4 = 33`, giving a baseline MSE of `33 / 4 = 8.25`. Appending that single outlier adds `100^2 = 10,000`, jumping the batch mean to `10,033 / 5 = 2,006.6` (`243x` larger from one data point!).",
+      },
+      {
+        kind: "heading",
+        id: "mean-absolute-error",
+        text: "Mean absolute error limits an outlier's influence",
+      },
+      {
+        kind: "paragraph",
+        html: "**Mean absolute error**, or **MAE**, strips the sign without amplifying distance. Every error contributes directly in original units: `-5` and `+5` both contribute `5`:",
+      },
+      {
+        kind: "formula",
+        tex: "\\operatorname{MAE} = \\frac{1}{N} \\sum_{i=1}^{N} |\\hat{y}_i - y_i|",
+        caption:
+          "Mean absolute error averages the absolute magnitudes of prediction errors across N examples.",
+      },
+      {
+        kind: "paragraph",
+        html: "Check the exact same five errors (`2`, `-3`, `4`, `-2`, `100`). Before the outlier, absolute errors sum to `2 + 3 + 4 + 2 = 11`, giving MAE `11 / 4 = 2.75` hours. Including `100` raises the average linearly to `(11 + 100) / 5 = 22.2` hours (`8.1x` rather than `243x`). Look at the slope to see why MAE resists extreme points: for `|e|`, the derivative away from zero is fixed at `+1` when `e > 0` and `-1` when `e < 0`. Even a `100`-hour error exerts the exact same step-size push (`1/N`) as a `2`-hour error! Right at `e = 0`, the V-shape has a sharp corner with no classical derivative, so automatic differentiation uses a standard subgradient value (`0` by convention at zero).",
+      },
+      {
+        kind: "image",
+        src: "/articles/mse-parabola-and-mae-v.svg",
+        alt: "Two-panel comparison of MSE and MAE. Left panel plots MSE = e squared as a smooth U-shaped parabola with growing slope 2e beside MAE = |e| as a sharp V-shape with constant slope plus or minus 1 over error -4 to +4. Right panel contrasts batch averages before and after adding a 100-hour outlier: MSE jumps 243 times from 8.25 to 2,006.6 whereas MAE scales linearly 8.1 times from 2.75 to 22.2.",
+        caption:
+          "Left: comparing loss shapes and slopes side by side across [-4, +4]. Right: one 100-hour outlier dominates MSE quadratically while MAE grows only linearly.",
+        width: 800,
+        height: 340,
+      },
+      {
+        kind: "table",
+        headers: ["Errors included", "MSE", "MAE"],
+        rows: [
+          ["First four: 2, -3, 4, -2", "8.25", "2.75"],
+          ["All five, including 100", "2,006.6", "22.2"],
+        ],
+        numericColumns: [1, 2],
+        caption: "The same extreme miss scales MSE by 243x compared with 8.1x under MAE.",
+      },
+      {
+        kind: "callout",
+        title: "Choosing between MSE and MAE",
+        body: "Neither loss is universally superior. Pick MSE when missing badly is truly much worse than missing slightly (and clean targets let gradient push taper smoothly to zero near e = 0). Pick MAE when noisy labels or rare wild outliers would otherwise hijack every weight update.",
+      },
+      {
+        kind: "heading",
+        id: "binary-cross-entropy",
+        text: "Binary cross entropy scores the probability of the true label",
+      },
+      {
+        kind: "paragraph",
+        html: 'Now shift the question from "how many hours?" to "is the ticket urgent?" Let the target `y` equal `1` for urgent and `0` for normal, while the model predicts a probability `p` inside `(0, 1)` that the ticket is urgent. Squared error fits badly on probability confidence near the boundary. Instead, cross entropy asks one pointed question: **how much probability `q` did the model place on the answer that actually happened?**',
+      },
+      {
+        kind: "paragraph",
+        html: "When the ticket is truly urgent (`y = 1`), the true answer's probability is `q = p`. When it is normal (`y = 0`), the true answer's probability is `q = 1 - p`. Cross entropy turns `q` into a loss with `-ln(q)` (the negative natural logarithm, base `e`). At `q = 1.0`, `-ln(1) = 0`, so confident right answers cost nothing. At `50/50` uncertainty (`q = 0.5`), `-ln(0.5) ≈ 0.693`. Slide `q` down toward `0`, and `-ln(q)` climbs steeply (`2.303` at `0.1`, `4.605` at `0.01`) without any upper ceiling:",
+      },
+      {
+        kind: "figure",
+        variant: "line",
+        title: "Cross-entropy penalty -ln(q) vs. probability assigned to the true label",
+        xKey: "q",
+        xLabel: "probability q given to true label",
+        yLabel: "loss -ln(q)",
+        note: "Computed from q = 0.01 (confident mistake) to q = 1.0 (certain match)",
+        caption:
+          "Why classifiers strongly avoid overconfident mistakes: dropping true-class probability from 0.9 to 0.5 nudges loss from 0.105 to 0.693, whereas dropping to 0.01 spikes penalty up to 4.605.",
+        series: [{ key: "loss", label: "Negative log loss: -ln(q)" }],
+        data: [
+          { q: "0.01", loss: 4.605 },
+          { q: "0.05", loss: 2.996 },
+          { q: "0.1", loss: 2.303 },
+          { q: "0.2", loss: 1.609 },
+          { q: "0.3", loss: 1.204 },
+          { q: "0.4", loss: 0.916 },
+          { q: "0.5", loss: 0.693 },
+          { q: "0.6", loss: 0.511 },
+          { q: "0.7", loss: 0.357 },
+          { q: "0.8", loss: 0.223 },
+          { q: "0.9", loss: 0.105 },
+          { q: "1", loss: 0.0 },
+        ],
+      },
+      {
+        kind: "paragraph",
+        html: "Rather than writing an `if / else` branch to swap between `-ln(p)` and `-ln(1 - p)`, binary cross entropy packs both branches into a smooth algebraic switch controlled by `y`:",
+      },
+      {
+        kind: "formula",
+        tex: "L = -\\left[y \\ln(p) + (1-y) \\ln(1-p)\\right]",
+        caption:
+          "Binary cross entropy uses the binary target y to select the probability of the true answer.",
+      },
+      {
+        kind: "paragraph",
+        html: "Plug in `y = 1`: `(1 - y)` equals zero, canceling the right term and leaving `-ln(p)`. Plug in `y = 0`: `y` vanishes, leaving `-ln(1 - p)`. On an urgent ticket predicted with `p = 0.9`, true-label probability is `0.9`, so loss is `0.105`. On a normal ticket with that same urgent probability `p = 0.9`, true-label probability shrinks to `1 - 0.9 = 0.1`, pushing loss up more than twenty-fold to `2.303`:",
+      },
+      {
+        kind: "table",
+        headers: ["True label", "Urgent probability p", "Probability of true label", "Loss"],
+        rows: [
+          ["Urgent (1)", "0.9", "0.9", "0.105"],
+          ["Urgent (1)", "0.01", "0.01", "4.605"],
+          ["Normal (0)", "0.1", "0.9", "0.105"],
+          ["Normal (0)", "0.9", "0.1", "2.303"],
+        ],
+        numericColumns: [1, 2, 3],
+        caption: "Illustrative binary cross-entropy values, rounded to three decimal places.",
+      },
+      {
+        kind: "paragraph",
+        html: "Choosing `-ln(q)` is not arbitrary either. Suppose two independent tickets receive true-label probabilities `0.9` and `0.8`: the joint probability of predicting both right is their product `0.9 * 0.8 = 0.72`. Across a thousand tickets, multiplying probabilities underflows near zero. Taking `-ln` converts that product cleanly into a sum of losses (`-(ln 0.9 + ln 0.8) = 0.105 + 0.223 = 0.329`), turning **maximum likelihood estimation** into simple gradient minimization. We will unpack that likelihood and KL-divergence view closely in Part 6.",
+      },
+      {
+        kind: "heading",
+        id: "logits-and-numerical-stability",
+        text: "Why binary classification should pass logits to the loss",
+      },
+      {
+        kind: "paragraph",
+        html: "Recall from [Part 3](/articles/why-relu-replaced-sigmoid) and Part 4 that a classifier's final `Linear` layer emits an unrestricted **logit** `z`, and sigmoid maps it into `(0, 1)` via `p = sigma(z) = 1 / (1 + e^(-z))` (for instance, `z ≈ 2.2` gives `p ≈ 0.9`). Passing logits through sigmoid is perfect for displaying a probability at inference. During training, computing sigmoid first and feeding `p` into a separate log loss breaks at extreme confidence.",
+      },
+      {
+        kind: "paragraph",
+        html: "Trace an urgent ticket (`y = 1`) where the model emits a terribly confident wrong logit `z = -1000`. Evaluating `sigmoid(-1000)` in 32-bit floating-point rounds the minuscule probability (`~10^-434`) flatly down to **`0.0`**. Feeding `0.0` into a standalone logarithm produces `ln(0) = -infinity`, so PyTorch's probability-based `nn.BCELoss` clamps its log output at `-100` and reports a capped loss of `100.0` (with zero useful slope left to pull `z` back up!) even though the true mathematical loss is about `1000.0`.",
+      },
+      {
+        kind: "paragraph",
+        html: "How does PyTorch avoid both `0.0` underflow AND `e^(+1000)` overflow inside `Softplus`? Substitute `p = 1 / (1 + e^(-z))` directly into `-ln(p)` for `y = 1`: reciprocal turns `-ln(1 / (1 + e^(-z)))` cleanly into `ln(1 + e^(-z)) = softplus(-z)`. Then factor out the larger magnitude cleanly with `softplus(x) = max(x, 0) + ln(1 + e^(-|x|))`. At `z = -1000` (`x = +1000`), that computes `1000 + ln(1 + e^(-1000)) ≈ 1000.0` directly without ever forming `e^(+1000)` or rounding sigmoid to zero:",
+      },
+      {
+        kind: "formula",
+        tex: "-\\ln(\\sigma(z)) = \\ln(1 + e^{-z}) = \\max(-z, 0) + \\ln\\!\\left(1 + e^{-|-z|}\\right)",
+        caption:
+          "Fusing sigmoid with binary cross entropy turns the loss into a shift-safe softplus that stays exact even at z = -1000.",
+      },
+      {
+        kind: "image",
+        src: "/articles/bce-stability-logits.svg",
+        alt: "Pipeline comparison on urgent ticket y = 1 with logit z = -1000. On top, running sigmoid then BCELoss underflows float32 to zero and clamps the loss at 100.0 with stuck zero gradient. On bottom, BCEWithLogitsLoss evaluates softplus(-z) via max(-z, 0) + ln(1 + e^-|z|) to recover exact loss 1000.0 and healthy training gradients.",
+        caption:
+          "Why nn.BCEWithLogitsLoss expects raw logits: fusing sigmoid and log-loss algebraically avoids float32 zero-underflow on extreme wrong predictions.",
+        width: 800,
+        height: 320,
+      },
+      {
+        kind: "paragraph",
+        html: "Extending the same identity to both `y = 1` and `y = 0` yields `softplus(z) - y * z` (equivalently `max(z, 0) - z * y + ln(1 + e^(-|z|))`). Give PyTorch's `nn.BCEWithLogitsLoss()` the raw logit `z` during training, and apply `torch.sigmoid(z)` only when inspecting probabilities for decisions or charts.",
+      },
+      {
+        kind: "callout",
+        title: "Use probabilities to interpret, logits to train",
+        body: "For binary classification, give `BCEWithLogitsLoss` the raw output of the final linear layer. Apply sigmoid when you need probabilities for interpretation. Adding sigmoid before this loss repeats part of its calculation and loses the numerically stable fused path.",
+      },
+      {
+        kind: "heading",
+        id: "multiclass-cross-entropy",
+        text: "Multiclass cross entropy scores the correct class",
+      },
+      {
+        kind: "paragraph",
+        html: "Now move to the third ticket question: choosing **which one** of four mutually exclusive categories handles this issue (`billing`, `login`, `bug`, or `feature`). The final linear layer emits four unbounded logits, say `[1.2, 3.7, 0.4, -0.8]`. Here index `1` (`login`, logit `3.7`) sits highest, yet raw logits can be negative and need not sum to `1`.",
+      },
+      {
+        kind: "paragraph",
+        html: "Softmax exponentiates each score `z_k` (`[3.320, 40.447, 1.492, 0.449]`) and divides by their total (`45.709`), turning those four logits into probabilities `[0.073, 0.885, 0.033, 0.010]`. Because the true category is `login` (`0.885`), multiclass cross entropy applies the exact same `-ln(q)` rule to `p_correct`:",
+      },
+      {
+        kind: "formula",
+        tex: "p_k = \\frac{e^{z_k}}{\\sum_{j=1}^{C} e^{z_j}}, \\qquad L = -\\ln(p_{\\text{correct}})",
+        caption:
+          "Softmax turns C logits into competing probabilities summing to 1, then cross entropy scores -ln of the correct class's probability.",
+      },
+      {
+        kind: "paragraph",
+        html: "Since `p_login = 0.885`, the ticket's cross-entropy loss is `-ln(0.885) ≈ 0.122`. Just as in the binary case, `0.99` yields `0.010`, `0.5` yields `0.693`, and `0.01` jumps to `4.605`. Binary cross entropy is simply the two-outcome case of the exact same `-ln(probability of truth)` principle.",
+      },
+      {
+        kind: "heading",
+        id: "log-softmax-and-nll",
+        text: "Log-softmax explains PyTorch's cross-entropy contract",
+      },
+      {
+        kind: "paragraph",
+        html: "Look inside `p_k = e^(z_k) / sum_j e^(z_j)` when you take `ln(p_k)`. Division inside a logarithm splits into subtraction, and `ln` cancels `e` in the numerator directly: `ln(p_k) = z_k - ln(sum_j e^(z_j))`. That operation is **log-softmax**. For our login ticket, `ln(45.709) ≈ 3.822`, so `ln(p_login) = 3.7 - 3.822 = -0.122`, and negating it recovers the exact cross-entropy loss `+0.122`.",
+      },
+      {
+        kind: "paragraph",
+        html: "In PyTorch, **negative log likelihood loss (`NLLLoss`)** expects those negative log-probabilities directly, indexes out the target class entry, and flips the sign. That makes `nn.CrossEntropyLoss()` strictly equivalent to **`LogSoftmax` + `NLLLoss`** fused cleanly together (using the max-shift trick `m = max(z)` inside `ln(sum e^(z_j - m)) + m` as derived in [Part 4](/articles/gelu-silu-and-softmax) so huge logits never overflow).",
+      },
+      {
+        kind: "paragraph",
+        html: "That fused architecture also explains why **never calling Softmax before `nn.CrossEntropyLoss()`** matters so much. Feed `[0.073, 0.885, 0.033, 0.010]` into `CrossEntropyLoss`, and PyTorch normalizes a *second time* inside `(0, 1)`, compressing `p_login` down to `0.437` and reporting a distorted loss of `0.827` (~`0.83`) instead of `0.122`! Raw logits go into `CrossEntropyLoss`:",
+      },
+      {
+        kind: "image",
+        src: "/articles/cross-entropy-ticket-flow.svg",
+        alt: "Worked multiclass cross-entropy calculation on support-ticket logits [1.2, 3.7, 0.4, -0.8] with correct class login (index 1). Softmax gives [0.073, 0.885, 0.033, 0.010] and LogSoftmax computes 3.7 - 3.822 = -0.122, producing NLL = 0.122, whereas mistakenly passing Softmax probabilities into CrossEntropyLoss squashes p to 0.437 and yields wrong loss 0.827.",
+        caption:
+          "How the 4-category ticket logits flow into exact loss 0.122 via LogSoftmax + NLLLoss, contrasted with the 0.827 distortion caused by applying Softmax twice.",
+        width: 800,
+        height: 350,
+      },
+      {
+        kind: "heading",
+        id: "loss-functions-in-pytorch",
+        text: "Put the right values into each PyTorch loss",
+      },
+      {
+        kind: "paragraph",
+        html: "Every PyTorch loss module enforces a strict **model-output and target contract** shaped directly by the prediction task you are solving:",
+      },
+      {
+        kind: "mermaid",
+        caption:
+          "Decision flow matching each prediction question to its output shape, target type, and standard PyTorch loss module.",
+        code: `flowchart TD
+  Q["What does this model output predict?"] --> R["Continuous quantity (hours, price)"]
+  Q --> B["Binary yes/no decision"]
+  Q --> M["1 of C mutually exclusive classes"]
+  Q --> N["Already normalized log-probabilities"]
+
+  R --> R1["Linear scalar + float target -> nn.MSELoss() or nn.L1Loss()"]
+  B --> B1["1 raw logit + float 0/1 target -> nn.BCEWithLogitsLoss()"]
+  M --> M1["C raw logits + integer index target -> nn.CrossEntropyLoss()"]
+  N --> N1["LogSoftmax outputs + integer index -> nn.NLLLoss()"]`,
+      },
+      {
+        kind: "table",
+        headers: ["PyTorch loss", "Model output", "Target"],
+        rows: [
+          ["`MSELoss`", "Predicted continuous value", "Floating-point value with matching shape"],
+          ["`L1Loss`", "Predicted continuous value", "Floating-point value with matching shape"],
+          [
+            "`BCEWithLogitsLoss`",
+            "One raw logit per binary label",
+            "Floating-point 0 or 1, matching shape",
+          ],
+          ["`CrossEntropyLoss`", "One raw logit per class", "Integer class index"],
+          ["`NLLLoss`", "Log-probability per class", "Integer class index"],
+        ],
+        caption: "The output and target formats are part of each PyTorch loss function's contract.",
+      },
+      {
+        kind: "paragraph",
+        html: "Notice how clearly the API names document those contracts: `MSELoss` expects predictions and floating-point targets of matching shape, `L1Loss` is PyTorch's name for MAE, `BCEWithLogitsLoss` explicitly names the raw-logit input, and `CrossEntropyLoss` runs `LogSoftmax + NLLLoss` inside a single logit-taking module (leaving `NLLLoss` for models whose forward pass already returns `LogSoftmax`).",
+      },
+      {
+        kind: "code",
+        filename: "loss_contracts.py",
+        code: `import torch.nn as nn
+
+# Regression: prediction and floating-point target share a shape
+regression_loss = nn.MSELoss()  # or nn.L1Loss()
+loss = regression_loss(predicted_hours, target_hours)
+
+# Binary: raw logits and float targets containing 0 or 1
+binary_loss = nn.BCEWithLogitsLoss()
+loss = binary_loss(urgent_logit, urgent_target)
+
+# Multiclass: raw logits and integer class indices
+class_loss = nn.CrossEntropyLoss()
+loss = class_loss(category_logits, category_index)`,
+      },
+      {
+        kind: "heading",
+        id: "interactive-loss-lab",
+        text: "Try changing the errors and logits",
+      },
+      {
+        kind: "paragraph",
+        html: "Run this browser-side Python lab using only the standard library. Try switching the final ticket error between `4` and `100` to watch MSE explode while MAE climbs steadily, pass `z = -1000.0` into the stable `softplus` binary form (`1000.000` with zero overflow), and compare correct multiclass cross-entropy (`0.122`) against the double-softmax bug (`0.827`):",
+      },
+      {
+        kind: "code",
+        filename: "loss_lab.py",
+        runnable: true,
+        code: `from math import exp, log, log1p
+
+def softplus(x):
+    # Stable form of log(1 + exp(x)) avoiding overflow for large |x|
+    return max(x, 0.0) + log1p(exp(-abs(x)))
+
+# Edit this last error to see outlier sensitivity.
+errors = [2.0, -3.0, 4.0, -2.0, 100.0]
+mse = sum(error * error for error in errors) / len(errors)
+mae = sum(abs(error) for error in errors) / len(errors)
+print(f"MSE across five tickets: {mse:.2f}")
+print(f"MAE across five tickets: {mae:.2f}")
+
+# Binary classification: y=1 means urgent. Try z=-1000.0!
+z, y = -2.0, 1.0
+binary_loss = softplus(z) - y * z
+print(f"Binary loss for logit {z:g}, target {y:g}: {binary_loss:.3f}")
+
+# Multiclass: class 1 (login) is correct. Compare raw logits vs double-softmax mistake.
+logits, target = [1.2, 3.7, 0.4, -0.8], 1
+largest = max(logits)
+exps = [exp(value - largest) for value in logits]
+denom = sum(exps)
+probs = [e / denom for e in exps]
+log_sum_exp = largest + log(denom)
+cross_entropy = log_sum_exp - logits[target]
+
+exps2 = [exp(p) for p in probs]
+double_softmax_loss = -log(exps2[target] / sum(exps2))
+print(f"Login cross-entropy (raw logits):    {cross_entropy:.3f}")
+print(f"Double-softmax trap (probs passed):  {double_softmax_loss:.3f}")`,
+      },
+      {
+        kind: "paragraph",
+        html: "Every loss function encodes what kinds of mistakes deserve the strongest correction. Squaring amplifies large numerical errors (`slope = 2e`), absolute value paces error linearly (`slope = ±1`), and cross entropy penalizes `-ln(q)` directly against the probability assigned to truth while relying on logit-based PyTorch implementations to preserve gradients cleanly across extreme values.",
+      },
+      {
+        kind: "paragraph",
+        html: "Once the prediction task is clear, selecting the starter loss becomes automatic: MSE or MAE for continuous targets, binary cross entropy (`BCEWithLogitsLoss`) for yes-or-no decisions, and multiclass cross entropy (`CrossEntropyLoss`) for one choice among exclusive categories. In [Part 6 of this series](/articles/why-loss-functions-use-the-log-and-kl-divergence), we open the hood on why classification losses use the natural logarithm, how the log-sum-exp trick prevents floating-point overflow, and how KL divergence generalizes cross-entropy to full probability distributions.",
+      },
+      {
+        kind: "references",
+        title: "References",
+        items: [
+          {
+            label: "MSELoss",
+            href: "https://docs.pytorch.org/docs/stable/generated/torch.nn.MSELoss.html",
+            source: "PyTorch documentation",
+            note: "Definition, reductions, and input and target shapes.",
+          },
+          {
+            label: "L1Loss",
+            href: "https://docs.pytorch.org/docs/stable/generated/torch.nn.L1Loss.html",
+            source: "PyTorch documentation",
+            note: "Absolute-error definition and reduction behavior.",
+          },
+          {
+            label: "BCEWithLogitsLoss",
+            href: "https://docs.pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html",
+            source: "PyTorch documentation",
+            note: "Binary cross entropy combined with sigmoid for numerical stability.",
+          },
+          {
+            label: "BCELoss",
+            href: "https://docs.pytorch.org/docs/stable/generated/torch.nn.BCELoss.html",
+            source: "PyTorch documentation",
+            note: "Probability-based binary cross entropy and its log-output clamp.",
+          },
+          {
+            label: "CrossEntropyLoss",
+            href: "https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html",
+            source: "PyTorch documentation",
+            note: "Raw logits and class-index targets for multiclass classification.",
+          },
+          {
+            label: "NLLLoss",
+            href: "https://docs.pytorch.org/docs/stable/generated/torch.nn.NLLLoss.html",
+            source: "PyTorch documentation",
+            note: "Negative log likelihood expects log-probabilities.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    slug: "gelu-silu-and-softmax",
+    title: "GELU, SiLU, and Softmax: Choosing by Layer",
+    dek: "ReLU unlocked deep networks with a sharp corner at zero, yet leaves no middle ground for mildly negative evidence or competing output scores. Derive ELU, GELU, SiLU, Softplus, and Softmax from first principles, and choose the right activation for every layer role.",
+    topic: "Research",
+    publishedAt: "2026-11-19",
+    likes: 0,
+    views: 0,
+    commentCount: 0,
+    tags: ["#deep-learning", "#neural-networks", "#machine-learning", "#pytorch", "#nn-module"],
+    series: { slug: "deep-learning", title: "Deep Learning", part: 4 },
+    coverImage: "/articles/gelu-silu-and-softmax.png",
+    body: [
+      {
+        kind: "paragraph",
+        html: "In [Part 3 of this series](/articles/why-relu-replaced-sigmoid), we saw why **ReLU** (`max(0, x)`) displaced sigmoid and tanh inside deep hidden layers. Holding a slope of `1` across positive inputs keeps backward learning signals alive across depth, while requiring only a single comparison against zero.",
+      },
+      {
+        kind: "paragraph",
+        html: "Look closely around zero, however, and ReLU enforces a rigid binary policy. Every negative score collapses cleanly to `0`, every positive score passes unchanged, and right at `x = 0` the curve bends through an abrupt corner where the slope jumps from `0` to `1`. That raises two practical questions: what happens inside hidden layers if we replace that hard cutoff with a **smooth** curve or input-dependent gate, and what happens at the **output layer** when scores must turn into probabilities?",
+      },
+      {
+        kind: "paragraph",
+        html: "To answer both cleanly, we split activations by where they sit inside `Linear -> Activation -> ... -> Output`. Inside **hidden layers**, we derive **ELU**, **GELU**, **SiLU (Swish)**, and **Softplus** on the exact same test inputs (`x = +1` and `x = -1`) so every curve and slope sits side by side without black boxes. At the **output layer**, we derive **Softmax** from raw logits, unpack its numerical stability trick and a notorious PyTorch loss trap, and establish one guiding rule for matching every layer to its target range.",
+      },
+      {
+        kind: "video",
+        youtubeId: "TG16QLxkAGI",
+        title: "How Do You Choose the Right Activation Function? | Ep. 4",
+        caption:
+          "Watch the companion Brain Link episode comparing ELU, GELU, SiLU, Softplus, and Softmax visually across hidden layers, probability bars, and PyTorch layer choices.",
+        variant: "compact",
+      },
+      {
+        kind: "heading",
+        id: "smooth-negative-elu",
+        text: "ELU: smoothing the negative side instead of going flat",
+      },
+      {
+        kind: "paragraph",
+        html: "The **Exponential Linear Unit (ELU)**, introduced by Clevert, Unterthiner, and Hochreiter in 2015, keeps ReLU's exact linear highway on the positive side while bending smoothly downward below zero instead of dropping flat:",
+      },
+      {
+        kind: "formula",
+        tex: "\\text{ELU}(x) = \\begin{cases} x & \\text{if } x > 0 \\\\ \\alpha(e^x - 1) & \\text{if } x \\le 0 \\end{cases}, \\qquad \\text{ELU}'(x) = \\begin{cases} 1 & \\text{if } x > 0 \\\\ \\alpha e^x & \\text{if } x \\le 0 \\end{cases}",
+        caption:
+          "ELU formula (left) and derivative slope (right), using Euler's constant e ≈ 2.718 and hyperparameter alpha defaulting to 1.0.",
+      },
+      {
+        kind: "paragraph",
+        html: "Look at why the left branch subtracts `1` inside `alpha * (e^x - 1)`. Because `e^0 = 1`, setting `x = 0` yields `alpha * (1 - 1) = 0`, so the negative curve meets the positive line `y = x` seamlessly at `(0, 0)`. Even better, when PyTorch uses its default `alpha = 1.0`, the left-branch derivative `alpha * e^x` evaluates at `x = 0` to `1.0 * e^0 = 1`, matching the positive slope `1` on the nose. Unlike ReLU or Leaky ReLU, `ELU(alpha=1.0)` has **zero kink** in either value or slope at the origin.",
+      },
+      {
+        kind: "paragraph",
+        html: "Trace our two benchmark inputs, `x = +1` and `x = -1`, using `alpha = 1.0`:",
+      },
+      {
+        kind: "list",
+        items: [
+          "**At `x = +1`**: since `x > 0`, ELU acts as the identity, returning `ELU(1) = 1.000` with gradient slope `1.000`.",
+          "**At `x = -1`**: since `x <= 0`, `e^(-1) ≈ 0.368`, giving `ELU(-1) = 0.368 - 1 = -0.632` with non-zero gradient slope `0.368`.",
+          "**Far left (`x -> -infinity`)**: `e^x -> 0`, so outputs glide gently toward the horizontal floor `-alpha` (`-1.0` when `alpha = 1.0`) rather than plunging linearly forever.",
+        ],
+      },
+      {
+        kind: "image",
+        src: "/articles/elu-curve-and-slope.svg",
+        alt: "Plot of the ELU activation function with alpha = 1.0 compared against a dashed ReLU curve from x = -3.5 to +2.5, highlighting (-1, -0.632), smooth join at (0, 0) with matching slope 1, (+1, 1.000), and the horizontal asymptote at y = -1.0.",
+        caption:
+          "Visualizing ELU right where it acts: positive inputs follow ReLU seamlessly at slope 1, while negative values bend gently toward -alpha instead of clamping flat at 0.",
+        width: 800,
+        height: 320,
+      },
+      {
+        kind: "callout",
+        title: "Does ELU eliminate negative saturation?",
+        body: "Not completely. While small negative inputs near zero preserve healthy gradient slopes (0.607 at x = -0.5 and 0.368 at x = -1), pushing far left reduces alpha * e^x exponentially toward zero (by x = -5, the slope falls to e^(-5) ≈ 0.0067). ELU gives bounded robustness against extreme negative outliers and pulls mean hidden activations closer toward zero, at the trade-off of evaluating an exponential on negative inputs instead of a single max comparison.",
+      },
+      {
+        kind: "heading",
+        id: "gaussian-gate-gelu",
+        text: "GELU: weighting inputs by a smooth bell-curve gate",
+      },
+      {
+        kind: "paragraph",
+        html: "Rather than carving `x <= 0` and `x > 0` with two separate formulas, the **Gaussian Error Linear Unit (GELU)**, introduced by Dan Hendrycks and Kevin Gimpel in 2016, reframes activation as a smooth **probability gate**. Instead of strictly flipping inputs on or off at zero, GELU scales every value `x` by where `x` lands along a standard normal bell curve:",
+      },
+      {
+        kind: "formula",
+        tex: "\\text{GELU}(x) = x \\cdot \\Phi(x) = \\frac{x}{2}\\left[1 + \\operatorname{erf}\\!\\left(\\frac{x}{\\sqrt{2}}\\right)\\right]",
+        caption:
+          "Exact GELU definition multiplying input x by the standard normal cumulative distribution function Phi(x).",
+      },
+      {
+        kind: "paragraph",
+        html: "To strip away any mystery from `Phi(x)` (the **standard normal cumulative distribution function**), picture drawing random numbers from a standard bell curve centered at `0` with spread `1`. For any score `x`, `Phi(x)` simply answers: **what fraction of that bell curve falls at or below `x`?** Because total area under the bell curve equals `1`, `Phi(x)` grows smoothly from `0` on the far left to `0.5` at the midpoint `x = 0`, then approaches `1` on the far right.",
+      },
+      {
+        kind: "paragraph",
+        html: "Plug in our test points directly from that bell-curve geometry:",
+      },
+      {
+        kind: "list",
+        items: [
+          "**At `x = 0`**: exact symmetry places half the bell curve to the left, so `Phi(0) = 0.500` and `GELU(0) = 0 * 0.500 = 0.000` (with slope `0.500`).",
+          "**At `x = +1`**: one standard deviation above the center covers half the curve below zero plus half of the `68.3%` middle band inside `[-1, +1]`, totaling `50% + 34.1% = 84.1%` (`Phi(1) ≈ 0.841`), so `GELU(1) ≈ 1 * 0.841 = 0.841`. Strongly positive scores stay nearly intact (`GELU(3) ≈ 2.996`), while small positive scores are gently damped.",
+          "**At `x = -1`**: by left-right symmetry, only `15.9%` of the curve sits below `-1` (`Phi(-1) = 1 - 0.841 = 0.159`), giving `GELU(-1) ≈ (-1) * 0.159 = -0.159`. Strongly negative inputs get gated close to zero (`GELU(-3) ≈ -0.004`), while mildly negative evidence keeps a soft voice.",
+        ],
+      },
+      {
+        kind: "image",
+        src: "/articles/gelu-bell-gate-curve.svg",
+        alt: "Two-panel diagram of GELU. Left panel shows the standard normal bell curve with cumulative area 0.159 below -1 and 0.841 below +1. Right panel plots GELU(x) across [-3, +3] against dashed ReLU, highlighting the slight negative dip to -0.170 near -0.75 and checkpoint (+1, 0.841).",
+        caption:
+          "Left: Phi(x) measures how much of a standard normal bell curve falls below x. Right: multiplying x by Phi(x) produces GELU's smooth transition through zero and small negative dip.",
+        width: 800,
+        height: 335,
+      },
+      {
+        kind: "paragraph",
+        html: "One geometric surprise pops out near `-0.75`: because multiplying a small negative `x` by a shrinking positive weight `Phi(x)` briefly drops faster than `Phi(x)` decays, GELU is not strictly monotonic on the left. It dips to a shallow minimum of `-0.170` near `x ≈ -0.752` before returning smoothly toward `0` on the left and climbing through `(0, 0)` on the right, giving a smooth curve that became a common default inside modern Transformer blocks such as BERT and GPT-style feed-forward networks.",
+      },
+      {
+        kind: "formula",
+        tex: "\\text{GELU}(x) \\approx \\frac{x}{2}\\left(1 + \\tanh\\!\\left[\\sqrt{\\frac{2}{\\pi}}\\left(x + 0.044715\\,x^3\\right)\\right]\\right)",
+        caption:
+          "The classic tanh approximation of GELU. Never memorize these constants, and know why this form exists alongside the exact erf formula.",
+      },
+      {
+        kind: "paragraph",
+        html: 'If you ever see that `tanh` approximation in a paper or codebase, do not memorize its constants. Early accelerators lacked fast hardware instructions for the Gaussian error function `erf`, so Hendrycks and Gimpel fitted a fast `tanh` polynomial that matches exact GELU to within roughly `0.0004` across `[-3, 3]`. In modern PyTorch, calling `nn.GELU()` uses the exact `erf` form (`approximate="none"`) by default, while passing `approximate="tanh"` switches to the classic approximation if you explicitly need parity with an older checkpoint.',
+      },
+      {
+        kind: "heading",
+        id: "self-gating-silu",
+        text: "SiLU (Swish): self-gating with the sigmoid you already know",
+      },
+      {
+        kind: "paragraph",
+        html: "What happens if you keep GELU's exact multiplicative gating idea (`x * gate`), yet build the gate out of the ordinary logistic sigmoid `sigma(x) = 1 / (1 + e^(-x))` from [Part 3](/articles/why-relu-replaced-sigmoid) instead of a Gaussian bell curve? You get **SiLU**, the **Sigmoid-Weighted Linear Unit**, also widely known as **Swish**:",
+      },
+      {
+        kind: "formula",
+        tex: "\\text{SiLU}(x) = x \\cdot \\sigma(x) = \\frac{x}{1 + e^{-x}}",
+        caption:
+          "SiLU (Swish) multiplies x by its own logistic sigmoid gate sigma(x), producing a smooth self-gated activation.",
+      },
+      {
+        kind: "paragraph",
+        html: "Trace that mechanism as a two-branch circuit: input `x` splits down two parallel wires. The top wire passes `x` through `sigma(x)` to produce a smooth valve value strictly inside `(0, 1)`. The bottom wire carries raw `x` untouched. Multiplication then joins the two wires back together. Because `x` opens or closes the gate that multiplies `x` itself, engineers describe SiLU as **self-gated**. Notice the dual history in the literature too: Elfwing, Uchibe, and Doya introduced it under the name **SiLU** in 2017, and Ramachandran, Zoph, and Le popularized the same form (`x * sigma(beta * x)` with default `beta = 1`) after automated architecture search under the name **Swish**.",
+      },
+      {
+        kind: "list",
+        items: [
+          "**At `x = +1`**: earlier we saw `sigma(1) = 1 / (1 + e^(-1)) ≈ 0.731`, so `SiLU(1) ≈ 1 * 0.731 = 0.731` (slope `≈ 0.928`). Because sigmoid approaches `1` more gradually than `Phi(x)`, SiLU damps `x = +1` a little more strongly than GELU's `0.841`.",
+          "**At `x = 0`**: `sigma(0) = 0.500`, so `SiLU(0) = 0.000` with slope `0.500`, matching GELU right through the origin.",
+          "**At `x = -1`**: `sigma(-1) = 1 - 0.731 = 0.269`, giving `SiLU(-1) ≈ (-1) * 0.269 = -0.269`. SiLU's negative pocket dips slightly deeper (reaching `-0.278` near `x ≈ -1.278`) before approaching `0` on the far left.",
+        ],
+      },
+      {
+        kind: "image",
+        src: "/articles/silu-self-gate-curve.svg",
+        alt: "Two-panel diagram of SiLU (Swish). Left panel draws the two-branch circuit where x computes a sigmoid gate sigma(x) and multiplies raw x to form SiLU(x). Right panel plots SiLU(x) across [-3, +3] against dashed ReLU, highlighting (-1.28, -0.278) minimum dip and (+1, 0.731).",
+        caption:
+          "Left: the two-branch self-gating circuit where x controls its own sigmoid valve sigma(x). Right: the resulting SiLU curve with a slightly deeper negative pocket than GELU.",
+        width: 800,
+        height: 335,
+      },
+      {
+        kind: "paragraph",
+        html: "Many recent Transformer architectures (including several open-weight language models following Shazeer, 2020) build their feed-forward blocks around a two-projection cousin called **SwiGLU**, which gates one linear projection using `SiLU` applied to a *separate* learned projection (`SiLU(x W_gate) * (x W_up)`). Full Transformer block dimensions belong to a dedicated architecture lesson later on, yet seeing `SiLU` here already makes every piece of that name click.",
+      },
+      {
+        kind: "heading",
+        id: "comparing-hidden-activations",
+        text: "Comparing ReLU, ELU, GELU, and SiLU: evolution, not strict replacement",
+      },
+      {
+        kind: "paragraph",
+        html: "Plotting the activation values alongside their exact derivatives across `x` in `[-3, 3]` makes clear what smoothing around zero changes and what stays invariant:",
+      },
+      {
+        kind: "figure",
+        variant: "line",
+        title: "Hidden-layer activation curves across x = -3 to +3",
+        xKey: "x",
+        xLabel: "Input x",
+        yLabel: "Output f(x)",
+        note: "ELU shown with default alpha = 1.0, and GELU uses exact erf",
+        caption:
+          "ReLU snaps hard onto y = 0 for all x <= 0. ELU drops smoothly toward -1.0, while GELU and SiLU dip briefly negative near zero before fading back toward 0 on the left.",
+        series: [
+          { key: "relu", label: "ReLU" },
+          { key: "elu", label: "ELU (alpha = 1)" },
+          { key: "gelu", label: "GELU" },
+          { key: "silu", label: "SiLU (Swish)" },
+        ],
+        data: [
+          { x: "-3", relu: 0.0, elu: -0.95, gelu: -0.004, silu: -0.142 },
+          { x: "-2.5", relu: 0.0, elu: -0.918, gelu: -0.016, silu: -0.19 },
+          { x: "-2", relu: 0.0, elu: -0.865, gelu: -0.046, silu: -0.238 },
+          { x: "-1.5", relu: 0.0, elu: -0.777, gelu: -0.1, silu: -0.274 },
+          { x: "-1", relu: 0.0, elu: -0.632, gelu: -0.159, silu: -0.269 },
+          { x: "-0.5", relu: 0.0, elu: -0.393, gelu: -0.154, silu: -0.189 },
+          { x: "0", relu: 0.0, elu: 0.0, gelu: 0.0, silu: 0.0 },
+          { x: "0.5", relu: 0.5, elu: 0.5, gelu: 0.346, silu: 0.311 },
+          { x: "1", relu: 1.0, elu: 1.0, gelu: 0.841, silu: 0.731 },
+          { x: "1.5", relu: 1.5, elu: 1.5, gelu: 1.4, silu: 1.226 },
+          { x: "2", relu: 2.0, elu: 2.0, gelu: 1.954, silu: 1.762 },
+          { x: "2.5", relu: 2.5, elu: 2.5, gelu: 2.484, silu: 2.31 },
+          { x: "3", relu: 3.0, elu: 3.0, gelu: 2.996, silu: 2.858 },
+        ],
+      },
+      {
+        kind: "figure",
+        variant: "line",
+        title: "Derivative slopes across x = -3 to +3",
+        xKey: "x",
+        xLabel: "Input x",
+        yLabel: "Slope f'(x)",
+        note: "Negative slopes on GELU and SiLU reflect their slight non-monotonic dip left of zero",
+        caption:
+          "ReLU jumps discontinuously from 0 to 1 at the origin. ELU rises continuously to 1 at zero when alpha = 1, while GELU and SiLU pass smoothly through slope 0.5 at x = 0.",
+        series: [
+          { key: "relu", label: "ReLU slope" },
+          { key: "elu", label: "ELU slope" },
+          { key: "gelu", label: "GELU slope" },
+          { key: "silu", label: "SiLU slope" },
+        ],
+        data: [
+          { x: "-3", relu: 0.0, elu: 0.05, gelu: -0.012, silu: -0.088 },
+          { x: "-2.5", relu: 0.0, elu: 0.082, gelu: -0.038, silu: -0.099 },
+          { x: "-2", relu: 0.0, elu: 0.135, gelu: -0.085, silu: -0.091 },
+          { x: "-1.5", relu: 0.0, elu: 0.223, gelu: -0.127, silu: -0.041 },
+          { x: "-1", relu: 0.0, elu: 0.368, gelu: -0.083, silu: 0.072 },
+          { x: "-0.5", relu: 0.0, elu: 0.607, gelu: 0.133, silu: 0.26 },
+          { x: "0", relu: 0.0, elu: 1.0, gelu: 0.5, silu: 0.5 },
+          { x: "0.5", relu: 1.0, elu: 1.0, gelu: 0.867, silu: 0.74 },
+          { x: "1", relu: 1.0, elu: 1.0, gelu: 1.083, silu: 0.928 },
+          { x: "1.5", relu: 1.0, elu: 1.0, gelu: 1.127, silu: 1.041 },
+          { x: "2", relu: 1.0, elu: 1.0, gelu: 1.085, silu: 1.091 },
+          { x: "2.5", relu: 1.0, elu: 1.0, gelu: 1.038, silu: 1.099 },
+          { x: "3", relu: 1.0, elu: 1.0, gelu: 1.012, silu: 1.088 },
+        ],
+      },
+      {
+        kind: "paragraph",
+        html: "Think of the arc across Sigmoid and Tanh -> ReLU -> Leaky ReLU and ELU -> GELU and SiLU as a story of **problem -> trade-off -> design evolution**, *not* a strict historical replacement chain where every newcomer obsoletes the previous one. ReLU remains widely used across convolutional networks, tabular MLPs, and latency-critical edge models precisely because comparing against zero is nearly free in hardware. Meanwhile, **many modern Transformers** choose GELU or SiLU where smoother gating around zero helps gradient optimization.",
+      },
+      {
+        kind: "heading",
+        id: "softplus-smooth-relu",
+        text: "Softplus: the always-positive smooth twin of ReLU",
+      },
+      {
+        kind: "paragraph",
+        html: "One more hidden-style curve belongs in your toolkit because it pops up whenever an output quantity **must stay strictly positive** rather than merely nonlinear. The **Softplus** function is defined using the natural logarithm (`ln`, base `e`):",
+      },
+      {
+        kind: "formula",
+        tex: "\\text{Softplus}(x) = \\ln(1 + e^x), \\qquad \\text{Softplus}'(x) = \\frac{e^x}{1 + e^x} = \\sigma(x)",
+        caption:
+          "Softplus formula on the left and its derivative on the right, which reduces algebraically to the logistic sigmoid.",
+      },
+      {
+        kind: "paragraph",
+        html: "Read why Softplus hugs ReLU closely at both tails directly from the algebra. When `x` is large and positive (say `x = +3`), `e^3 ≈ 20.086` dominates `1`, so `ln(1 + 20.086) = 3.049` tracks `y = x` smoothly from just above. When `x` is strongly negative (say `x = -3`), `e^(-3) ≈ 0.050` is tiny, so `ln(1.050) ≈ 0.049` glides gently toward `0` without ever touching zero or going negative. Right at `x = 0`, `e^0 = 1`, giving `Softplus(0) = ln(2) ≈ 0.693`. And differentiating `ln(1 + e^x)` gives `e^x / (1 + e^x)`, and dividing both numerator and denominator by `e^x` turns it into `1 / (e^(-x) + 1) = sigma(x)`, rising smoothly from `0` to `1`!",
+      },
+      {
+        kind: "figure",
+        variant: "line",
+        title: "Softplus vs. ReLU across x = -3 to +3",
+        xKey: "x",
+        xLabel: "Input x",
+        yLabel: "Output f(x)",
+        note: "Softplus crosses x = 0 at ln(2) ≈ 0.693 and stays strictly positive everywhere",
+        caption:
+          "Softplus tracks ReLU asymptotically on both sides while removing the corner at zero and keeping all outputs strictly above 0.",
+        series: [
+          { key: "relu", label: "ReLU" },
+          { key: "softplus", label: "Softplus" },
+        ],
+        data: [
+          { x: "-3", relu: 0.0, softplus: 0.049 },
+          { x: "-2.5", relu: 0.0, softplus: 0.079 },
+          { x: "-2", relu: 0.0, softplus: 0.127 },
+          { x: "-1.5", relu: 0.0, softplus: 0.201 },
+          { x: "-1", relu: 0.0, softplus: 0.313 },
+          { x: "-0.5", relu: 0.0, softplus: 0.474 },
+          { x: "0", relu: 0.0, softplus: 0.693 },
+          { x: "0.5", relu: 0.5, softplus: 0.974 },
+          { x: "1", relu: 1.0, softplus: 1.313 },
+          { x: "1.5", relu: 1.5, softplus: 1.701 },
+          { x: "2", relu: 2.0, softplus: 2.127 },
+          { x: "2.5", relu: 2.5, softplus: 2.579 },
+          { x: "3", relu: 3.0, softplus: 3.049 },
+        ],
+      },
+      {
+        kind: "paragraph",
+        html: "Why do most hidden layers still prefer ReLU, GELU, or SiLU over Softplus? First, Softplus demands both an exponential and a logarithm (`exp + log`), making it heavier per neuron than ReLU's single max comparison (and in PyTorch, `nn.Softplus(beta=1, threshold=20)` quietly returns `x` once `beta * x > threshold` to prevent `e^x` overflow). Second, Softplus shifts outputs upward by `0.693` at `x = 0` and stays non-zero everywhere, forfeiting ReLU's clean zero sparsity. Where Softplus truly shines is on specialized outputs that must be smoothly positive without zero plateaus, such as predicted standard deviations (`sigma > 0`), variances, or event rates.",
+      },
+      {
+        kind: "table",
+        headers: ["Activation", "f(+1)", "f(-1)", "f'(+1)", "f'(-1)", "Primary trade-off"],
+        numericColumns: [1, 2, 3, 4],
+        rows: [
+          [
+            "**ReLU**",
+            "1.000",
+            "0.000",
+            "1.000",
+            "0.000",
+            "Fastest compute and exact zero sparsity, sharp corner at 0, can suffer dead units",
+          ],
+          [
+            "**ELU (alpha = 1)**",
+            "1.000",
+            "-0.632",
+            "1.000",
+            "0.368",
+            "Smooth match at 0 and bounded -alpha tail, still saturates far left, uses exp",
+          ],
+          [
+            "**GELU**",
+            "0.841",
+            "-0.159",
+            "1.083",
+            "-0.083",
+            "Smooth bell-curve gate common in Transformers, higher compute cost than ReLU",
+          ],
+          [
+            "**SiLU (Swish)**",
+            "0.731",
+            "-0.269",
+            "0.928",
+            "0.072",
+            "Smooth sigmoid self-gate with slightly deeper negative dip, uses sigmoid and multiply",
+          ],
+          [
+            "**Softplus**",
+            "1.313",
+            "0.313",
+            "0.731",
+            "0.269",
+            "Always positive and smooth everywhere (slope = sigmoid), exp + log overhead",
+          ],
+        ],
+        caption:
+          "Exact values and local slopes evaluated at x = +1 and x = -1 across the five continuous hidden-style activations.",
+      },
+      {
+        kind: "heading",
+        id: "softmax-output-probabilities",
+        text: "Softmax: turning output logits into competing probabilities",
+      },
+      {
+        kind: "paragraph",
+        html: "Notice something shared by all five functions above: every single one runs **neuron by neuron** on each number independently. At the **output layer** of a multiclass classifier (`cat` vs. `dog` vs. `bird`), that independence breaks down. When an example must belong to one mutually exclusive category, boosting the `cat` score has to pull down the share of probability left for `dog` and `bird`.",
+      },
+      {
+        kind: "paragraph",
+        html: "Recall from Part 1 and [Part 2](/articles/neural-network-parameters-and-flops) that a classifier's final `Linear` layer outputs unconstrained raw numbers called **logits** (`z_1, ..., z_C`). Why can we not simply divide each raw logit `z_i` by `sum(z_j)` to form percentages? Because logits can easily be negative (`-1.5`), or sum right to `0.0`, producing nonsensical negative probabilities or dividing by zero.",
+      },
+      {
+        kind: "paragraph",
+        html: "**Softmax** fixes both problems cleanly in two steps:",
+      },
+      {
+        kind: "formula",
+        tex: "p_i = \\frac{e^{z_i}}{\\sum_{j=1}^{C} e^{z_j}}, \\qquad 0 < p_i < 1, \\quad \\sum_{i=1}^{C} p_i = 1",
+        caption:
+          "Softmax first exponentiates every logit z_i to make every term strictly positive, then divides by the total across all C classes.",
+      },
+      {
+        kind: "paragraph",
+        html: "Step 1 passes each logit through `e^(z_i)`. No matter whether `z_i` is `+50`, `0`, or `-50`, `e^(z_i)` is always **strictly positive** (`> 0`), preserves rank order (`cat` still beats `dog`), and amplifies differences smoothly. Step 2 divides each positive score by the sum across all classes. Every resulting probability sits cleanly inside `(0, 1)`, and the probabilities across all classes sum strictly to `1`.",
+      },
+      {
+        kind: "paragraph",
+        html: "Walk through a concrete 3-class example with logits `[cat: 2.0, dog: 1.0, bird: 0.1]`: taking exponentials produces `[e^2.0 ≈ 7.389, e^1.0 ≈ 2.718, e^0.1 ≈ 1.105]`, whose denominator sum is `11.213`. Dividing each entry by `11.213` yields `[0.659, 0.242, 0.099]`, meaning `cat` carries `65.9%`, `dog` carries `24.2%`, and `bird` carries `9.9%`. Now keep `dog = 1.0` and `bird = 0.1` completely frozen and increase only `cat` from `2.0` to `3.0`: `e^3.0 ≈ 20.086` pushes the shared denominator to `23.909`, lifting `cat` to `0.840` while automatically pushing `dog` down to `0.114` and `bird` down to `0.046`.",
+      },
+      {
+        kind: "image",
+        src: "/articles/softmax-competition.svg",
+        alt: "Worked Softmax example showing logits [cat: 2.0, dog: 1.0, bird: 0.1] normalizing via denominator 11.213 to probabilities [0.659, 0.242, 0.099], and changing only the cat logit to 3.0 raising the denominator to 23.909 so cat jumps to 0.840 while dog and bird fall to 0.114 and 0.046.",
+        caption:
+          "Because every class divides by the same sum of exponentials, Softmax couples the entire output layer: changing a single logit shifts every class probability.",
+      },
+      {
+        kind: "callout",
+        title: "Why real implementations subtract max(z) first",
+        body: "What happens if logits reach `[1002.0, 1001.0, 1000.1]`? Computing `exp(1002)` overflows 64-bit floating point to infinity, turning `infinity / infinity` into `NaN`. Fortunately, subtracting the largest logit `m = max(z)` leaves every probability identical because `e^(z_i - m) / sum e^(z_j - m)` equals `(e^(-m) * e^(z_i)) / (e^(-m) * sum e^(z_j))`, so the shared `e^(-m)` factor cancels cleanly! That shifts `[1002.0, 1001.0, 1000.1]` to `[0.0, -1.0, -1.9]`, keeping the largest exponent at `e^0 = 1.0` and preventing overflow completely.",
+      },
+      {
+        kind: "heading",
+        id: "pytorch-activations-and-crossentropy",
+        text: "Using modern activations and Softmax safely in PyTorch",
+      },
+      {
+        kind: "paragraph",
+        html: "All five functions live directly in `torch.nn` as zero-parameter modules (`nn.ELU(alpha=1.0)`, `nn.GELU()`, `nn.SiLU()`, `nn.Softplus()`, and `nn.Softmax(dim=-1)`). Pay close attention to `dim=-1` on Softmax. In real batches of shape `(batch_size, num_classes)` such as `(32, 10)`, axis `0` runs across the `32` separate examples in the batch, while axis `-1` (the trailing class axis) normalizes across the `10` class scores of each individual example so every row sums to `1`.",
+      },
+      {
+        kind: "paragraph",
+        html: "Just as with binary `BCEWithLogitsLoss()` in Part 3, **never apply `nn.Softmax` inside your training forward pass if you train with `nn.CrossEntropyLoss()`**. Inside `CrossEntropyLoss`, PyTorch automatically computes a numerically fused `log_softmax` followed by negative log-likelihood loss. Feeding already-normalized `probs = torch.softmax(logits, dim=-1)` into `CrossEntropyLoss` runs Softmax a **second time** on numbers squeezed inside `(0, 1)`!",
+      },
+      {
+        kind: "paragraph",
+        html: "Check the exact arithmetic damage of that double-Softmax bug on our `3`-class example: even if raw logits `[10, 0, 0]` give `p_cat = 0.99991`, squishing `[0.99991, 0.00005, 0.00005]` through Softmax again caps top confidence near `e^1 / (e^1 + 2 e^0) ≈ 0.5761` and locks cross-entropy loss at a floor of `0.5515` instead of letting it drop toward `0`. Pass **raw logits** into `nn.CrossEntropyLoss()`, and call `torch.softmax(logits, dim=-1)` only when reading out predicted probabilities at inference:",
+      },
+      {
+        kind: "code",
+        filename: "modern_classifier_and_loss.py",
+        code: `import torch
+import torch.nn as nn
+
+# Hidden activations swap cleanly in the same 1,994-parameter architecture from Parts 2 & 3
+for act in (nn.ELU(alpha=1.0), nn.GELU(), nn.SiLU()):
+    model = nn.Sequential(
+        nn.Linear(20, 64),
+        act,
+        nn.Linear(64, 10),  # 10 raw logits out, NO Softmax inside the training head
+    )
+    print(f"{act.__class__.__name__:5s} -> {sum(p.numel() for p in model.parameters())} params")
+
+logits = torch.tensor([[2.0, 1.0, 0.1]])
+targets = torch.tensor([0])  # true class is index 0 (cat)
+
+criterion = nn.CrossEntropyLoss()
+loss = criterion(logits, targets)  # computes fused log_softmax + NLL internally
+
+# Need human-readable probabilities at evaluation or inference? Apply softmax outside the loss:
+with torch.no_grad():
+    probs = torch.softmax(logits, dim=-1)
+print("Inference probs:", probs.squeeze(0).tolist())  # [0.659..., 0.242..., 0.098...]`,
+      },
+      {
+        kind: "paragraph",
+        html: "Run the pure-Python experiment below directly in your browser to inspect every activation value and local derivative side by side (including extreme values like `1000.0` or `-1000.0` without overflow), watch Softmax couple `[cat, dog, bird]` probabilities when `cat` jumps from `2.0` to `3.0`, verify `max`-shift stability on huge logits, and measure the double-Softmax cross-entropy ceiling:",
+      },
+      {
+        kind: "code",
+        filename: "activation_gate_and_softmax_lab.py",
+        runnable: true,
+        code: `import math
+
+def sigmoid(x):
+    if x >= 0.0:
+        return 1.0 / (1.0 + math.exp(-x))
+    ez = math.exp(x)
+    return ez / (1.0 + ez)
+
+def softplus(x):
+    return max(x, 0.0) + math.log1p(math.exp(-abs(x)))
+
+def normal_cdf(x):
+    return 0.5 * (1.0 + math.erf(x / math.sqrt(2.0)))
+
+def inspect_hidden(x):
+    relu_v, relu_g = (x, 1.0) if x > 0.0 else (0.0, 0.0)
+    elu_v, elu_g = (x, 1.0) if x > 0.0 else (math.expm1(x), math.exp(x))
+    phi = normal_cdf(x)
+    pdf = math.exp(-0.5 * x * x) / math.sqrt(2.0 * math.pi)
+    gelu_v, gelu_g = x * phi, phi + x * pdf
+    s = sigmoid(x)
+    silu_v, silu_g = x * s, s + x * s * (1.0 - s)
+    sp_v, sp_g = softplus(x), s
+
+    print(f"--- x = {x:+.1f} ---")
+    for name, val, slope in (
+        ("ReLU", relu_v, relu_g),
+        ("ELU", elu_v, elu_g),
+        ("GELU", gelu_v, gelu_g),
+        ("SiLU", silu_v, silu_g),
+        ("Softplus", sp_v, sp_g),
+    ):
+        print(f"  {name:8s} out={val:7.4f}  slope={slope:7.4f}")
+
+def stable_softmax(logits):
+    top = max(logits)
+    exps = [math.exp(z - top) for z in logits]
+    denom = sum(exps)
+    return [e / denom for e in exps]
+
+for x in (1.0, -1.0):
+    inspect_hidden(x)
+    print()
+
+base = [2.0, 1.0, 0.1]
+raised = [3.0, 1.0, 0.1]
+huge = [1002.0, 1001.0, 1000.1]
+
+print("Softmax [2.0, 1.0, 0.1]       ->", [round(p, 3) for p in stable_softmax(base)])
+print("Softmax [3.0, 1.0, 0.1]       ->", [round(p, 3) for p in stable_softmax(raised)])
+print("Softmax [1002, 1001, 1000.1]  ->", [round(p, 3) for p in stable_softmax(huge)])
+
+# Double-softmax bug check on confident raw logits [10, 0, 0] for class 0
+confident_logits = [10.0, 0.0, 0.0]
+raw_probs = stable_softmax(confident_logits)
+double_probs = stable_softmax(raw_probs)
+print(f"Correct CE loss(raw logits)   = {-math.log(raw_probs[0]):.4f} (p={raw_probs[0]:.4f})")
+print(f"Double-Softmax CE loss        = {-math.log(double_probs[0]):.4f} (capped p={double_probs[0]:.4f})")`,
+      },
+      {
+        kind: "heading",
+        id: "choosing-by-layer-position",
+        text: "Choosing an activation by layer position",
+      },
+      {
+        kind: "paragraph",
+        html: "Instead of memorizing long rulebooks, anchor every design choice in one single question: **what range and behavior should this layer's output have?** Tracing where the layer sits inside the network gives the answer immediately:",
+      },
+      {
+        kind: "mermaid",
+        code: `flowchart TD
+  Q["What layer am I placing?"] --> H["Hidden layer (intermediate features)"]
+  Q --> B["Binary output (2 mutually exclusive labels)"]
+  Q --> M["Multiclass output (C mutually exclusive classes)"]
+  Q --> R["Regression output (continuous target like -100 or 1000)"]
+
+  H --> H1["Use ReLU, Leaky ReLU, GELU, or SiLU for nonlinearity and clean gradient flow"]
+  B --> B1["1 raw logit -> BCEWithLogitsLoss in training (sigmoid at inference)"]
+  M --> M1["C raw logits -> CrossEntropyLoss in training (softmax at inference)"]
+  R --> R1["Linear layer only, no activation (or Softplus if strictly positive)"]`,
+        caption:
+          "Layer-position decision map showing why hidden activations aim for learnable representations while output heads match the numerical range of the prediction target.",
+      },
+      {
+        kind: "list",
+        items: [
+          "**Hidden layers**: pick `ReLU`, `Leaky ReLU`, `GELU`, or `SiLU`. Their job is breaking linear collapse and transmitting gradients backward across depth, not shaping final predictions.",
+          "**Binary classification output**: emit `1` raw logit per sample and train with `nn.BCEWithLogitsLoss()`, keeping sigmoid conceptually for turning that logit into a `(0, 1)` positive probability at inference.",
+          "**Multiclass mutually exclusive output**: emit `C` raw logits and train with `nn.CrossEntropyLoss()`, keeping `torch.softmax(logits, dim=-1)` for probability readouts at inference. (If multiple tags can be true simultaneously rather than competing, treat each tag as its own binary logit with `BCEWithLogitsLoss` rather than Softmax.)",
+          "**Continuous regression output**: leave the final `Linear` layer completely bare with **no activation function** when targets span arbitrary numbers like `-100`, `0`, `25`, or `1,000`, so `Sigmoid`, `Tanh`, or `ReLU` never clip valid values. Use `Softplus` only when modeling a positive-only continuous scale such as standard deviation.",
+        ],
+      },
+      {
+        kind: "table",
+        headers: [
+          "Layer position",
+          "Typical output",
+          "PyTorch training loss / activation",
+          "Inference interpretation",
+        ],
+        rows: [
+          [
+            "**Hidden layer**",
+            "`d_hidden` feature vector",
+            "`nn.ReLU()`, `nn.GELU()`, `nn.SiLU()`, `nn.LeakyReLU()`",
+            "Feeds next linear transformation",
+          ],
+          [
+            "**Binary output**",
+            "`1` raw logit",
+            "`nn.BCEWithLogitsLoss()` on raw logit",
+            "`torch.sigmoid(logit)` in `(0, 1)`",
+          ],
+          [
+            "**Multiclass output**",
+            "`C` raw logits",
+            "`nn.CrossEntropyLoss()` on raw logits",
+            "`torch.softmax(logits, dim=-1)` summing to `1`",
+          ],
+          [
+            "**Regression output**",
+            "`1` or `k` scalars",
+            "No output activation (`nn.MSELoss()` / `nn.L1Loss()`)",
+            "Direct unbounded numerical prediction",
+          ],
+        ],
+        caption:
+          "Practical pairing of network layer role, training objective, and inference conversion across standard deep learning tasks.",
+      },
+      {
+        kind: "video",
+        youtubeId: "TG16QLxkAGI",
+        title: "How Do You Choose the Right Activation Function? | Ep. 4",
+        caption:
+          "Watch the full Brain Link walkthrough tracing ELU, GELU, SiLU, Softplus, live Softmax probability bars, and the layer-by-layer selection rule.",
+        variant: "feature",
+      },
+      {
+        kind: "paragraph",
+        html: "Stepping back across Part 3 and this guide, an activation function is never mere decoration dropped between weight matrices. Paired with a `Linear` layer's weighted evidence, hidden activations create nonlinear features while shaping local derivatives, and gradients flow through those slopes to govern how well weights actually learn, while output heads shape logits into the target space the task requires. What turns those logits, probabilities, or scalar predictions into a training update is measuring exactly how wrong they are, which brings us next to [Part 5 of this series](/articles/loss-functions-mse-mae-cross-entropy).",
+      },
+      {
+        kind: "references",
+        title: "References",
+        items: [
+          {
+            label: "Fast and Accurate Deep Network Learning by Exponential Linear Units (ELUs)",
+            href: "https://arxiv.org/abs/1511.07289",
+            source: "Djork-Arne Clevert, Thomas Unterthiner, and Sepp Hochreiter (2015)",
+            note: "Introduces ELU for smooth negative activations and reduced bias shift toward zero.",
+          },
+          {
+            label: "Gaussian Error Linear Units (GELUs)",
+            href: "https://arxiv.org/abs/1606.08415",
+            source: "Dan Hendrycks and Kevin Gimpel (2016)",
+            note: "Derives x * Phi(x) alongside the polynomial tanh approximation used across Transformer models.",
+          },
+          {
+            label:
+              "Sigmoid-Weighted Linear Units for Neural Network Function Approximation in Reinforcement Learning",
+            href: "https://arxiv.org/abs/1702.03118",
+            source: "Stefan Elfwing, Eiji Uchibe, and Kenji Doya (2017)",
+            note: "Defines SiLU as x * sigmoid(x) and analyzes its smooth gradient and negative minimum.",
+          },
+          {
+            label: "Searching for Activation Functions",
+            href: "https://arxiv.org/abs/1710.05941",
+            source: "Prajit Ramachandran, Barret Zoph, and Quoc V. Le (2017)",
+            note: "Popularizes Swish (x * sigmoid(beta * x)) via neural architecture search across vision and language tasks.",
+          },
+          {
+            label: "GLU Variants Improve Transformer",
+            href: "https://arxiv.org/abs/2002.05202",
+            source: "Noam Shazeer (2020)",
+            note: "Introduces SwiGLU feed-forward gating built from separate learned projections gated by Swish/SiLU.",
+          },
+          {
+            label: "torch.nn.ELU, nn.GELU, nn.SiLU, and nn.Softplus documentation",
+            href: "https://docs.pytorch.org/docs/stable/generated/torch.nn.GELU.html",
+            source: "PyTorch documentation",
+            note: "Documents default approximate='none' vs 'tanh' for GELU alongside sibling zero-parameter activation modules.",
+          },
+          {
+            label: "torch.nn.Softmax and nn.CrossEntropyLoss documentation",
+            href: "https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html",
+            source: "PyTorch documentation",
+            note: "Specifies raw logit inputs for CrossEntropyLoss via fused log-softmax and negative log likelihood.",
+          },
+          {
+            label: "How Do You Choose the Right Activation Function? (video)",
+            href: "https://www.youtube.com/watch?v=TG16QLxkAGI",
+            source: "Brain Link on YouTube",
+          },
+          {
+            label: "Deep Learning Fundamentals playlist",
+            href: "https://www.youtube.com/playlist?list=PLX2zaNhVC3Eo",
+            source: "Brain Link on YouTube",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    slug: "why-relu-replaced-sigmoid",
+    title: "Activation Functions: Why ReLU Replaced Sigmoid",
+    dek: "Sigmoid and tanh look smooth and well-behaved until their tails flatten out and choke deep training signals. Derive every curve, slope, and derivative behind sigmoid, tanh, ReLU, and Leaky ReLU to see why modern networks switched.",
+    topic: "Research",
+    publishedAt: "2026-11-19",
+    likes: 0,
+    views: 0,
+    commentCount: 0,
+    tags: ["#deep-learning", "#neural-networks", "#machine-learning", "#pytorch", "#nn-module"],
+    series: { slug: "deep-learning", title: "Deep Learning", part: 3 },
+    coverImage: "/articles/why-relu-replaced-sigmoid.png",
+    body: [
+      {
+        kind: "paragraph",
+        html: "In [Part 2 of this series](/articles/neural-network-parameters-and-flops), our three-step classifier (`Linear(20, 64) -> ReLU -> Linear(64, 10)`) held `1,994` trainable parameters, and every single one of them lived inside the two `Linear` layers. `nn.ReLU()` added **zero** weights and biases.",
+      },
+      {
+        kind: "paragraph",
+        html: "Yet deleting that zero-parameter layer collapses the entire stack. Two linear layers composed without a nonlinear activation fold algebraically into a single flat affine step (`W2(W1 x + b1) + b2 = (W2 W1) x + (W2 b1 + b2) = W_eff x + b_eff`), leaving a multi-layer network no more expressive than one neuron's straight boundary from [Part 1](/articles/from-one-neuron-to-neural-networks). Even once you commit to adding an activation function, though, *which* curve you pick decides whether a deep network actually learns or stalls out.",
+      },
+      {
+        kind: "paragraph",
+        html: "For decades, neural networks defaulted to a smooth S-shaped curve called the **sigmoid**. Modern networks almost universally default to the sharp-cornered **ReLU** in hidden layers instead. Understanding that shift comes down to one physical quantity: the **slope** of each activation curve.",
+      },
+      {
+        kind: "video",
+        youtubeId: "ZGIVMKvQ5Cg",
+        title: "Why Neural Networks Need Activation Functions",
+        caption:
+          "Watch the companion Brain Link episode comparing sigmoid, tanh, ReLU, and Leaky ReLU visually through tangent slopes moving across each curve and multiplying backward through depth.",
+        variant: "compact",
+      },
+      {
+        kind: "heading",
+        id: "why-slopes-matter",
+        text: "What an activation does to learning signals",
+      },
+      {
+        kind: "paragraph",
+        html: "A neuron begins by computing an affine score `z = w^T x + b` (the dot product of its weight row `w` and input vector `x`, shifted by bias `b`), then passes that raw number through an element-wise activation function `f(z)`. Think of `f` as doing two coupled jobs. Forward, it bends straight weighted sums so stacked layers can carve curved boundaries. Backward during training, its curve governs how much **sensitivity** passes back to earlier weights.",
+      },
+      {
+        kind: "paragraph",
+        html: "To see why without getting ahead of full backpropagation calculus, follow the question training must answer right after checking the final prediction error (**loss**): if an early weight nudges slightly, how much does that final loss change? By the **chain rule** of calculus, local sensitivities multiply step by step backward from the output error toward Layer 1.",
+      },
+      {
+        kind: "paragraph",
+        html: "Every time that backward **learning signal** (gradient) crosses a neuron's activation `f(z)`, it gets **multiplied by `f'(z)`**, the local tangent slope (`rise / run`) of `f` at that neuron's current input `z`. Check the concrete arithmetic: if nudging `z` by `+0.01` lifts `f(z)` by `+0.0025`, then `f'(z) = 0.0025 / 0.01 = 0.25`, so only a quarter of that sensitivity continues backward to earlier weights. When a curve goes flat (`f'(z) ≈ 0`), a neuron squeezes almost the entire learning signal down to nothing.",
+      },
+      {
+        kind: "image",
+        src: "/articles/activation-tangent-slope-gate.svg",
+        alt: "Two-panel diagram explaining tangent slope f'(z) on an activation curve and its role as a multiplicative backward gate. Left panel contrasts steep center slope 0.25 at z equals 0 against flat tail slope 0.018 at z equals +4. Right panel shows incoming backward loss gradient multiplied by f'(z), comparing 1.00 (100% preserved), 0.25 (25% preserved), and near-zero (stalled updates).",
+        caption:
+          "Geometric meaning of activation slope: steep tangents forward become open gradient valves backward, while flat curve tails close the valve toward zero.",
+        width: 800,
+        height: 315,
+      },
+      {
+        kind: "callout",
+        title: "What saturation actually means",
+        body: "Saturation does not mean an activation outputs a broken number or gets permanently locked by software. It simply means the curve flattens out so its derivative `f'(z)` approaches zero. Large changes in pre-activation `z` produce barely any change in output, turning the backward learning signal weak. Older sigmoid networks still train in shallow models, yet depth multiplies those small slopes rapidly into vanishing gradients.",
+      },
+      {
+        kind: "heading",
+        id: "sigmoid-and-saturation",
+        text: "Sigmoid and why smooth curves saturate",
+      },
+      {
+        kind: "paragraph",
+        html: "The **logistic sigmoid** takes any real pre-activation `z` from `-infinity` to `+infinity` and squeezes it smoothly into the open interval `(0, 1)`:",
+      },
+      {
+        kind: "formula",
+        tex: "\\sigma(z) = \\frac{1}{1 + e^{-z}}, \\qquad \\sigma'(z) = \\sigma(z)\\bigl(1 - \\sigma(z)\\bigr)",
+        caption:
+          "Sigmoid formula on the left (using Euler's constant e ≈ 2.718) and its closed-form slope derivative on the right.",
+      },
+      {
+        kind: "paragraph",
+        html: "Read the behavior directly from `e^(-z)` (where `e ≈ 2.718`). Because an exponential of any real number is strictly positive, the denominator `1 + e^(-z)` is always strictly greater than `1`, trapping output values neatly inside `(0, 1)`. Testing three values maps out the S-shape immediately:",
+      },
+      {
+        kind: "list",
+        items: [
+          "**At `z = 0`**: `e^0 = 1`, so `sigma(0) = 1 / (1 + 1) = 0.500` right in the center.",
+          "**At `z = +5`**: `e^(-5) ≈ 0.00674`, so the denominator sits near `1.0067` and `sigma(5) ≈ 0.99331`, hugging the top ceiling `1`.",
+          "**At `z = -5`**: `e^(+5) ≈ 148.41`, inflating the denominator so `sigma(-5) = 1 / 149.41 ≈ 0.00669`, flattening near `0`.",
+        ],
+      },
+      {
+        kind: "paragraph",
+        html: "Now inspect sigmoid's derivative formula, `sigma'(z) = sigma(z) * (1 - sigma(z))`. Letting `s = sigma(z)` and completing the square shows `s(1 - s) = s - s^2 = -(s^2 - s + 0.25) + 0.25 = 0.25 - (s - 0.5)^2`. Because a squared real number can never go negative, **sigmoid's slope can never exceed `0.25`**, reaching that peak only right at `z = 0` (`s = 0.5`). Out at `z = 5` or `z = -5`, the slope collapses to `0.99331 * 0.00669 ≈ 0.00665`, less than seven thousandths.",
+      },
+      {
+        kind: "image",
+        src: "/articles/sigmoid-curve-and-slope.svg",
+        alt: "Two-panel graph of the logistic sigmoid function on the left and its derivative bell curve on the right across z from -6 to +6. Highlights shaded saturated tails beyond plus or minus 3, test checkpoints (-5, 0.007), (0, 0.50), and (+5, 0.993), peak derivative 0.25 at z = 0, and tail slope 0.00665 at z = +5.",
+        caption:
+          "Visualizing sigmoid right where it acts: outputs stay bounded between 0 and 1, while its slope peaks at just 0.25 and collapses below 0.007 in both shaded tails.",
+        width: 800,
+        height: 335,
+      },
+      {
+        kind: "paragraph",
+        html: "Multiply those slopes through depth. Suppose a network stacks `4` hidden sigmoid layers whose neurons sit slightly away from zero around slope `0.1`: multiplying `0.1 * 0.1 * 0.1 * 0.1` shrinks the signal to `0.0001` (`0.01%` remaining). Even in the theoretical **best case** where every single neuron across all `4` layers lands right at `z = 0` (`slope = 0.25`), `0.25^4 ≈ 0.0039`, leaving under four tenths of one percent for Layer 1 weights. That rapid shrinkage across depth is the start of the **vanishing gradient problem**.",
+      },
+      {
+        kind: "image",
+        src: "/articles/gradient-signal-depth.svg",
+        alt: "Comparison of backward learning signal attenuation across four hidden layers. On top, four sigmoid layers with slope 0.1 shrink a 1.0000 signal to 0.0001. On bottom, four active ReLU layers with slope 1.0 transmit the full 1.0000 signal.",
+        caption:
+          "Because chain-rule derivatives multiply at every layer, four sigmoid slopes of 0.1 shrink an incoming gradient to 0.0001 (and even the theoretical peak of 0.25^4 leaves 0.0039), while active ReLU slopes of 1.0 preserve 1.0000.",
+        width: 800,
+        height: 360,
+      },
+      {
+        kind: "paragraph",
+        html: "Sigmoid carries a second subtle drawback inside hidden layers: **every output is strictly positive** (`0 < sigma(z) < 1`). On a training sample, each weight update feeding a downstream neuron multiplies the same scalar upstream error sensitivity by the positive hidden activations `h_j > 0`, forcing all weights in that neuron's row to nudge with the **exact same sign** (either all increase together or all decrease together). Whenever an ideal correction needs some weights to grow while others shrink, optimization has to stair-step through multi-step zig-zags instead of moving directly toward the solution.",
+      },
+      {
+        kind: "paragraph",
+        html: "Does that mean sigmoid is obsolete? Not at all. While it fell out of favor in hidden layers, sigmoid still shines at the **output layer** of a binary classifier whenever a single unbounded logit needs converting into a class probability between `0` and `1`. Notice a practical PyTorch nuance here too: during training, we rarely place an explicit `nn.Sigmoid()` in front of binary cross-entropy loss. Instead, `nn.BCEWithLogitsLoss()` accepts the raw linear logit directly and fuses sigmoid plus logarithm arithmetic algebraically for cleaner numerical precision near `0` and `1`.",
+      },
+      {
+        kind: "heading",
+        id: "tanh-activation",
+        text: "Tanh centers outputs around zero",
+      },
+      {
+        kind: "paragraph",
+        html: "The **hyperbolic tangent** (`tanh`) solves sigmoid's positive-only bias while keeping a smooth S-shape:",
+      },
+      {
+        kind: "formula",
+        tex: "\\tanh(z) = \\frac{e^z - e^{-z}}{e^z + e^{-z}} = 2\\sigma(2z) - 1, \\qquad \\tanh'(z) = 1 - \\tanh^2(z)",
+        caption:
+          "Tanh is a vertically stretched and centered version of sigmoid, spanning (-1, 1) with derivative 1 minus tanh squared.",
+      },
+      {
+        kind: "paragraph",
+        html: "Rewriting `tanh(z)` via `2 * sigma(2z) - 1 = 2 / (1 + e^(-2z)) - 1 = (1 - e^(-2z)) / (1 + e^(-2z))` and multiplying top and bottom by `e^z` explains both advantages in one glance. Subtracting `1` shifts the range from `(0, 1)` to **`(-1, 1)`** centered cleanly at `tanh(0) = 0`, so negative inputs emit negative activations (`tanh(-1) ≈ -0.762`, `tanh(+1) ≈ +0.762`) and break sigmoid's positive-only constraint. Meanwhile, differentiating `2 * sigma(2z)` picks up a factor of `2` outside and `2` inside, quadrupling the center slope from `0.25` to **`1.0`** (`1 - 0^2 = 1`).",
+      },
+      {
+        kind: "image",
+        src: "/articles/tanh-curve-and-slope.svg",
+        alt: "Two-panel graph comparing tanh with dashed sigmoid from z = -5 to +5. Left panel shows tanh spanning (-1, 1) centered at (0, 0) and flattening near plus or minus 3 to 0.995. Right panel shows tanh derivative peaking at 1.000 at z = 0 (4 times sigmoid's 0.25 peak) yet dropping to 0.0099 by z = 3.",
+        caption:
+          "Left: tanh centers outputs around zero by stretching sigmoid across (-1, 1). Right: peak slope rises to 1.0 at zero, yet still decays toward 0.01 by z = +-3.",
+        width: 800,
+        height: 335,
+      },
+      {
+        kind: "paragraph",
+        html: "Why did `tanh` still fail to hold its crown across deep stacks? Because scaling an S-curve only delays saturation without removing it. At `z = 1`, `tanh'(1) = 1 - 0.762^2 ≈ 0.420`, and by `z = 3`, `tanh(3) ≈ 0.99505`, so its local slope `1 - 0.99505^2` drops to `0.00987`, below one percent. Across `4` saturated layers at `z = 3`, `0.00987^4` shrinks past one part in a hundred million (`~9.5e-9`). As Xavier Glorot and Yoshua Bengio showed in 2010, saturating activations still starve deep layers of gradients whenever units drift outside the narrow center band.",
+      },
+      {
+        kind: "heading",
+        id: "relu-and-dying-neurons",
+        text: "ReLU eliminates positive saturation",
+      },
+      {
+        kind: "paragraph",
+        html: "The fix that transformed deep training turned out to be dramatically simpler than exponential S-curves: **ReLU** (Rectified Linear Unit) keeps a completely straight line for positive inputs (`ReLU(1) = 1`, `ReLU(100) = 100`) and clamps everything at or below zero flat to `0`:",
+      },
+      {
+        kind: "formula",
+        tex: "\\operatorname{ReLU}(z) = \\max(0, z), \\qquad \\operatorname{ReLU}'(z) = \\begin{cases} 1 & \\text{if } z > 0 \\\\ 0 & \\text{if } z < 0 \\end{cases}",
+        caption:
+          "ReLU passes positive values unchanged with constant slope 1 and zeros out negative pre-activations.",
+      },
+      {
+        kind: "image",
+        src: "/articles/relu-curve-and-dying-slope.svg",
+        alt: "Two-panel graph of the ReLU activation function max(0, z) on the left and its piecewise step derivative plus dying ReLU failure box on the right. Left panel highlights flat zero along negative inputs, corner at (0, 0), and constant slope 1 ray for positive inputs. Right panel plots step derivative jumping from 0 to 1 at z = 0 and shows the three steps that trap a permanently negative dying ReLU unit.",
+        caption:
+          "Visualizing ReLU where it acts: positive scores ride a constant-slope 1 line without ever saturating, while negative inputs drop to 0 with zero backward slope.",
+        width: 800,
+        height: 335,
+      },
+      {
+        kind: "paragraph",
+        html: "Check the obvious calculus question right at the sharp corner `z = 0`: on the left side the slope is `0`, and on the right side the slope is `1`, so a strict classical derivative does not exist at `z = 0`. Deep learning libraries handle this seamlessly by picking a fixed subgradient value at exact `0.0` (verified in PyTorch `2.9.1`: `nn.ReLU()` returns `0.0` gradient at `z = 0.0`). Because continuous floating-point weighted sums rarely land on exact zero, that convention causes zero trouble in practice.",
+      },
+      {
+        kind: "paragraph",
+        html: "Replacing exponential curves with `max(0, z)` gave deep architectures three decisive advantages:",
+      },
+      {
+        kind: "list",
+        items: [
+          "**Zero saturation for positive inputs**: even at `z = 100`, `ReLU(100) = 100` and its slope stays **`1.0`**. Multiply `1` across `4` active hidden layers (`1 * 1 * 1 * 1 = 1`) and `100%` of the backward learning signal passes through active paths unattenuated.",
+          "**Cheap compute**: evaluating sigmoid or tanh requires computing exponentials (`exp`), whereas `max(0, z)` is one fast threshold comparison per neuron.",
+          "**Natural sparsity**: clamping negative pre-activations directly to `0` switches off inactive units (observed in Glorot, Bordes, and Bengio's 2011 study on rectifier networks), letting models build clean sparse representations rather than keeping every unit partially active.",
+        ],
+      },
+      {
+        kind: "paragraph",
+        html: "ReLU solves positive saturation, yet introduces its own failure mode on the opposite side of zero: the **dying ReLU problem**. Suppose a large training update (triggered for instance by an aggressive learning rate) pushes a neuron's weights and bias negative enough that `w^T x + b < 0` for *every* example in the dataset. Because `ReLU(z) = 0` and `ReLU'(z) = 0` for all `z < 0`, every backward learning signal crossing that unit multiplies by `0`. With zero gradient flowing to its weights or bias, that neuron can never update itself back across zero and stops learning permanently.",
+      },
+      {
+        kind: "heading",
+        id: "leaky-relu-tradeoff",
+        text: "Leaky ReLU and the slope trade-off",
+      },
+      {
+        kind: "paragraph",
+        html: "**Leaky ReLU** fixes the dead negative zone with a small tweak: instead of clamping `z <= 0` completely flat at `0`, leave a shallow nonzero negative slope `alpha` (typically `0.01`):",
+      },
+      {
+        kind: "formula",
+        tex: "f(z) = \\begin{cases} z & \\text{if } z > 0 \\\\ \\alpha z & \\text{if } z \\le 0 \\end{cases}",
+        caption:
+          "Leaky ReLU multiplies negative inputs by a small slope alpha (default 0.01 in PyTorch) so backward gradients never vanish to zero.",
+      },
+      {
+        kind: "paragraph",
+        html: "Test `z = -5` with the standard `alpha = 0.01`: instead of returning `0` with `0` slope, Leaky ReLU emits `0.01 * (-5) = -0.05` and carries slope `0.01` backward. That tiny trickle lets weights recover even if a neuron temporarily drifts negative. Yet choosing `alpha` reflects a direct trade-off. Make `alpha` too small (`0.0001`), and recovery gradients become negligible like plain ReLU. Make `alpha` too large (toward `1.0`), and both halves blend into a straight identity line (`f(z) = z` at `alpha = 1`), weakening the nonlinearity that separates layers.",
+      },
+      {
+        kind: "image",
+        src: "/articles/leaky-relu-slope-tradeoff.svg",
+        alt: "Two-panel graph of Leaky ReLU showing negative slope alpha variations from z = -6 to +4 on the left and the design trade-off cards on the right. Left panel contrasts ReLU (alpha = 0), PyTorch default alpha = 0.01 reaching -0.05 at z = -5, exaggerated alpha = 0.1 for visibility, and linear extreme alpha = 1.0.",
+        caption:
+          "Visualizing Leaky ReLU on its own: small alpha = 0.01 barely dips below zero (-0.05 at z = -5) yet keeps backward updates alive, whereas alpha near 1 collapses the bend back to linear.",
+        width: 800,
+        height: 330,
+      },
+      {
+        kind: "heading",
+        id: "side-by-side-comparison",
+        text: "Comparing all four curves and slopes side by side",
+      },
+      {
+        kind: "paragraph",
+        html: "Now that you have seen each curve individually, place all four activation functions and their derivatives onto shared axes to compare saturation, centering, and tail gradients directly (note `alpha = 0.1` is exaggerated on these charts so Leaky ReLU's negative tilt stays distinct from ReLU's zero floor):",
+      },
+      {
+        kind: "figure",
+        variant: "line",
+        title: "Activation curves across z = -3 to +3",
+        xKey: "z",
+        xLabel: "pre-activation z",
+        yLabel: "output f(z)",
+        note: "Leaky ReLU uses alpha = 0.1 for visibility (PyTorch default is 0.01)",
+        caption:
+          "Comparing sigmoid, tanh, ReLU, and Leaky ReLU (with alpha = 0.1 exaggerated to distinguish its negative slope from ReLU's flat zero floor). Click legend pills to compare pairs.",
+        series: [
+          { key: "sigmoid", label: "Sigmoid" },
+          { key: "tanh", label: "Tanh" },
+          { key: "relu", label: "ReLU" },
+          { key: "leaky", label: "Leaky ReLU (alpha = 0.1)" },
+        ],
+        data: [
+          { z: "-3", sigmoid: 0.047, tanh: -0.995, relu: 0.0, leaky: -0.3 },
+          { z: "-2.5", sigmoid: 0.076, tanh: -0.987, relu: 0.0, leaky: -0.25 },
+          { z: "-2", sigmoid: 0.119, tanh: -0.964, relu: 0.0, leaky: -0.2 },
+          { z: "-1.5", sigmoid: 0.182, tanh: -0.905, relu: 0.0, leaky: -0.15 },
+          { z: "-1", sigmoid: 0.269, tanh: -0.762, relu: 0.0, leaky: -0.1 },
+          { z: "-0.5", sigmoid: 0.378, tanh: -0.462, relu: 0.0, leaky: -0.05 },
+          { z: "0", sigmoid: 0.5, tanh: 0.0, relu: 0.0, leaky: 0.0 },
+          { z: "0.5", sigmoid: 0.622, tanh: 0.462, relu: 0.5, leaky: 0.5 },
+          { z: "1", sigmoid: 0.731, tanh: 0.762, relu: 1.0, leaky: 1.0 },
+          { z: "1.5", sigmoid: 0.818, tanh: 0.905, relu: 1.5, leaky: 1.5 },
+          { z: "2", sigmoid: 0.881, tanh: 0.964, relu: 2.0, leaky: 2.0 },
+          { z: "2.5", sigmoid: 0.924, tanh: 0.987, relu: 2.5, leaky: 2.5 },
+          { z: "3", sigmoid: 0.953, tanh: 0.995, relu: 3.0, leaky: 3.0 },
+        ],
+      },
+      {
+        kind: "figure",
+        variant: "line",
+        title: "Local slopes (derivatives) across z = -5 to +5",
+        xKey: "z",
+        xLabel: "pre-activation z",
+        yLabel: "local slope f'(z)",
+        note: "PyTorch returns ReLU'(0) = 0.0, with Leaky ReLU alpha = 0.1 shown for visibility",
+        caption:
+          "Plotting derivatives directly shows why ReLU displaced sigmoid and tanh in hidden layers: sigmoid peaks at 0.25 and both S-curves drop near 0 by z = +-3, whereas ReLU stays flat at 1.0 across positive inputs.",
+        series: [
+          { key: "dSigmoid", label: "Sigmoid slope" },
+          { key: "dTanh", label: "Tanh slope" },
+          { key: "dRelu", label: "ReLU slope" },
+          { key: "dLeaky", label: "Leaky ReLU slope (alpha = 0.1)" },
+        ],
+        data: [
+          { z: "-5", dSigmoid: 0.0066, dTanh: 0.0002, dRelu: 0.0, dLeaky: 0.1 },
+          { z: "-4.5", dSigmoid: 0.0109, dTanh: 0.0005, dRelu: 0.0, dLeaky: 0.1 },
+          { z: "-4", dSigmoid: 0.0177, dTanh: 0.0013, dRelu: 0.0, dLeaky: 0.1 },
+          { z: "-3.5", dSigmoid: 0.0285, dTanh: 0.0036, dRelu: 0.0, dLeaky: 0.1 },
+          { z: "-3", dSigmoid: 0.0452, dTanh: 0.0099, dRelu: 0.0, dLeaky: 0.1 },
+          { z: "-2.5", dSigmoid: 0.0701, dTanh: 0.0266, dRelu: 0.0, dLeaky: 0.1 },
+          { z: "-2", dSigmoid: 0.105, dTanh: 0.0707, dRelu: 0.0, dLeaky: 0.1 },
+          { z: "-1.5", dSigmoid: 0.1491, dTanh: 0.1807, dRelu: 0.0, dLeaky: 0.1 },
+          { z: "-1", dSigmoid: 0.1966, dTanh: 0.42, dRelu: 0.0, dLeaky: 0.1 },
+          { z: "-0.5", dSigmoid: 0.235, dTanh: 0.7864, dRelu: 0.0, dLeaky: 0.1 },
+          { z: "0", dSigmoid: 0.25, dTanh: 1.0, dRelu: 0.0, dLeaky: 0.1 },
+          { z: "0.5", dSigmoid: 0.235, dTanh: 0.7864, dRelu: 1.0, dLeaky: 1.0 },
+          { z: "1", dSigmoid: 0.1966, dTanh: 0.42, dRelu: 1.0, dLeaky: 1.0 },
+          { z: "1.5", dSigmoid: 0.1491, dTanh: 0.1807, dRelu: 1.0, dLeaky: 1.0 },
+          { z: "2", dSigmoid: 0.105, dTanh: 0.0707, dRelu: 1.0, dLeaky: 1.0 },
+          { z: "2.5", dSigmoid: 0.0701, dTanh: 0.0266, dRelu: 1.0, dLeaky: 1.0 },
+          { z: "3", dSigmoid: 0.0452, dTanh: 0.0099, dRelu: 1.0, dLeaky: 1.0 },
+          { z: "3.5", dSigmoid: 0.0285, dTanh: 0.0036, dRelu: 1.0, dLeaky: 1.0 },
+          { z: "4", dSigmoid: 0.0177, dTanh: 0.0013, dRelu: 1.0, dLeaky: 1.0 },
+          { z: "4.5", dSigmoid: 0.0109, dTanh: 0.0005, dRelu: 1.0, dLeaky: 1.0 },
+          { z: "5", dSigmoid: 0.0066, dTanh: 0.0002, dRelu: 1.0, dLeaky: 1.0 },
+        ],
+      },
+      {
+        kind: "table",
+        headers: [
+          "Activation",
+          "Output range",
+          "Slope for z > 0",
+          "Slope for z < 0",
+          "Centering & trade-off",
+        ],
+        rows: [
+          [
+            "**Sigmoid**",
+            "`(0, 1)`",
+            "`<= 0.25`, approaches `0`",
+            "`<= 0.25`, approaches `0`",
+            "Positive-only outputs and two saturating tails shrink gradients",
+          ],
+          [
+            "**Tanh**",
+            "`(-1, 1)`",
+            "`<= 1`, approaches `0`",
+            "`<= 1`, approaches `0`",
+            "Zero-centered, four times steeper at zero, still saturates in both tails",
+          ],
+          [
+            "**ReLU**",
+            "`[0, infinity)`",
+            "`1` everywhere",
+            "`0` everywhere",
+            "Healthy positive gradients and fast math, but negative units can die",
+          ],
+          [
+            "**Leaky ReLU**",
+            "`(-infinity, infinity)`",
+            "`1` everywhere",
+            "`alpha` (default `0.01`)",
+            "Avoids dead ReLU, introduces negative slope hyperparameter alpha",
+          ],
+        ],
+        caption:
+          "Summary of output bounds, local slopes, and engineering trade-offs across the four core activations.",
+      },
+      {
+        kind: "heading",
+        id: "pytorch-activations",
+        text: "Swapping activations in PyTorch",
+      },
+      {
+        kind: "paragraph",
+        html: "In PyTorch, switching between these activations inside our series classifier takes a single line. Every element-wise module (`nn.Sigmoid()`, `nn.Tanh()`, `nn.ReLU()`, and `nn.LeakyReLU(negative_slope=0.01)`) stores zero parameters of its own, so swapping any of them into `Linear(20, 64) -> Activation -> Linear(64, 10)` leaves the model at the exact same `1,994` trainable parameters while changing its training behavior:",
+      },
+      {
+        kind: "code",
+        filename: "activation_swap.py",
+        code: `import torch.nn as nn
+
+# Hidden-layer activation options (one-line swap, 1,994 params for all four):
+for act in (
+    nn.Sigmoid(),
+    nn.Tanh(),
+    nn.ReLU(),
+    nn.LeakyReLU(negative_slope=0.01),
+):
+    model = nn.Sequential(
+        nn.Linear(20, 64),
+        act,
+        nn.Linear(64, 10),
+    )
+    print(f"{act.__class__.__name__:10s} -> {sum(p.numel() for p in model.parameters())} params")
+
+# For binary classification (1 output logit), skip explicit nn.Sigmoid() in the model:
+binary_model = nn.Sequential(
+    nn.Linear(20, 64),
+    nn.ReLU(),
+    nn.Linear(64, 1),
+)
+criterion = nn.BCEWithLogitsLoss()  # fuses sigmoid + cross-entropy numerically cleanly`,
+      },
+      {
+        kind: "mermaid",
+        caption:
+          "Hidden layers swap between activations like nn.ReLU and nn.LeakyReLU freely, while binary output heads leave the final score as an unbounded logit for nn.BCEWithLogitsLoss during training.",
+        code: `flowchart TD
+  IN["20 input features"] --> L1["nn.Linear(20, 64)"]
+  L1 --> ACT["Hidden activation<br/>nn.ReLU() or nn.LeakyReLU(0.01)"]
+  ACT --> L2["nn.Linear(64, 1) -> raw logit"]
+  L2 -->|"training loss"| LOSS["nn.BCEWithLogitsLoss()"]
+  L2 -->|"inference readout"| SIG["Optional torch.sigmoid(logit)"]`,
+      },
+      {
+        kind: "paragraph",
+        html: "You can probe exact activation outputs, tangent slopes, and multi-layer signal survival (`slope ** depth`) directly in Python below. Try changing `z` to `3.0`, testing extreme negative inputs like `-1000.0`, or varying `depth` and `alpha` to see how quickly saturating slopes crush deep gradients while active ReLU holds at `1`:",
+      },
+      {
+        kind: "code",
+        filename: "activation_slopes_lab.py",
+        runnable: true,
+        code: `import math
+
+def sigmoid(z: float) -> float:
+    if z >= 0:
+        return 1.0 / (1.0 + math.exp(-z))
+    ez = math.exp(z)
+    return ez / (1.0 + ez)
+
+def inspect_activations(z: float, depth: int = 4, alpha: float = 0.01) -> None:
+    s = sigmoid(z)
+    ds = s * (1.0 - s)
+    th = math.tanh(z)
+    dth = 1.0 - th * th
+    rl = max(0.0, z)
+    drl = 1.0 if z > 0 else 0.0
+    lrl = z if z > 0 else alpha * z
+    dlrl = 1.0 if z > 0 else alpha
+
+    print(f"=== z = {z} across {depth} layers ===")
+    rows = [
+        ("Sigmoid", s, ds),
+        ("Tanh", th, dth),
+        ("ReLU", rl, drl),
+        (f"LeakyReLU(a={alpha})", lrl, dlrl),
+    ]
+    for name, out, slope in rows:
+        signal = slope ** depth
+        print(f"{name:18s} out={out:8.4f}  slope={slope:7.4f}  signal={signal:.4g}")
+
+for z in (0.0, 1.5, 3.0, 5.0, -5.0):
+    inspect_activations(z)
+    print()`,
+      },
+      {
+        kind: "video",
+        youtubeId: "ZGIVMKvQ5Cg",
+        title: "Why Neural Networks Need Activation Functions",
+        caption:
+          "Watch the full animated Brain Link episode covering tangent slopes, sigmoid saturation, 4-layer signal decay, tanh, ReLU, dying neurons, Leaky ReLU, and PyTorch swaps.",
+        variant: "feature",
+      },
+      {
+        kind: "paragraph",
+        html: "Notice the overarching pattern across all four functions: every activation fixes one failure mode while trading in another. Sigmoid gave smooth probability outputs, yet suffered from two-sided saturation and positive bias. Tanh centered activations at zero and quadrupled peak slope, yet still vanished in the tails. ReLU unlocked deep positive gradient highways at negligible compute cost, yet risked silencing negative neurons forever. In [Part 4 of this series](/articles/gelu-silu-and-softmax), we build on that foundation to derive smooth modern activations (**ELU**, **GELU**, **SiLU**, and **Softplus**), output **Softmax**, and how to choose the right activation by layer position.",
+      },
+      {
+        kind: "references",
+        title: "References",
+        items: [
+          {
+            label: "Understanding the difficulty of training deep feedforward neural networks",
+            href: "https://proceedings.mlr.press/v9/glorot10a.html",
+            source: "Xavier Glorot and Yoshua Bengio, AISTATS (2010)",
+            note: "Demonstrates how saturating sigmoid activations impede deep training signals compared to zero-centered and unsaturated alternatives.",
+          },
+          {
+            label: "Deep Sparse Rectifier Neural Networks",
+            href: "https://proceedings.mlr.press/v15/glorot11a.html",
+            source: "Xavier Glorot, Antoine Bordes, and Yoshua Bengio, AISTATS (2011)",
+            note: "Examines ReLU sparsity, gradient propagation, and biological and computational advantages over sigmoid and tanh.",
+          },
+          {
+            label: "torch.nn.Sigmoid documentation",
+            href: "https://docs.pytorch.org/docs/stable/generated/torch.nn.Sigmoid.html",
+            source: "PyTorch documentation",
+            note: "Element-wise logistic sigmoid function mapping inputs to (0, 1).",
+          },
+          {
+            label: "torch.nn.Tanh documentation",
+            href: "https://docs.pytorch.org/docs/stable/generated/torch.nn.Tanh.html",
+            source: "PyTorch documentation",
+            note: "Element-wise hyperbolic tangent activation mapping inputs to (-1, 1).",
+          },
+          {
+            label: "torch.nn.ReLU documentation",
+            href: "https://docs.pytorch.org/docs/stable/generated/torch.nn.ReLU.html",
+            source: "PyTorch documentation",
+            note: "Applies rectified linear unit max(0, x) element-wise.",
+          },
+          {
+            label: "torch.nn.LeakyReLU documentation",
+            href: "https://docs.pytorch.org/docs/stable/generated/torch.nn.LeakyReLU.html",
+            source: "PyTorch documentation",
+            note: "Applies max(0, x) + negative_slope * min(0, x) with negative_slope defaulting to 0.01.",
+          },
+          {
+            label: "torch.nn.BCEWithLogitsLoss documentation",
+            href: "https://docs.pytorch.org/docs/stable/generated/torch.nn.BCEWithLogitsLoss.html",
+            source: "PyTorch documentation",
+            note: "Combines a Sigmoid layer and binary cross-entropy loss in one numerically stable module.",
+          },
+          {
+            label: "Why Neural Networks Need Activation Functions (video)",
+            href: "https://www.youtube.com/watch?v=ZGIVMKvQ5Cg",
+            source: "Brain Link on YouTube",
+          },
+          {
+            label: "Deep Learning Fundamentals playlist",
+            href: "https://www.youtube.com/playlist?list=PLX2zaNhVC3Eo",
+            source: "Brain Link on YouTube",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    slug: "neural-network-parameters-and-flops",
+    title: "Counting Neural Network Parameters and FLOPs",
+    dek: "One hidden layer can approximate a wide range of continuous functions, yet every extra neuron demands memory and arithmetic. Derive parameter counts, forward FLOPs, batch scaling, and widening behavior directly from weight matrix shapes.",
+    topic: "Research",
+    publishedAt: "2026-11-19",
+    likes: 0,
+    views: 0,
+    commentCount: 0,
+    tags: ["#deep-learning", "#neural-networks", "#machine-learning", "#pytorch", "#nn-module"],
+    series: { slug: "deep-learning", title: "Deep Learning", part: 2 },
+    coverImage: "/articles/neural-network-parameters-and-flops.png",
+    body: [
+      {
+        kind: "paragraph",
+        html: "In [Part 1 of this series](/articles/from-one-neuron-to-neural-networks), we saw why a single perceptron gets stuck on curved or diagonal patterns like XOR: one weighted neuron can only draw one flat straight cut across its inputs. Adding even one hidden layer with a nonlinear step such as ReLU bends the space so a network can carve out nonlinear regions.",
+      },
+      {
+        kind: "paragraph",
+        html: "Mathematical theory pushes that observation to a striking conclusion. A feedforward network with just one hidden layer and a suitable nonlinear activation can approximate a remarkably broad class of functions as closely as you want, provided you give it enough hidden units. Taken at face value, that invites an obvious question: why build deep networks with dozens of layers if one sufficiently wide hidden layer can represent almost anything?",
+      },
+      {
+        kind: "paragraph",
+        html: "The answer starts with accounting. Every neuron you add to a layer expands what the network must **store in memory** and how much **arithmetic it executes** on every pass. Once you derive parameter counts and floating-point operations (**FLOPs**) straight from a layer's matrix dimensions, widening a layer stops feeling abstract or free.",
+      },
+      {
+        kind: "video",
+        youtubeId: "07T63bLOmJg",
+        title: "How to Calculate Neural Network Parameters and FLOPs",
+        caption:
+          "Watch the companion Brain Link episode for animated walkthroughs of universal approximation, the 64 by 20 weight matrix, FLOP counting per neuron, and doubling the hidden layer.",
+        variant: "compact",
+      },
+      {
+        kind: "heading",
+        id: "universal-approximation",
+        text: "What universal approximation promises",
+      },
+      {
+        kind: "paragraph",
+        html: "In 1989, George Cybenko proved a foundational version of what is now called the **Universal Approximation Theorem**: a feedforward neural network with a single internal hidden layer and a continuous S-shaped (sigmoidal) activation can uniformly approximate any continuous function defined on the unit hypercube to arbitrary accuracy. Later proofs extended that same density property to other non-polynomial activations, including modern piecewise-linear functions like ReLU.",
+      },
+      {
+        kind: "paragraph",
+        html: "Before relying on that statement, unpack two mathematical conditions hidden inside it:",
+      },
+      {
+        kind: "list",
+        items: [
+          "**Continuous function**: a smooth or connected curve with no sudden jumps or tears where outputs teleport instantaneously.",
+          "**Compact domain (such as the unit hypercube `[0, 1]^d`)**: a closed, bounded box of inputs. The theorem promises close approximation *inside* that bounded region, never unbounded extrapolation outside the range of data the network saw.",
+        ],
+      },
+      {
+        kind: "paragraph",
+        html: "How does summing simple hidden units actually reconstruct a bumpy curve? With ReLU (`ReLU(z) = max(0, z)`), the mechanism is transparent. Each hidden unit computes `a_i * ReLU(w_i * x + b_i)`. Before `x` crosses the threshold where `w_i * x + b_i = 0`, the unit outputs zero and contributes nothing. Once `x` crosses that breakpoint, the unit switches on as a straight line with slope `a_i * w_i`. Combining just two shifted units, such as `h1 = +ReLU(x + 1)` turning upward at `x = -1` and `h2 = -2 * ReLU(x - 0.5)` turning downward at `x = +0.5`, builds an isolated triangular tent peaking at `(0.5, 1.5)` and returning to `0` at `x = 2`:",
+      },
+      {
+        kind: "image",
+        src: "/articles/relu-hinge-building-blocks.svg",
+        alt: "Side-by-side plot showing two individual shifted ReLU units on the left, h1 = ReLU(x + 1) switching on at x = -1 and h2 = -2 * ReLU(x - 0.5) switching downward at x = +0.5, and their piecewise-linear sum on the right forming a triangular peak at (0.5, 1.5).",
+        caption:
+          "How two ReLU units build a piecewise-linear tent: each unit stays flat zero until its breakpoint, then adds its slope cleanly onto the combined curve.",
+        width: 800,
+        height: 330,
+      },
+      {
+        kind: "paragraph",
+        html: "Stacking `N` hidden units simply places `N` hinge points across an interval, turning a one-hidden-layer ReLU network into a **continuous piecewise-linear curve**. With `2` linear segments across `[-3, 3]`, the fit captures only a coarse triangle. Raising resolution to `8` segments narrows the largest gaps, and `32` segments trace the smooth target closely:",
+      },
+      {
+        kind: "figure",
+        variant: "line",
+        title: "Approximating a smooth target curve with ReLU pieces",
+        xKey: "x",
+        xLabel: "input x",
+        yLabel: "output value",
+        note: "Computed on [-3, 3] for sin(1.2x) + 0.4 cos(2.7x) - 0.15",
+        caption:
+          "Piecewise-linear ReLU fits across [-3, 3]. Maximum absolute error drops from 1.77 with 2 linear pieces to 0.28 with 8 pieces and 0.02 with 32 pieces. Toggle series in the legend to compare fits directly against the target.",
+        series: [
+          { key: "target", label: "Target curve" },
+          { key: "u2", label: "2 linear pieces (err 1.77)" },
+          { key: "u8", label: "8 linear pieces (err 0.28)" },
+          { key: "u32", label: "32 linear pieces (err 0.02)" },
+        ],
+        data: [
+          { x: "-3", target: 0.195, u2: 0.195, u8: 0.195, u32: 0.195 },
+          { x: "-2.75", target: 0.174, u2: 0.2, u8: 0.068, u32: 0.168 },
+          { x: "-2.5", target: 0.066, u2: 0.204, u8: -0.059, u32: 0.057 },
+          { x: "-2.25", target: -0.186, u2: 0.209, u8: -0.186, u32: -0.186 },
+          { x: "-2", target: -0.572, u2: 0.213, u8: -0.581, u32: -0.574 },
+          { x: "-1.75", target: -1.008, u2: 0.218, u8: -0.975, u32: -1.004 },
+          { x: "-1.5", target: -1.37, u2: 0.223, u8: -1.37, u32: -1.37 },
+          { x: "-1.25", target: -1.537, u2: 0.227, u8: -1.283, u32: -1.52 },
+          { x: "-1", target: -1.444, u2: 0.232, u8: -1.196, u32: -1.428 },
+          { x: "-0.75", target: -1.109, u2: 0.236, u8: -1.109, u32: -1.109 },
+          { x: "-0.5", target: -0.627, u2: 0.241, u8: -0.656, u32: -0.627 },
+          { x: "-0.25", target: -0.133, u2: 0.245, u8: -0.203, u32: -0.14 },
+          { x: "0", target: 0.25, u2: 0.25, u8: 0.25, u32: 0.25 },
+          { x: "0.25", target: 0.458, u2: 0.172, u8: 0.319, u32: 0.448 },
+          { x: "0.5", target: 0.502, u2: 0.093, u8: 0.389, u32: 0.496 },
+          { x: "0.75", target: 0.458, u2: 0.015, u8: 0.458, u32: 0.458 },
+          { x: "1", target: 0.42, u2: -0.063, u8: 0.498, u32: 0.426 },
+          { x: "1.25", target: 0.458, u2: -0.142, u8: 0.538, u32: 0.464 },
+          { x: "1.5", target: 0.578, u2: -0.22, u8: 0.578, u32: 0.578 },
+          { x: "1.75", target: 0.718, u2: -0.298, u8: 0.608, u32: 0.713 },
+          { x: "2", target: 0.779, u2: -0.377, u8: 0.638, u32: 0.769 },
+          { x: "2.25", target: 0.669, u2: -0.455, u8: 0.669, u32: 0.669 },
+          { x: "2.5", target: 0.348, u2: -0.533, u8: 0.216, u32: 0.338 },
+          { x: "2.75", target: -0.141, u2: -0.612, u8: -0.237, u32: -0.146 },
+          { x: "3", target: -0.69, u2: -0.69, u8: -0.69, u32: -0.69 },
+        ],
+      },
+      {
+        kind: "paragraph",
+        html: "Notice the qualifier right at the heart of the theorem: it proves a wide single hidden layer can **approximate**, not that it can learn easily or run cheaply. In real problems with dozens or thousands of input dimensions, covering every fold individually in a single layer can demand an astronomical width. Before judging depth against width, let us measure the exact price tag of a concrete network layer by layer.",
+      },
+      {
+        kind: "heading",
+        id: "weight-matrix-shapes",
+        text: "Why a linear layer stores a 64 by 20 matrix",
+      },
+      {
+        kind: "paragraph",
+        html: "Take the exact three-step multi-layer perceptron from Part 1: it accepts `20` numerical input features, transforms them into `64` hidden values, clamps negatives with ReLU, and scores `10` output classes:",
+      },
+      {
+        kind: "code",
+        filename: "mlp_shapes.py",
+        code: `import torch.nn as nn
+
+model = nn.Sequential(
+    nn.Linear(20, 64),  # index 0
+    nn.ReLU(),          # index 1
+    nn.Linear(64, 10),  # index 2
+)`,
+      },
+      {
+        kind: "paragraph",
+        html: "If you inspect `model[0].weight.shape` in PyTorch (where `model[0]` selects the first layer, `nn.Linear(20, 64)`), the printed tuple is `(64, 20)`, not `(20, 64)`. That flipped order catches almost every newcomer off guard, yet it follows straight from matrix multiplication.",
+      },
+      {
+        kind: "paragraph",
+        html: "Suppose a single input example arrives as a vertical column of `20` numbers (`x`, shape `20 x 1`), and we want our first layer to output a column of `64` numbers (`y`, shape `64 x 1`). When you multiply a matrix `W` on the left of column vector `x` (`Wx + b`), matrix multiplication requires the **number of columns in `W`** to equal the **number of rows in `x`**:",
+      },
+      {
+        kind: "formula",
+        tex: "W x + b \\quad\\longrightarrow\\quad (64 \\times 20)(20 \\times 1) + (64 \\times 1) = (64 \\times 1)",
+        caption:
+          "Matrix multiplication pairs the matching inner 20 dimensions and leaves 64 output rows in both Wx and the bias vector b.",
+      },
+      {
+        kind: "paragraph",
+        html: "To compute the first output number `y[0]`, row `0` of `W` walks across all `20` weights (`W[0, 0]` through `W[0, 19]`), multiplies each one by the matching input entry (`x[0]` through `x[19]`), adds those products together, and shifts the sum by `b[0]`. Row `1` does the exact same arithmetic with its own `20` weights and bias `b[1]`, and so on down to row `63`. Each **row** of `W` therefore belongs to one output neuron, while each **column** corresponds to one input feature. That fixes `weight.shape == (d_out, d_in)` and `bias.shape == (d_out,)`:",
+      },
+      {
+        kind: "image",
+        src: "/articles/weight-matrix-shape.svg",
+        alt: "Diagram of nn.Linear(20, 64) showing weight matrix W with 64 rows and 20 columns multiplying a 20 by 1 input vector x and adding a 64 by 1 bias vector b to produce a 64 by 1 output vector y.",
+        caption:
+          "Row 0 of W multiplies every entry in x, adds bias b[0], and writes y[0]. Because there are 64 outputs fed by 20 inputs each, PyTorch stores W as (64, 20) and b as (64,).",
+        width: 800,
+        height: 365,
+      },
+      {
+        kind: "paragraph",
+        html: "Why does `nn.Linear(20, 64)` still work when you pass batched tensors shaped `(32, 20)` where each example sits horizontally as a row instead of a column? Under the hood, PyTorch computes `X @ W.T + b`. Transposing `W` (`W.T`) flips `(64, 20)` into `(20, 64)`, so `(32, 20) @ (20, 64)` matches along `20` and returns `(32, 64)`. The 1D bias vector `b` of shape `(64,)` is automatically **broadcast** (copied virtually across all `32` rows) so `b_j` is added to column `j` of every example. Even with batched execution, PyTorch keeps `W` stored as `(out_features, in_features)`. Note also that if you initialize a layer with `bias=False`, no bias tensor is created at all, leaving only the `(d_out, d_in)` weight matrix:",
+      },
+      {
+        kind: "formula",
+        tex: "X W^{\\top} + b \\quad\\longrightarrow\\quad (32 \\times 20)(20 \\times 64) + (\\text{broadcast } 64) = (32 \\times 64)",
+        caption:
+          "Batched forward pass transposes W to (20, 64) so 32 row-vectors multiply simultaneously and share broadcast bias b.",
+      },
+      {
+        kind: "heading",
+        id: "counting-parameters",
+        text: "Counting trainable parameters from layer shapes",
+      },
+      {
+        kind: "paragraph",
+        html: "In PyTorch, a **trainable parameter** is a stored tensor marked for optimization (`requires_grad=True` by default on `nn.Linear`), meaning gradient descent updates its numbers during training. Once you see `W` as a `d_out x d_in` grid plus a `d_out`-element bias vector, counting parameters is pure rectangle arithmetic:",
+      },
+      {
+        kind: "list",
+        items: [
+          "**First linear layer `nn.Linear(20, 64)`**: its `64 x 20` weight grid stores `64 * 20 = 1,280` weights, and its bias vector adds `64` offsets, totaling `1,344` trainable parameters.",
+          "**Activation `nn.ReLU()`**: computes `max(0, z)` with a fixed threshold at zero. Because it holds no learned weights or offsets, it stores `0` parameters.",
+          "**Second linear layer `nn.Linear(64, 10)`**: maps `64` hidden values to `10` class scores using a `(10, 64)` weight grid (`640` weights) plus `10` biases, giving `650` parameters.",
+        ],
+      },
+      {
+        kind: "paragraph",
+        html: "Summing the layers (`1,344 + 0 + 650`) reveals **1,994 trainable parameters** in total. Writing the dimensions symbolically as `d_in` inputs and `d_out` outputs yields the general rule for any linear layer with bias:",
+      },
+      {
+        kind: "formula",
+        tex: "\\text{Parameters} = d_{\\text{out}}\\, d_{\\text{in}} + d_{\\text{out}} = d_{\\text{out}}(d_{\\text{in}} + 1)",
+        caption:
+          "Every output neuron owns d_in input weights plus 1 bias parameter, factoring cleanly into d_out(d_in + 1).",
+      },
+      {
+        kind: "paragraph",
+        html: "Why does parameter count matter operationally? Because parameters set the model's **stored memory footprint**. Each standard 32-bit float (`float32`) takes `4` bytes. For our tiny `1,994`-parameter network, storing the weights takes `1,994 * 4 = 7,976` bytes (about `8 KB`). During training, memory grows multiple times larger because each parameter also needs space for its computed gradient (`+4` bytes in FP32) and optimizer tracking buffers, such as the running momentum and squared-gradient estimates kept by Adam (`+8` bytes more per parameter in FP32, bringing parameter, gradient, and Adam state to `16` bytes per parameter, or `31,904` bytes before activations). At billion-parameter scale, those exact multipliers decide whether a model fits on a GPU:",
+      },
+      {
+        kind: "image",
+        src: "/articles/parameter-and-memory-budget.svg",
+        alt: "Two-panel breakdown of parameter distribution and FP32 memory footprint. Left panel shows Linear(20, 64) accounts for 1,344 parameters (67.4%), ReLU accounts for 0, and Linear(64, 10) accounts for 650 (32.6%). Right panel contrasts inference weight storage (7,976 bytes at 4 bytes per parameter) against Adam training state (31,904 bytes at 16 bytes per parameter).",
+        caption:
+          "Left: how weights and biases split the 1,994 parameters across layers. Right: why training memory expands to 4 times weight storage once gradients and Adam buffers are included.",
+        width: 800,
+        height: 320,
+      },
+      {
+        kind: "heading",
+        id: "counting-flops",
+        text: "Counting forward FLOPs per example and per batch",
+      },
+      {
+        kind: "paragraph",
+        html: "Knowing how many numbers a network stores does not tell you how much arithmetic it executes when processing inputs. To measure computation, we count **floating-point operations (FLOPs)** performed during a forward pass.",
+      },
+      {
+        kind: "callout",
+        title: "Conventions behind these FLOP numbers",
+        body: "First, **FLOPs** here is a count of operations executed, not **FLOPS** (operations per second, a measure of hardware speed). Second, we count `1` floating-point multiplication as `1` FLOP and `1` addition as `1` FLOP, with bias addition included. Hardware benchmarks that count a fused multiply-accumulate (MAC) as `1` unit report half this total (`d_in * d_out`). Finally, these are **forward-pass** linear-layer counts: `nn.ReLU()` still performs `d_out` element-wise comparisons (`64` ops here), which we omit because dense matrix multiplications dominate.",
+      },
+      {
+        kind: "paragraph",
+        html: "Trace a single output neuron inside `nn.Linear(20, 64)` step by step. Computing `y[0] = W[0, 0]*x[0] + W[0, 1]*x[1] + ... + W[0, 19]*x[19] + b[0]` takes `20` multiplications (`W[0, j] * x[j]`), `19` additions to fold those `20` products into one sum, and `1` final addition for the bias `b[0]`. Notice the exact cancellation: `20 + 19 + 1 = 40 = 2 * 20` FLOPs for one output value. Replacing `20` with `d_in` explains the clean factor of `2`: `d_in + (d_in - 1) + 1 = 2 * d_in` operations per output neuron (and without bias, `(2 * d_in - 1)`).",
+      },
+      {
+        kind: "paragraph",
+        html: "Because the first layer computes `64` output neurons in parallel for every input example, one example costs `2 * 20 * 64 = 2,560` forward linear FLOPs. Notice that `2,560` is nearly double the layer's `1,344` parameters because every weight performs both a multiplication and participates in a sum. Applying the same formula to `Linear(64, 10)` adds `2 * 64 * 10 = 1,280` FLOPs, bringing one forward pass per example to `2,560 + 1,280 = 3,840` linear FLOPs.",
+      },
+      {
+        kind: "paragraph",
+        html: "In real training and inference, we group examples into a **mini-batch** of size `B` rather than feeding one item at a time. Passing `B = 32` examples shaped `(32, 20)` runs `(32, 20) @ (20, 64) -> (32, 64)` followed by `(32, 64) @ (64, 10) -> (32, 10)`. Each of the `32` examples executes the exact same linear arithmetic, so batch FLOPs scale linearly with `B`:",
+      },
+      {
+        kind: "formula",
+        tex: "\\text{FLOPs}_{\\text{batch}} = B \\times 2\\, d_{\\text{in}}\\, d_{\\text{out}}",
+        caption:
+          "Batch forward FLOPs under the 1-multiply + 1-add convention scale per-example linear operations directly by batch size B.",
+      },
+      {
+        kind: "paragraph",
+        html: "For `B = 32`, one forward pass executes `32 * 3,840 = 122,880` operations across both linear layers. That immediately raises a practical hardware question: if `32` examples execute `32` times the FLOPs, why do GPUs finish a batch of `32` so much faster than `32` sequential single-example calls? The answer is **weight reuse**. Loading `1,344` weights from chip memory into fast compute units is often slower than the math itself. In one dense matrix multiply (**GEMM**), the processor reads each weight once and applies it across all `32` rows simultaneously, turning memory-bound single-vector work into high-throughput parallel arithmetic.",
+      },
+      {
+        kind: "paragraph",
+        html: "Keep one scope reminder in mind as well: these numbers cover the **forward pass** only (inference). During training, backpropagation reverses through each hidden linear layer using two extra matrix multiplications of matching cost, one to compute gradients with respect to the inputs (`(B, d_out) @ (d_out, d_in)`) and one for the weights (`(d_out, B) @ (B, d_in)`), multiplying total linear arithmetic by roughly `2` to `3` times forward FLOPs.",
+      },
+      {
+        kind: "image",
+        src: "/articles/neuron-flops-and-batch-gemm.svg",
+        alt: "Two-panel diagram showing single-neuron FLOP counting and batch GEMM weight reuse. On the left, one output neuron performs 20 multiplications, 19 summation additions, and 1 bias addition for 40 FLOPs (2,560 across 64 neurons). On the right, batch B = 32 examples (32 by 20) multiply transposed matrix W.T (20 by 64) loaded once to compute 122,880 total forward FLOPs across the 2-layer model.",
+        caption:
+          "Left: adding 20 products requires 19 additions plus 1 bias offset, giving exact cancellation to 2 * d_in = 40 FLOPs per neuron. Right: batch GEMM reads weights once and reuses them across all 32 examples.",
+        width: 800,
+        height: 340,
+      },
+      {
+        kind: "table",
+        headers: [
+          "Layer",
+          "Weight shape",
+          "Bias shape",
+          "Parameters",
+          "Forward FLOPs (per example)",
+        ],
+        rows: [
+          ["`nn.Linear(20, 64)`", "`(64, 20)`", "`(64,)`", "1,344", "2,560"],
+          ["`nn.ReLU()`", "none", "none", "0", "omitted (64 max ops)"],
+          ["`nn.Linear(64, 10)`", "`(10, 64)`", "`(10,)`", "650", "1,280"],
+          ["**Total model**", "", "", "**1,994**", "**3,840**"],
+        ],
+        numericColumns: [3, 4],
+        caption:
+          "Layer-by-layer ledger for Linear(20, 64) -> ReLU -> Linear(64, 10). Under the multiply-plus-add convention, forward linear work totals 3,840 FLOPs per example (122,880 for a batch of 32).",
+      },
+      {
+        kind: "heading",
+        id: "parameters-vs-flops",
+        text: "Model size vs. computational work",
+      },
+      {
+        kind: "paragraph",
+        html: "Separating parameters from FLOPs clears up a persistent systems mistake: parameters measure **how much state a model stores**, whereas FLOPs measure **how much arithmetic a pass performs**. Both numbers follow from the layer dimensions (`20`, `64`, `10`), yet they behave independently whenever an architecture reuses weights across inputs:",
+      },
+      {
+        kind: "list",
+        items: [
+          "**Batching**: raising `B` from `1` to `128` keeps parameters pinned at `1,994`, while forward compute grows `128`-fold because every example reuses the same weights.",
+          "**Shared layers across tokens or pixels**: applying the same dense projection across every token in a `1,000`-token sequence (as inside a Transformer) or sliding one convolutional filter across a high-resolution image multiplies FLOPs without adding a single parameter.",
+          "**Embedding lookup tables**: a large language model's vocabulary table stores millions of parameters (`vocab_size * d_model`), yet fetching one row vector for each token executes virtually zero FLOPs.",
+        ],
+      },
+      {
+        kind: "mermaid",
+        caption:
+          "Architectural choices set layer dimensions and depth, which jointly determine stored parameters, forward FLOPs per example, and how batch size scales compute without changing parameter count.",
+        code: `flowchart TD
+  ARCH["Architecture choices (widths and layer count)"]
+  DIMS["Layer dimensions (d_in and d_out)"]
+  DEPTH["Depth (composed nonlinear stages)"]
+  PARAMS["Parameters: d_out(d_in + 1) stored weights"]
+  FLOPS["FLOPs per example: 2 * d_in * d_out linear ops"]
+  BATCH["Batch size B (reuses loaded weights)"]
+  MEM["Model size (memory, checkpoints, Adam state)"]
+  WORK["Compute work (B * per-example FLOPs)"]
+
+  ARCH --> DIMS
+  ARCH --> DEPTH
+  DIMS --> PARAMS
+  DIMS --> FLOPS
+  PARAMS --> MEM
+  FLOPS --> WORK
+  BATCH -->|"scales by B"| WORK
+  BATCH -. "keeps fixed" .-> MEM`,
+      },
+      {
+        kind: "figure",
+        variant: "bar",
+        title: "Stored parameters vs. forward FLOPs as batch size grows",
+        xKey: "batch",
+        xLabel: "batch size (B)",
+        yLabel: "thousands (K)",
+        note: "Computed for Linear(20, 64) -> ReLU -> Linear(64, 10)",
+        caption:
+          "Increasing batch size from 1 to 128 leaves parameter count flat at 1.99K while scaling forward arithmetic from 3.84K to 491.52K FLOPs.",
+        series: [
+          { key: "paramsK", label: "Parameters (K)" },
+          { key: "flopsK", label: "Forward FLOPs (K)" },
+        ],
+        data: [
+          { batch: "B = 1", paramsK: 1.99, flopsK: 3.84 },
+          { batch: "B = 8", paramsK: 1.99, flopsK: 30.72 },
+          { batch: "B = 16", paramsK: 1.99, flopsK: 61.44 },
+          { batch: "B = 32", paramsK: 1.99, flopsK: 122.88 },
+          { batch: "B = 64", paramsK: 1.99, flopsK: 245.76 },
+          { batch: "B = 128", paramsK: 1.99, flopsK: 491.52 },
+        ],
+      },
+      {
+        kind: "heading",
+        id: "widening-exercise",
+        text: "Widening the hidden layer from 64 to 128",
+      },
+      {
+        kind: "paragraph",
+        html: "Put the shape rules to work with a prediction check before calculating. Suppose you double the hidden layer width from `64` to `128`, turning the network into `Linear(20, 128) -> ReLU -> Linear(128, 10)`. Does the total parameter count double from `1,994` to `3,988`?",
+      },
+      {
+        kind: "paragraph",
+        html: "It does not. Changing the hidden width affects **two** layers unevenly. Layer 1 (`Linear(20, 128)`) has `128` outputs instead of `64`, so both its weights (`128 * 20 = 2,560`) and its biases (`128`) double cleanly to `2,688` (`2 * 1,344`). Layer 2 (`Linear(128, 10)`), however, keeps the exact same `10` class outputs while accepting `128` inputs instead of `64`. Its weight grid doubles from `640` to `1,280`, yet its bias vector stays fixed at `10`, giving `1,290` parameters instead of `1,300`.",
+      },
+      {
+        kind: "paragraph",
+        html: "Adding both layers gives `2,688 + 1,290 = 3,978` parameters (`10` fewer than `3,988`). Forward linear FLOPs **do** double (`5,120 + 2,560 = 7,680` per example) because `2 * d_in * d_out` already accounts for one bias add per output rather than counting bias tensors separately, and the internal hidden vector doubles from `64` to `128` numbers. One final caveat matters just as much: giving a network `3,978` parameters instead of `1,994` increases capacity, **not** accuracy. Only training and measuring on held-out validation data reveals whether wider layers actually help or simply overfit:",
+      },
+      {
+        kind: "image",
+        src: "/articles/widening-64-to-128.svg",
+        alt: "Architecture diagram comparing baseline hidden width 64 against widened hidden width 128. Layer 1 doubles both weights and biases from 1,344 to 2,688, whereas Layer 2 doubles weights from 640 to 1,280 while leaving the 10 output biases unchanged, giving 1,290 and a total of 3,978 parameters instead of 3,988.",
+        caption:
+          "Visualizing why total parameters land at 3,978 rather than 3,988: Layer 1 scales cleanly by 2x, while Layer 2 still predicts the exact same 10 classes so its 10 bias offsets remain fixed.",
+        width: 800,
+        height: 325,
+      },
+      {
+        kind: "table",
+        headers: ["Quantity", "Hidden = 64", "Hidden = 128", "Change"],
+        rows: [
+          ["Layer 1 parameters", "1,344", "2,688", "2.00x (weights and biases double)"],
+          ["Layer 2 parameters", "650", "1,290", "weights double, 10 biases unchanged"],
+          ["**Total parameters**", "**1,994**", "**3,978**", "10 fewer than 3,988"],
+          ["Forward FLOPs (per example)", "3,840", "7,680", "2.00x"],
+          ["Forward FLOPs (batch of 32)", "122,880", "245,760", "2.00x"],
+          ["Hidden representation size", "64", "128", "2.00x"],
+        ],
+        numericColumns: [1, 2],
+        caption:
+          "Comparing hidden width 64 against 128 shows why deriving counts from tensor shapes catches the 3,978 vs. 3,988 difference that naive doubling misses.",
+      },
+      {
+        kind: "paragraph",
+        html: "In PyTorch, you can confirm exact parameter counts directly from instantiated tensors in one expression. Calling `model.parameters()` yields every trainable weight and bias tensor across the sequential layers, and calling `.numel()` (`number of elements`) multiplies each tensor's shape dimensions (`64 * 20 = 1,280`, `64`, `10 * 64 = 640`, `10`) before `sum(...)` totals them:",
+      },
+      {
+        kind: "code",
+        filename: "pytorch_param_check.py",
+        code: `import torch.nn as nn
+
+for hidden in (64, 128):
+    model = nn.Sequential(
+        nn.Linear(20, hidden),
+        nn.ReLU(),
+        nn.Linear(hidden, 10),
+    )
+    total = sum(p.numel() for p in model.parameters())
+    print(f"hidden={hidden}: layer0={tuple(model[0].weight.shape)}, "
+          f"layer2={tuple(model[2].weight.shape)}, total={total}")
+
+# Verified with PyTorch 2.9.1:
+# hidden=64: layer0=(64, 20), layer2=(10, 64), total=1994
+# hidden=128: layer0=(128, 20), layer2=(10, 128), total=3978`,
+      },
+      {
+        kind: "paragraph",
+        html: "Below is a standalone pure-Python calculator that walks any list of layer widths (`zip(dims, dims[1:])` pairs each layer's `(d_in, d_out)` automatically) and computes parameter counts, per-example FLOPs, and batch FLOPs. Try replacing `[20, 128, 10]` with the three-layer architecture `[50, 128, 32, 4]` (Layer 1: `6,528` params / `12,800` FLOPs, Layer 2: `4,128` params / `8,192` FLOPs, Layer 3: `132` params / `256` FLOPs, totaling `10,788` params and `21,248` FLOPs) or a Transformer feedforward block `[768, 3072, 768]` (`4,722,432` params and `9,437,184` FLOPs per token):",
+      },
+      {
+        kind: "code",
+        filename: "mlp_cost_calculator.py",
+        runnable: true,
+        code: `def analyze_mlp(dims: list[int], batch_size: int = 32) -> None:
+    total_params = 0
+    total_flops = 0
+    for idx, (d_in, d_out) in enumerate(zip(dims, dims[1:]), start=1):
+        params = d_out * (d_in + 1)
+        flops = 2 * d_in * d_out
+        total_params += params
+        total_flops += flops
+        print(
+            f"Layer {idx} Linear({d_in}, {d_out}): "
+            f"W=({d_out}, {d_in}), b=({d_out},) -> "
+            f"{params:,} params, {flops:,} FLOPs/ex"
+        )
+    print(f"Total params:     {total_params:,}")
+    print(f"FLOPs / example:  {total_flops:,}")
+    print(f"Batch ({batch_size}) FLOPs: {batch_size * total_flops:,}")
+
+print("=== Baseline MLP ===")
+analyze_mlp([20, 64, 10], batch_size=32)
+
+print("\\n=== Widened hidden layer (try changing dims) ===")
+analyze_mlp([20, 128, 10], batch_size=32)`,
+      },
+      {
+        kind: "heading",
+        id: "where-uat-stops",
+        text: "Where universal approximation falls short",
+      },
+      {
+        kind: "paragraph",
+        html: "Return now to our opening question: if one wide hidden layer can represent continuous functions arbitrarily closely, why do real models stack depth instead? Because **representable** in theory tells you nothing about three engineering realities:",
+      },
+      {
+        kind: "list",
+        items: [
+          "**Representable is not efficiently learnable**: gradient-based optimizers have to discover useful weights from finite batches of noisy examples, and flat ultra-wide layers often need far more units or steps to converge cleanly than structured deep stacks.",
+          "**Learnable is not generalizing well**: **generalization** means performing accurately on unseen examples outside the training data. A giant shallow layer with abundant piecewise bends can memorize idiosyncratic training noise (**overfitting**) instead of learning shared structure.",
+          "**Generalizing is not production-efficient**: real networks stack layers sequentially so later transformations reuse intermediate features built by earlier ones. Breaking a task into composed stages can achieve rich expressive power with dramatically fewer parameters, less memory, and lower FLOPs than one massive hidden layer.",
+        ],
+      },
+      {
+        kind: "mermaid",
+        caption:
+          "Universal approximation guarantees only the top box, whereas practical deep models must satisfy every constraint down the chain.",
+        code: `flowchart TD
+  R["Representable in theory (1 wide layer can exist)"] -->|"not automatic"| L["Efficiently learnable (converges from noisy batches)"]
+  L -->|"not automatic"| G["Generalizes well (accurate on unseen test data)"]
+  G -->|"not automatic"| P["Production-efficient (depth reuse keeps memory and FLOPs low)"]`,
+      },
+      {
+        kind: "paragraph",
+        html: "Once this shape-first accounting becomes automatic, larger architectures stop looking opaque. Whether you inspect a small MLP or `nn.Linear(768, 3072)` inside a Transformer block, you can derive tensor dimensions, stored parameters, memory multipliers, and forward arithmetic straight from the layer definitions.",
+      },
+      {
+        kind: "video",
+        youtubeId: "07T63bLOmJg",
+        title: "How to Calculate Neural Network Parameters and FLOPs",
+        caption:
+          "Watch the full animated Brain Link episode covering universal approximation fits, the 64 by 20 grid, FLOPs counting per neuron and batch, and widening from 64 to 128.",
+        variant: "feature",
+      },
+      {
+        kind: "paragraph",
+        html: "Notice one piece in the middle of our `1,994`-parameter network that added `0` trainable weights and only minimal comparisons next to dense matrix multiplies, yet prevented every `Linear` layer from collapsing into one linear transformation: `nn.ReLU()`. Because activations sit at the exact boundary between linear collapse and stable training, choosing **which** activation function to use turns out to matter enormously. In [Part 3 of this series](/articles/why-relu-replaced-sigmoid), we compare sigmoid, tanh, ReLU, and Leaky ReLU through their slopes and see why gradients either vanish or survive across depth.",
+      },
+      {
+        kind: "references",
+        title: "References",
+        items: [
+          {
+            label: "Approximation by superpositions of a sigmoidal function",
+            href: "https://link.springer.com/article/10.1007/BF02551274",
+            source: "George Cybenko, Mathematics of Control, Signals, and Systems (1989)",
+            note: "Foundational universal approximation theorem for single-hidden-layer feedforward networks.",
+          },
+          {
+            label: "Deep Feedforward Networks (Chapter 6, Deep Learning)",
+            href: "https://www.deeplearningbook.org/contents/mlp.html",
+            source: "Ian Goodfellow, Yoshua Bengio, and Aaron Courville",
+            note: "Covers universal approximation properties, depth vs. width, and piecewise-linear activations.",
+          },
+          {
+            label: "torch.nn.Linear documentation",
+            href: "https://docs.pytorch.org/docs/stable/generated/torch.nn.Linear.html",
+            source: "PyTorch documentation",
+            note: "Specifies weight shape (out_features, in_features) and bias shape (out_features).",
+          },
+          {
+            label: "torch.nn.ReLU documentation",
+            href: "https://docs.pytorch.org/docs/stable/generated/torch.nn.ReLU.html",
+            source: "PyTorch documentation",
+            note: "Fixed element-wise max(0, x) nonlinearity with zero learnable parameters.",
+          },
+          {
+            label: "torch.Tensor.numel documentation",
+            href: "https://docs.pytorch.org/docs/stable/generated/torch.Tensor.numel.html",
+            source: "PyTorch documentation",
+            note: "Returns the total element count used when summing model parameter tensors.",
+          },
+          {
+            label: "How to Calculate Neural Network Parameters and FLOPs (video)",
+            href: "https://www.youtube.com/watch?v=07T63bLOmJg",
+            source: "Brain Link on YouTube",
+          },
+          {
+            label: "Deep Learning Fundamentals playlist",
+            href: "https://www.youtube.com/playlist?list=PLX2zaNhVC3Eo",
+            source: "Brain Link on YouTube",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    slug: "from-one-neuron-to-neural-networks",
+    title: "From One Neuron to Deep Neural Networks",
+    dek: "A single neuron multiplies inputs by weights, adds a bias, and draws one straight boundary. That works until a pattern like XOR refuses to separate cleanly. Stacking layers with nonlinear activations bends the space so a network can build representations step by step.",
+    topic: "Research",
+    publishedAt: "2026-11-19",
+    likes: 0,
+    views: 0,
+    commentCount: 0,
+    tags: ["#deep-learning", "#neural-networks", "#machine-learning", "#pytorch"],
+    series: { slug: "deep-learning", title: "Deep Learning", part: 1 },
+    coverImage: "/articles/from-one-neuron-to-neural-networks.png",
+    body: [
+      {
+        kind: "paragraph",
+        html: "Picture a support desk that receives hundreds of incoming tickets every day. For each ticket, software has to answer one practical question: is this urgent?",
+      },
+      {
+        kind: "paragraph",
+        html: "Computers and neural networks cannot read text or judge priority directly. Every model begins by encoding a real-world situation into a fixed list of numbers called an **input feature vector**. Suppose an incoming ticket is summarized by three numerical features: `2` unresolved tickets already open for that customer, a priority score of `8`, and `5` hours spent waiting in the queue.",
+      },
+      {
+        kind: "paragraph",
+        html: "Turning `[2, 8, 5]` into a decision starts inside a single mathematical unit that multiplies each input by a weight, adds a bias offset, and checks a threshold. That simple unit handles clean cutoffs well until a pattern like exclusive-OR (XOR) breaks every straight line you try to draw. Getting past that geometric wall is the entire reason deep neural networks are stacked out of layers with nonlinear steps in between.",
+      },
+      {
+        kind: "video",
+        youtubeId: "cD0gD94tp7g",
+        title: "How Neural Networks Actually Learn: Step-by-Step",
+        caption:
+          "Watch the companion Brain Link episode for animated walkthroughs of the support-ticket neuron building equation by equation, the perceptron line rotating and sliding, and ReLU bending the coordinate grid.",
+        variant: "compact",
+      },
+      {
+        kind: "heading",
+        id: "inside-one-neuron",
+        text: "Inside a single neuron",
+      },
+      {
+        kind: "paragraph",
+        html: "Start with one artificial neuron. Our support ticket feeds it three input features packed into a vector `x`: `x1 = 2` unresolved tickets, `x2 = 8` for the priority score, and `x3 = 5` hours waiting.",
+      },
+      {
+        kind: "paragraph",
+        html: "Notice those three features measure completely different quantities (counts, ratings, and hours). Each input receives a **weight** (`w1`, `w2`, `w3`), a number that controls both how strongly that signal pulls the score and in which direction (positive weights push scores up, negative weights push them down). The neuron multiplies each input by its matching weight, adds the products together, and adds one shared offset called the **bias** (`b`):",
+      },
+      {
+        kind: "formula",
+        tex: "z = w_1 x_1 + w_2 x_2 + w_3 x_3 + b = \\mathbf{w}^\\top \\mathbf{x} + b",
+        caption:
+          "The pre-activation score z combines each input xᵢ with its weight wᵢ and a bias offset b, written expanded on the left and as a compact dot product on the right.",
+      },
+      {
+        kind: "paragraph",
+        html: "Do not let the right-hand notation look mysterious. When we collect inputs into a vertical column vector `x` and weights into a matching column `w`, writing `w^T` (**transpose**) simply tips `w` on its side into a horizontal row `[w1, w2, w3]`. Multiplying that row by column `x` computes their **dot product** (`w1*x1 + w2*x2 + w3*x3`), a single shorthand that works just as cleanly for 3 inputs or 3,000. Combining weighted products with a shift `+ b` is called an **affine transformation**.",
+      },
+      {
+        kind: "paragraph",
+        html: "Plug in illustrative parameters `w = [0.4, 0.7, 0.2]` and `b = -3`. Multiplying each feature by its weight gives `0.4 * 2 = 0.8`, `0.7 * 8 = 5.6`, and `0.2 * 5 = 1.0`. Summing those weighted contributions produces `7.4`. Adding the bias shifts that total down by `3`, landing at `z = 4.4`.",
+      },
+      {
+        kind: "mermaid",
+        caption:
+          "Data flow through one artificial neuron on the support-ticket example. Weights scale each input before the sum and bias produce z = 4.4, which an activation function turns into the final output.",
+        code: `flowchart LR
+  X1["x1 = 2 (unresolved tickets)"] -->|"w1 = 0.4 -> 0.8"| SUM["Weighted sum + bias (b = -3)"]
+  X2["x2 = 8 (priority score)"] -->|"w2 = 0.7 -> 5.6"| SUM
+  X3["x3 = 5 (hours waiting)"] -->|"w3 = 0.2 -> 1.0"| SUM
+  SUM -->|"z = 4.4"| ACT["Activation f(z)"]
+  ACT --> Y["Output"]`,
+      },
+      {
+        kind: "paragraph",
+        html: "Why keep a separate bias term at all? Test what happens when every input equals zero (`x1 = x2 = x3 = 0`). Without `b`, multiplying zero by any weight always leaves `z = 0`, pinning the neuron to zero whenever features disappear. Including `b` decouples the neuron's baseline from the origin (`z = b` when all `x = 0`), acting like an adjustable threshold offset.",
+      },
+      {
+        kind: "paragraph",
+        html: "Where do numbers like `0.4` or `-3` come from in real models? No engineer chooses them by hand. Training begins with small random numbers for weights and biases, feeds labeled tickets through the forward arithmetic, measures how far predictions sit from known urgency labels using a **loss function**, and nudges each weight and bias repeatedly via gradient updates until prediction error drops. In this article we inspect how the network computes and shapes boundaries once weights exist.",
+      },
+      {
+        kind: "callout",
+        title: "What 4.4 and the weights actually represent",
+        body: "Here `w = [0.4, 0.7, 0.2]` and `b = -3` are chosen for illustration. Notice that `4.4` is a **raw pre-activation score**, not an urgency probability, and weights are **not** probabilities or importance percentages. Their numeric scale shifts depending on feature units (hours vs. minutes) and training dynamics, and turning `z` into a class decision depends on the activation function that follows.",
+      },
+      {
+        kind: "paragraph",
+        html: "The final step inside the neuron passes `z` through an **activation function**, `f(z)`, to produce its output. Swapping `f` is what turns the same weighted sum into either a rigid threshold switch or a composable unit inside deep networks.",
+      },
+      {
+        kind: "heading",
+        id: "the-perceptron",
+        text: "The perceptron and its straight-line boundary",
+      },
+      {
+        kind: "paragraph",
+        html: "The earliest activation function is a hard **step function**, introduced by Frank Rosenblatt in 1958 inside the **perceptron**:",
+      },
+      {
+        kind: "formula",
+        tex: "\\hat{y} = \\begin{cases} 1 & \\text{if } z \\ge 0 \\\\ 0 & \\text{if } z < 0 \\end{cases}",
+        caption:
+          "The perceptron step rule thresholds the weighted sum z at zero to emit a binary decision.",
+      },
+      {
+        kind: "paragraph",
+        html: "Read the perceptron in three concrete stages: score the weighted evidence (`z = w^T x + b`), test whether that score clears zero (`z >= 0`), and emit a binary decision (`1` for urgent, `0` for not urgent). On our `[2, 8, 5]` ticket, `z = 4.4 >= 0`, so the perceptron predicts `1`.",
+      },
+      {
+        kind: "image",
+        src: "/articles/step-function-curve.svg",
+        alt: "Graph of the perceptron step activation showing output 0 along a flat horizontal line for z below 0 with an open circle at (0, 0), jumping vertically to a filled dot at (0, 1), and staying flat at 1 across positive values including the support ticket score z = +4.4.",
+        caption:
+          "Plot of the binary step activation: flat slope 0 on both sides with a hard jump from 0 to 1 right at z = 0, placing the support ticket z = +4.4 squarely in the positive output region.",
+        width: 800,
+        height: 320,
+      },
+      {
+        kind: "paragraph",
+        html: "To see *what* a perceptron can divide, simplify to two inputs `x1` and `x2` so every input pair `(x1, x2)` becomes a point on a flat 2D plane. The output flips cleanly between `0` and `1` right where `z = 0`, along `w1 * x1 + w2 * x2 + b = 0`. Solving for `x2` (assuming `w2 != 0`) gives `x2 = -(w1 / w2) * x1 - (b / w2)` (while `w2 = 0` gives a vertical line `x1 = -b / w1`). Either way, it is always a **straight line**.",
+      },
+      {
+        kind: "paragraph",
+        html: "Changing the weights alters the ratio `-w1 / w2`, which changes the slope and **rotates** the dividing line. Changing the bias alters `-b / w2`, which changes the intercept and **slides** the line across the plane without rotating it. Every point on the side where `w1 * x1 + w2 * x2 + b >= 0` outputs `1` (the weight vector `(w1, w2)` points into that positive half-plane), and every point on the opposite side outputs `0`. You can always check which side is `0` or `1` by testing `(0, 0)`, which gives `z = b`.",
+      },
+      {
+        kind: "paragraph",
+        html: "For any rule that a straight cut can isolate (**linearly separable** patterns), one perceptron solves it effortlessly. Take **logical AND** on binary inputs `0` and `1`, where output is `1` only when both `x1 = 1` and `x2 = 1`: setting `w1 = 1`, `w2 = 1`, and `b = -1.5` gives `z = x1 + x2 - 1.5`. Checking all four corners gives `-1.5 -> 0` at `(0, 0)`, `-0.5 -> 0` at `(0, 1)` and `(1, 0)`, and `+0.5 -> 1` at `(1, 1)`. Likewise, shifting only the bias to `b = -0.5` solves **logical OR** (`x1 + x2 - 0.5 >= 0` whenever at least one input is `1`).",
+      },
+      {
+        kind: "image",
+        src: "/articles/perceptron-linear-boundary.svg",
+        alt: "Two 2D coordinate planes showing linear decision boundaries. On the left, changing bias shifts x1 + x2 + b = 0 in parallel from b = -0.5 to b = -1.5 while changing weight ratio to w = (2, 1) rotates the angle. On the right, logical OR (b = -0.5) isolates (0,0) while logical AND (b = -1.5) isolates (1,1).",
+        caption:
+          "Left: weights control the boundary slope (rotation) while bias controls its parallel offset (sliding). Right: two linearly separable logic gates solved by shifting the same line from OR to AND.",
+        width: 800,
+        height: 385,
+      },
+      {
+        kind: "heading",
+        id: "the-xor-limitation",
+        text: "The XOR blind spot",
+      },
+      {
+        kind: "paragraph",
+        html: "A single straight cut breaks as soon as two classes are interleaved across opposite diagonals. The classic failure case, highlighted in Marvin Minsky and Seymour Papert's 1969 analysis of perceptrons, is **XOR** (exclusive OR): output `1` when *exactly one* binary input is `1`, and `0` when both match:",
+      },
+      {
+        kind: "table",
+        headers: ["x1", "x2", "Target y (x1 XOR x2)"],
+        rows: [
+          ["0", "0", "0"],
+          ["0", "1", "1"],
+          ["1", "0", "1"],
+          ["1", "1", "0"],
+        ],
+        numericColumns: [0, 1, 2],
+        caption:
+          "Truth table for XOR. The positive points (0, 1) and (1, 0) sit on one diagonal, while the negative points (0, 0) and (1, 1) sit on the opposite diagonal.",
+      },
+      {
+        kind: "paragraph",
+        html: "Picture those four corners on a square. The two positive points `(0, 1)` and `(1, 0)` sit on one diagonal, while the two negative points `(0, 0)` and `(1, 1)` sit on the opposite diagonal. Rotate or slide a single straight ruler anywhere across that square: it is geometrically impossible to keep `(0, 1)` and `(1, 0)` on one side while placing `(0, 0)` and `(1, 1)` on the other.",
+      },
+      {
+        kind: "paragraph",
+        html: "Four lines of algebra prove no choice of weights and bias can cheat that geometry. Suppose a single perceptron `z = w1 * x1 + w2 * x2 + b` gets all four corners right: `(0, 0) -> 0` forces `b < 0`, `(1, 0) -> 1` forces `w1 + b >= 0`, and `(0, 1) -> 1` forces `w2 + b >= 0`. Adding the two positive inequalities gives `w1 + w2 + 2b >= 0`. Because `b < 0`, subtracting `b` makes the right side strictly positive (`-b > 0`), forcing `w1 + w2 + b >= -b > 0`. That guarantees input `(1, 1)` outputs `1` when XOR requires `0`. No single linear separator (whether a step perceptron or raw logistic regression on the original features) can represent XOR.",
+      },
+      {
+        kind: "image",
+        src: "/articles/xor-decision-boundary.svg",
+        alt: "Side-by-side 2D plots of the four XOR inputs. Left: a single straight line leaves (1,1) inside the positive region as an error. Right: two lines from hidden neurons h1 and h2 form a diagonal band that cleanly isolates (0,1) and (1,0).",
+        caption:
+          "Left: any single straight line leaves at least one XOR corner misclassified. Right: two hidden neurons draw two lines that bound a diagonal strip around (0, 1) and (1, 0).",
+        width: 800,
+        height: 390,
+      },
+      {
+        kind: "paragraph",
+        html: "You can test that algebra directly in Python below. Try changing `w1`, `w2`, and `bias` in section 2 (`Single perceptron`): the error count never drops to `0/4`, whereas combining two hidden neurons (`h1`, `h2`) feeding an output neuron solves all four cases immediately:",
+      },
+      {
+        kind: "code",
+        filename: "xor_perceptron.py",
+        runnable: true,
+        code: `def step(z: float) -> int:
+    return 1 if z >= 0 else 0
+
+# 1. Support-ticket neuron from the earlier example
+x = [2, 8, 5]
+w = [0.4, 0.7, 0.2]
+b = -3.0
+z = sum(wi * xi for wi, xi in zip(w, x)) + b
+print(f"Ticket score z = {z:.1f}, step(z) = {step(z)}")
+
+# 2. Try ANY single straight line (w1, w2, bias) on XOR
+xor_cases = [((0, 0), 0), ((0, 1), 1), ((1, 0), 1), ((1, 1), 0)]
+w1, w2, bias = 1.0, 1.0, -0.5  # Edit these weights and re-run
+single_errors = sum(
+    step(w1 * a + w2 * c + bias) != y for (a, c), y in xor_cases
+)
+print(f"Single perceptron errors on XOR: {single_errors}/4")
+
+# 3. Two hidden neurons + one output neuron solve XOR
+def xor_mlp(a: float, c: float) -> int:
+    h1 = step(a + c - 0.5)       # fires if at least one input is 1 (OR)
+    h2 = step(a + c - 1.5)       # fires if both inputs are 1 (AND)
+    return step(h1 - h2 - 0.5)   # keeps the band where h1=1 and h2=0
+
+mlp_errors = sum(xor_mlp(a, c) != y for (a, c), y in xor_cases)
+print(f"Two-layer MLP errors on XOR:   {mlp_errors}/4")`,
+      },
+      {
+        kind: "paragraph",
+        html: 'Rather than treating `xor_mlp` as magic, trace every input pair through both hidden neurons (`h1`, `h2`) and the final output neuron (`y_hat = step(h1 - h2 - 0.5)`). Notice what `h1` and `h2` actually compute: `h1` checks the **OR** boundary (`x1 + x2 - 0.5 >= 0`), and `h2` checks the **AND** boundary (`x1 + x2 - 1.5 >= 0`). Because XOR means "at least one input is on (`h1 = 1`), and not both (`h2 = 0`)", giving `h1` weight `+1`, `h2` weight `-1`, and bias `-0.5` turns `(h1 = 1, h2 = 0)` into `+0.5 -> 1` while leaving every other combination negative:',
+      },
+      {
+        kind: "table",
+        headers: [
+          "(x1, x2)",
+          "h1 = step(x1+x2-0.5)",
+          "h2 = step(x1+x2-1.5)",
+          "step(h1 - h2 - 0.5)",
+        ],
+        rows: [
+          ["(0, 0)", "0", "0", "0 (score -0.5)"],
+          ["(0, 1)", "1", "0", "1 (score +0.5)"],
+          ["(1, 0)", "1", "0", "1 (score +0.5)"],
+          ["(1, 1)", "1", "1", "0 (score -0.5)"],
+        ],
+        numericColumns: [1, 2],
+        caption:
+          "Step-by-step evaluation of the two-layer XOR network. In (h1, h2) coordinates, both positive corners (0, 1) and (1, 0) collapse onto the single point (1, 0), making the final output linearly separable.",
+      },
+      {
+        kind: "heading",
+        id: "multi-layer-perceptrons-and-nonlinearity",
+        text: "Multi-layer perceptrons and why nonlinearity matters",
+      },
+      {
+        kind: "paragraph",
+        html: "In `xor_mlp`, putting two neurons (`h1`, `h2`) in a **hidden layer** in front of an output neuron built a **multi-layer perceptron (MLP)**: a network where each layer consumes the outputs produced by the previous layer. Look at what happened geometrically in the trace table above. Originally `(0, 1)` and `(1, 0)` sat on opposite corners of the plane. Passing them through `(h1, h2)` mapped **both** positive corners onto the exact same hidden coordinate `(1, 0)`, while `(0, 0)` stayed at `(0, 0)` and `(1, 1)` moved to `(1, 1)`. Inside that new hidden coordinate space, a single straight cut cleanly separates `(1, 0)` from the rest.",
+      },
+      {
+        kind: "image",
+        src: "/articles/xor-hidden-coordinate-map.svg",
+        alt: "Coordinate transformation diagram from 2D input space (x1, x2) on the left to 2D hidden space (h1, h2) on the right. Hidden neurons h1 = step(x1+x2-0.5) and h2 = step(x1+x2-1.5) collapse both positive points (0,1) and (1,0) onto (1,0), enabling the single straight line h1 - h2 = 0.5 to isolate them cleanly.",
+        caption:
+          "Hidden layers turn non-separable inputs into simpler coordinates: once (0, 1) and (1, 0) map to the same hidden coordinate (1, 0), one output line cuts XOR cleanly.",
+        width: 800,
+        height: 360,
+      },
+      {
+        kind: "paragraph",
+        html: "When we pack several neurons side by side into one layer, we write the whole layer in matrix notation: stack each neuron's weight vector as one **row** inside weight matrix `W`, stack their biases into vector `b`, multiply `Wx + b`, and apply an activation function `f` independently to every neuron's score (**element-wise**), written `h = f(Wx + b)`.",
+      },
+      {
+        kind: "paragraph",
+        html: "Why does `f` have to be **nonlinear** (something that bends or clamps rather than scaling cleanly along flat lines)? Look at what happens if you remove `f` and stack two purely linear transformations back to back (`h = W1 x + b1`, then `y = W2 h + b2`). Think of a simple 1D example first: running `3x + 1` and multiplying the output by `2` gives `2(3x + 1) - 5 = 6x - 3`, which is still just one straight line. The exact same algebraic collapse holds for matrices of any size:",
+      },
+      {
+        kind: "formula",
+        tex: "y = W_2(W_1 x + b_1) + b_2 = (W_2 W_1)x + (W_2 b_1 + b_2)",
+        caption:
+          "Two linear layers without an activation collapse into one linear transformation with effective weight matrix W₂W₁ and bias W₂b₁ + b₂.",
+      },
+      {
+        kind: "paragraph",
+        html: "Because the product of two matrices `W2 W1` is just another matrix `W'` and `W2 b1 + b2` is just another bias vector `b'`, stacking two (or two hundred) linear layers without nonlinear activations can never represent anything a single linear layer could not already draw. Every hyperplane stays flat.",
+      },
+      {
+        kind: "paragraph",
+        html: "Modern neural networks prevent linear collapse, and fix a fatal limitation of the 1958 step function, using **ReLU** (Rectified Linear Unit), defined simply as `ReLU(z) = max(0, z)`. Any negative score becomes `0`, while positive scores pass through unchanged with slope `1`. Unlike the binary `step(z)`, which stays completely flat (`slope = 0`) everywhere except the threshold jump and starves gradient-based learning of directional feedback, ReLU keeps a constant active slope for positive values while still putting a sharp **bend** at `z = 0`:",
+      },
+      {
+        kind: "formula",
+        tex: "\\text{ReLU}(z) = \\max(0, z) = \\begin{cases} z & \\text{if } z > 0 \\\\ 0 & \\text{if } z \\le 0 \\end{cases}",
+        caption:
+          "ReLU zeroes every negative pre-activation score while forwarding positive values linearly with slope 1.",
+      },
+      {
+        kind: "image",
+        src: "/articles/relu-function-curve.svg",
+        alt: "Graph of ReLU(z) = max(0, z) across z from -3 to +3. Negative inputs clamp flat along y = 0 with slope 0, meeting a sharp hinge at the origin (0, 0) where positive inputs climb straight along y = z with constant slope 1.",
+        caption:
+          "Visualizing ReLU right where it acts: every negative input clamps flat onto y = 0, then a sharp bend at z = 0 sends positive scores upward with steady slope 1.",
+        width: 800,
+        height: 320,
+      },
+      {
+        kind: "paragraph",
+        html: "Trace how two standard ReLU neurons solve XOR when inputs enter as `s = x1 + x2`: build neuron 1 as `h1 = ReLU(1*x1 + 1*x2 + 0) = ReLU(s)`, build neuron 2 with a `-1` bias as `h2 = ReLU(1*x1 + 1*x2 - 1) = ReLU(s - 1)`, and combine them at the output as `1 * h1 - 2 * h2`. Watch every checkpoint along `s`:",
+      },
+      {
+        kind: "list",
+        items: [
+          "**At `s = 0` (`(0, 0)`)**: `ReLU(0) - 2 * ReLU(-1) = 0 - 0 = 0`.",
+          "**At `s = 1` (`(0, 1)` and `(1, 0)`)**: `ReLU(1) - 2 * ReLU(0) = 1 - 0 = 1`, peaking right at the target.",
+          "**At `s = 2` (`(1, 1)`)**: `ReLU(2) - 2 * ReLU(1) = 2 - 2 = 0`, folding the ramp back down to zero.",
+        ],
+      },
+      {
+        kind: "figure",
+        variant: "line",
+        title: "Folding space with ReLU on XOR",
+        xKey: "sum",
+        xLabel: "sum of inputs (x1 + x2)",
+        yLabel: "value",
+        note: "Computed from s = x1 + x2 (XOR targets: 0 at s = 0, 1 at s = 1, 0 at s = 2)",
+        caption:
+          "Seeing the sum piece by piece: ReLU(s) climbs steadily, -2 * ReLU(s - 1) switches on downward past s = 1, and adding both curves folds the flat linear diagonal into the XOR tent peaking at s = 1.",
+        series: [
+          { key: "reluMlp", label: "Combined XOR tent: ReLU(s) - 2 * ReLU(s - 1)" },
+          { key: "linearOnly", label: "Linear layer only: 0.5 * s" },
+          { key: "h1", label: "Neuron 1: ReLU(s)" },
+          { key: "h2", label: "Weighted Neuron 2: -2 * ReLU(s - 1)" },
+        ],
+        data: [
+          { sum: "0.0", reluMlp: 0.0, linearOnly: 0.0, h1: 0.0, h2: 0.0 },
+          { sum: "0.5", reluMlp: 0.5, linearOnly: 0.25, h1: 0.5, h2: 0.0 },
+          { sum: "1.0", reluMlp: 1.0, linearOnly: 0.5, h1: 1.0, h2: 0.0 },
+          { sum: "1.5", reluMlp: 0.5, linearOnly: 0.75, h1: 1.5, h2: -1.0 },
+          { sum: "2.0", reluMlp: 0.0, linearOnly: 1.0, h1: 2.0, h2: -2.0 },
+        ],
+      },
+      {
+        kind: "heading",
+        id: "hidden-layers-and-why-depth-helps",
+        text: "Hidden layers and why depth helps",
+      },
+      {
+        kind: "paragraph",
+        html: "Any layer sitting between the raw input and the final prediction is called a **hidden layer**. Nothing about the math is secretive. It simply holds intermediate activation vectors (for example, `[0.0, 1.3, 0.0, 2.1, 0.7, 0.4]`) that a user never sees as the model's final answer, yet downstream layers use as cleaner coordinates than the raw inputs.",
+      },
+      {
+        kind: "paragraph",
+        html: "Think of classifying a photograph. Raw inputs are just grids of pixel intensities where moving an object by one pixel changes almost every number. Early hidden layers learn to detect simple local contrast edges (`horizontal`, `diagonal`, `bright-to-dark`). Subsequent hidden layers combine edges into corners and textures, deeper layers combine textures into recognizable parts like wheels or windows, and the final layer turns those high-level parts into class scores. Nobody programs rules for wheels or edges manually. Training adjusts the weights so useful intermediate representations emerge automatically because they drive prediction error down.",
+      },
+      {
+        kind: "paragraph",
+        html: "Mathematically, stacking hidden layers turns one monolithic mapping into **function composition**, much like breaking one enormous 2,000-line script into modular steps (`parse() -> validate() -> transform() -> predict()`) where each stage prepares easier structure for the next:",
+      },
+      {
+        kind: "formula",
+        tex: "f(x) = f_3\\bigl(f_2(f_1(x))\\bigr)",
+        caption:
+          "Each hidden layer transforms the representation produced by the previous layer rather than restarting from raw input features alone.",
+      },
+      {
+        kind: "mermaid",
+        caption:
+          "How depth builds representations hierarchically: early layers detect low-level edges, middle layers combine them into textures and parts, and the output layer scores categories.",
+        code: `flowchart TD
+  P["Raw pixels (brightness grid)"] -->|"f1: Layer 1"| E["Edges & local contrast"]
+  E -->|"f2: Layer 2"| T["Corners & textures"]
+  T -->|"f3: Layer 3"| O["Object parts (wheels, windows)"]
+  O -->|"Output Linear"| C["Class logits (car, bicycle, truck)"]`,
+      },
+      {
+        kind: "paragraph",
+        html: "Notice how widening one layer and adding deeper layers grow a network along two completely different axes:",
+      },
+      {
+        kind: "table",
+        headers: ["Dimension", "What increases", "Role in the network"],
+        rows: [
+          [
+            "**Width**",
+            "More neurons working side by side in one layer",
+            "Computes more parallel detectors at the same representation level",
+          ],
+          [
+            "**Depth**",
+            "More transformation layers stacked sequentially",
+            "Adds more steps of composition so later layers reuse what earlier layers already found",
+          ],
+        ],
+        caption:
+          "Width adds parallel capacity within one layer, while depth adds sequential stages that reuse earlier features.",
+      },
+      {
+        kind: "paragraph",
+        html: "A quick geometric example shows why composition is so economical. Build one two-neuron tent `t(x) = 2 * ReLU(x) - 4 * ReLU(x - 0.5)` on `[0, 1]`: it rises cleanly from `0` at `x = 0` to `1` at `x = 0.5` and drops back to `0` at `x = 1`, creating `2` linear segments. Pass `t(x)` back through a second identical 2-neuron layer (`t(t(x))`), and both halves fold again into `4` segments (`2` peaks using `4` total neurons). Adding one more layer (`t(t(t(x)))`, `6` total neurons) doubles again to `4` peaks (`8` segments). Repeat across `10` layers (`20` total neurons), and repeated folding produces `2^10 = 1,024` linear pieces. Under the **Universal Approximation Theorem**, a single wide hidden layer can represent continuous curves arbitrarily well too, yet building `1,024` distinct hinges flatly in one layer requires around a thousand parallel units rather than `20`. Depth shines whenever structure repeats or composes.",
+      },
+      {
+        kind: "image",
+        src: "/articles/exponential-relu-folding.svg",
+        alt: "Piecewise-linear sawtooth curves showing exponential folding across depth on x from 0 to 1. One 2-neuron layer makes a single triangle with 2 segments, two layers fold into 2 sharp triangles with 4 segments, and three layers fold into 4 sharp triangles with 8 segments.",
+        caption:
+          "Each added 2-neuron layer folds every straight ramp back onto itself with sharp linear corners, turning 2 segments into 4 and then 8 without widening any layer.",
+        width: 800,
+        height: 365,
+      },
+      {
+        kind: "heading",
+        id: "reading-an-mlp-in-pytorch",
+        text: "Reading a real MLP in PyTorch",
+      },
+      {
+        kind: "paragraph",
+        html: "Once you connect neurons, affine matrices, ReLU bends, and layer composition, real neural network code stops looking opaque and reads like a clear wiring diagram. Inspect this compact PyTorch classifier:",
+      },
+      {
+        kind: "code",
+        filename: "mlp.py",
+        code: `import torch.nn as nn
+
+model = nn.Sequential(
+    nn.Linear(20, 64),
+    nn.ReLU(),
+    nn.Linear(64, 10),
+)`,
+      },
+      {
+        kind: "paragraph",
+        html: "Under the hood, `nn.Sequential` chains those modules in exact top-to-bottom order (`out = layer2(relu(layer1(x)))`), passing each layer's output tensor straight into the next:",
+      },
+      {
+        kind: "list",
+        items: [
+          "**`nn.Linear(20, 64)`** creates `64` artificial neurons running side by side on the same `20` inputs (`Wx + b`), transforming every `20`-number input vector into a `64`-dimensional intermediate vector.",
+          "**`nn.ReLU()`** clamps any negative entries among those `64` numbers to `0` element-wise so the second linear layer cannot collapse linearly back into the first.",
+          "**`nn.Linear(64, 10)`** combines the `64` hidden features via `10` output neurons to emit `10` raw class scores called **logits** (unbounded scores such as `[-1.2, 3.8, 0.4, ...]`). Notice there is deliberately **no `nn.ReLU()`** after this final layer: clamping negative scores to zero would erase how strongly the model rejects unlikely classes and prevent loss functions like `CrossEntropyLoss` (which convert logits into class probabilities internally via softmax) from training across negative values.",
+        ],
+      },
+      {
+        kind: "mermaid",
+        caption:
+          "Structural tensor flow through the PyTorch model: 20 input features expand to 64 hidden values, pass through ReLU, and map to 10 output class scores.",
+        code: `flowchart TD
+  X["20 input features"] -->|"nn.Linear(20, 64)"| H1["64 hidden values"]
+  H1 -->|"nn.ReLU()"| H2["64 hidden activations"]
+  H2 -->|"nn.Linear(64, 10)"| OUT["10 class scores (logits)"]`,
+      },
+      {
+        kind: "video",
+        youtubeId: "cD0gD94tp7g",
+        title: "How Neural Networks Actually Learn: Step-by-Step",
+        caption:
+          "Watch the full animated Brain Link episode covering the ticket neuron, rotating perceptron lines, the XOR grid, ReLU bending space, and this PyTorch architecture.",
+        variant: "feature",
+      },
+      {
+        kind: "paragraph",
+        html: "Every engineering trade-off for this classifier flows directly out of those three numbers (`20`, `64`, and `10`): they fix the exact shapes of every weight matrix and bias vector, how many bytes the network stores in memory, and how many arithmetic operations run per example. In [Part 2 of this series](/articles/neural-network-parameters-and-flops), we derive parameter counts and FLOPs directly from those layer dimensions and examine where wide single layers hit practical limits.",
+      },
+      {
+        kind: "references",
+        title: "References",
+        items: [
+          {
+            label: "Deep Feedforward Networks (Chapter 6, Deep Learning)",
+            href: "https://www.deeplearningbook.org/contents/mlp.html",
+            source: "Ian Goodfellow, Yoshua Bengio, and Aaron Courville",
+            note: "Covers the XOR problem, linear collapse, ReLU representation, and depth vs. width.",
+          },
+          {
+            label: "torch.nn.Linear documentation",
+            href: "https://docs.pytorch.org/docs/stable/generated/torch.nn.Linear.html",
+            source: "PyTorch documentation",
+            note: "Applies an affine linear transformation y = xA^T + b across input features.",
+          },
+          {
+            label: "torch.nn.ReLU documentation",
+            href: "https://docs.pytorch.org/docs/stable/generated/torch.nn.ReLU.html",
+            source: "PyTorch documentation",
+            note: "Applies the rectified linear unit max(0, x) element-wise.",
+          },
+          {
+            label: "torch.nn.Sequential documentation",
+            href: "https://docs.pytorch.org/docs/stable/generated/torch.nn.Sequential.html",
+            source: "PyTorch documentation",
+            note: "Sequential container that passes inputs through modules in order.",
+          },
+          {
+            label: "How Neural Networks Actually Learn: Step-by-Step (video)",
+            href: "https://www.youtube.com/watch?v=cD0gD94tp7g",
+            source: "Brain Link on YouTube",
+          },
+          {
+            label: "Deep Learning Fundamentals playlist",
+            href: "https://www.youtube.com/playlist?list=PLX2zaNhVC3Eo",
+            source: "Brain Link on YouTube",
+          },
+        ],
+      },
+    ],
+  },
+  {
     slug: "how-git-actually-works",
     title: "How Git Actually Works: Fingerprints, Snapshots and a 41-Byte Branch",
     dek: "Git doesn't store your changes. It keeps a small database of objects, each named by a fingerprint of its content. Open the .git folder with real hashes and you can explain what a commit saves, why its ID looks random, and why a new branch costs 41 bytes.",

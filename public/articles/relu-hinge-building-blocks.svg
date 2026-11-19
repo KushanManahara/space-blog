@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 330" width="800" height="330" role="img" aria-label="Two side-by-side coordinate plots showing how shifted ReLU neurons combine into a piecewise-linear bump. On the left, h1 = ReLU(x + 1) turns on at x = -1 and rises to +3 at x = 2, while h2 = -2 * ReLU(x - 0.5) turns on at x = 0.5 and drops to -3 at x = 2. On the right, summing h1 + h2 yields 0 until x = -1, rises straight to peak 1.5 at x = 0.5, and bends straight back down to 0 at x = 2.">
+  <title>How two shifted ReLU hinges add together to build a piecewise-linear bump</title>
+
+  <rect x="0.5" y="0.5" width="799" height="329" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+
+  <!-- Header -->
+  <text x="400" y="28" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#0f172a">How individual ReLU hinges combine into piecewise-linear curves</text>
+  <text x="400" y="47" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#475569">Each unit stays zero until its threshold breakpoint, then adds one straight slope segment</text>
+
+  <!-- Panel headings -->
+  <text x="200" y="72" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#0f172a">Step 1: Two separate ReLU hinges</text>
+  <text x="600" y="72" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#047857">Step 2: Sum h1(x) + h2(x)</text>
+
+  <line x1="400" y1="62" x2="400" y2="300" stroke="#e2e8f0" stroke-width="1" />
+
+  <!-- LEFT PANEL: x in [-2, 2], y in [-3, +3] -->
+  <!-- px(x) = 200 + x * 65 => -2: 70, -1: 135, 0: 200, 0.5: 232.5, 1: 265, 2: 330 -->
+  <!-- py(y) = 186 - y * 30 => +3: 96, +1.5: 141, 0: 186, -1.5: 231, -3: 276 -->
+  <rect x="44" y="84" width="312" height="204" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+  <line x1="60" y1="186" x2="342" y2="186" stroke="#94a3b8" stroke-width="1.2" />
+  <line x1="200" y1="92" x2="200" y2="280" stroke="#cbd5e1" stroke-width="1.2" />
+  <line x1="135" y1="92" x2="135" y2="280" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3 3" />
+  <line x1="232.5" y1="92" x2="232.5" y2="280" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3 3" />
+
+  <!-- Y ticks -->
+  <text x="58" y="100" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">+3</text>
+  <text x="58" y="190" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" fill="#475569">0</text>
+  <text x="58" y="279" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">-3</text>
+
+  <!-- X ticks -->
+  <text x="70" y="200" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">-2</text>
+  <text x="135" y="200" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#0369a1">-1</text>
+  <text x="232.5" y="200" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#b45309">+0.5</text>
+  <text x="330" y="200" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">+2</text>
+
+  <!-- h1 = +ReLU(x + 1): (-2,0) -> (-1,0) -> (2,+3) -->
+  <polyline points="70,186 135,186 330,96" fill="none" stroke="#0284c7" stroke-width="2.8" stroke-linejoin="miter" />
+  <circle cx="135" cy="186" r="4.5" fill="#0284c7" />
+  <text x="206" y="106" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10.5" font-weight="700" fill="#0369a1">h1 = +ReLU(x+1)</text>
+
+  <!-- h2 = -2*ReLU(x - 0.5): (-2,0) -> (0.5,0) -> (2,-3) -->
+  <polyline points="70,186 232.5,186 330,276" fill="none" stroke="#d97706" stroke-width="2.8" stroke-linejoin="miter" />
+  <circle cx="232.5" cy="186" r="4.5" fill="#d97706" />
+  <text x="206" y="256" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10.5" font-weight="700" fill="#b45309">h2 = -2*ReLU(x-0.5)</text>
+
+  <!-- RIGHT PANEL: px(x) = 610 + x * 60 => -2: 490, -1: 550, 0: 610, 0.5: 640, 2: 730 -->
+  <rect x="436" y="84" width="320" height="204" rx="8" fill="#f0fdf4" stroke="#86efac" stroke-width="1" />
+  <line x1="482" y1="186" x2="742" y2="186" stroke="#94a3b8" stroke-width="1.2" />
+  <line x1="610" y1="92" x2="610" y2="280" stroke="#cbd5e1" stroke-width="1.2" />
+  <line x1="550" y1="92" x2="550" y2="280" stroke="#dcfce7" stroke-width="1.2" />
+  <line x1="640" y1="92" x2="640" y2="280" stroke="#dcfce7" stroke-width="1.2" />
+
+  <!-- Y ticks -->
+  <text x="478" y="145" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" fill="#047857">+1.5</text>
+  <text x="478" y="190" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" fill="#475569">0</text>
+
+  <!-- X ticks -->
+  <text x="490" y="200" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">-2</text>
+  <text x="550" y="200" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#065f46">-1</text>
+  <text x="640" y="200" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#065f46">+0.5</text>
+  <text x="730" y="200" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">+2</text>
+
+  <!-- Sum polyline: (-2,0) -> (-1,0) -> (0.5,+1.5) -> (2,0) -->
+  <polygon points="550,186 640,141 730,186" fill="#10b981" fill-opacity="0.16" />
+  <polyline points="490,186 550,186 640,141 730,186" fill="none" stroke="#059669" stroke-width="3.2" stroke-linejoin="miter" />
+
+  <circle cx="550" cy="186" r="5" fill="#059669" stroke="#ffffff" stroke-width="1.8" />
+  <circle cx="640" cy="141" r="5.5" fill="#059669" stroke="#ffffff" stroke-width="1.8" />
+  <circle cx="730" cy="186" r="5" fill="#059669" stroke="#ffffff" stroke-width="1.8" />
+
+  <text x="640" y="122" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="700" fill="#065f46">hinge peak (0.5, 1.5)</text>
+  <text x="545" y="220" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#047857">hinge 1 bends up</text>
+  <text x="692" y="220" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#047857">hinge 2 bends down</text>
+
+  <!-- Footer -->
+  <text x="400" y="312" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#334155">Adding more hidden ReLUs simply places more straight line hinges along the curve to hug complex targets closely.</text>
+</svg>

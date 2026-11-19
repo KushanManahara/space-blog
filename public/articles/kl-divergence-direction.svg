@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 325" width="800" height="325" role="img" aria-label="Two-panel visualization of Kullback-Leibler divergence comparing target distribution p = [0.70, 0.20, 0.10] against two model predictions q. Left panel compares close prediction [0.60, 0.30, 0.10] with KL 0.027 against shifted prediction [0.20, 0.20, 0.60] whose term sum is +0.877 plus 0 minus 0.179 equals +0.698. Right panel proves direction asymmetry: D(p||q) equals 0.698 while reversed D(q||p) equals 0.825, alongside identity D(p||q) = CE(p, q) minus H(p).">
+  <title>KL divergence bars, term cancellation, and direction asymmetry</title>
+
+  <rect x="0.5" y="0.5" width="799" height="324" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+
+  <!-- Header -->
+  <text x="400" y="28" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#0f172a">KL divergence D(p || q) = Σ pᵢ ln(pᵢ / qᵢ): distribution gap and direction</text>
+  <text x="400" y="47" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#475569">Zero only when predicted distribution q matches reviewer target p identically across every class</text>
+
+  <line x1="428" y1="62" x2="428" y2="286" stroke="#e2e8f0" stroke-width="1" />
+
+  <!-- LEFT PANEL: Term-by-term comparison on [billing 0.7, tech 0.2, account 0.1] -->
+  <text x="218" y="75" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#0f172a">Target p = [0.7, 0.2, 0.1] vs. predictions q</text>
+  <rect x="24" y="86" width="388" height="196" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+
+  <!-- Case 1 card: close q -->
+  <rect x="38" y="98" width="360" height="72" rx="6" fill="#ecfdf5" stroke="#86efac" stroke-width="1" />
+  <text x="48" y="116" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="700" fill="#065f46">Close match q = [0.6, 0.3, 0.1]</text>
+  <text x="386" y="116" text-anchor="end" font-family="ui-monospace, monospace" font-size="11.5" font-weight="700" fill="#047857">KL = 0.027</text>
+  <text x="48" y="135" font-family="ui-monospace, monospace" font-size="10" fill="#047857">billing: +0.108   tech: -0.081   account: 0.000</text>
+  <text x="48" y="154" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#065f46">Exact match q = p produces ln(1) = 0 -&gt; KL = 0.000</text>
+
+  <!-- Case 2 card: far q -->
+  <rect x="38" y="182" width="360" height="88" rx="6" fill="#fff7ed" stroke="#fed7aa" stroke-width="1" />
+  <text x="48" y="200" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="700" fill="#9a3412">Poor match q = [0.2, 0.2, 0.6]</text>
+  <text x="386" y="200" text-anchor="end" font-family="ui-monospace, monospace" font-size="11.5" font-weight="700" fill="#c2410c">KL = 0.698</text>
+  <text x="48" y="220" font-family="ui-monospace, monospace" font-size="10" fill="#9a3412">billing: +0.877   tech: 0.000   account: -0.179</text>
+  <text x="48" y="239" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#b45309">Single terms go negative when q &gt; p (account -0.179),</text>
+  <text x="48" y="255" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#b45309">yet the weighted sum across all classes stays &gt;= 0.</text>
+
+  <!-- RIGHT PANEL: Asymmetry & CE link -->
+  <text x="610" y="75" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#1e3a8a">Asymmetry &amp; cross-entropy link</text>
+  <rect x="444" y="86" width="332" height="196" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+
+  <!-- Asymmetric comparison bars -->
+  <text x="460" y="110" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="700" fill="#334155">Swapping p and q changes the value:</text>
+
+  <text x="460" y="135" font-family="ui-monospace, monospace" font-size="11" font-weight="700" fill="#0369a1">D(p || q)</text>
+  <rect x="536" y="123" width="130" height="16" rx="4" fill="#0284c7" />
+  <text x="676" y="135" font-family="ui-monospace, monospace" font-size="11" font-weight="700" fill="#0369a1">0.698</text>
+
+  <text x="460" y="164" font-family="ui-monospace, monospace" font-size="11" font-weight="700" fill="#7c3aed">D(q || p)</text>
+  <rect x="536" y="152" width="154" height="16" rx="4" fill="#8b5cf6" />
+  <text x="700" y="164" font-family="ui-monospace, monospace" font-size="11" font-weight="700" fill="#6d28d9">0.825</text>
+
+  <!-- KL = CE - H(p) decomposition -->
+  <rect x="460" y="186" width="300" height="82" rx="6" fill="#eff6ff" stroke="#93c5fd" stroke-width="1" />
+  <text x="610" y="205" text-anchor="middle" font-family="ui-monospace, monospace" font-size="11" font-weight="700" fill="#1e3a8a">D(p || q) = CE(p, q) − H(p)</text>
+  <text x="610" y="226" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10.5" fill="#1d4ed8">0.698 = 1.500 − 0.802</text>
+  <text x="610" y="248" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#334155">Fixed target entropy H(p) = constant during training,</text>
+  <text x="610" y="261" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#334155">so minimizing CE minimizes KL identically.</text>
+
+  <!-- Footer -->
+  <text x="400" y="305" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#334155">Used whenever targets are soft reviewer votes or probability distributions copied in knowledge distillation.</text>
+</svg>

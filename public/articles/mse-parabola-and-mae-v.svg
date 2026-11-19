@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 340" width="800" height="340" role="img" aria-label="Two-panel plot comparing MSE parabola and MAE V-shape over error e from -4 to +4 alongside outlier batch behavior. Left panel draws e squared as a smooth U parabola with derivative slope 2e and MAE |e| as a sharp V with slope +/-1 and corner at zero. Right panel shows bar values when adding error 100 to batch [2, -3, 4, -2]: MSE jumps from 8.25 to 2,006.6 while MAE moves linearly from 2.75 to 22.2.">
+  <title>MSE quadratic parabola versus MAE linear V-shape and outlier sensitivity</title>
+
+  <rect x="0.5" y="0.5" width="799" height="339" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+
+  <!-- Header -->
+  <text x="400" y="28" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#0f172a">Quadratic MSE (slope 2e) vs. Linear MAE (slope ±1) across negative and positive misses</text>
+  <text x="400" y="47" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#475569">Squaring amplifies extreme misses smoothly with error size, while absolute error pushes with steady slope 1</text>
+
+  <!-- Panel headers -->
+  <text x="200" y="72" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#0f172a">Loss curves for e in [-4, +4]</text>
+  <text x="600" y="72" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#9a3412">Impact of adding 100h outlier</text>
+
+  <line x1="400" y1="62" x2="400" y2="300" stroke="#e2e8f0" stroke-width="1" />
+
+  <!-- LEFT PANEL: px(e) = 200 + 34e ([-4..+4] -> 64..336), py(y) = 236 - 9y (y=16 -> 92) -->
+  <rect x="34" y="84" width="336" height="202" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+  <line x1="56" y1="236" x2="348" y2="236" stroke="#94a3b8" stroke-width="1.2" />
+  <line x1="200" y1="92" x2="200" y2="239" stroke="#94a3b8" stroke-width="1.2" />
+
+  <!-- Y guides: 4 -> 200, 8 -> 164, 16 -> 92 -->
+  <line x1="56" y1="164" x2="348" y2="164" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3 3" />
+  <text x="52" y="240" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" fill="#475569">0</text>
+  <text x="52" y="168" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" fill="#475569">8</text>
+  <text x="52" y="96" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" fill="#475569">16</text>
+
+  <!-- X ticks -->
+  <text x="64" y="252" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">-4</text>
+  <text x="132" y="252" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">-2</text>
+  <text x="200" y="252" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#0f172a">0</text>
+  <text x="268" y="252" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">+2</text>
+  <text x="336" y="252" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">+4</text>
+
+  <!-- Exact MSE parabola: e^2 -->
+  <polyline points="64.0,92.0 72.5,109.4 81.0,125.8 89.5,140.9 98.0,155.0 106.5,167.9 115.0,179.8 123.5,190.4 132.0,200.0 140.5,208.4 149.0,215.8 157.5,221.9 166.0,227.0 174.5,230.9 183.0,233.8 191.5,235.4 200.0,236.0 208.5,235.4 217.0,233.8 225.5,230.9 234.0,227.0 242.5,221.9 251.0,215.8 259.5,208.4 268.0,200.0 276.5,190.4 285.0,179.8 293.5,167.9 302.0,155.0 310.5,140.9 319.0,125.8 327.5,109.4 336.0,92.0" fill="none" stroke="#0284c7" stroke-width="3" />
+
+  <!-- MAE |e| on SAME scale (y=4 at e=4 -> py = 236 - 9*4 = 200) -->
+  <polyline points="64.0,200.0 200.0,236.0 336.0,200.0" fill="none" stroke="#d97706" stroke-width="2.6" stroke-linejoin="miter" />
+  <circle cx="200" cy="236" r="4" fill="#d97706" />
+
+  <!-- Legend & non-overlapping U-interior note -->
+  <rect x="104" y="103" width="192" height="17" rx="4" fill="#f8fafc" />
+  <text x="200" y="115" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#475569">Flat bottom at e = 0 vs. sharp V corner</text>
+
+  <line x1="56" y1="270" x2="72" y2="270" stroke="#0284c7" stroke-width="3" stroke-linecap="round" />
+  <text x="76" y="274" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#0369a1">MSE = e² (slope 2e)</text>
+  <line x1="204" y1="270" x2="220" y2="270" stroke="#d97706" stroke-width="2.6" stroke-linecap="round" />
+  <text x="224" y="274" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#b45309">MAE = |e| (slope ±1)</text>
+
+  <!-- RIGHT PANEL: Outlier bar impact [2, -3, 4, -2] vs [+100] -->
+  <rect x="430" y="84" width="340" height="202" rx="8" fill="#fff7ed" stroke="#fed7aa" stroke-width="1" />
+
+  <!-- Clean batch -->
+  <text x="448" y="108" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="700" fill="#334155">Clean batch: [2, -3, 4, -2]</text>
+  <rect x="448" y="118" width="144" height="26" rx="5" fill="#eff6ff" stroke="#93c5fd" stroke-width="1" />
+  <text x="520" y="135" text-anchor="middle" font-family="ui-monospace, monospace" font-size="11.5" font-weight="700" fill="#1e3a8a">MSE = 8.25</text>
+  <rect x="604" y="118" width="148" height="26" rx="5" fill="#f0fdf4" stroke="#86efac" stroke-width="1" />
+  <text x="678" y="135" text-anchor="middle" font-family="ui-monospace, monospace" font-size="11.5" font-weight="700" fill="#065f46">MAE = 2.75</text>
+
+  <!-- With outlier 100 -->
+  <text x="448" y="170" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="700" fill="#9a3412">Add 1 extreme miss (+100h):</text>
+
+  <!-- MSE jump bar -->
+  <text x="448" y="191" font-family="ui-monospace, monospace" font-size="11" font-weight="700" fill="#0369a1">MSE explodes (243×):</text>
+  <text x="752" y="191" text-anchor="end" font-family="ui-monospace, monospace" font-size="11.5" font-weight="700" fill="#b91c1c">2,006.6</text>
+  <rect x="448" y="197" width="304" height="14" rx="4" fill="#dc2626" />
+  <text x="448" y="223" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#7f1d1d">100² = 10,000 dwarfs the other 4 squares summing to 33</text>
+
+  <!-- MAE jump bar (proportional comparison ~22.2 / 2006.6 is tiny, show visual ~16px vs full width + exact 8.1x badge) -->
+  <text x="448" y="246" font-family="ui-monospace, monospace" font-size="11" font-weight="700" fill="#047857">MAE scales linearly (8.1×):</text>
+  <text x="752" y="246" text-anchor="end" font-family="ui-monospace, monospace" font-size="11.5" font-weight="700" fill="#047857">22.2</text>
+  <rect x="448" y="252" width="304" height="14" rx="4" fill="#fde68a" fill-opacity="0.35" />
+  <rect x="448" y="252" width="14" height="14" rx="3" fill="#059669" />
+  <text x="448" y="278" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#065f46">Gradient push on every step stays fixed at ±1 per outlier</text>
+
+  <!-- Footer -->
+  <text x="400" y="320" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#334155">Pick MSE to penalize large misses aggressively, or MAE to keep noisy extreme outliers from hijacking updates.</text>
+</svg>

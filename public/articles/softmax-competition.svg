@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 410" width="800" height="410" role="img" aria-label="Comparison of Softmax probabilities before and after increasing only the cat logit from 2.0 to 3.0. In the top panel, logits 2.0, 1.0, and 0.1 normalize to probabilities 0.659, 0.242, and 0.099. In the bottom panel, raising cat to 3.0 expands the sum of exponentials from 11.213 to 23.909, lifting cat to 0.840 while forcing dog down to 0.114 and bird down to 0.046 even though their own logits stayed fixed.">
+  <title>How Softmax couples all output classes across a shared probability budget</title>
+
+  <rect x="0.5" y="0.5" width="799" height="409" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+
+  <!-- Header -->
+  <text x="400" y="30" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15.5" font-weight="700" fill="#0f172a">How Softmax couples all outputs together</text>
+  <text x="400" y="50" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#475569">Increasing only one logit raises the shared denominator, forcing every competing class downward</text>
+
+  <!-- PANEL 1: Baseline logits [2.0, 1.0, 0.1] -->
+  <rect x="24" y="68" width="752" height="142" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2" />
+  <text x="40" y="90" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#0f172a">Baseline logits: [cat: 2.0, dog: 1.0, bird: 0.1]</text>
+  <text x="760" y="90" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11.5" font-weight="700" fill="#334155">Denominator sum = 11.213</text>
+
+  <!-- Column headers -->
+  <text x="44" y="112" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#64748b">Class</text>
+  <text x="124" y="112" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#64748b">Logit z</text>
+  <text x="224" y="112" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#64748b">Positive score e^z</text>
+  <text x="466" y="112" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#64748b">Probability p = e^z / 11.213</text>
+
+  <!-- Cat row (top) -->
+  <text x="44" y="136" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="700" fill="#0f172a">cat</text>
+  <rect x="98" y="121" width="52" height="22" rx="5" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="1" />
+  <text x="124" y="136" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11.5" font-weight="700" fill="#0369a1">2.0</text>
+  <text x="166" y="136" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#64748b">→</text>
+  <text x="224" y="136" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11.5" font-weight="600" fill="#334155">7.389</text>
+  <text x="288" y="136" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10.5" fill="#64748b">÷ 11.213 →</text>
+  <rect x="366" y="123" width="200" height="16" rx="4" fill="#e2e8f0" />
+  <rect x="366" y="123" width="131.8" height="16" rx="4" fill="#0284c7" />
+  <text x="582" y="136" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11.5" font-weight="700" fill="#0369a1">0.659  (65.9%)</text>
+
+  <!-- Dog row (top) -->
+  <text x="44" y="164" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="700" fill="#0f172a">dog</text>
+  <rect x="98" y="149" width="52" height="22" rx="5" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1" />
+  <text x="124" y="164" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11.5" font-weight="700" fill="#334155">1.0</text>
+  <text x="166" y="164" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#64748b">→</text>
+  <text x="224" y="164" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11.5" font-weight="600" fill="#334155">2.718</text>
+  <text x="288" y="164" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10.5" fill="#64748b">÷ 11.213 →</text>
+  <rect x="366" y="151" width="200" height="16" rx="4" fill="#e2e8f0" />
+  <rect x="366" y="151" width="48.5" height="16" rx="4" fill="#64748b" />
+  <text x="582" y="164" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11.5" font-weight="700" fill="#334155">0.242  (24.2%)</text>
+
+  <!-- Bird row (top) -->
+  <text x="44" y="192" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="700" fill="#0f172a">bird</text>
+  <rect x="98" y="177" width="52" height="22" rx="5" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1" />
+  <text x="124" y="192" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11.5" font-weight="700" fill="#334155">0.1</text>
+  <text x="166" y="192" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#64748b">→</text>
+  <text x="224" y="192" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11.5" font-weight="600" fill="#334155">1.105</text>
+  <text x="288" y="192" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10.5" fill="#64748b">÷ 11.213 →</text>
+  <rect x="366" y="179" width="200" height="16" rx="4" fill="#e2e8f0" />
+  <rect x="366" y="179" width="19.7" height="16" rx="4" fill="#94a3b8" />
+  <text x="582" y="192" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11.5" font-weight="700" fill="#475569">0.099   (9.9%)</text>
+
+  <!-- PANEL 2: Raised cat logit [3.0, 1.0, 0.1] -->
+  <rect x="24" y="226" width="752" height="142" rx="10" fill="#f0fdf4" stroke="#86efac" stroke-width="1.2" />
+  <text x="40" y="248" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#065f46">Raise only cat logit (2.0 → 3.0) while dog and bird stay at 1.0 and 0.1</text>
+  <text x="760" y="248" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11.5" font-weight="700" fill="#047857">Sum jumps to 23.909</text>
+
+  <!-- Column headers -->
+  <text x="44" y="270" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#475569">Class</text>
+  <text x="124" y="270" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#475569">Logit z</text>
+  <text x="224" y="270" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#475569">Positive score e^z</text>
+  <text x="466" y="270" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#475569">New probability p = e^z / 23.909</text>
+
+  <!-- Cat row (bottom - changed) -->
+  <text x="44" y="294" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="700" fill="#0f172a">cat</text>
+  <rect x="98" y="279" width="52" height="22" rx="5" fill="#d1fae5" stroke="#10b981" stroke-width="1.5" />
+  <text x="124" y="294" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11.5" font-weight="700" fill="#065f46">3.0</text>
+  <text x="166" y="294" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#047857">→</text>
+  <text x="224" y="294" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11.5" font-weight="700" fill="#065f46">20.086</text>
+  <text x="288" y="294" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10.5" fill="#047857">÷ 23.909 →</text>
+  <rect x="366" y="281" width="200" height="16" rx="4" fill="#dcfce7" />
+  <rect x="366" y="281" width="168.0" height="16" rx="4" fill="#059669" />
+  <text x="582" y="294" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11.5" font-weight="700" fill="#065f46">0.840  ↑ from 0.659</text>
+
+  <!-- Dog row (bottom - unchanged logit, dropped prob) -->
+  <text x="44" y="322" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="700" fill="#0f172a">dog</text>
+  <rect x="98" y="307" width="52" height="22" rx="5" fill="#ffffff" stroke="#cbd5e1" stroke-width="1" />
+  <text x="124" y="322" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11.5" font-weight="700" fill="#334155">1.0</text>
+  <text x="166" y="322" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#64748b">→</text>
+  <text x="224" y="322" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11.5" font-weight="600" fill="#334155">2.718</text>
+  <text x="288" y="322" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10.5" fill="#64748b">÷ 23.909 →</text>
+  <rect x="366" y="309" width="200" height="16" rx="4" fill="#dcfce7" />
+  <rect x="366" y="309" width="22.7" height="16" rx="4" fill="#d97706" />
+  <text x="582" y="322" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11.5" font-weight="700" fill="#b45309">0.114  ↓ from 0.242</text>
+
+  <!-- Bird row (bottom - unchanged logit, dropped prob) -->
+  <text x="44" y="350" font-family="system-ui, -apple-system, sans-serif" font-size="12.5" font-weight="700" fill="#0f172a">bird</text>
+  <rect x="98" y="335" width="52" height="22" rx="5" fill="#ffffff" stroke="#cbd5e1" stroke-width="1" />
+  <text x="124" y="350" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11.5" font-weight="700" fill="#334155">0.1</text>
+  <text x="166" y="350" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#64748b">→</text>
+  <text x="224" y="350" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11.5" font-weight="600" fill="#334155">1.105</text>
+  <text x="288" y="350" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10.5" fill="#64748b">÷ 23.909 →</text>
+  <rect x="366" y="337" width="200" height="16" rx="4" fill="#dcfce7" />
+  <rect x="366" y="337" width="9.2" height="16" rx="4" fill="#d97706" />
+  <text x="582" y="350" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11.5" font-weight="700" fill="#b45309">0.046  ↓ from 0.099</text>
+
+  <!-- Bottom note -->
+  <text x="400" y="392" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#334155">Every row obeys 0 &lt; p_i &lt; 1 and Σ p_i = 1.000. Unlike ReLU or GELU, Softmax ties all classes together.</text>
+</svg>

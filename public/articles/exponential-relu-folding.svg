@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 365" width="800" height="365" role="img" aria-label="Piecewise-linear sawtooth folding curves on x from 0 to 1 for one, two, and three stacked two-neuron ReLU tent layers. One layer produces a single triangle with 2 linear segments peaking at x = 0.5. Two layers fold into 2 sharp triangles with 4 segments peaking at 0.25 and 0.75. Three layers fold into 4 sharp triangles with 8 segments peaking at 0.125, 0.375, 0.625, and 0.875.">
+  <title>Exponential linear segments from stacking two-neuron ReLU tent layers</title>
+
+  <rect x="0.5" y="0.5" width="799" height="364" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+
+  <!-- Header -->
+  <text x="400" y="28" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#0f172a">Exponential linear segments from stacking ReLU tents</text>
+  <text x="400" y="47" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#475569">Each added 2-neuron layer folds every straight ramp back onto itself, doubling corners cleanly</text>
+
+  <!-- Plot area: x in [0, 1] -> px = 80 + x * 640 (width=640, ends at 720) -->
+  <!-- y in [0, 1] -> py = 266 - y * 180 (height=180, top at 86) -->
+  <rect x="52" y="68" width="696" height="226" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+
+  <!-- Vertical subtle ticks for every 0.125 (px = 80 + k * 80) -->
+  <line x1="160" y1="86" x2="160" y2="266" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3 3" />
+  <line x1="240" y1="86" x2="240" y2="266" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3 3" />
+  <line x1="320" y1="86" x2="320" y2="266" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3 3" />
+  <line x1="400" y1="86" x2="400" y2="266" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3 3" />
+  <line x1="480" y1="86" x2="480" y2="266" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3 3" />
+  <line x1="560" y1="86" x2="560" y2="266" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3 3" />
+  <line x1="640" y1="86" x2="640" y2="266" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3 3" />
+  <line x1="720" y1="86" x2="720" y2="266" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3 3" />
+
+  <!-- Horizontal dashed guides y = 0.5, 1.0 -->
+  <line x1="80" y1="176" x2="720" y2="176" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 4" />
+  <line x1="80" y1="86" x2="720" y2="86" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 4" />
+
+  <!-- Axes -->
+  <line x1="80" y1="266" x2="724" y2="266" stroke="#94a3b8" stroke-width="1.3" />
+  <line x1="80" y1="82" x2="80" y2="266" stroke="#94a3b8" stroke-width="1.3" />
+
+  <!-- Y axis labels -->
+  <text x="72" y="270" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10.5" fill="#475569">0</text>
+  <text x="72" y="180" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10.5" fill="#475569">0.5</text>
+  <text x="72" y="90" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10.5" fill="#475569">1.0</text>
+
+  <!-- X axis labels -->
+  <text x="80" y="283" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10" fill="#475569">0</text>
+  <text x="160" y="283" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10" fill="#64748b">0.125</text>
+  <text x="240" y="283" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10" fill="#475569">0.25</text>
+  <text x="320" y="283" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10" fill="#64748b">0.375</text>
+  <text x="400" y="283" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10" font-weight="700" fill="#0f172a">0.5</text>
+  <text x="480" y="283" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10" fill="#64748b">0.625</text>
+  <text x="560" y="283" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10" fill="#475569">0.75</text>
+  <text x="640" y="283" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10" fill="#64748b">0.875</text>
+  <text x="720" y="283" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10" fill="#475569">1.0</text>
+
+  <!-- Sharp Piecewise-Linear Polylines! -->
+  <!-- 1 layer (2 segments): (0,0) -> (0.5, 1.0) -> (1.0, 0) -->
+  <polyline points="80,266 400,86 720,266" fill="none" stroke="#64748b" stroke-width="2.4" stroke-dasharray="6 4" stroke-linejoin="miter" />
+
+  <!-- 2 layers (4 segments): (0,0) -> (0.25,1) -> (0.5,0) -> (0.75,1) -> (1,0) -->
+  <polyline points="80,266 240,86 400,266 560,86 720,266" fill="none" stroke="#d97706" stroke-width="2.6" stroke-linejoin="miter" />
+
+  <!-- 3 layers (8 segments): (0,0) -> (0.125,1) -> (0.25,0) -> (0.375,1) -> (0.5,0) -> (0.625,1) -> (0.75,0) -> (0.875,1) -> (1,0) -->
+  <polyline points="80,266 160,86 240,266 320,86 400,266 480,86 560,266 640,86 720,266" fill="none" stroke="#0284c7" stroke-width="3" stroke-linejoin="miter" />
+
+  <!-- Vertex hinge markers -->
+  <circle cx="400" cy="86" r="4" fill="#64748b" />
+  <circle cx="240" cy="86" r="4" fill="#d97706" />
+  <circle cx="560" cy="86" r="4" fill="#d97706" />
+  <circle cx="160" cy="86" r="4.5" fill="#0284c7" />
+  <circle cx="320" cy="86" r="4.5" fill="#0284c7" />
+  <circle cx="480" cy="86" r="4.5" fill="#0284c7" />
+  <circle cx="640" cy="86" r="4.5" fill="#0284c7" />
+
+  <!-- Legend below plot -->
+  <line x1="60" y1="316" x2="84" y2="316" stroke="#64748b" stroke-width="2.5" stroke-dasharray="5 3" />
+  <text x="92" y="320" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#334155">1 layer (2 neurons → 2 segments)</text>
+
+  <line x1="290" y1="316" x2="314" y2="316" stroke="#d97706" stroke-width="2.6" />
+  <text x="322" y="320" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#b45309">2 layers (4 neurons → 4 segments)</text>
+
+  <line x1="520" y1="316" x2="544" y2="316" stroke="#0284c7" stroke-width="3" />
+  <text x="552" y="320" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="700" fill="#0369a1">3 layers (6 neurons → 8 segments)</text>
+
+  <!-- Footer -->
+  <text x="400" y="346" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#475569">Repeating this exact 2-neuron folding step across 10 layers (20 total neurons) generates 2^10 = 1,024 crisp linear segments.</text>
+</svg>

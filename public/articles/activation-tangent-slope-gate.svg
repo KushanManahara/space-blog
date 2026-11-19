@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 315" width="800" height="315" role="img" aria-label="Two-panel diagram explaining how local activation slope acts as a tangent derivative forward and a multiplicative learning signal valve backward. Left panel plots a smooth S-curve comparing slope 0.25 at z equals 0 against flat slope 0.018 at z equals +4. Right panel shows gradient signal times f'(z) passing backward from loss through three slope cases: 1.00 preserves 100%, 0.25 preserves 25%, and 0.01 leaves 1%.">
+  <title>Activation tangent slopes govern backward learning signals</title>
+
+  <rect x="0.5" y="0.5" width="799" height="314" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+
+  <!-- Header -->
+  <text x="400" y="28" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#0f172a">How local slope f'(z) measures sensitivity and gates learning signals</text>
+  <text x="400" y="47" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#475569">Slope = rise / run forward; backward training multiplies incoming sensitivity by that same slope f'(z)</text>
+
+  <line x1="400" y1="62" x2="400" y2="282" stroke="#e2e8f0" stroke-width="1" />
+
+  <!-- LEFT PANEL: px(z) = 200 + 26z (z in [-5, +5] -> 70..330), py(y) = 228 - 116y (0..1 -> 228..112) -->
+  <text x="200" y="74" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#0f172a">1. Tangent slope on the curve (rise / run)</text>
+  <rect x="30" y="84" width="350" height="190" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+
+  <!-- Subtle flat tail band right z >= +3 (278..330) -->
+  <rect x="278" y="96" width="60" height="132" rx="4" fill="#fef3c7" fill-opacity="0.55" />
+
+  <!-- Axes (vertical stops above 0 tick) -->
+  <line x1="62" y1="228" x2="342" y2="228" stroke="#94a3b8" stroke-width="1.2" />
+  <line x1="200" y1="98" x2="200" y2="232" stroke="#94a3b8" stroke-width="1.2" />
+  <line x1="62" y1="112" x2="342" y2="112" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3 3" />
+
+  <text x="56" y="232" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" fill="#475569">0</text>
+  <text x="56" y="116" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" fill="#475569">1</text>
+  <text x="122" y="246" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">-3</text>
+  <text x="200" y="246" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#0f172a">0</text>
+  <text x="304" y="246" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" fill="#64748b">+4</text>
+
+  <!-- Curve -->
+  <polyline points="70.0,227.2 76.5,227.0 83.0,226.7 89.5,226.4 96.0,225.9 102.5,225.3 109.0,224.6 115.5,223.7 122.0,222.5 128.5,221.0 135.0,219.2 141.5,216.9 148.0,214.2 154.5,210.8 161.0,206.8 167.5,202.2 174.0,196.8 180.5,190.8 187.0,184.2 193.5,177.2 200.0,170.0 206.5,162.8 213.0,155.8 219.5,149.2 226.0,143.2 232.5,137.8 239.0,133.2 245.5,129.2 252.0,125.8 258.5,123.1 265.0,120.8 271.5,119.0 278.0,117.5 284.5,116.3 291.0,115.4 297.5,114.7 304.0,114.1 310.5,113.6 317.0,113.3 323.5,113.0 330.0,112.8" fill="none" stroke="#0284c7" stroke-width="2.5" />
+
+  <!-- Tangent 1 at z=0 (200, 170) -->
+  <line x1="164" y1="210.2" x2="236" y2="129.8" stroke="#059669" stroke-width="2.4" stroke-linecap="round" />
+  <circle cx="200" cy="170" r="4.5" fill="#059669" stroke="#ffffff" stroke-width="1.5" />
+  <text x="150" y="138" text-anchor="end" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#047857">slope = 0.25</text>
+  <text x="150" y="151" text-anchor="end" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" fill="#065f46">+0.01 step -&gt; +0.0025</text>
+
+  <!-- Tangent 2 at z=+4 (304, 114.1) -->
+  <line x1="266" y1="117.1" x2="342" y2="111.1" stroke="#d97706" stroke-width="2.4" stroke-linecap="round" />
+  <circle cx="304" cy="114.1" r="4.5" fill="#d97706" stroke="#ffffff" stroke-width="1.5" />
+  <text x="304" y="176" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#b45309">flat tail (slope 0.018)</text>
+  <text x="304" y="190" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="9.5" fill="#9a3412">nudge z barely moves f(z)</text>
+
+  <text x="205" y="264" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#475569">Green tangent keeps 25% sensitivity; flat amber tail loses 98%</text>
+
+  <!-- RIGHT PANEL: Chain-rule backward slope valve -->
+  <text x="600" y="74" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#0f172a">2. Activation slope acts as backward gate</text>
+  <rect x="420" y="84" width="354" height="190" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+
+  <!-- Forward & backward mini strip -->
+  <rect x="436" y="96" width="60" height="24" rx="5" fill="#eff6ff" stroke="#93c5fd" stroke-width="1" />
+  <text x="466" y="112" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10.5" font-weight="700" fill="#1e3a8a">z</text>
+
+  <line x1="498" y1="108" x2="532" y2="108" stroke="#64748b" stroke-width="1.5" />
+  <polygon points="532,104 540,108 532,112" fill="#64748b" />
+
+  <rect x="542" y="96" width="84" height="24" rx="5" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.2" />
+  <text x="584" y="112" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10.5" font-weight="700" fill="#1d4ed8">f(z) valve</text>
+
+  <line x1="628" y1="108" x2="662" y2="108" stroke="#64748b" stroke-width="1.5" />
+  <polygon points="662,104 670,108 662,112" fill="#64748b" />
+
+  <rect x="672" y="96" width="86" height="24" rx="5" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1" />
+  <text x="715" y="112" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" font-weight="600" fill="#334155">Next / Loss</text>
+
+  <!-- Backward arrow directly underneath -->
+  <line x1="710" y1="136" x2="480" y2="136" stroke="#d97706" stroke-width="2.2" />
+  <polygon points="480,131 468,136 480,141" fill="#d97706" />
+  <rect x="530" y="126" width="142" height="19" rx="9.5" fill="#fff7ed" stroke="#fed7aa" stroke-width="1" />
+  <text x="601" y="139" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#b45309">signal × f'(z)</text>
+
+  <!-- Three slope outcome pills -->
+  <rect x="436" y="158" width="322" height="30" rx="6" fill="#ecfdf5" stroke="#86efac" stroke-width="1" />
+  <text x="450" y="177" font-family="ui-monospace, monospace" font-size="10.5" font-weight="700" fill="#047857">f'(z) = 1.00</text>
+  <text x="744" y="177" text-anchor="end" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#065f46">100% of signal passes backward</text>
+
+  <rect x="436" y="195" width="322" height="30" rx="6" fill="#fffbeb" stroke="#fcd34d" stroke-width="1" />
+  <text x="450" y="214" font-family="ui-monospace, monospace" font-size="10.5" font-weight="700" fill="#b45309">f'(z) = 0.25</text>
+  <text x="744" y="214" text-anchor="end" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#92400e">Only 25% survives each layer</text>
+
+  <rect x="436" y="232" width="322" height="30" rx="6" fill="#fef2f2" stroke="#fca5a5" stroke-width="1" />
+  <text x="450" y="251" font-family="ui-monospace, monospace" font-size="10.5" font-weight="700" fill="#b91c1c">f'(z) ≈ 0.00</text>
+  <text x="744" y="251" text-anchor="end" font-family="system-ui, -apple-system, sans-serif" font-size="10.5" fill="#991b1b">Saturated or dead: updates stall</text>
+
+  <!-- Footer -->
+  <text x="400" y="299" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="600" fill="#334155">Every backward weight gradient multiplies by f'(z) at each activation it crosses.</text>
+</svg>
