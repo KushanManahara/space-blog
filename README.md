@@ -19,16 +19,18 @@ Space is an independent engineering publication dedicated to what is actually ha
 
 ## 🛠️ Architecture & Tech Stack
 
-| Layer              | Technologies                                                                                  |
-| :----------------- | :-------------------------------------------------------------------------------------------- |
-| **Framework**      | [Next.js 16.3.1](https://nextjs.org/) (App Router + Turbopack + React 19)                     |
-| **Styling & UI**   | [Tailwind CSS v4](https://tailwindcss.com/), Radix UI primitives, Lucide Icons                |
-| **Typography**     | Louis George Café (Custom variable font)                                                      |
-| **Database**       | [Turso](https://turso.tech/) (Serverless libSQL / SQLite in AWS Mumbai `ap-south-1`)          |
-| **ORM**            | [Drizzle ORM](https://orm.drizzle.team/) with automated migrations                            |
-| **Email Service**  | [Resend](https://resend.com/) Unified Contacts API & React Email templates                    |
-| **Content Engine** | Fully typed, build-time Zod schema validation (`src/lib/content/`)                            |
-| **Hosting & DNS**  | [Vercel](https://vercel.com/) Global Edge Network + [Cloudflare](https://cloudflare.com/) DNS |
+| Layer              | Technologies                                                                                              |
+| :----------------- | :-------------------------------------------------------------------------------------------------------- |
+| **Framework**      | [Next.js 16.4](https://nextjs.org/) (App Router + Turbopack + React 19)                                   |
+| **Styling & UI**   | [Tailwind CSS v4](https://tailwindcss.com/), Radix UI primitives, Lucide Icons                            |
+| **Typography**     | Louis George Café (Custom variable font)                                                                  |
+| **Database**       | [Turso](https://turso.tech/) (Serverless libSQL / SQLite in AWS Mumbai `ap-south-1`)                      |
+| **ORM**            | [Drizzle ORM](https://orm.drizzle.team/) with automated migrations                                        |
+| **Email Service**  | [Resend](https://resend.com/) Unified Contacts API & React Email templates                                |
+| **Scheduling**     | Vercel schedule (`vercel.json`) for the daily new-article email queue                                     |
+| **Spam Control**   | [Cloudflare Turnstile](https://www.cloudflare.com/products/turnstile/) on reviews, honeypots, rate limits |
+| **Content Engine** | Fully typed, build-time Zod schema validation (`src/lib/content/`)                                        |
+| **Hosting & DNS**  | [Vercel](https://vercel.com/) Global Edge Network + [Cloudflare](https://cloudflare.com/) DNS             |
 
 ---
 
@@ -36,9 +38,11 @@ Space is an independent engineering publication dedicated to what is actually ha
 
 - 👓 **Distraction-Free Reader Mode**: Dedicated reading canvas with keyboard shortcut (`R`), customizable fonts, column widths, and reading themes (Clean, Warm, Sepia, Night).
 - 📱 **Mobile-First Ergonomics & Native iOS Experience**: Edge-to-edge safe area rendering (`viewport-fit=cover`, translucent status bar), smart auto-collapsing sticky navbar on scroll down and expanding on scroll up, zero horizontal overflow, iOS auto-zoom elimination (`text-[16px]` inputs), and accessible touch targets (≥ 36px–44px).
-- 💬 **Verified Peer Discussions**: Real-time reader discussion threads with verified author credentials (name, role, and email).
-- 📬 **Newsletter & Broadcast Pipeline**: Automated subscriber synchronization, RFC 8058 One-Click Unsubscribe headers, web-based `/unsubscribe` interface, and an author `/studio` broadcast engine.
-- 🔍 **Multi-Facet Search & Tagging**: Instant search with deep keyword indexing across articles, topics, and reading durations.
+- 💬 **Moderated Discussions & Reviews**: Reader comments and reviews are held for approval before they appear; reviews are protected by Cloudflare Turnstile and can be moderated from signed email links or the CLI.
+- 📬 **Newsletter Pipeline**: Double opt-in confirmation, signed RFC 8058 one-click unsubscribe links, and a daily schedule that emails subscribers about new articles automatically (manual sends via `pnpm broadcast`).
+- 🔍 **Keyword & Semantic Search**: Instant keyword search across articles, topics, and tags, plus opt-in semantic search that embeds the query in the browser.
+- 🧪 **Interactive Articles**: Runnable Python (Pyodide), Mermaid diagrams, KaTeX formulas, interactive charts, and lazy-loaded YouTube embeds.
+- 🎓 **Brain Link on YouTube**: The companion teaching channel is featured on the homepage and the About page.
 - 🌐 **Rich Social Graph & SEO**: High-resolution OpenGraph previews (512×512 branding), structured JSON-LD schemas, RSS 2.0 feed (`/rss.xml`), and dynamic sitemaps.
 
 ---
@@ -47,7 +51,7 @@ Space is an independent engineering publication dedicated to what is actually ha
 
 ### Prerequisites
 
-- **Node.js**: `20.x` or higher
+- **Node.js**: `20.9` or higher (22 LTS recommended)
 - **Package Manager**: `pnpm` (v10+ recommended)
 
 ### 1. Clone & Install Dependencies
@@ -80,7 +84,19 @@ TURSO_AUTH_TOKEN=your-turso-auth-token
 RESEND_API_KEY=re_your_api_key
 NEWSLETTER_SECRET=your-newsletter-hmac-secret
 NEWSLETTER_FROM_EMAIL="Space <newsletter.space@gimhara.com>"
+
+# Contact form delivery
+CONTACT_TO_EMAIL=you@example.com
+
+# Cloudflare Turnstile (reviews). Leave empty locally to use test keys.
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=
+TURNSTILE_SECRET_KEY=
+
+# Protects the email-queue cron route
+CRON_SECRET=
 ```
+
+See `.env.example` for every variable and what it does.
 
 ### 3. Initialize the Database
 
@@ -105,10 +121,12 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to view the 
 
 ```bash
 # Quality Assurance
-pnpm build           # Production build (compiles all pre-rendered routes)
-pnpm typecheck       # TypeScript type checking
+pnpm build           # Run DB migrations, then the production build
+pnpm typecheck       # Generate route types, then TypeScript type checking
 pnpm lint            # Run ESLint checks
 pnpm format          # Format codebase with Prettier
+pnpm test            # Run tests (Node test runner via tsx)
+pnpm check           # format:check + lint + typecheck + build
 
 # Database Operations (Drizzle ORM + Turso)
 pnpm db:push         # Push schema changes from schema.ts to Turso Cloud
@@ -119,12 +137,14 @@ pnpm db:studio       # Launch visual Drizzle database GUI
 # Article Newsletter Broadcasting
 pnpm broadcast                       # List available article slugs
 pnpm broadcast <slug>                # Dry-run (preview article details & subscriber count)
-pnpm broadcast <slug> --to=<email>   # Send article update to a single subscriber or test inbox
-pnpm broadcast <slug> --send         # Broadcast article update to ALL registered subscribers
+pnpm broadcast <slug> --test=<email> # Send a preview to one inbox (--to= also works)
+pnpm broadcast <slug> --send         # Send to ALL subscribers now (the daily schedule then skips it)
 
-# Comments Moderation & Semantic Search
-pnpm comments        # Interactive CLI to review, approve, or delete reader comments
-pnpm embeddings      # Precompute semantic vector embeddings for instant search
+# Moderation, Search & Maintenance
+pnpm comments        # List, approve, or reject held reader comments
+pnpm reviews         # List, approve, feature, hide, or reject reader reviews
+pnpm embeddings      # Rebuild semantic search embeddings (run after editing article bodies)
+pnpm prune:limits    # Delete expired rate-limit rows
 ```
 
 ---
@@ -138,6 +158,7 @@ pnpm embeddings      # Precompute semantic vector embeddings for instant search
 - GitHub: [@KushanManahara](https://github.com/KushanManahara)
 - LinkedIn: [/in/kushan-manahara](https://www.linkedin.com/in/kushan-manahara)
 - X (Twitter): [@Kushan_Manahara](https://x.com/Kushan_Manahara)
+- YouTube: [Brain Link (@Brain-Link-ai)](https://www.youtube.com/@Brain-Link-ai)
 - Email: [hi@gimhara.com](mailto:hi@gimhara.com)
 
 ---
