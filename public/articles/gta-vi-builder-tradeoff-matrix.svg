@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 315" width="800" height="315" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <rect width="800" height="315" rx="14" fill="#ffffff"/>
+  <rect x="0.5" y="0.5" width="799" height="314" rx="14" fill="none" stroke="#e2e8f0"/>
+
+  <!-- Header -->
+  <text x="400" y="29" text-anchor="middle" font-size="15.5" font-weight="700" fill="#0f172a">From launch numbers to builder principles</text>
+  <text x="400" y="48" text-anchor="middle" font-size="11.5" fill="#475569">Every takeaway is anchored to a concrete mechanism rather than generic motivation</text>
+
+  <!-- Row 1: 3 cards -->
+  <!-- Card 1 -->
+  <rect x="24" y="66" width="242" height="102" rx="9" fill="#eff6ff" stroke="#93c5fd"/>
+  <text x="38" y="86" font-size="11" font-weight="700" fill="#1d4ed8">1. EARNED PATIENCE</text>
+  <text x="38" y="105" font-size="11.5" font-weight="700" fill="#0f172a">13 years + 2 delays -&gt; 99 score</text>
+  <text x="38" y="123" font-size="10.5" fill="#334155">Delays fade once quality lands,</text>
+  <text x="38" y="138" font-size="10.5" fill="#334155">but only a track record buys</text>
+  <text x="38" y="153" font-size="10.5" fill="#334155">permission to take your time.</text>
+
+  <!-- Card 2 -->
+  <rect x="279" y="66" width="242" height="102" rx="9" fill="#ecfdf5" stroke="#6ee7b7"/>
+  <text x="293" y="86" font-size="11" font-weight="700" fill="#047857">2. PRICING POWER</text>
+  <text x="293" y="105" font-size="11.5" font-weight="700" fill="#0f172a">82% chose $99.99 Ultimate</text>
+  <text x="293" y="123" font-size="10.5" fill="#334155">Category-defining craft removes</text>
+  <text x="293" y="138" font-size="10.5" fill="#334155">price resistance (+$402M uplift</text>
+  <text x="293" y="153" font-size="10.5" fill="#334155">on digital pre-orders alone).</text>
+
+  <!-- Card 3 -->
+  <rect x="534" y="66" width="242" height="102" rx="9" fill="#faf5ff" stroke="#d8b4fe"/>
+  <text x="548" y="86" font-size="11" font-weight="700" fill="#7e22ce">3. COMPOUNDING RUNWAY</text>
+  <text x="548" y="105" font-size="11.5" font-weight="700" fill="#0f172a">RAGE 7 -&gt; 8 -&gt; 9 + $400M/yr</text>
+  <text x="548" y="123" font-size="10.5" fill="#334155">Moonshots rest on boring engines</text>
+  <text x="548" y="138" font-size="10.5" fill="#334155">and steady cash flow built years</text>
+  <text x="548" y="153" font-size="10.5" fill="#334155">before the headline moment.</text>
+
+  <!-- Row 2: 3 cards -->
+  <!-- Card 4 -->
+  <rect x="24" y="182" width="242" height="102" rx="9" fill="#fff7ed" stroke="#fdba74"/>
+  <text x="38" y="202" font-size="11" font-weight="700" fill="#c2410c">4. EXPLICIT TRADE-OFFS</text>
+  <text x="38" y="221" font-size="11.5" font-weight="700" fill="#0f172a">30 FPS lock for full RTGI</text>
+  <text x="38" y="239" font-size="10.5" fill="#334155">Even $1B+ cannot beat physics.</text>
+  <text x="38" y="254" font-size="10.5" fill="#334155">Pick the dimension that defines</text>
+  <text x="38" y="269" font-size="10.5" fill="#334155">your product and own the cost.</text>
+
+  <!-- Card 5 -->
+  <rect x="279" y="182" width="242" height="102" rx="9" fill="#f0fdfa" stroke="#5eead4"/>
+  <text x="293" y="202" font-size="11" font-weight="700" fill="#0f766e">5. SIGNAL OVER NOISE</text>
+  <text x="293" y="221" font-size="11.5" font-weight="700" fill="#0f172a">Few trailers -&gt; 475M in 24h</text>
+  <text x="293" y="239" font-size="10.5" fill="#334155">Scarcity paired with visible</text>
+  <text x="293" y="254" font-size="10.5" fill="#334155">quality outperforms daily filler</text>
+  <text x="293" y="269" font-size="10.5" fill="#334155">updates every single time.</text>
+
+  <!-- Card 6 -->
+  <rect x="534" y="182" width="242" height="102" rx="9" fill="#fef2f2" stroke="#fca5a5"/>
+  <text x="548" y="202" font-size="11" font-weight="700" fill="#b91c1c">6. PRODUCT != SYSTEM</text>
+  <text x="548" y="221" font-size="11.5" font-weight="700" fill="#0f172a">$3.79B launch + layoff fear</text>
+  <text x="548" y="239" font-size="10.5" fill="#334155">A historic release does not fix</text>
+  <text x="548" y="254" font-size="10.5" fill="#334155">job insecurity or crunch. Healthy</text>
+  <text x="548" y="269" font-size="10.5" fill="#334155">teams need durable trust too.</text>
+
+  <!-- Footer -->
+  <text x="400" y="302" text-anchor="middle" font-size="11" font-weight="600" fill="#334155">Quality takes time, and when you get it right it gives back far more than you put in.</text>
+</svg>
