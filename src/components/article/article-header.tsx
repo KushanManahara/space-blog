@@ -104,6 +104,8 @@ export function ArticleHeader({
             topic={post.topic}
             image={post.coverImage}
             priority
+            sizes="(max-width: 1180px) 100vw, 1100px"
+            quality={90}
             pattern={false}
             zoom={false}
             notch

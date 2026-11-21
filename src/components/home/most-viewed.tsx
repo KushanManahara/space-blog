@@ -162,6 +162,8 @@ function MostViewedHero({ post }: { post: PostSummary }) {
         <PostCover
           topic={post.topic}
           image={post.coverImage}
+          sizes="(max-width: 1024px) 100vw, 620px"
+          quality={90}
           pattern={false}
           notch
           className="aspect-[16/11] rounded-lg [mask-image:linear-gradient(to_bottom,black_75%,transparent_98%)]"

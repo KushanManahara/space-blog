@@ -122,6 +122,11 @@ const nextConfig: NextConfig = {
      */
     formats: ["image/avif", "image/webp"],
     /**
+     * Default 75 for cards/thumbnails; 90 for full-width article and homepage
+     * hero covers so crisp line art and typography stay sharp at native size.
+     */
+    qualities: [75, 90],
+    /**
      * Hosts allowed for `image` blocks in article bodies. Next refuses to
      * optimise anything not listed here, so a new external source needs an
      * entry adding before it will render.
