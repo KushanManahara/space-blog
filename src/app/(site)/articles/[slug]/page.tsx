@@ -68,6 +68,10 @@ export async function generateMetadata({
   const post = getPostBySlug(slug);
   if (!post) return {};
 
+  const articleUrl = `${siteUrl}/articles/${post.slug}`;
+  const cardUrl = `${siteUrl}/articles/${post.slug}/card.png`;
+  const cardAlt = `${post.title} on Space`;
+
   return {
     // Search results cut titles off around 60 characters. For headlines that
     // already fill that, the " · Space" suffix only pushes the end of the
@@ -79,27 +83,29 @@ export async function generateMetadata({
       type: "article",
       title: post.title,
       description: post.dek,
-      url: `/articles/${post.slug}`,
+      url: articleUrl,
       publishedTime: post.publishedAt,
       authors: [author.name],
       tags: post.tags,
-      // The article's own card, at its stable URL. Without this the helper's
-      // site-wide default won, so every article previewed with the generic card.
+      // The article's own share card at its absolute, stable URL. Without this
+      // the site-wide default card wins and every article previews identically.
       images: [
         {
-          url: `/articles/${post.slug}/card.png`,
+          url: cardUrl,
           width: 1200,
           height: 630,
-          alt: `${post.title}, on Space`,
+          type: "image/png",
+          alt: cardAlt,
         },
       ],
     }),
     twitter: {
-      images: [`/articles/${post.slug}/card.png`],
       card: "summary_large_image",
+      site: xHandle,
+      creator: xHandle,
       title: post.title,
       description: post.dek,
-      creator: xHandle,
+      images: [{ url: cardUrl, alt: cardAlt }],
     },
   };
 }
