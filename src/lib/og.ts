@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { join, resolve, sep } from "node:path";
 
@@ -7,6 +8,13 @@ import type { TopicName } from "@/lib/content";
 export const OG_SIZE = { width: 1200, height: 630 } as const;
 
 export const OG_CONTENT_TYPE = "image/png";
+
+/**
+ * Bump whenever the article OG card layout changes so social crawlers
+ * (LinkedIn, Facebook, WhatsApp, X) and CDN edge caches never hold onto a
+ * stale `card.png` from an earlier design.
+ */
+export const OG_CARD_VERSION = "2";
 
 /**
  * Topic gradients, mirroring `topicVisuals` in the app.
@@ -180,6 +188,15 @@ function readCoverDimensions(buffer: Buffer, mime: string): { width?: number; he
   return {};
 }
 
+/** Resolve a local `/…` public asset path safely, returning `null` on traversal. */
+function resolvePublicAssetPath(assetPath?: string): string | null {
+  if (!assetPath || !assetPath.startsWith("/")) return null;
+  const publicDir = resolve(process.cwd(), "public");
+  const target = resolve(publicDir, assetPath.slice(1));
+  if (!target.startsWith(`${publicDir}${sep}`)) return null;
+  return target;
+}
+
 /**
  * Load an article's local cover image from `public/` as an inline data URI for
  * `ImageResponse` (satori). Sniffs real magic bytes (so a JPEG saved with a
@@ -187,11 +204,8 @@ function readCoverDimensions(buffer: Buffer, mime: string): { width?: number; he
  * `null` for missing or unsupported files so the card falls back gracefully.
  */
 export async function loadOgCoverImage(coverImage?: string): Promise<OgCoverAsset | null> {
-  if (!coverImage || !coverImage.startsWith("/")) return null;
-
-  const publicDir = resolve(process.cwd(), "public");
-  const target = resolve(publicDir, coverImage.slice(1));
-  if (!target.startsWith(`${publicDir}${sep}`)) return null;
+  const target = resolvePublicAssetPath(coverImage);
+  if (!target) return null;
 
   try {
     const file = await readFile(target);
@@ -208,4 +222,33 @@ export async function loadOgCoverImage(coverImage?: string): Promise<OgCoverAsse
   } catch {
     return null;
   }
+}
+
+/**
+ * Deterministic 8-character content fingerprint for an article's `card.png` URL
+ * (`?v=<hash>`). Rotates automatically whenever the card layout version,
+ * article title/dek/topic, or the underlying cover image file bytes change,
+ * preventing social crawlers like LinkedIn from reusing stale cached previews.
+ */
+export async function articleOgCardVersion(post: {
+  title: string;
+  dek: string;
+  topic: TopicName;
+  coverImage?: string;
+}): Promise<string> {
+  const hash = createHash("sha256");
+  hash.update(
+    `${OG_CARD_VERSION}\0${post.title}\0${post.dek}\0${post.topic}\0${post.coverImage ?? ""}`,
+  );
+
+  const target = resolvePublicAssetPath(post.coverImage);
+  if (target) {
+    try {
+      hash.update(await readFile(target));
+    } catch {
+      // Missing cover falls back to topic gradient; metadata fields still hash cleanly.
+    }
+  }
+
+  return hash.digest("hex").slice(0, 8);
 }

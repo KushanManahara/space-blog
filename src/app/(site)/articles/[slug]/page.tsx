@@ -40,6 +40,7 @@ import {
 } from "@/lib/content";
 import { getLiveComments, getLivePostStats } from "@/lib/db/queries";
 import { alternates, openGraph, xHandle } from "@/lib/metadata";
+import { articleOgCardVersion } from "@/lib/og";
 
 const BODY_ID = "article-body";
 
@@ -69,7 +70,8 @@ export async function generateMetadata({
   if (!post) return {};
 
   const articleUrl = `${siteUrl}/articles/${post.slug}`;
-  const cardUrl = `${siteUrl}/articles/${post.slug}/card.png`;
+  const cardVersion = await articleOgCardVersion(post);
+  const cardUrl = `${siteUrl}/articles/${post.slug}/card.png?v=${cardVersion}`;
   const cardAlt = `${post.title} on Space`;
 
   return {
@@ -87,11 +89,13 @@ export async function generateMetadata({
       publishedTime: post.publishedAt,
       authors: [author.name],
       tags: post.tags,
-      // The article's own share card at its absolute, stable URL. Without this
-      // the site-wide default card wins and every article previews identically.
+      // The article's own share card at its absolute, content-versioned URL.
+      // Versioning busts stale crawler/CDN caches (such as LinkedIn's 7-day
+      // image cache) whenever the cover art or card design updates.
       images: [
         {
           url: cardUrl,
+          secureUrl: cardUrl,
           width: 1200,
           height: 630,
           type: "image/png",

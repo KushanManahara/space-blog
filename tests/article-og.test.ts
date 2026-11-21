@@ -3,7 +3,7 @@ import { describe, test } from "node:test";
 
 import { generateMetadata } from "@/app/(site)/articles/[slug]/page";
 import { getPostBySlug, siteUrl } from "@/lib/content";
-import { formatOgExcerpt, loadOgCoverImage } from "@/lib/og";
+import { articleOgCardVersion, formatOgExcerpt, loadOgCoverImage } from "@/lib/og";
 
 describe("article OG cover loader", () => {
   test("sniffs real PNG covers and reads IHDR dimensions", async () => {
@@ -61,6 +61,26 @@ describe("formatOgExcerpt", () => {
   });
 });
 
+describe("articleOgCardVersion", () => {
+  test("produces a stable 8-char hex fingerprint that rotates on metadata or cover changes", async () => {
+    const post = getPostBySlug("gta-vi-records-engineering-and-lessons");
+    assert.ok(post);
+
+    const v1 = await articleOgCardVersion(post);
+    const v1Repeat = await articleOgCardVersion(post);
+    const vTitleChanged = await articleOgCardVersion({ ...post, title: `${post.title} v2` });
+    const vCoverChanged = await articleOgCardVersion({
+      ...post,
+      coverImage: "/articles/sir-don-bradman.png",
+    });
+
+    assert.match(v1, /^[0-9a-f]{8}$/);
+    assert.equal(v1, v1Repeat);
+    assert.notEqual(v1, vTitleChanged);
+    assert.notEqual(v1, vCoverChanged);
+  });
+});
+
 describe("article generateMetadata", () => {
   test("emits complete absolute Open Graph and Twitter Card tags per article", async () => {
     const slug = "gta-vi-records-engineering-and-lessons";
@@ -75,7 +95,8 @@ describe("article generateMetadata", () => {
     const og = meta.openGraph as Record<string, unknown>;
     const tw = meta.twitter as Record<string, unknown>;
     const expectedUrl = `${siteUrl}/articles/${slug}`;
-    const expectedImage = `${siteUrl}/articles/${slug}/card.png`;
+    const expectedVersion = await articleOgCardVersion(post);
+    const expectedImage = `${siteUrl}/articles/${slug}/card.png?v=${expectedVersion}`;
 
     assert.equal(og.type, "article");
     assert.equal(og.title, post.title);
@@ -85,6 +106,7 @@ describe("article generateMetadata", () => {
     const ogImages = og.images as Array<Record<string, unknown>>;
     assert.equal(ogImages.length, 1);
     assert.equal(ogImages[0].url, expectedImage);
+    assert.equal(ogImages[0].secureUrl, expectedImage);
     assert.equal(ogImages[0].width, 1200);
     assert.equal(ogImages[0].height, 630);
     assert.equal(ogImages[0].type, "image/png");
