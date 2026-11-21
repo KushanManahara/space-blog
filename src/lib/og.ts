@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { join } from "node:path";
+import { join, resolve, sep } from "node:path";
 
 import type { TopicName } from "@/lib/content";
 
@@ -49,17 +49,163 @@ export async function loadOgFonts() {
 }
 
 /**
- * Long titles have to stay inside two or three lines at 60px, so the font size
- * steps down rather than letting the card overflow.
+ * Long titles have to stay inside three or four lines so they never collide
+ * with the accent rule or excerpt. Split-layout cards (with a cover image on
+ * the right) have a narrower text column and step down one notch earlier.
  */
-export function titleSize(title: string): number {
+export function titleSize(title: string, hasCover = false): number {
+  if (hasCover) {
+    if (title.length > 80) return 38;
+    if (title.length > 56) return 44;
+    if (title.length > 36) return 52;
+    return 58;
+  }
   if (title.length > 92) return 50;
   if (title.length > 64) return 58;
   return 66;
+}
+
+/**
+ * Trim an article dek cleanly for OG cards without dangling trailing articles
+ * or conjunctions ("and a…", "The…"). Prefers a complete first sentence when
+ * it fits within the budget.
+ */
+export function formatOgExcerpt(dek: string, maxChars = 116): string {
+  const clean = dek.trim().replace(/\s+/g, " ");
+  if (clean.length <= maxChars) return clean;
+
+  // Prefer the first complete sentence if it is neither too short nor too long.
+  const sentenceEnd = clean.search(/[.!?](?:\s|$)/);
+  if (sentenceEnd >= 48 && sentenceEnd + 1 <= maxChars + 38) {
+    return clean.slice(0, sentenceEnd + 1);
+  }
+
+  let cut = clean.slice(0, maxChars);
+  const lastSpace = cut.lastIndexOf(" ");
+  if (lastSpace > 40) cut = cut.slice(0, lastSpace);
+
+  // Drop trailing punctuation or weak hanging words before appending an ellipsis.
+  cut = cut.replace(/[,;:\-–—]+$/, "").trim();
+  const hanging = /\s+(?:and|or|but|with|for|of|in|on|at|to|by|from|the|a|an)$/i;
+  while (hanging.test(cut) && cut.length > 40) {
+    cut = cut
+      .replace(hanging, "")
+      .replace(/[,;:\-–—]+$/, "")
+      .trim();
+  }
+
+  return `${cut}…`;
 }
 
 /** The brandmark, inlined as a data URI — ImageResponse cannot fetch by path. */
 export async function loadOgLogo(): Promise<string> {
   const file = await readFile(join(process.cwd(), "public/logo.png"));
   return `data:image/png;base64,${file.toString("base64")}`;
+}
+
+export interface OgCoverAsset {
+  dataUri: string;
+  mime: string;
+  width?: number;
+  height?: number;
+}
+
+/** Detect real image MIME type from file magic bytes rather than trusting extensions. */
+function sniffImageMime(buffer: Buffer): string | null {
+  if (
+    buffer.length >= 8 &&
+    buffer[0] === 0x89 &&
+    buffer[1] === 0x50 &&
+    buffer[2] === 0x4e &&
+    buffer[3] === 0x47
+  ) {
+    return "image/png";
+  }
+  if (buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) {
+    return "image/jpeg";
+  }
+  if (buffer.length >= 6) {
+    const header = buffer.toString("ascii", 0, 6);
+    if (header === "GIF87a" || header === "GIF89a") return "image/gif";
+  }
+  const head = buffer.toString("utf8", 0, Math.min(buffer.length, 512)).trimStart();
+  if (head.startsWith("<svg") || (head.startsWith("<?xml") && head.includes("<svg"))) {
+    return "image/svg+xml";
+  }
+  return null;
+}
+
+/** Read intrinsic pixel dimensions from PNG IHDR, JPEG SOF, GIF, or SVG viewBox. */
+function readCoverDimensions(buffer: Buffer, mime: string): { width?: number; height?: number } {
+  if (mime === "image/png" && buffer.length >= 24 && buffer.toString("ascii", 12, 16) === "IHDR") {
+    return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
+  }
+  if (mime === "image/jpeg") {
+    let offset = 2;
+    while (offset + 9 < buffer.length) {
+      if (buffer[offset] !== 0xff) break;
+      const marker = buffer[offset + 1];
+      offset += 2;
+      // Standalone markers without length
+      if (marker === 0xd8 || marker === 0xd9 || (marker >= 0xd0 && marker <= 0xd7)) continue;
+      if (offset + 2 > buffer.length) break;
+      const segmentLength = buffer.readUInt16BE(offset);
+      // SOF0..SOF3, SOF5..SOF7, SOF9..SOF11, SOF13..SOF15 carry height & width
+      const isSof =
+        marker >= 0xc0 && marker <= 0xcf && marker !== 0xc4 && marker !== 0xc8 && marker !== 0xcc;
+      if (isSof && offset + 7 < buffer.length) {
+        return {
+          height: buffer.readUInt16BE(offset + 3),
+          width: buffer.readUInt16BE(offset + 5),
+        };
+      }
+      if (segmentLength < 2) break;
+      offset += segmentLength;
+    }
+  }
+  if (mime === "image/gif" && buffer.length >= 10) {
+    return { width: buffer.readUInt16LE(6), height: buffer.readUInt16LE(8) };
+  }
+  if (mime === "image/svg+xml") {
+    const head = buffer.toString("utf8", 0, Math.min(buffer.length, 1024));
+    const vb = head.match(/viewBox=["'][\d.\s-]+?([\d.]+)\s+([\d.]+)["']/i);
+    if (vb) {
+      const width = Number(vb[1]);
+      const height = Number(vb[2]);
+      if (Number.isFinite(width) && Number.isFinite(height) && width > 0 && height > 0) {
+        return { width, height };
+      }
+    }
+  }
+  return {};
+}
+
+/**
+ * Load an article's local cover image from `public/` as an inline data URI for
+ * `ImageResponse` (satori). Sniffs real magic bytes (so a JPEG saved with a
+ * `.png` extension still renders cleanly), blocks path traversal, and returns
+ * `null` for missing or unsupported files so the card falls back gracefully.
+ */
+export async function loadOgCoverImage(coverImage?: string): Promise<OgCoverAsset | null> {
+  if (!coverImage || !coverImage.startsWith("/")) return null;
+
+  const publicDir = resolve(process.cwd(), "public");
+  const target = resolve(publicDir, coverImage.slice(1));
+  if (!target.startsWith(`${publicDir}${sep}`)) return null;
+
+  try {
+    const file = await readFile(target);
+    const mime = sniffImageMime(file);
+    if (!mime) return null;
+
+    const { width, height } = readCoverDimensions(file, mime);
+    return {
+      dataUri: `data:${mime};base64,${file.toString("base64")}`,
+      mime,
+      width,
+      height,
+    };
+  } catch {
+    return null;
+  }
 }
