@@ -36,6 +36,7 @@ export function ArticleImage({
 }) {
   const isSvg = src.toLowerCase().endsWith(".svg");
   const hasIntrinsicSize = width !== undefined && height !== undefined;
+  const imageSizes = wide ? "(max-width: 1080px) 100vw, 1000px" : "(max-width: 768px) 100vw, 780px";
 
   return (
     <figure
@@ -61,7 +62,8 @@ export function ArticleImage({
             preload={priority}
             loading={priority ? "eager" : "lazy"}
             unoptimized={isSvg}
-            sizes="(max-width: 768px) 100vw, 780px"
+            sizes={imageSizes}
+            quality={90}
             className="h-auto w-full"
           />
         ) : (
@@ -75,7 +77,8 @@ export function ArticleImage({
               preload={priority}
               loading={priority ? "eager" : "lazy"}
               unoptimized={isSvg}
-              sizes="(max-width: 768px) 100vw, 780px"
+              sizes={imageSizes}
+              quality={90}
               className="object-contain"
             />
           </div>

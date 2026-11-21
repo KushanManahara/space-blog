@@ -25,6 +25,8 @@ export function PostCover({
    */
   alt = "",
   priority = false,
+  sizes = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
+  quality = 75,
   className,
   pattern = true,
   zoom = true,
@@ -35,6 +37,9 @@ export function PostCover({
   image?: string;
   alt?: string;
   priority?: boolean;
+  /** Override for wide hero covers; the default assumes a 2–3 column card grid. */
+  sizes?: string;
+  quality?: number;
   className?: string;
   pattern?: boolean;
   zoom?: boolean;
@@ -78,7 +83,8 @@ export function PostCover({
             // The cover that owns `priority` is the page's LCP element; tell
             // the browser so it outranks fonts and scripts in the queue.
             fetchPriority={priority ? "high" : undefined}
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            sizes={sizes}
+            quality={quality}
             className="object-cover object-center"
           />
         ) : null}

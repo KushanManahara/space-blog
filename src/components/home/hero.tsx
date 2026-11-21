@@ -111,6 +111,8 @@ function FeaturedCard({ post }: { post: Post }) {
             topic={post.topic}
             image={post.coverImage}
             priority
+            sizes="(max-width: 1024px) 100vw, 660px"
+            quality={90}
             pattern={false}
             notch
             className="aspect-[16/10] rounded-lg [mask-image:linear-gradient(to_bottom,black_75%,transparent_98%)]"
