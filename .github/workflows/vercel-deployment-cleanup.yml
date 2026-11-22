@@ -9,7 +9,7 @@ name: Vercel Deployment Cleanup
 # set to `true` (as a GitHub Actions Repository Variable or Secret).
 on:
   schedule:
-    # Runs every 30 minutes, offset from :00/:30 (busy GitHub cron slots) and
+    # Runs hourly at :17, offset from :00/:30 (busy GitHub cron slots) and
     # offset from uptime.yml (7,37).
     - cron: "17 * * * *"
   workflow_dispatch:

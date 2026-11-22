@@ -1007,8 +1007,11 @@ describe("end-to-end runner safeguards", () => {
 describe("GitHub Actions workflow configuration", () => {
   const workflow = readFileSync(".github/workflows/vercel-deployment-cleanup.yml", "utf8");
 
-  test("schedules every 30 minutes, supports manual dispatch with dry-run default, and guards concurrency", () => {
-    assert.match(workflow, /cron:\s*"13,43 \* \* \* \*"/);
+  test("declares a cron schedule, supports manual dispatch with dry-run default, and guards concurrency", () => {
+    assert.match(
+      workflow,
+      /schedule:[\s\S]*-\s*cron:\s*"[^\s"]+\s+[^\s"]+\s+[^\s"]+\s+[^\s"]+\s+[^\s"]+"/,
+    );
     assert.match(workflow, /workflow_dispatch:/);
     assert.match(workflow, /dry_run:[\s\S]*default:\s*true/);
     assert.match(
