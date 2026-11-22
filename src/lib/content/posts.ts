@@ -6,7 +6,7 @@ const parsedPosts = postSchema.array().parse([
   {
     slug: "gta-vi-records-engineering-and-lessons",
     title: "GTA VI at $3.79B: Records, Trade-Offs, and Lessons",
-    dek: "Grand Theft Auto VI hit $3.79 billion in day-one retail sales, 33.03 Tbps of global internet traffic, and a 99 Metacritic tie on consoles alone. The verified numbers, the RAGE 9 engineering trade-offs, the human cost behind the studio walls, and six grounded lessons for builders.",
+    dek: "Grand Theft Auto VI made $3.79 billion on day one, pushed DE-CIX to 33.03 Tbps, and tied Ocarina of Time at 99 on Metacritic on consoles alone. Here is how RAGE 9 got there, what funded the 13-year wait, and what builders can take from it.",
     topic: "Career",
     publishedAt: "2026-11-21",
     likes: 0,
@@ -17,26 +17,26 @@ const parsedPosts = postSchema.array().parse([
     body: [
       {
         kind: "paragraph",
-        html: "On the evening of November 18, 2026, data flowing across DE-CIX's global internet exchanges surged to **33.03 terabits per second**, an all-time record roughly 25% above a typical week. Around the same time, workforce platforms logged a **29% jump in global leave requests** for November 19, a wave of booked days off quickly nicknamed **Grand Theft Auto Flu**. Then, a day after launch, Rockstar Games and Take-Two Interactive confirmed the number that stopped the wider tech and media world cold: **$3.79 billion** in worldwide day-one retail sales, backed by **32.5 million** pre-release units.",
+        html: "On the evening of November 18, 2026, traffic across DE-CIX's global internet exchanges hit 33.03 terabits per second, an all-time record roughly 25% above a normal week. Around the same time, workforce platforms logged a 29% jump in global leave requests for November 19, a wave of booked days off quickly nicknamed Grand Theft Auto Flu. A day after launch, Rockstar Games and Take-Two Interactive confirmed the figure behind both spikes. Grand Theft Auto VI generated **$3.79 billion** in worldwide day-one retail sales, alongside 32.5 million pre-release units.",
       },
       {
         kind: "paragraph",
-        html: "Every single launch record from this week happened strictly on **PlayStation 5 and Xbox Series X|S**. There is no PC version yet and no online multiplayer mode live yet. Looking past the headline hype reveals three layered stories worth studying closely as someone who builds software: the hard commercial and infrastructure numbers, the brutal hardware trade-offs inside Rockstar's proprietary engine, and the human tension sitting directly beneath the biggest entertainment debut in history.",
+        html: "Every number from launch week came strictly from PlayStation 5 and Xbox Series X|S. There is no PC version yet and no online multiplayer mode live yet. When a single software release moves that much money, bandwidth, and attention in 24 hours, the interesting question isn't how big the launch was. It's what Rockstar traded to build it and what happened inside the studio while the records piled up.",
       },
       {
         kind: "callout",
         title: "Sam Houser on launch day",
-        body: '"It is with immense gratitude that we enter a new chapter of Rockstar Games with the release of Grand Theft Auto VI. We are incredibly humbled by the response from players around the world and we couldn\'t be more excited to share this moment with you." - Sam Houser, Rockstar Games president and founder, November 20, 2026.',
+        body: '"It is with immense gratitude that we enter a new chapter of Rockstar Games with the release of Grand Theft Auto VI. We are incredibly humbled by the response from players around the world and we couldn\'t be more excited to share this moment with you." Sam Houser, Rockstar Games president and founder, November 20, 2026.',
       },
       {
         kind: "heading",
         id: "the-scoreboard",
         level: 2,
-        text: "The scoreboard: why this is not just gaming news",
+        text: "Why the sales numbers matter outside gaming",
       },
       {
         kind: "paragraph",
-        html: "Blockbuster movies measure success over months of theatrical runs, while most software products fight for single-digit conversion lifts. *Grand Theft Auto VI* cleared the entire lifetime global box office of *Avatar* (`$2.92B`) and *Avengers: Endgame* (`$2.80B`) inside its first 24 hours, running nearly **4.74x** ahead of *GTA V*'s historic `$800 million` day-one debut in 2013.",
+        html: "Films take months of global box office runs to cross two billion dollars. *Grand Theft Auto VI* passed the lifetime theatrical totals of *Avatar* ($2.92 billion) and *Avengers: Endgame* ($2.80 billion) in a single day, running 4.74 times ahead of *GTA V*'s $800 million debut in 2013.",
       },
       {
         kind: "figure",
@@ -58,15 +58,15 @@ const parsedPosts = postSchema.array().parse([
       },
       {
         kind: "paragraph",
-        html: "What stands out even more than raw volume is **pricing behavior**. Before discs even hit store shelves, market intelligence firm Sensor Tower tracked **24.5 million digital pre-orders** worth **$2.36 billion** (more than 3x the prior `$709 million` pre-order record, with totals more than doubling in the final 10 days alone, split `75%` PlayStation 5 and `25%` Xbox Series X|S). Inside those pre-orders, **82% of buyers chose the `$99.99` Ultimate Edition**, while only `18%` picked the `$79.99` Standard Edition.",
+        html: "The pricing split is even more unusual than the total. Before discs reached stores, Sensor Tower tracked 24.5 million digital pre-orders worth $2.36 billion, more than three times the previous $709 million pre-order record. Pre-order volume more than doubled in the final ten days alone, with PlayStation 5 taking 75% and Xbox Series X|S taking 25%. Inside those digital orders, **82% of buyers paid $99.99** for the Ultimate Edition while only 18% chose the $79.99 Standard Edition.",
       },
       {
         kind: "paragraph",
-        html: "Check the arithmetic yourself. Weighting `82%` at `$99.99` and `18%` at `$79.99` gives a blended digital pre-order price of `$96.39`, which times `24.5 million` copies lands right on `$2.36 billion`. That optional `$20` tier upgrade alone generated roughly **`$402 million`** (`24.5M × 0.82 × $20`) in incremental pre-launch revenue before a single player loaded into Vice City.",
+        html: "Run the arithmetic on that split and the numbers check out cleanly. My calculation weights 82% at $99.99 and 18% at $79.99 for a blended pre-order price of $96.39, which across 24.5 million digital copies equals $2.36 billion. That optional $20 tier upgrade alone brought in roughly $402 million before anyone loaded into Vice City.",
       },
       {
         kind: "paragraph",
-        html: "Critical reception matched the commercial shockwave. When review embargoes lifted, *GTA VI* landed at **99 out of 100 on Metacritic**, tying *The Legend of Zelda: Ocarina of Time* (1998) for the highest score in the aggregator's history and edging past *GTA IV* (`98`) and *GTA V* (`97`). Even before release day, Screen Engine/ASI reported that *GTA VI* captured **5.64% of global attention share**, displacing *Minecraft* after 45 weeks to become the first unreleased game to top the index.",
+        html: "Critics agreed at a rate that almost never happens for a blockbuster. *GTA VI* opened at 99 out of 100 on Metacritic, tying *The Legend of Zelda: Ocarina of Time* from 1998 for the highest score on the site and sitting above *GTA IV* at 98 and *GTA V* at 97. Before release day, Screen Engine/ASI measured *GTA VI* at 5.64% of global attention share, passing *Minecraft* after 45 weeks to become the first unreleased game to top the index.",
       },
       {
         kind: "table",
@@ -125,15 +125,15 @@ const parsedPosts = postSchema.array().parse([
         kind: "heading",
         id: "bending-infrastructure-and-attention",
         level: 2,
-        text: "How one release bent internet exchanges and streaming records",
+        text: "What a 210 GB launch does to the internet",
       },
       {
         kind: "paragraph",
-        html: "From a systems perspective, the DE-CIX traffic record makes immediate physical sense once you look at the install footprint. The base console download runs roughly **210 GB to 212 GB**. Running a quick derived estimate on Sensor Tower's `24.5 million` digital pre-orders at `210 GB` per copy puts the pre-load payload at roughly **5.14 exabytes** (over `5.1 million` terabytes) before accounting for physical disc patches or day-one digital buyers.",
+        html: "The DE-CIX traffic record makes simple physical sense once you check the download size. The base console install sits around 210 GB to 212 GB. Multiplying Sensor Tower's 24.5 million digital pre-orders by 210 GB gives my rough floor of 5.14 exabytes (over 5.1 million terabytes) of game data before physical disc patches or day-one digital buyers even enter the picture.",
       },
       {
         kind: "paragraph",
-        html: "To avoid melting store CDNs on launch night, PlayStation opened pre-loads **9 days early** on November 10. Even spread smoothly across nine full days, `5.14 exabytes` averages roughly **`52.9 Tbps`** of sustained global delivery across CDNs and ISPs. Real user demand never arrives smoothly: DE-CIX logged an initial spike of **33.01 Tbps** when pre-loads opened on November 10 (with DE-CIX Frankfurt hitting a local `22.30 Tbps`), then set the all-time global record of **33.03 Tbps** on launch eve, November 18 at 20:20 CET.",
+        html: "To keep store CDNs upright on launch night, PlayStation opened pre-loads nine days early on November 10. Even if every player downloaded evenly across those nine days, 5.14 exabytes works out to about 52.9 Tbps of continuous global transfer. Downloads never spread evenly. DE-CIX recorded an initial peak of 33.01 Tbps when pre-loads opened on November 10, with DE-CIX Frankfurt reaching 22.30 Tbps on its own, then set the all-time global record of 33.03 Tbps on November 18 at 20:20 CET.",
       },
       {
         kind: "image",
@@ -146,7 +146,7 @@ const parsedPosts = postSchema.array().parse([
       },
       {
         kind: "paragraph",
-        html: "Once servers unlocked on November 19, bandwidth demand shifted from downloads straight into live video. Analytics firm Streams Charts recorded a combined peak of **7.91 million concurrent viewers** (`7,915,475`) across major platforms, including **3.31 million on Twitch** (dethroning *League of Legends* for the highest gaming peak in Twitch history), **3.22 million on YouTube**, and **1.50 million on Kick**, logging more than `125 million` hours watched inside the first 24 hours.",
+        html: "Once the game went live on November 19, traffic shifted from file downloads to live video. Streams Charts tracked a combined peak of 7.91 million concurrent viewers (7,915,475) across major platforms, split across 3.31 million on Twitch, 3.22 million on YouTube, and 1.50 million on Kick. That Twitch peak passed *League of Legends* for the highest gaming viewership in the platform's history, and viewers logged more than 125 million hours watched inside the first 24 hours.",
       },
       {
         kind: "figure",
@@ -167,7 +167,7 @@ const parsedPosts = postSchema.array().parse([
       },
       {
         kind: "paragraph",
-        html: "Notice how Rockstar built that gravity over three years with almost zero marketing filler. Trailer 1 in December 2023 earned an official Guinness World Record with **90,421,491 YouTube views in 24 hours**. When Trailer 2 dropped in May 2025, Rockstar reported **475 million cross-platform views in a single day**, sailing past major Hollywood trailer benchmarks like *Deadpool & Wolverine* (`365 million`).",
+        html: "Rockstar built that demand over three years without a steady drip of teasers. Trailer 1 in December 2023 set a Guinness World Record with 90,421,491 YouTube views in 24 hours. Trailer 2 in May 2025 reached 475 million views across all platforms in one day, ahead of major film trailer openings like *Deadpool & Wolverine* at 365 million.",
       },
       {
         kind: "video",
@@ -181,23 +181,23 @@ const parsedPosts = postSchema.array().parse([
         kind: "heading",
         id: "under-the-hood-rage-9",
         level: 2,
-        text: "Under the hood: RAGE 9, 600,000 animations, and the physics of 30 FPS",
+        text: "RAGE 9, 600,000 animations, and why consoles stay at 30 FPS",
       },
       {
         kind: "paragraph",
-        html: "Great coverage needs engineering honesty alongside the victory lap. Instead of jumping to a third-party engine, Rockstar spent another decade iterating on its proprietary **RAGE (Rockstar Advanced Game Engine)**, stacking **RAGE 9** directly atop the rendering, weather, and AI foundations forged in *GTA V* (RAGE 7) and *Red Dead Redemption 2* (RAGE 8).",
+        html: "Instead of switching to an off-the-shelf engine, Rockstar spent another decade extending its in-house Rockstar Advanced Game Engine. RAGE 9 builds directly on the weather, AI, and rendering systems from *GTA V* (RAGE 7) and *Red Dead Redemption 2* (RAGE 8).",
       },
       {
         kind: "paragraph",
-        html: "The depth shows up in both animation craft and real-time light transport. *GTA V* shipped with roughly **55,000** character and world animations, and *Red Dead Redemption 2* pushed that ceiling to around **300,000**. *GTA VI* crosses **600,000 animations**, more than double *Red Dead Redemption 2* and over ten times *GTA V*, supported by dedicated character teams crafting how pedestrians across Vice City and the state of Leonida dress, walk, react to weather, comment on player behavior, and interact with physical interiors.",
+        html: "You can measure that decade of iteration in animation count alone. *GTA V* shipped with roughly 55,000 animations, and *Red Dead Redemption 2* climbed to around 300,000. *GTA VI* passes 600,000, more than double *Red Dead Redemption 2* and over ten times *GTA V*. Rockstar put a dedicated team on the citizens of Vice City and Leonida so pedestrians dress for their neighborhoods, react to rain and storms, remember what the player did nearby, and move through interiors rather than looping like background props.",
       },
       {
         kind: "paragraph",
-        html: "On the rendering side, technical analyses by Digital Foundry called *GTA VI* a generational milestone built around mandatory **ray-traced global illumination (RTGI)** and **ray-traced reflections** across every single launch console. Rather than relying on static pre-baked light maps that break when weather or time of day shifts, RTGI traces light bouncing off asphalt, glass towers, vehicle paint, and interiors in real time, layered atop real-time water physics and dynamic storms that physically affect vehicle handling.",
+        html: "On the graphics side, Digital Foundry's launch breakdown centers on mandatory ray-traced global illumination (RTGI) and ray-traced reflections on every launch console. Static pre-baked light maps break down when clouds roll in or headlights sweep across wet asphalt. RTGI traces how light bounces across buildings, glass, car paint, and rooms in real time, running alongside live water physics and storms that change how cars handle.",
       },
       {
         kind: "paragraph",
-        html: "Yet even a reported **$1 billion+ development budget** cannot negotiate with silicon physics. Running at `60 FPS` leaves just **16.7 milliseconds** to simulate crowds, physics, audio, and ray-traced lighting for every frame, whereas `30 FPS` doubles that budget to **33.3 milliseconds**. Rockstar spent the entire frame budget on world density and mandatory ray tracing, locking every console version to a **30 FPS target with no 60 FPS or 40 FPS performance mode**.",
+        html: "Even a reported billion-dollar budget can't buy its way past a console frame timer. At 60 FPS, the CPU and GPU have 16.7 milliseconds to simulate crowds, physics, audio, and ray-traced light for every frame. At 30 FPS, that budget doubles to 33.3 milliseconds. Rockstar spent the entire 33.3 milliseconds on simulation density and mandatory ray tracing, shipping every console version at a **30 FPS target with no 60 FPS or 40 FPS mode**.",
       },
       {
         kind: "image",
@@ -238,11 +238,11 @@ const parsedPosts = postSchema.array().parse([
         kind: "heading",
         id: "the-runway-and-the-human-cost",
         level: 2,
-        text: "The runway and the human paradox behind the studio walls",
+        text: "The $400 million safety net, and the worry inside the studio",
       },
       {
         kind: "paragraph",
-        html: "It is tempting to look at a 13-year gap between mainline entries and treat patience as pure willpower. The reality is much more grounded, and far more instructive. First, Rockstar had a financial engine almost no other studio possesses: the *Grand Theft Auto* franchise had already passed **480 million units** (~`235 million` from *GTA V* alone), and *GTA V* kept generating roughly **$400 million per year** across the last four years. That recurring cash flow bought the runway to delay *GTA VI* twice (first on May 2, 2025 from Fall 2025 to May 26, 2026, and again on November 6, 2025 to November 19, 2026) without facing a cash crunch.",
+        html: "Rockstar didn't wait 13 years between flagship GTA games on discipline alone. It had a cash engine almost no studio has. Before launch week, the *Grand Theft Auto* series had sold roughly 480 million copies, with about 235 million from *GTA V* alone, and *GTA V* kept bringing in around $400 million a year across the last four years. That recurring revenue let Rockstar delay *GTA VI* twice, first on May 2, 2025 from Fall 2025 to May 26, 2026 and again on November 6, 2025 to November 19, 2026, without running out of money.",
       },
       {
         kind: "mermaid",
@@ -256,22 +256,22 @@ const parsedPosts = postSchema.array().parse([
       },
       {
         kind: "paragraph",
-        html: "Second, mega-projects carry a real human cost that sales charts hide. Even though *GTA VI* is a razor-sharp satire of modern America, its core development was anchored in Edinburgh at **Rockstar North** by thousands of engineers, artists, animators, and testers over roughly a decade. Yet launch week unfolded right alongside a historic **union recognition ballot** covering roughly **1,600 UK employees** organized with the IWGB, amid reports of late-stage crunch pressure, AI anxiety, and widespread fear of post-launch redundancies after more than `40` studio closures across the broader games industry.",
+        html: "The human side inside the studio looks far less triumphant than the sales chart. Core development ran out of Edinburgh at Rockstar North across thousands of engineers, animators, artists, and testers over roughly a decade. Yet launch week coincided with a union recognition ballot covering about 1,600 UK staff organized with the IWGB, alongside reports of late-stage crunch, AI anxiety, and fear of post-launch cuts after more than 40 studio closures across the games industry.",
       },
       {
         kind: "callout",
         title: "Nestor Uriarte, Rockstar North animation programmer",
-        body: '"It says a lot about the industry that even my colleagues and I, working on the biggest game of all time, are worried about getting laid off." - Published in The Guardian on November 18, 2026, one day before launch.',
+        body: '"It says a lot about the industry that even my colleagues and I, working on the biggest game of all time, are worried about getting laid off." Published in The Guardian on November 18, 2026, one day before launch.',
       },
       {
         kind: "heading",
         id: "six-lessons-for-builders",
         level: 2,
-        text: "Six grounded lessons for builders and engineers",
+        text: "What builders can actually take from this",
       },
       {
         kind: "paragraph",
-        html: "As someone who builds software in an industry obsessed with shipping every Friday, watching this launch leaves one quiet truth echoing louder than the `$3.79 billion` headline: **quality takes time, and when you get it right, it gives back far more than you ever put in.** Tying that sentiment directly back to the verified evidence gives six practical principles that hold up outside gaming too.",
+        html: "Most of us build software under pressure to ship fast. Watching this launch leaves a simpler truth standing next to the $3.79 billion headline. **Quality takes time, and when you get it right, it gives back more than you ever put in.** Tie that idea back to what actually happened this week and six practical rules fall out of the numbers.",
       },
       {
         kind: "image",
@@ -283,19 +283,32 @@ const parsedPosts = postSchema.array().parse([
         height: 315,
       },
       {
-        kind: "list",
-        items: [
-          "**1. Delays fade and mediocrity is permanent, if you have earned the trust.** Players groaned through 13 years and two public delays, yet 48 hours after launch nobody is debating the old release calendar. The hidden condition matters: patience works only when backed by a real track record. A newcomer copying Rockstar's silence without Rockstar's proof of work simply gets forgotten.",
-          "**2. Obsessive craft destroys price resistance.** In software and consumer markets locked in a discount race to the bottom, `82%` of pre-order buyers willingly paid `$99.99` instead of `$79.99`. When people genuinely believe your work defines its category, price stops being the friction point.",
-          "**3. Compounding foundations enable moonshots.** RAGE 9 (`600,000+` animations, mandatory RTGI) evolved step by step out of RAGE 7 (`55,000` animations) and RAGE 8 (`300,000`), funded by a decade of steady cash flow from *GTA V*. Whether in software architecture or personal careers, today's unglamorous fundamentals buy the runway for tomorrow's breakthroughs.",
-          "**4. Clarity means picking your trade-offs out loud.** Even a billion-dollar budget could not deliver `60 FPS` alongside dense world simulation and full ray-traced lighting on base consoles. Rockstar picked the dimension that defined its identity and accepted every frame-rate critique. Optimizing every axis at once usually yields something bland.",
-          "**5. High signal beats constant noise.** While most teams post daily trying to stay visible, Rockstar dropped just a handful of meticulously crafted reveals across three years and bent global internet traffic. One unforgettable piece of work outperforms ten forgettable status updates.",
-          "**6. Never mistake a great product for a healthy system.** Shipping the most lucrative entertainment release in history did not erase crunch fatigue or layoff anxiety inside the building. Real engineering excellence is measured not only by launch-day metrics, but by whether the people who built it have the stability and trust to build what comes next.",
-        ],
+        kind: "paragraph",
+        html: "Delays fade once the work holds up, **if you have earned the trust**. Players complained through 13 years and two public slips, and two days after launch nobody is arguing about the old release dates. Patience only works with a track record behind it, though. A new team copying Rockstar's silence without Rockstar's past proof just gets forgotten.",
       },
       {
         kind: "paragraph",
-        html: "Most of us do not have `$400 million` a year in recurring runway or a ten-year schedule, so we cannot blindly imitate Rockstar's timeline. We can still borrow its discipline: guard your core craft fiercely, choose your trade-offs explicitly instead of diluting what matters, protect the people doing the hard work, and remember that when you refuse to cut corners on the details that make something truly alive, the work pays you back long after the deadline fades.",
+        html: "Real craft also weakens price resistance. In software and consumer markets obsessed with discounting, 82% of pre-order buyers paid $99.99 instead of $79.99. When people trust that a release will define its category, $20 stops being the reason they hesitate.",
+      },
+      {
+        kind: "paragraph",
+        html: "Big swings still sit on compounding foundations. RAGE 9's 600,000 animations and real-time ray tracing grew out of RAGE 7 (55,000 animations) and RAGE 8 (300,000), paid for by a decade of steady revenue from *GTA V*. In both systems engineering and a personal career, reliable everyday work funds the harder bets later.",
+      },
+      {
+        kind: "paragraph",
+        html: "Clarity means naming your trade-offs out loud. Even a billion-dollar budget couldn't fit 60 FPS, dense crowds, and mandatory RTGI onto base consoles at the same time. Rockstar picked world immersion at 30 FPS and accepted every complaint about frame rate. Trying to win every metric at once usually produces something forgettable.",
+      },
+      {
+        kind: "paragraph",
+        html: "Signal beats frequency. Most teams post weekly updates hoping to stay visible, while Rockstar released a handful of trailers across three years, pulled 90.4 million and 475 million views in 24 hours, and broke internet traffic records. One piece of work people cannot ignore outweighs ten updates they scroll past.",
+      },
+      {
+        kind: "paragraph",
+        html: "And a historic product doesn't guarantee a healthy organization. Shipping a $3.79 billion launch didn't protect developers from crunch pressure or layoff anxiety. Durable work depends on whether the people who built it have the stability and trust to stay for the next one.",
+      },
+      {
+        kind: "paragraph",
+        html: "Almost none of us have $400 million a year in runway or a decade to polish one release, so copying Rockstar's schedule would be foolish. What translates directly is knowing which details actually make your work worth waiting for, and refusing to cut those corners just to hit Friday.",
       },
       {
         kind: "references",
