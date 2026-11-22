@@ -4,7 +4,7 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 
 ## What this is
 
-`Space` — a single-author technical blog UI built from the Codex Design project
+`Space` — a single-author technical blog UI built from the Claude Design project
 "Technical blog UI mockups" (`Space Blog.dc.html`). The design's own handoff screen is
 implemented at `/system` and lists the intended component inventory; keep it in sync when
 components are added or renamed.
@@ -23,6 +23,7 @@ pnpm typecheck    # tsc --noEmit
 pnpm format       # prettier --write . (tailwind class sorting via plugin)
 pnpm format:check # prettier --check .
 pnpm comments     # moderate held comments: list / approve <id> / approve --all / reject <id>
+pnpm reviews      # moderate reader reviews: list / --all / approve|feature|hide|reject <id>
 pnpm embeddings   # rebuild public/embeddings.json — run after editing article bodies
 ```
 
@@ -65,6 +66,11 @@ editor. Reader state (saved/liked posts) lives in `SavedPostsProvider`; there is
 
 Form submissions go through the server actions in `src/app/actions.ts`, which own validation.
 
+Reader reviews (`/reviews`, homepage "What readers say") live in `src/lib/reviews.ts`. Every review is
+stored `pending`; the owner gets an email with signed moderation links (`/api/reviews/moderate`, GET
+shows, POST applies) or uses `pnpm reviews`. Turnstile keys: `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and
+`TURNSTILE_SECRET_KEY` (without them production refuses reviews; locally Cloudflare's test keys apply).
+
 ### Design system
 
 `src/app/globals.css` is the single token layer — colours, radii, indigo-tinted shadows, easings,
@@ -94,9 +100,72 @@ Use an arbitrary value (`p-[9px]`) for those.
 
 ## Writing articles
 
-Any task that writes, rewrites, reviews or publishes an article follows the skill at
-`.claude/skills/tech-blog-writing/SKILL.md`. Open it, pick the workflow it lists for the task, and load the
-reference files it points to. Space's component and publishing details are in `docs/authoring/`.
+Full authoring documentation: `docs/authoring/ARTICLE_AUTHORING_GUIDE.md` (components, publishing,
+best practices, AI-agent instructions).
+
+Every task that writes, rewrites, reviews or publishes an article follows the project skill at
+`.claude/skills/tech-blog-writing/SKILL.md`. Codex and other agents don't load it automatically: open
+`SKILL.md` first, pick the workflow it lists for the task (write, technical article, rewrite, review), and
+load the reference files it points to. This section is a quick reference to the Space-specific rules the
+skill relies on.
+
+### Content model
+
+- Articles are records in `src/lib/content/posts.ts`, newest first at the top of the array, validated
+  by `postSchema`. Required: `slug`, `title`, `dek`, `topic`, `publishedAt`, `tags`, `body`; keep
+  `likes`/`views`/`commentCount` at 0 (live counts come from the DB). Reading time is derived.
+- Body block kinds (`articleBlockSchema`): `paragraph`, `heading` (needs a unique `id`), `list`,
+  `code` (`runnable: true` only for browser-safe Python with no network/keys), `formula` (KaTeX `tex`),
+  `table`, `figure` (interactive Recharts line/area/bar — hover + legend toggles), `mermaid`,
+  `callout`, `image`, `video` (YouTube, `variant: "compact"` near the top or `"feature"` card; the player
+  loads only on play), `references`, `footnotes`, `correction`, `chart` (legacy static bars).
+- **Markdown renders in** paragraph html, headings, list items, table headers and cells, callout
+  title/body, footnotes, and correction notes. **Plain text only in** table/figure/formula/mermaid/
+  image/video **captions**, figure `note`, and reference label/source/note — backticks or `**` show
+  literally there. Heading text also renders as plain text in the sidebar table of contents, so keep
+  Markdown out of headings.
+- Write emphasis with `**`/`*`, not `__`/`_`. Link URLs may contain underscores and one level of balanced
+  parentheses.
+- The schema rejects duplicate heading `id`s and a `figure` `xKey` that equals a series `key`.
+- Topics are defined in `site.ts` `topicBlurbs`; pick by each topic's description. Every topic must keep
+  at least one post (schema requires a positive count). Series: `series: { slug, title, part }` plus a
+  blurb in `seriesBlurbs`.
+
+### Rendering gotchas
+
+- Mermaid (12.3.0, pinned) is converted through `@excalidraw/mermaid-to-excalidraw` with a local
+  patch, so rendered diagrams have no `.node` classes. On that path `<br>` becomes a newline and
+  `<b>`/`<strong>`/`<i>`/`<em>`/`<span>` are stripped, so don't rely on them for emphasis. Validate new diagram source by importing the
+  pinned mermaid version from cdn.jsdelivr.net in the page and calling `parse()`/`render()`.
+- Mermaid and Recharts render on intersection / measured width — a hidden or non-painting preview pane
+  can show them as empty. Scroll them into a painting viewport before concluding they're broken.
+- Covers: `coverImage: "/articles/<slug>.png"` in `public/articles/`, served via Next/Image
+  (`object-cover`, centre-anchored — keep the subject centred). Existing covers are ~1.6 MB PNGs; SVG
+  is allowed. No cover falls back to the topic gradient.
+
+### Adding a new block or interactive component
+
+New kinds (e.g. a slider-driven simulation) are welcome when they genuinely help. Add the schema entry
+in `schemas.ts`, then handle it in the exhaustive switches in `block-text.ts` and
+`components/article/article-body.tsx`, plus `export-article.ts` (has a default). Client-only renderers
+are lazy-loaded with `next/dynamic` in `article-body.tsx` so posts that don't use them don't pay.
+Follow the design-system and a11y rules above; reader mode reuses `ArticleBody`.
+
+### Publishing
+
+`pnpm format && pnpm lint && pnpm typecheck && pnpm embeddings && pnpm build`, check the article in
+the dev server, then branch + PR (the repo merges PRs into `main`; Vercel deploys `main`). After
+deploy, confirm the live URL, the archive, `sitemap.xml` and `rss.xml`.
+
+Subscribers are emailed automatically: the daily `email-queue` schedule (00:15 Asia/Colombo) sends any
+post dated today or in the last 14 days that has not been sent yet. A future `publishedAt` waits for
+that date. `pnpm broadcast <slug> --test=<email>` still previews the email; `--send` sends now instead
+of waiting, and the schedule then skips that post.
+
+### Privacy
+
+No personal paths, account names, filenames, hostnames or identifiers in articles; use placeholders and
+say so. Published git history keeps old versions.
 
 ## Coding standards
 
