@@ -141,10 +141,12 @@ pnpm broadcast <slug> --test=<email> # Send a preview to one inbox (--to= also w
 pnpm broadcast <slug> --send         # Send to ALL subscribers now (the daily schedule then skips it)
 
 # Moderation, Search & Maintenance
-pnpm comments        # List, approve, or reject held reader comments
-pnpm reviews         # List, approve, feature, hide, or reject reader reviews
-pnpm embeddings      # Rebuild semantic search embeddings (run after editing article bodies)
-pnpm prune:limits    # Delete expired rate-limit rows
+pnpm comments               # List, approve, or reject held reader comments
+pnpm reviews                # List, approve, feature, hide, or reject reader reviews
+pnpm embeddings             # Rebuild semantic search embeddings (run after editing article bodies)
+pnpm prune:limits           # Delete expired rate-limit rows
+pnpm vercel:cleanup         # Preview Vercel deployment retention cleanup (dry-run by default)
+pnpm vercel:cleanup:dry-run # Force dry-run Vercel deployment cleanup (see scripts/vercel-cleanup/README.md)
 ```
 
 ---

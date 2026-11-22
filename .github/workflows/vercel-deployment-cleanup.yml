@@ -1,0 +1,88 @@
+name: Vercel Deployment Cleanup
+
+# Independent of the deployment CI/CD pipeline (`ci.yml` and Vercel Git deploys).
+# Retains the latest KEEP_LAST_N (default 5) eligible deployments per configured
+# Vercel project while protecting active production, production aliases, custom
+# domains, in-progress builds, and rollback targets.
+#
+# Dry-run is the default until `VERCEL_CLEANUP_ENABLE_DELETION` is explicitly
+# set to `true` (as a GitHub Actions Repository Variable or Secret).
+on:
+  schedule:
+    # Runs every 30 minutes, offset from :00/:30 (busy GitHub cron slots) and
+    # offset from uptime.yml (7,37).
+    - cron: "17 * * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Force dry-run mode (preview only, no deletions)"
+        type: boolean
+        default: true
+      keep_last_n:
+        description: "Override KEEP_LAST_N for this run (leave blank for configured default)"
+        type: string
+        required: false
+        default: ""
+      project_ids:
+        description: "Override comma-separated Vercel project IDs/names for this run (leave blank for secret)"
+        type: string
+        required: false
+        default: ""
+
+# Least privilege: only read repository contents to run the cleanup script.
+permissions:
+  contents: read
+
+# Prevent concurrent executions from racing on the same Vercel deployments.
+# `cancel-in-progress: false` lets an active run finish cleanly instead of
+# aborting mid-deletion.
+concurrency:
+  group: vercel-deployment-cleanup
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.4.1
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Run Vercel deployment cleanup
+        run: pnpm vercel:cleanup
+        env:
+          # Authentication & scope (from GitHub Actions Secrets — never echoed).
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_TEAM_ID: ${{ secrets.VERCEL_TEAM_ID }}
+
+          # Target projects: manual input overrides secrets; supports either
+          # comma-separated VERCEL_PROJECT_IDS or structured VERCEL_PROJECTS_JSON.
+          VERCEL_PROJECT_IDS: ${{ inputs.project_ids || secrets.VERCEL_PROJECT_IDS }}
+          VERCEL_PROJECTS_JSON: ${{ inputs.project_ids == '' && secrets.VERCEL_PROJECTS_JSON || '' }}
+
+          # Retention & safety tuning (Repository Variables take precedence,
+          # with Secret fallback and safe defaults).
+          KEEP_LAST_N: ${{ inputs.keep_last_n || vars.KEEP_LAST_N || secrets.KEEP_LAST_N || '5' }}
+          MIN_PRODUCTION_DEPLOYMENTS: ${{ vars.VERCEL_MIN_PRODUCTION_DEPLOYMENTS || '2' }}
+          MIN_AGE_MINUTES: ${{ vars.VERCEL_CLEANUP_MIN_AGE_MINUTES || '0' }}
+          PROTECT_ALL_ALIASES: ${{ vars.VERCEL_CLEANUP_PROTECT_ALL_ALIASES || 'false' }}
+          MAX_DELETIONS_PER_PROJECT: ${{ vars.VERCEL_CLEANUP_MAX_DELETIONS_PER_PROJECT || '' }}
+
+          # Explicit opt-in gate: dry-run by default.
+          # - Scheduled runs delete ONLY when VERCEL_CLEANUP_ENABLE_DELETION == 'true'
+          #   and VERCEL_CLEANUP_DRY_RUN != 'true'.
+          # - Manual workflow_dispatch forces dry-run unless `dry_run` is unchecked
+          #   AND VERCEL_CLEANUP_ENABLE_DELETION == 'true'.
+          ENABLE_DELETION: ${{ vars.VERCEL_CLEANUP_ENABLE_DELETION || secrets.VERCEL_CLEANUP_ENABLE_DELETION || 'false' }}
+          DRY_RUN: ${{ (github.event_name == 'workflow_dispatch' && inputs.dry_run && 'true') || vars.VERCEL_CLEANUP_DRY_RUN || 'false' }}
