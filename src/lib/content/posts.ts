@@ -5,7 +5,7 @@ import { postSchema, type Post } from "./schemas";
 const parsedPosts = postSchema.array().parse([
   {
     slug: "gta-vi-records-engineering-and-lessons",
-    title: "GTA VI at $3.79B: Records, Trade-Offs, and Lessons",
+    title: "The $3.79 Billion Day Rockstar Spent 13 Years Building",
     dek: "Grand Theft Auto VI made $3.79 billion on day one, pushed DE-CIX to 33.03 Tbps, and tied Ocarina of Time at 99 on Metacritic on consoles alone. Here is how RAGE 9 got there, what funded the 13-year wait, and what builders can take from it.",
     topic: "Career",
     publishedAt: "2026-11-21",
