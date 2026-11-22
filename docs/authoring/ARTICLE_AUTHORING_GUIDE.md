@@ -10,7 +10,7 @@ How to write, structure, enrich and publish an article on Space. Written for hum
 | [best-practices.md](best-practices.md) | Writing, interactivity, accessibility, performance                 |
 | [ai-agents.md](ai-agents.md)           | Operating instructions for Claude Code, Codex and other agents     |
 
-Writing voice and editorial standards live in the user-level `tech-blog-writing` skill. This guide covers the Space side: what the app can render and how content ships.
+Writing voice, editorial standards and the writing, rewriting and review workflows live in the project skill at [`.claude/skills/tech-blog-writing/`](../../.claude/skills/tech-blog-writing/SKILL.md). This guide covers the Space side: what the app can render and how content ships.
 
 ## 1. How articles work
 
@@ -44,8 +44,8 @@ The block kinds are: `paragraph`, `heading`, `list`, `code`, `formula`, `table`,
 2. **Keep `likes`, `views`, `commentCount` at `0`.** Live counts come from the database. Never seed them.
 3. **Do not write `readingMinutes`.** It is derived from the body at 200 words a minute.
 4. **Markdown renders in some fields only.** Paragraphs, headings, list items, table headers and cells, callout title/body, footnotes and correction notes render inline Markdown. Captions (table, figure, formula, mermaid, image, video), figure notes and reference fields are plain text, so backticks and `**` appear literally there.
-5. **Every heading needs a unique `id`.** It becomes the anchor and the table-of-contents entry. The schema does not check this, so you must. Keep Markdown out of heading text: the sidebar table of contents prints it literally.
-6. **In a `figure`, `xKey` must not equal any series `key`.** Also not checked by the schema.
+5. **Every heading needs a unique `id`.** It becomes the anchor and the table-of-contents entry, and the build rejects duplicates. Keep Markdown out of heading text, because the sidebar table of contents prints it as plain text.
+6. **In a `figure`, `xKey` must not equal any series `key`.** The build rejects a clash.
 7. **Every table row must have as many cells as `headers`.** The schema rejects mismatches.
 8. **`runnable: true` only on browser-safe Python** (no network, no API keys, no packages Pyodide lacks).
 9. **No personal data.** Use placeholder paths, account names and hostnames, and tell the reader they are placeholders. Git history is public and permanent.
@@ -88,7 +88,7 @@ The block kinds are: `paragraph`, `heading`, `list`, `code`, `formula`, `table`,
 1. **Read the material.** Notes, research, code, logs. Note what the source claims and what you will calculate yourself.
 2. **Choose the topic** by reading each topic's description in `site.ts`, not its name. See [publishing.md](publishing.md#topics).
 3. **Outline in blocks.** Decide where a diagram, chart, table or runnable example will teach better than prose.
-4. **Write** following [best-practices.md](best-practices.md) and the `tech-blog-writing` skill.
+4. **Write** following the [`tech-blog-writing` skill](../../.claude/skills/tech-blog-writing/SKILL.md) and [best-practices.md](best-practices.md).
 5. **Add the cover** at `public/articles/<slug>.png` (or `.svg`).
 6. **Validate**: pipeline commands, then open the article in `pnpm dev` and check every visual renders.
 7. **Ship**: branch, commit, PR. Merging to `main` deploys through Vercel. Then verify production. See [publishing.md](publishing.md#publish-pipeline).

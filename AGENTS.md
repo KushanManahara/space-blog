@@ -92,6 +92,12 @@ Scroll reveals use `components/motion/reveal.tsx`, which only applies the hidden
 Quarter-step spacing utilities (`p-2.25`, `mt-1.75`) generate nothing — only halves are supported.
 Use an arbitrary value (`p-[9px]`) for those.
 
+## Writing articles
+
+Any task that writes, rewrites, reviews or publishes an article follows the skill at
+`.claude/skills/tech-blog-writing/SKILL.md`. Open it, pick the workflow it lists for the task, and load the
+reference files it points to. Space's component and publishing details are in `docs/authoring/`.
+
 ## Coding standards
 
 These are the standing rules for this codebase.

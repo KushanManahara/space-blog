@@ -152,8 +152,9 @@ These are the standing rules for this codebase.
 Full authoring documentation: `docs/authoring/ARTICLE_AUTHORING_GUIDE.md` (components, publishing,
 best practices, AI-agent instructions).
 
-Use the user-level `tech-blog-writing` skill for every article (voice, structure, accuracy, references,
-editing passes). This section is the Space-specific half: what the skill's step 0 needs to know here.
+Use the project skill in `.claude/skills/tech-blog-writing/` for every article: writing, rewriting and
+reviewing (voice, structure, accuracy, references, editing passes, publishing). Other agents should read
+its `SKILL.md` directly. This section is a quick reference to the Space-specific rules it relies on.
 
 ### Content model
 
@@ -170,10 +171,9 @@ editing passes). This section is the Space-specific half: what the skill's step 
   image/video **captions**, figure `note`, and reference label/source/note — backticks or `**` show
   literally there. Heading text also renders as plain text in the sidebar table of contents, so keep
   Markdown out of headings.
-- Markdown links: write emphasis with `**`/`*`, not `__`/`_` (underscores inside a link URL get turned
-  into `<em>`), and avoid `(` `)` inside link URLs (they end the link early).
-- Not enforced by the schema, but required: unique heading `id`s, and a `figure` `xKey` that differs
-  from every series `key`.
+- Markdown links: at most one link per text block. Two links in one block currently get an `<em>`
+  injected between their `target="_blank"` attributes. Write emphasis with `**`/`*`, not `__`/`_`.
+- The schema rejects duplicate heading `id`s and a `figure` `xKey` that equals a series `key`.
 - Topics are defined in `site.ts` `topicBlurbs`; pick by each topic's description. Every topic must keep
   at least one post (schema requires a positive count). Series: `series: { slug, title, part }` plus a
   blurb in `seriesBlurbs`.

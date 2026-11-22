@@ -2,6 +2,8 @@
 
 For Claude Code, Codex and any other agent asked to write or edit a Space article. Read this file and [ARTICLE_AUTHORING_GUIDE.md](ARTICLE_AUTHORING_GUIDE.md) before editing content.
 
+For the writing itself (voice, structure, research, and the write, rewrite and review workflows), follow the project skill at [`.claude/skills/tech-blog-writing/SKILL.md`](../../.claude/skills/tech-blog-writing/SKILL.md). Claude Code loads it automatically. Other agents should open that file and follow the workflow it selects.
+
 ## Source of truth
 
 When this documentation and the code disagree, the code wins. Check these before writing:
@@ -36,8 +38,8 @@ When this documentation and the code disagree, the code wins. Check these before
 - Do not change existing slugs or heading ids.
 - No Markdown in plain-text fields (table/figure/formula/mermaid/image/video captions, figure `note`, reference `label`/`source`/`note`).
 - In `figure`, `xKey` must not equal a series `key`.
-- Heading `id`s must be unique. Neither this nor the `xKey` rule is checked by the schema, so check them yourself.
-- No Markdown in heading text (the table of contents prints it literally), no `__`/`_` emphasis, and no parentheses inside link URLs.
+- Heading `id`s must be unique. The build rejects duplicates, and a `figure` `xKey` that equals a series key.
+- No Markdown in heading text (the table of contents prints it as plain text), no `__`/`_` emphasis, and at most one Markdown link per text block.
 - No `<b>`/`<i>` styling in Mermaid labels. The Excalidraw converter strips it.
 - Only mark code `runnable: true` if it runs under Pyodide in the browser without network access.
 - Keep personal data out. Use placeholders and say they are placeholders.
