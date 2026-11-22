@@ -25,6 +25,24 @@ describe("markdownToHtml links", () => {
     assert.equal(href(html), "https://a.com/x_y_z");
   });
 
+  test("two links in one block don't inject emphasis", () => {
+    const html = markdownToHtml("See [a](https://a.com/x) and [b](https://b.com/y) here.");
+    assert.doesNotMatch(html, /<em/);
+    assert.equal((html.match(/target="_blank"/g) ?? []).length, 2);
+  });
+
+  test("raw HTML links keep their attributes intact", () => {
+    const html = markdownToHtml(
+      '<a href="https://a.com/x">a</a> and <a href="https://b.com/y">b</a>',
+    );
+    assert.doesNotMatch(html, /<em/);
+  });
+
+  test("emphasis next to two links still renders", () => {
+    const html = markdownToHtml("*one* [a](https://a.com) _two_ [b](https://b.com)");
+    assert.equal((html.match(/<em/g) ?? []).length, 2);
+  });
+
   test("unsafe schemes are still blocked", () => {
     assert.equal(href(markdownToHtml("[x](javascript:alert(1))")), "#");
   });

@@ -17,7 +17,7 @@ Every article in this series follows these principles alongside [best-practices.
 
 Keep these consistent across future episodes unless explicitly extended:
 
-- **Voice & notation:** Calm, clear peer-to-peer technical teaching. No em dashes (`—`) or semicolons (`;`) in prose. Plain text only (no backticks or `**`) inside captions, figure titles/notes/axis labels, callout titles, and references. At most one Markdown link `[label](url)` per text block (to avoid Space's pre-existing `markdown.ts` `_blank` regex interaction).
+- **Voice & notation:** Calm, clear peer-to-peer technical teaching. No em dashes (`—`) or semicolons (`;`) in prose. Plain text only (no backticks or `**`) inside captions, figure titles/notes/axis labels, callout titles, and references.
 - **Topic & tags:** Topic is `"Research"`. Core series tags: `#deep-learning`, `#neural-networks`, `#machine-learning`, `#pytorch`, `#nn-module` (add existing Space tags where accurate rather than single-use orphan tags).
 - **Thumbnail & cover art aesthetic:** Always follow a **PREMIUM EDITORIAL DESIGN** aesthetic when generating covers (`public/articles/<slug>.png`). Vary backgrounds, environments, lighting, color palettes, and compositions across episodes to avoid repetitive templates, generic AI tropes, or clutter. Keep the primary subject prominent, visually balanced, and inside the central `60%` safe zone with generous side margins, prefer minimal or no embedded text, and aim for a distinct, art-directed editorial cover identity on every piece.
 - **Notation established:**

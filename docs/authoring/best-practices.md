@@ -1,6 +1,6 @@
 # Authoring best practices
 
-The full editorial standard lives in the `tech-blog-writing` skill. This page is the short version, plus the Space-specific parts.
+The full editorial standard lives in the project skill at [`.claude/skills/tech-blog-writing/`](../../.claude/skills/tech-blog-writing/SKILL.md). This page is the short version, plus the Space-specific parts.
 
 ## Writing
 

@@ -45,6 +45,7 @@ export function markdownToHtml(raw: string): string {
   // One level of balanced parentheses is allowed in the URL, as in
   // `wiki/Pascal_(unit)`.
   const hrefs: string[] = [];
+  const anchors: string[] = [];
 
   return (
     withoutCode
@@ -58,6 +59,13 @@ export function markdownToHtml(raw: string): string {
       .replace(/<a\s+([^>]*href=["']https?:\/\/[^"']+["'][^>]*)>/gi, (match, attrs) => {
         if (/target\s*=/i.test(attrs)) return match;
         return `<a ${attrs} target="_blank" rel="noopener noreferrer">`;
+      })
+      // Opening <a> tags are held out of the emphasis passes too. Their
+      // attributes carry `target="_blank"`, and with two links in one block the
+      // italic rule matched from one `_blank` to the next and injected <em>.
+      .replace(/<a\s[^>]*>/gi, (tag: string) => {
+        anchors.push(tag);
+        return `\u0002${anchors.length - 1}\u0002`;
       })
       // Bold: **text** or __text__
       .replace(/\*\*([^*]+)\*\*/g, '<strong class="font-bold text-fg-1">$1</strong>')
@@ -73,7 +81,8 @@ export function markdownToHtml(raw: string): string {
         (_, index: string) =>
           `<code class="rounded border border-line-1 bg-bg-2 px-1.5 py-0.5 font-mono text-[0.88em] font-medium text-brand">${escapeHtml(codeSpans[Number(index)])}</code>`,
       )
-      // Link targets: restored verbatim
+      // Opening <a> tags, then the link targets inside them: restored verbatim
+      .replace(/\u0002(\d+)\u0002/g, (_, index: string) => anchors[Number(index)])
       .replace(/\u0001(\d+)\u0001/g, (_, index: string) => hrefs[Number(index)])
   );
 }
