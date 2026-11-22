@@ -126,7 +126,7 @@ export function ReviewInviteFloat({ quote }: { quote: InviteQuote | null }) {
     <aside
       aria-label="Review invitation"
       className={cn(
-        "fixed bottom-7 left-7 z-60 hidden w-[288px] rounded-lg border border-line-1 bg-bg-2 p-4 shadow-xl transition-[opacity,translate] duration-500 ease-expo motion-reduce:transition-none md:block print:hidden",
+        "fixed bottom-[calc(var(--safe-bottom)+1.75rem)] left-[calc(var(--safe-left)+1.75rem)] z-60 hidden w-[288px] rounded-lg border border-line-1 bg-bg-2 p-4 shadow-xl transition-[opacity,translate] duration-500 ease-expo motion-reduce:transition-none md:block print:hidden",
         "starting:translate-y-3 starting:opacity-0",
         quiet ? "pointer-events-none translate-y-3 opacity-0" : "translate-y-0 opacity-100",
       )}
