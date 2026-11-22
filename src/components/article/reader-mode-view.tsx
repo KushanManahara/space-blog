@@ -213,8 +213,8 @@ export function ReaderModeView({
       onScroll={handleScroll}
       className={cn(
         "fixed inset-0 z-100 overflow-y-auto overscroll-contain transition-colors duration-300 selection:bg-brand/25",
-        // Keeps the closing button clear of the home indicator.
-        "pb-[env(safe-area-inset-bottom,0px)]",
+        // Keeps content and closing controls clear of the home indicator and landscape cutouts.
+        "pr-[var(--safe-right)] pb-[var(--safe-bottom)] pl-[var(--safe-left)]",
         isExiting ? "animate-focus-overlay-out pointer-events-none" : "animate-focus-overlay-in",
         currentTheme.bg,
         currentTheme.text,
@@ -226,7 +226,7 @@ export function ReaderModeView({
         className={cn(
           // Background stays edge-to-edge; only the toolbar's contents are
           // pushed clear of the notch.
-          "sticky top-0 z-50 border-b pt-[env(safe-area-inset-top,0px)] backdrop-blur-md transition-colors duration-300",
+          "sticky top-0 z-50 border-b pt-[var(--safe-top)] backdrop-blur-md transition-colors duration-300",
           isExiting ? "opacity-0" : "animate-focus-toolbar-in",
           currentTheme.headerBg,
         )}

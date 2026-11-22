@@ -23,7 +23,7 @@ export function HeaderAtmosphere({ className }: { className?: string }) {
       aria-hidden
       className={cn(
         "pointer-events-none absolute -inset-x-4 bottom-0 -z-10 sm:inset-x-[calc(50%-50vw)]",
-        "top-[calc(-1*(var(--nav-bleed)+env(safe-area-inset-top,0px)))]",
+        "top-[calc(-1*(var(--nav-bleed)+var(--safe-top)))]",
         className,
       )}
       style={{ backgroundImage: "var(--header-atmosphere)" }}

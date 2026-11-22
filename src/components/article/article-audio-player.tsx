@@ -105,7 +105,7 @@ export function ArticleAudioPlayer() {
   return (
     <aside
       aria-label="Article Audio Narrator"
-      className="fixed inset-x-0 bottom-4 z-[120] mx-auto w-[calc(100%-1.5rem)] max-w-2xl px-2 sm:bottom-6 print:hidden"
+      className="fixed inset-x-0 bottom-[calc(var(--safe-bottom)+1rem)] z-[120] mx-auto w-[calc(100%-1.5rem)] max-w-2xl pr-[max(0.5rem,var(--safe-right))] pl-[max(0.5rem,var(--safe-left))] sm:bottom-[calc(var(--safe-bottom)+1.5rem)] print:hidden"
     >
       <div className="relative overflow-hidden rounded-2xl border border-line-1/80 bg-bg-1/95 shadow-[0_20px_50px_rgba(0,0,0,0.18)] backdrop-blur-2xl transition-all duration-300 dark:border-white/12 dark:bg-bg-2/95 dark:shadow-[0_24px_60px_rgba(0,0,0,0.85)]">
         {/* Scrubber Progress Bar */}
