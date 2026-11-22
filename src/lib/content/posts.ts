@@ -3879,7 +3879,7 @@ ref: refs/heads/main`,
       },
       {
         kind: "paragraph",
-        html: "There was no human aboard for any of it. Musk said the car was technically autonomous for the demo, for safety; a Starman mannequin rode along for one run. In customer hands, Tesla says the Roadster will be the only car it sells that you drive yourself.",
+        html: "There was no human aboard for any of it. Musk said the car was technically autonomous for the demo, for safety, and a Starman mannequin rode along for one run. In customer hands, Tesla says the Roadster will be the only car it sells that you drive yourself.",
       },
       {
         kind: "table",
@@ -3961,7 +3961,7 @@ ref: refs/heads/main`,
         yLabel: "fan power (kW)",
         note: "My estimate: 4 m² floor, 13 m sealing edge, 60% fan efficiency",
         caption:
-          "Roughly 20 kW for every extra millimetre of gap. On a smooth test ramp a tight seal is easy; on a public road with bumps, camber and debris, holding it is the entire engineering problem.",
+          "Roughly 20 kW for every extra millimetre of gap. On a smooth test ramp a tight seal is easy. On a public road with bumps, camber and debris, holding it is the entire engineering problem.",
         series: [{ key: "power", label: "fan power" }],
         data: [
           { gap: "3 mm", power: 60 },
@@ -4081,7 +4081,7 @@ ref: refs/heads/main`,
       },
       {
         kind: "paragraph",
-        html: "It is the tanks. Tesla stores the air in **composite overwrapped pressure vessels**: a thin liner wrapped in carbon fibre, the same class of hardware SpaceX flies. Two of them, with Tesla saying every usable void in the car is packed with tankage. Nobody stated a pressure on stage, but 250 kg in 600 litres works out to about 417 kg/m³, roughly 340 times the density of sea-level air, which puts you in the several-hundred-bar range; a trackside screen in Tesla's own photos reportedly read 5,500 psi, about 380 bar.",
+        html: "It is the tanks. Tesla stores the air in **composite overwrapped pressure vessels**: a thin liner wrapped in carbon fibre, the same class of hardware SpaceX flies. Two of them, with Tesla saying every usable void in the car is packed with tankage. Nobody stated a pressure on stage, but 250 kg in 600 litres works out to about 417 kg/m³, roughly 340 times the density of sea-level air, which puts you in the several-hundred-bar range. A trackside screen in Tesla's own photos reportedly read 5,500 psi, about 380 bar.",
       },
       {
         kind: "paragraph",
@@ -4091,7 +4091,7 @@ ref: refs/heads/main`,
         kind: "list",
         items: [
           "**Stress rupture.** Carbon fibre can fail after long periods under sustained load, below its rated burst strength. NASA has studied this for decades because COPVs sit on nearly every spacecraft, and published fresh work on it in 2026.",
-          "**It has happened.** The September 2016 AMOS-6 pad loss destroyed a Falcon 9 and its payload; SpaceX traced it to a COPV. Room-temperature air is a far gentler case, but the hardware class earns respect.",
+          "**It has happened.** The September 2016 AMOS-6 pad loss destroyed a Falcon 9 and its payload, and SpaceX traced it to a COPV. Room-temperature air is a far gentler case, but the hardware class earns respect.",
           "**Road cars are worse than rockets** in one specific way: crashes, fire, and thousands of fill cycles. Hydrogen and CNG vehicles already certify tanks against exactly this. A road-legal thruster car would have to do the same.",
           "**Cold.** Gas leaving a tank chills what remains, hard. Valves and nozzles have to keep working far below freezing, and the air has to be bone dry or it will ice up mid-firing.",
         ],
@@ -4142,11 +4142,11 @@ ref: refs/heads/main`,
           ],
         ],
         caption:
-          "The 2J is the direct ancestor; the Spéirling is the closest modern match. Tesla's contribution is doing it with a much heavier car, and bolting thrusters on.",
+          "The 2J is the direct ancestor, and the Spéirling is the closest modern match. Tesla's contribution is doing it with a much heavier car, and bolting thrusters on.",
       },
       {
         kind: "paragraph",
-        html: "The Chaparral 2J is worth knowing properly. Jim Hall's team sealed the floor with flexible Lexan skirts linked to the suspension, holding about a 25 mm gap to the road; with the fans running the car visibly squatted about 5 cm. It was the quickest thing in qualifying and it kept breaking, mostly in the fan drive. Rivals argued the skirts were a movable aerodynamic device, which the rules banned, and complained about the grit it fired at them. The SCCA killed it after a single season.",
+        html: "The Chaparral 2J is worth knowing properly. Jim Hall's team sealed the floor with flexible Lexan skirts linked to the suspension, holding about a 25 mm gap to the road. With the fans running, the car visibly squatted about 5 cm. It was the quickest thing in qualifying and it kept breaking, mostly in the fan drive. Rivals argued the skirts were a movable aerodynamic device, which the rules banned, and complained about the grit it fired at them. The SCCA killed it after a single season.",
       },
       {
         kind: "paragraph",
@@ -4154,7 +4154,7 @@ ref: refs/heads/main`,
       },
       {
         kind: "paragraph",
-        html: 'The thruster half has a quieter precedent. In 2018 **Bosch tested a motorcycle** that fires a sideways gas jet when sensors detect the front wheel sliding, nudging the bike back onto its line; it used airbag-style gas generators, so it was single-use. That is the useful reframing here. A thruster that fires when the tyres let go is not a stunt. It is an active safety system. Musk first promised a "SpaceX package" of about ten small thrusters back in June 2018. This is that promise, eight years late.',
+        html: 'The thruster half has a quieter precedent. In 2018 **Bosch tested a motorcycle** that fires a sideways gas jet when sensors detect the front wheel sliding, nudging the bike back onto its line. It used airbag-style gas generators, so it was single-use. That is the useful reframing here. A thruster that fires when the tyres let go is not a stunt. It is an active safety system. Musk first promised a "SpaceX package" of about ten small thrusters back in June 2018. This is that promise, eight years late.',
       },
       {
         kind: "heading",
@@ -4173,7 +4173,7 @@ ref: refs/heads/main`,
           [
             "No human aboard during the stunts",
             "**Confirmed**",
-            "Stated on stage; a mannequin rode one run",
+            "Stated on stage, and a mannequin rode one run",
           ],
           [
             "Held itself inverted, flipped, landed",
@@ -4183,17 +4183,17 @@ ref: refs/heads/main`,
           [
             "Up to 2 g of fan suction, 4,700 kg",
             "Tesla's figure",
-            "On-screen readout; no independent test",
+            "On-screen readout, with no independent test",
           ],
           [
             "Over 80 kN thrust, 250 kg air, 10 nozzles",
             "Tesla's figure",
-            "Stated by Tesla; consistent with basic physics",
+            "Stated by Tesla and consistent with basic physics",
           ],
           [
             "0–60 mph in 0.81 s",
             "Shown once",
-            "Live run on a cut-short pad; no independent timing",
+            "Live run on a cut-short pad, with no independent timing",
           ],
           [
             "Thrust is 4–5× tyre force",
@@ -4203,12 +4203,12 @@ ref: refs/heads/main`,
           [
             "Sustained flight",
             "**Not shown**",
-            "Hops of a few seconds; my estimate caps hover at 4–5 s",
+            "Hops of a few seconds, and my estimate caps hover at 4–5 s",
           ],
           [
             "Street-legal thrusters",
             "**Unclear**",
-            "Musk said it may not be legal everywhere; the Rocket trim is marked not road approved",
+            "Musk said it may not be legal everywhere, and the Rocket trim is marked not road approved",
           ],
           [
             "Production in 2028",
@@ -4221,7 +4221,7 @@ ref: refs/heads/main`,
       },
       {
         kind: "paragraph",
-        html: "And the questions Tesla simply has not answered: what the car weighs by trim; how many fans, at what power, and whether the production car uses skirts at all; how the tanks refill, how long that takes, and how many launches a fill buys; whether the Thrust trim may legally fire on a public road; how a several-hundred-bar tank gets certified for crash and fire; what happens if a fan quits or the seal breaks while the car is inverted, or a valve sticks mid-air. Gizmodo, citing MotorTrend, reports the FAA imposed airspace limits around the test site for the event, which is its own kind of answer about where this sits.",
+        html: "Then there are the questions Tesla simply has not answered. What does the car weigh in each trim? How many fans does it have, at what power, and does the production car use skirts at all? How do the tanks refill, how long does that take, and how many launches does a fill buy? May the Thrust trim legally fire on a public road? How does a several-hundred-bar tank get certified for crash and fire? And what happens if a fan quits or the seal breaks while the car is inverted, or a valve sticks mid-air? Gizmodo, citing MotorTrend, reports the FAA imposed airspace limits around the test site for the event, which is its own kind of answer about where this sits.",
       },
       {
         kind: "paragraph",
@@ -5291,7 +5291,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "If you've used NumPy, this is familiar ground: the API was deliberately kept close, and most `np.` code has a one-to-one `torch.` translation. Try the snippet below; every line runs.",
+        html: "If you've used NumPy, this is familiar ground: the API was deliberately kept close, and most `np.` code has a one-to-one `torch.` translation. Try the snippet below. Every line runs.",
       },
       {
         kind: "code",
@@ -5327,7 +5327,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "The `device` attribute isn't a formality. The same operation, a matrix multiply, runs orders of magnitude faster on a GPU once the matrices are big enough to hide the cost of shipping them there. Below is `A @ B` for square matrices of growing size; hover the lines. For small tensors the CPU wins (no transfer overhead); the GPU pulls ahead fast and then runs away.",
+        html: "The `device` attribute isn't a formality. The same operation, a matrix multiply, runs orders of magnitude faster on a GPU once the matrices are big enough to hide the cost of shipping them there. Below is `A @ B` for square matrices of growing size, so hover the lines. For small tensors the CPU wins (no transfer overhead), but the GPU pulls ahead fast and then runs away.",
       },
       {
         kind: "figure",
@@ -5431,7 +5431,7 @@ Quota         : 800 GB`,
       {
         kind: "mermaid",
         caption:
-          "The entire PyTorch object model. A model is Modules all the way down; at the leaves are Parameters, which are Tensors that autograd tracks.",
+          "The entire PyTorch object model. A model is Modules all the way down. At the leaves are Parameters, which are Tensors that autograd tracks.",
         code: `flowchart TD
     MODEL["<b>model</b> — nn.Module"]
     L1["nn.Linear(784, 128)"]
@@ -5465,7 +5465,7 @@ Quota         : 800 GB`,
         items: [
           "**Tensors** hold the numbers, plus a shape, a dtype, a device, and a gradient-tracking flag.",
           "**Operations** on tensors (matmul, `relu`, `sum`) are the arithmetic a network is made of.",
-          "**Broadcasting** is how tensors of different shapes combine without copying; shape errors name the dimension that failed.",
+          "**Broadcasting** is how tensors of different shapes combine without copying, and shape errors name the dimension that failed.",
           "**`nn.Parameter`** is a tensor a layer owns and wants gradients for.",
           "**`nn.Module`** bundles parameters with a `forward` method into a reusable unit, and a model is just Modules nested inside Modules.",
         ],
@@ -5538,7 +5538,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "Picture the loss as a landscape. Every parameter is an axis; the height at any point is how wrong the model is with those parameter values. Training is walking downhill. The **gradient** is the arrow pointing in the steepest uphill direction, so you step the opposite way:",
+        html: "Picture the loss as a landscape. Every parameter is an axis, and the height at any point is how wrong the model is with those parameter values. Training is walking downhill. The **gradient** is the arrow pointing in the steepest uphill direction, so you step the opposite way:",
       },
       {
         kind: "formula",
@@ -5571,7 +5571,7 @@ Quota         : 800 GB`,
       {
         kind: "mermaid",
         caption:
-          "The computational graph for y = x³ + 2x. The forward pass (solid, downward) computes values; backward() flows gradients up the same edges in reverse.",
+          "The computational graph for y = x³ + 2x. The forward pass (solid, downward) computes values, and backward() flows gradients up the same edges in reverse.",
         code: `flowchart TD
     X["x = 2.0  (leaf, requires_grad)"]
     P["pow:  x³ = 8"]
@@ -5652,7 +5652,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "Every supervised training loop in PyTorch, from a tutorial notebook to a foundation-model run, is a variation on these five lines. The **optimizer** holds a reference to the model's parameters and knows one update rule (SGD, Adam, …); you hand it gradients, it takes the step.",
+        html: "Every supervised training loop in PyTorch, from a tutorial notebook to a foundation-model run, is a variation on these five lines. The **optimizer** holds a reference to the model's parameters and knows one update rule (SGD, Adam, …). You hand it gradients, it takes the step.",
       },
       {
         kind: "code",
@@ -5749,7 +5749,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "A Module is two methods. `__init__` **declares** the pieces (layers, parameters, constants) and assigns them to `self`. `forward` **describes** how a tensor flows through those pieces. You never call `forward` directly; you call the module (`model(x)`), which runs hooks and then `forward`. Here's a residual block, the pattern at the heart of every ResNet and Transformer:",
+        html: "A Module is two methods. `__init__` **declares** the pieces (layers, parameters, constants) and assigns them to `self`. `forward` **describes** how a tensor flows through those pieces. You never call `forward` directly. You call the module (`model(x)`), which runs hooks and then `forward`. Here's a residual block, the pattern at the heart of every ResNet and Transformer:",
       },
       {
         kind: "code",
@@ -5893,7 +5893,7 @@ Quota         : 800 GB`,
         items: [
           "`__init__` declares, `forward` connects, and you call the module, never `forward` directly.",
           "Layers must be attributes (or live in a `ModuleList` / `ModuleDict`) to be registered and trained.",
-          "Parameters are learned; buffers persist but aren't; register buffers explicitly.",
+          "Parameters are learned. Buffers persist but aren't learned, so register them explicitly.",
           "`model.train()` / `model.eval()` change what Dropout and BatchNorm do, so set them deliberately.",
           "Save the `state_dict`, rebuild the architecture, then `load_state_dict`.",
         ],
@@ -5981,7 +5981,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "The common kind is a **map-style** Dataset: implement `__len__` and `__getitem__(i)`, and you have something that behaves like a list of `(input, target)` pairs. Where the data lives (memory, a folder of images, a database, a set of shards) is entirely your business; the DataLoader only ever asks for item `i`.",
+        html: "The common kind is a **map-style** Dataset: implement `__len__` and `__getitem__(i)`, and you have something that behaves like a list of `(input, target)` pairs. Where the data lives (memory, a folder of images, a database, a set of shards) is entirely your business. The DataLoader only ever asks for item `i`.",
       },
       {
         kind: "code",
@@ -6005,7 +6005,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "`num_workers` is the dial that matters most, and more is not always better. Each worker is a process with its own Python interpreter and memory; past the point where workers can keep the GPU fed, you're just paying RAM and startup cost. The curve almost always looks like this:",
+        html: "`num_workers` is the dial that matters most, and more is not always better. Each worker is a process with its own Python interpreter and memory. Past the point where workers can keep the GPU fed, you're just paying RAM and startup cost. The curve almost always looks like this:",
       },
       {
         kind: "figure",
@@ -6077,7 +6077,7 @@ Quota         : 800 GB`,
           [
             "`num_workers`",
             "the knee of your throughput curve",
-            "parallel decode; measure, don't guess",
+            "parallel decode. Measure, don't guess",
           ],
           [
             "`pin_memory`",
@@ -6092,7 +6092,7 @@ Quota         : 800 GB`,
           [
             "`drop_last`",
             "`True` for training",
-            "keeps batch shape constant; avoids a tiny final batch",
+            "keeps batch shape constant and avoids a tiny final batch",
           ],
           ["`prefetch_factor`", "`2`–`4`", "buffer batches ahead without hoarding RAM"],
         ],
@@ -6101,11 +6101,11 @@ Quota         : 800 GB`,
       {
         kind: "list",
         items: [
-          "`Dataset` yields one example; `DataLoader` yields batches and parallelises the slow work.",
+          "`Dataset` yields one example, and `DataLoader` yields batches and parallelises the slow work.",
           "Put decoding and augmentation in `__getitem__` so the workers do it off the critical path.",
           "Tune `num_workers` to where throughput plateaus, then stop.",
           "`pin_memory=True` + `.to(device, non_blocking=True)` overlaps the copy with compute.",
-          "Custom `collate_fn` for variable-length data; `WeightedRandomSampler` for imbalance.",
+          "Custom `collate_fn` for variable-length data, `WeightedRandomSampler` for imbalance.",
         ],
       },
       {
@@ -6161,7 +6161,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "Pick a device once, at the top, and move the model and every batch onto it. The model moves in place; tensors don't, so you reassign. `non_blocking=True` lets the host→device copy overlap with compute when the source is pinned memory (which your DataLoader is providing, from Part 4).",
+        html: "Pick a device once, at the top, and move the model and every batch onto it. The model moves in place, but tensors don't, so you reassign. `non_blocking=True` lets the host→device copy overlap with compute when the source is pinned memory (which your DataLoader is providing, from Part 4).",
       },
       {
         kind: "code",
@@ -6236,7 +6236,7 @@ Quota         : 800 GB`,
         yLabel: "learning rate (fraction of base)",
         note: "1,000-step run, 100-step warmup",
         caption:
-          "Cosine + warmup (smooth) vs. step decay (drop 10× at the halfway mark). Warmup is the short ramp at the start; both end far below where they began. Hover to compare.",
+          "Cosine + warmup (smooth) vs. step decay (drop 10× at the halfway mark). Warmup is the short ramp at the start, and both end far below where they began. Hover to compare.",
         series: [
           { key: "cosine", label: "cosine + warmup" },
           { key: "stepdecay", label: "step decay" },
@@ -6311,17 +6311,17 @@ Quota         : 800 GB`,
       {
         kind: "list",
         items: [
-          "One device, chosen once; model moved in place, batches moved every step with `non_blocking=True`.",
+          "One device, chosen once. The model is moved in place, batches are moved every step with `non_blocking=True`.",
           "AMP with `autocast` + `GradScaler`, for roughly 2× throughput and half the memory.",
-          "Warmup then cosine decay; `scheduler.step()` once per optimizer step.",
-          "Clip the gradient norm; accumulate when the batch you want won't fit.",
+          "Warmup then cosine decay, with `scheduler.step()` once per optimizer step.",
+          "Clip the gradient norm, and accumulate when the batch you want won't fit.",
           "Checkpoint model + optimizer + scheduler + scaler + epoch, or you can't truly resume.",
-          "`@torch.no_grad()` and `model.eval()` around validation; back to `model.train()` after.",
+          "`@torch.no_grad()` and `model.eval()` around validation, then back to `model.train()` after.",
         ],
       },
       {
         kind: "paragraph",
-        html: "That's the series. Five parts ago this was a single data structure; now it's a training run you could put on a cluster. Everything past here (`torch.compile`, FSDP and multi-node, quantisation, custom kernels) is a refinement of these same pieces, and none of it will surprise you once this loop is muscle memory.",
+        html: "That's the series. Five parts ago this was a single data structure. Now it's a training run you could put on a cluster. Everything past here (`torch.compile`, FSDP and multi-node, quantisation, custom kernels) is a refinement of these same pieces, and none of it will surprise you once this loop is muscle memory.",
       },
       {
         kind: "references",
@@ -6393,7 +6393,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "That academic foundation was deeply rigorous. It wasn't just about learning high-level programming frameworks; it meant mastering computer systems architecture, operating systems internals, discrete mathematics, digital signal processing, electronic circuit design, and hardware-software co-design. That breadth builds an instinct for understanding exactly what happens when high-level code interacts with physical transistors and OS schedulers.",
+        html: "That academic foundation was deeply rigorous. It wasn't just about learning high-level programming frameworks. It meant mastering computer systems architecture, operating systems internals, discrete mathematics, digital signal processing, electronic circuit design, and hardware-software co-design. That breadth builds an instinct for understanding exactly what happens when high-level code interacts with physical transistors and OS schedulers.",
       },
       {
         kind: "heading",
@@ -6425,7 +6425,7 @@ Quota         : 800 GB`,
   {
     slug: "mcp-vs-acp",
     title: "MCP and A2A Are Layers, Not Rivals",
-    dek: "The consolidation under open standards settled the protocol question. MCP solves tool access; A2A solves agent collaboration. Here is how they stack in production.",
+    dek: "The consolidation under open standards settled the protocol question. MCP solves tool access, and A2A solves agent collaboration. Here is how they stack in production.",
     topic: "Systems",
     publishedAt: "2025-02-25",
     likes: 0,
@@ -6445,7 +6445,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "That debate is over because it was based on a category error. **MCP and A2A operate on orthogonal axes.** MCP is the *vertical* plane (model-to-tool), while A2A is the *horizontal* plane (agent-to-agent). High-scale enterprise agentic systems do not pick between them; they use MCP at the bottom of the stack and A2A at the top.",
+        html: "That debate is over because it was based on a category error. **MCP and A2A operate on orthogonal axes.** MCP is the *vertical* plane (model-to-tool), while A2A is the *horizontal* plane (agent-to-agent). High-scale enterprise agentic systems do not pick between them. They use MCP at the bottom of the stack and A2A at the top.",
       },
       {
         kind: "heading",
@@ -6777,7 +6777,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "The boundary point is worth taking seriously rather than treating as a feature list item. A tool named `run_query` that accepts arbitrary SQL is a very different security proposition from one that accepts a customer ID. The protocol gives you the control; deciding how narrow to make each tool is still your job.",
+        html: "The boundary point is worth taking seriously rather than treating as a feature list item. A tool named `run_query` that accepts arbitrary SQL is a very different security proposition from one that accepts a customer ID. The protocol gives you the control, but deciding how narrow to make each tool is still your job.",
       },
       {
         kind: "paragraph",
@@ -7629,7 +7629,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "There is no additional cost for Bedrock Studio; customers pay only for their Bedrock usage. Colangelo does point out a limitation, which is that AWS IAM Identity Center has to be configured in the same region where Bedrock Studio is available.",
+        html: "There is no additional cost for Bedrock Studio. Customers pay only for their Bedrock usage. Colangelo does point out a limitation, which is that AWS IAM Identity Center has to be configured in the same region where Bedrock Studio is available.",
       },
       {
         kind: "paragraph",
@@ -7971,7 +7971,7 @@ Quota         : 800 GB`,
       {
         kind: "mermaid",
         caption:
-          "The retrieval loop. Everything left of the model is ordinary information retrieval; the model only ever sees text that was already selected for it.",
+          "The retrieval loop. Everything left of the model is ordinary information retrieval. The model only ever sees text that was already selected for it.",
         code: 'flowchart TD\n    Q["Question"] --> E["Embedding model"]\n    E --> V["Query vector"]\n    V --> S{"Cosine similarity<br/>search"}\n    D[("Vector database")] --> S\n    S --> K["Top-k chunks"]\n    K --> P["Prompt:<br/>question + context"]\n    Q --> P\n    P --> L["Language model"]\n    L --> A["Grounded answer"]\n\n    DOC["Source documents"] -.chunk + embed.-> D',
       },
       {
@@ -7987,7 +7987,7 @@ Quota         : 800 GB`,
         kind: "formula",
         tex: "\\cos(\\theta) = \\frac{A \\cdot B}{\\lVert A \\rVert \\, \\lVert B \\rVert} = \\frac{\\sum_{i} A_i B_i}{\\sqrt{\\sum_{i} A_i^{2}} \; \\sqrt{\\sum_{i} B_i^{2}}}",
         caption:
-          "Cosine similarity measures the angle between vectors. 1.0 means identical orientation; 0.0 means orthogonal / unrelated.",
+          "Cosine similarity measures the angle between vectors. 1.0 means identical orientation, and 0.0 means orthogonal, or unrelated.",
       },
       {
         kind: "paragraph",
@@ -8481,7 +8481,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "It is easy to believe that artificial intelligence is written in Python. Researchers write PyTorch scripts, prompt engineers configure LangChain pipelines, and data scientists train scikit-learn models. But Python is strictly the **ergonomic steering wheel**; the actual engine running underneath is pure, highly optimized C++ and CUDA.",
+        html: "It is easy to believe that artificial intelligence is written in Python. Researchers write PyTorch scripts, prompt engineers configure LangChain pipelines, and data scientists train scikit-learn models. But Python is strictly the **ergonomic steering wheel**. The actual engine running underneath is pure, highly optimized C++ and CUDA.",
       },
       {
         kind: "paragraph",
@@ -8559,7 +8559,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "In statistical terms, Bradman is not just the best cricket batsman; he is the greatest statistical outlier across all major human sporting endeavors. The mean batting average for recognized international Test batsmen hovers around 35 to 40, with a standard deviation (`σ`) of roughly 12 to 14.",
+        html: "In statistical terms, Bradman is not just the best cricket batsman. He is the greatest statistical outlier across all major human sporting endeavors. The mean batting average for recognized international Test batsmen hovers around 35 to 40, with a standard deviation (`σ`) of roughly 12 to 14.",
       },
       {
         kind: "paragraph",
@@ -8668,7 +8668,7 @@ Quota         : 800 GB`,
       {
         kind: "callout",
         title: "Key Takeaway",
-        body: "Software engineering at scale is not just about writing code; it is about building reliable automated systems that allow teams to ship changes with confidence every day.",
+        body: "Software engineering at scale is not just about writing code. It is about building reliable automated systems that allow teams to ship changes with confidence every day.",
       },
       {
         kind: "paragraph",
@@ -8703,7 +8703,7 @@ Quota         : 800 GB`,
       },
       {
         kind: "paragraph",
-        html: "The Computer Engineering program at Peradeniya is renowned for its depth. We did not simply write web applications; we tore computers apart to understand how they work at every layer of abstraction:",
+        html: "The Computer Engineering program at Peradeniya is renowned for its depth. We did not simply write web applications. We tore computers apart to understand how they work at every layer of abstraction:",
       },
       {
         kind: "list",
