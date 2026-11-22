@@ -20,6 +20,8 @@
     "embeddings": "tsx scripts/build-embeddings.ts",
     "broadcast": "tsx scripts/broadcast.ts",
     "prune:limits": "tsx scripts/prune-rate-limits.ts",
+    "vercel:cleanup": "tsx scripts/vercel-cleanup/cli.ts",
+    "vercel:cleanup:dry-run": "tsx scripts/vercel-cleanup/cli.ts --dry-run",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm build",
     "typegen": "next typegen"
   },
