@@ -33,7 +33,6 @@ Every block kind `articleBlockSchema` accepts (`src/lib/content/schemas.ts`), wi
 - `html` accepts inline Markdown and raw HTML. Markdown is the norm.
 - Links to external sites open in a new tab automatically. Link schemes are restricted to `http`, `https`, `mailto`, `tel` and relative paths.
 - Use `**bold**` and `*italic*`, not `__bold__` and `_italic_`.
-- **At most one Markdown link per block.** With two links in the same block, the italic rule matches across their two `target="_blank"` attributes and injects `<em>` into the output. Split the sentence or move the second link to another block.
 - Link URLs may contain underscores and one level of balanced parentheses (`wiki/Pascal_(unit)`).
 
 ## heading

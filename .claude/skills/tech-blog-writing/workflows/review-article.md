@@ -8,7 +8,7 @@ Use when the user wants feedback on a draft without you changing it, or as the q
 2. **Check substance** against [article-structure.md](../references/article-structure.md) and [technical-writing.md](../references/technical-writing.md). Look at the opening, the structure, whether the topic is finished for its reader, and the ending.
 3. **Check accuracy.** Verify claims, numbers, code and references (see [research-and-sources.md](../references/research-and-sources.md)). Flag anything fabricated or unsupported as the most serious finding.
 4. **Check language and style** against [editorial-guidelines.md](../references/editorial-guidelines.md). Run the [mechanical scan](../references/editorial-checklist.md#mechanical-scan), then read for the patterns a scan can't find, such as uniform rhythm, template structure and superficial analysis.
-5. **For Space,** check the component rules in [space-publication.md](../references/space-publication.md) (plain-text captions, heading ids, links per block) and render the page if you can.
+5. **For Space,** check the component rules in [space-publication.md](../references/space-publication.md) (plain-text captions, heading ids, Markdown-free headings) and render the page if you can.
 6. **Walk the [editorial checklist](../references/editorial-checklist.md)** and turn each failure into a finding.
 
 ## Severity

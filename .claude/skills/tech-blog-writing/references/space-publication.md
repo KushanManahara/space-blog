@@ -25,7 +25,7 @@ You still need the docs above. These are the rules most often broken.
 - **Plain text only** in every `caption`, figure `note`, and reference `label`, `source` and `note`. Markdown there shows literally.
 - **Headings** need a unique `id` (the build rejects duplicates) and no Markdown in their text, because the table of contents prints plain text.
 - **Figures:** `xKey` must differ from every series `key`. The build rejects a clash.
-- **Links:** at most one Markdown link per text block. Two links in one block currently corrupt the output, because the italic rule matches across the two `target="_blank"` attributes. Use `**bold**` and `*italic*`, never `__` or `_`.
+- **Emphasis:** use `**bold**` and `*italic*`, never `__` or `_`.
 - **Mermaid** strips `<b>`, `<i>` and similar tags. Don't rely on them for emphasis.
 - **Runnable code** only for Python that runs in the browser with no network.
 - **Privacy:** placeholders for personal paths, accounts, hostnames and identifiers, and say they're placeholders. Git history is public.

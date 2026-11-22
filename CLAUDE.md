@@ -171,8 +171,8 @@ its `SKILL.md` directly. This section is a quick reference to the Space-specific
   image/video **captions**, figure `note`, and reference label/source/note — backticks or `**` show
   literally there. Heading text also renders as plain text in the sidebar table of contents, so keep
   Markdown out of headings.
-- Markdown links: at most one link per text block. Two links in one block currently get an `<em>`
-  injected between their `target="_blank"` attributes. Write emphasis with `**`/`*`, not `__`/`_`.
+- Write emphasis with `**`/`*`, not `__`/`_`. Link URLs may contain underscores and one level of balanced
+  parentheses.
 - The schema rejects duplicate heading `id`s and a `figure` `xKey` that equals a series `key`.
 - Topics are defined in `site.ts` `topicBlurbs`; pick by each topic's description. Every topic must keep
   at least one post (schema requires a positive count). Series: `series: { slug, title, part }` plus a

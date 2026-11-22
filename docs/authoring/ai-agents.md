@@ -39,7 +39,7 @@ When this documentation and the code disagree, the code wins. Check these before
 - No Markdown in plain-text fields (table/figure/formula/mermaid/image/video captions, figure `note`, reference `label`/`source`/`note`).
 - In `figure`, `xKey` must not equal a series `key`.
 - Heading `id`s must be unique. The build rejects duplicates, and a `figure` `xKey` that equals a series key.
-- No Markdown in heading text (the table of contents prints it as plain text), no `__`/`_` emphasis, and at most one Markdown link per text block.
+- No Markdown in heading text (the table of contents prints it as plain text), and no `__`/`_` emphasis.
 - No `<b>`/`<i>` styling in Mermaid labels. The Excalidraw converter strips it.
 - Only mark code `runnable: true` if it runs under Pyodide in the browser without network access.
 - Keep personal data out. Use placeholders and say they are placeholders.
