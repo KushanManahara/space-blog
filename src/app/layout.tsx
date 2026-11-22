@@ -5,10 +5,8 @@ import Script from "next/script";
 import { ViewTransitionGuard } from "@/components/motion/view-transition-guard";
 import { CommandMenuProvider } from "@/components/nav/command-menu";
 import { SavedPostsProvider } from "@/components/providers/saved-posts-provider";
-import { ThemeChromeSync } from "@/components/providers/theme-chrome-sync";
 import { author, site, siteUrl } from "@/lib/content";
 import { openGraph, twitter } from "@/lib/metadata";
-import { getThemeInitScript, THEME_CHROME_COLORS } from "@/lib/theme-chrome";
 
 import "./globals.css";
 
@@ -30,11 +28,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   viewportFit: "cover",
-  // Light by default; updated synchronously before first paint when Dark mode
-  // is active (`getThemeInitScript` + `ThemeChromeSync`) so mobile status bars
-  // and navigation chrome always match `--color-bg-1`.
-  themeColor: THEME_CHROME_COLORS.light,
-  colorScheme: "light",
+  // Light by default whatever the OS prefers, so the browser chrome matches.
+  themeColor: "#f8fafc",
 };
 
 export const metadata: Metadata = {
@@ -88,7 +83,22 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Script
           id="theme-init"
           strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{ __html: getThemeInitScript() }}
+          dangerouslySetInnerHTML={{
+            /*
+             * Light by default. Dark only when the reader has chosen it with
+             * the theme toggle (stored as `theme: "dark"`); the operating
+             * system's setting is deliberately not followed.
+             */
+            __html: `
+              try {
+                var dark = localStorage.getItem('theme') === 'dark';
+                document.documentElement.classList.add(dark ? 'dark' : 'light');
+                document.documentElement.classList.remove(dark ? 'light' : 'dark');
+              } catch (_) {
+                document.documentElement.classList.add('light');
+              }
+            `,
+          }}
         />
       </head>
       <body className="flex min-h-dvh flex-col bg-bg-1 text-fg-1">
@@ -126,7 +136,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             }),
           }}
         />
-        <ThemeChromeSync />
         <ViewTransitionGuard />
         <SavedPostsProvider>
           <CommandMenuProvider>{children}</CommandMenuProvider>

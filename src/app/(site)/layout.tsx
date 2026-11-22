@@ -24,7 +24,7 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
           not have to walk the whole nav on every page to reach the article. */}
       <a
         href="#main"
-        className="sr-only rounded-md bg-brand px-4 py-2.5 text-[14px] font-semibold text-on-brand focus-visible:not-sr-only focus-visible:absolute focus-visible:top-[calc(var(--safe-top)+12px)] focus-visible:left-[calc(var(--safe-left)+1rem)] focus-visible:z-[60]"
+        className="sr-only rounded-md bg-brand px-4 py-2.5 text-[14px] font-semibold text-on-brand focus-visible:not-sr-only focus-visible:absolute focus-visible:top-[calc(env(safe-area-inset-top,0px)+12px)] focus-visible:left-4 focus-visible:z-[60]"
       >
         Skip to content
       </a>

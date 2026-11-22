@@ -65,10 +65,10 @@ export function ScrollToTop() {
   return (
     <div
       className={cn(
-        "fixed right-[calc(var(--safe-right)+1rem)] z-60 transition-all duration-300 ease-expo sm:right-[calc(var(--safe-right)+1.75rem)]",
+        "fixed right-4 z-60 transition-all duration-300 ease-expo sm:right-7 sm:bottom-7",
         isArticle
-          ? "bottom-[calc(var(--safe-bottom)+5rem)] sm:bottom-[calc(var(--safe-bottom)+1.75rem)]"
-          : "bottom-[calc(var(--safe-bottom)+1.25rem)] sm:bottom-[calc(var(--safe-bottom)+1.75rem)]",
+          ? "bottom-[calc(env(safe-area-inset-bottom,0px)+5rem)]"
+          : "bottom-[calc(env(safe-area-inset-bottom,0px)+1.25rem)]",
         visible
           ? "pointer-events-auto translate-y-0 opacity-100"
           : "pointer-events-none translate-y-4 opacity-0",

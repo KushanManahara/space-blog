@@ -263,8 +263,8 @@ export function SiteHeader() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-60 w-full pr-[max(1rem,var(--safe-right))] pl-[max(1rem,var(--safe-left))]",
-        "sm:pr-[max(clamp(16px,4vw,40px),var(--safe-right))] sm:pl-[max(clamp(16px,4vw,40px),var(--safe-left))]",
+        "sticky top-0 z-60 w-full px-4",
+        "sm:px-[clamp(16px,4vw,40px)]",
         /*
          * A fixed layout height: the bar's top-of-page size. Collapsing on
          * scroll used to shrink this sticky box (77px → 59px, and taller for a
@@ -273,10 +273,10 @@ export function SiteHeader() {
          * ~0.03 CLS on every mobile scroll. The pill still animates inside; it
          * just no longer pushes anything. Click-through outside the pill.
          */
-        "pointer-events-none h-[calc(var(--safe-top)+68px)] sm:h-[calc(var(--safe-top)+76px)] md:h-[calc(var(--safe-top)+77px)]",
+        "pointer-events-none h-[calc(env(safe-area-inset-top,0px)+68px)] sm:h-[calc(env(safe-area-inset-top,0px)+76px)] md:h-[calc(env(safe-area-inset-top,0px)+77px)]",
         isScrolled
-          ? "pt-[calc(var(--safe-top)+0.375rem)] sm:pt-[calc(var(--safe-top)+0.625rem)]"
-          : "pt-[calc(var(--safe-top)+0.625rem)] sm:pt-[calc(var(--safe-top)+1.125rem)]",
+          ? "pt-[calc(env(safe-area-inset-top,0px)+0.375rem)] sm:pt-2.5"
+          : "pt-[calc(env(safe-area-inset-top,0px)+0.625rem)] sm:pt-4.5",
       )}
     >
       {/*
@@ -285,7 +285,7 @@ export function SiteHeader() {
       */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[calc(var(--safe-top)+5rem)] overflow-hidden"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[calc(env(safe-area-inset-top,0px)+5rem)] overflow-hidden"
       >
         {BLUR_LAYERS.map((layer) => (
           <span
@@ -293,7 +293,7 @@ export function SiteHeader() {
             className="progressive-blur-layer"
             style={
               {
-                "--pb-height": "calc(var(--safe-top) + 80px)",
+                "--pb-height": "calc(env(safe-area-inset-top, 0px) + 80px)",
                 "--pb-radius": layer.radius,
                 "--pb-solid": layer.solid,
                 "--pb-fade": layer.fade,

@@ -4,8 +4,8 @@
   "description": "Ideas, lessons, and things I've learned while building with technology.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f8fafc",
-  "theme_color": "#f8fafc",
+  "background_color": "#09090b",
+  "theme_color": "#007AFF",
   "icons": [
     {
       "src": "/favicon-32x32.png",

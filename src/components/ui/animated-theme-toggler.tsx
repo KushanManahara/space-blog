@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { flushSync } from "react-dom";
 
-import { syncThemeChrome } from "@/lib/theme-chrome";
 import { cn } from "@/lib/utils";
 
 export type TransitionVariant =
@@ -223,7 +222,6 @@ export const AnimatedThemeToggler = ({
         document.documentElement.classList.add("light");
         document.documentElement.classList.remove("dark");
       }
-      syncThemeChrome(newTheme ? "dark" : "light");
       if (isControlled) {
         onThemeChange?.(newTheme ? "dark" : "light");
       } else {
